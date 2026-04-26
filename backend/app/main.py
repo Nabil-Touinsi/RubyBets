@@ -1,13 +1,11 @@
 from fastapi import FastAPI
 
-app = FastAPI(title="RubyBets API", version="0.1.0")
+from app.api.health import router as health_router
+from app.core.config import settings
 
+app = FastAPI(
+    title=settings.app_name,
+    version=settings.app_version,
+)
 
-@app.get("/")
-def read_root():
-    return {"message": "RubyBets API is running"}
-
-
-@app.get("/health")
-def health_check():
-    return {"status": "ok"}
+app.include_router(health_router)
