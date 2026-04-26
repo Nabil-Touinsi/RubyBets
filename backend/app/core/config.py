@@ -16,6 +16,11 @@ class Settings(BaseSettings):
     rapidapi_flashscore_host: str = "flashscore4.p.rapidapi.com"
     rapidapi_flashscore_base_url: str = "https://flashscore4.p.rapidapi.com/api/flashscore/v2"
 
+    def get_api_football_headers(self) -> dict[str, str]:
+        return {
+            "x-apisports-key": self.api_football_key,
+        }
+
     def get_rapidapi_headers(self) -> dict[str, str]:
         return {
             "Content-Type": "application/json",
