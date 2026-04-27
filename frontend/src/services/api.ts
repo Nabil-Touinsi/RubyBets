@@ -21,3 +21,15 @@ export async function getCompetitions() {
 
   return response.json();
 }
+
+export async function getMatches(competitionCode = "PL") {
+  const response = await fetch(
+    `${API_BASE_URL}/api/matches?competition_code=${competitionCode}`
+  );
+
+  if (!response.ok) {
+    throw new Error("Erreur lors du chargement des matchs.");
+  }
+
+  return response.json();
+}
