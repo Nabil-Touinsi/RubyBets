@@ -1,0 +1,23 @@
+// Ce fichier centralise les appels API entre le frontend React et le backend RubyBets.
+
+const API_BASE_URL = "http://127.0.0.1:8000";
+
+export async function getHealth() {
+  const response = await fetch(`${API_BASE_URL}/health`);
+
+  if (!response.ok) {
+    throw new Error("Erreur lors de la vérification du backend.");
+  }
+
+  return response.json();
+}
+
+export async function getCompetitions() {
+  const response = await fetch(`${API_BASE_URL}/api/competitions`);
+
+  if (!response.ok) {
+    throw new Error("Erreur lors du chargement des compétitions.");
+  }
+
+  return response.json();
+}
