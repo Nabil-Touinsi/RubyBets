@@ -7,6 +7,9 @@ from app.core.config import settings
 from app.api.data_sources import router as data_sources_router
 from app.api.competitions import router as competitions_router
 from app.api.matches import router as matches_router
+from app.api.recommendations import router as recommendations_router
+from app.api.glossary import router as glossary_router
+from app.api.responsible_info import router as responsible_info_router
 
 app = FastAPI(
     title=settings.app_name,
@@ -25,3 +28,6 @@ app.include_router(health_router)
 app.include_router(data_sources_router)
 app.include_router(competitions_router)
 app.include_router(matches_router)
+app.include_router(recommendations_router)
+app.include_router(glossary_router)
+app.include_router(responsible_info_router)
