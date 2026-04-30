@@ -1,29 +1,296 @@
-main {
+/* Ce fichier améliore l'apparence globale de la page MVP RubyBets sans modifier la logique React. */
+
+:root {
+  --rb-bg: #071013;
+  --rb-bg-soft: #0b171b;
+  --rb-card: rgba(14, 30, 35, 0.92);
+  --rb-card-soft: rgba(18, 42, 48, 0.72);
+  --rb-border: rgba(148, 163, 184, 0.18);
+  --rb-border-strong: rgba(45, 212, 191, 0.38);
+  --rb-text: #f8fafc;
+  --rb-muted: #94a3b8;
+  --rb-accent: #2dd4bf;
+  --rb-accent-soft: rgba(45, 212, 191, 0.12);
+  --rb-warning: #facc15;
+  --rb-radius: 18px;
+  --rb-shadow: 0 20px 60px rgba(0, 0, 0, 0.28);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at top left, rgba(45, 212, 191, 0.16), transparent 34rem),
+    linear-gradient(135deg, #071013 0%, #0b171b 48%, #071013 100%);
+  color: var(--rb-text);
+}
+
+#root {
+  width: 100%;
+  max-width: none;
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background: #071013;
-  color: #f5f5f5;
-  font-family: Arial, sans-serif;
+  margin: 0;
+  border: 0;
+  text-align: left;
+}
+
+main {
+  width: min(1180px, calc(100% - 32px));
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 48px 0 64px;
+  color: var(--rb-text);
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+p {
+  margin: 0;
 }
 
 h1 {
-  color: #2dd4bf;
-  font-size: 3rem;
+  color: var(--rb-accent);
+  font-size: clamp(2.6rem, 6vw, 5rem);
+  line-height: 0.95;
+  letter-spacing: -0.08em;
   margin-bottom: 1rem;
 }
 
-p {
-  margin: 0.25rem 0;
+h2 {
+  color: var(--rb-text);
+  font-size: clamp(1.35rem, 2vw, 1.8rem);
+  line-height: 1.2;
+  margin-bottom: 1rem;
+}
+
+h3 {
+  color: var(--rb-text);
+  font-size: 1.15rem;
+  line-height: 1.35;
+  margin-bottom: 0.75rem;
+}
+
+h4,
+h5 {
+  color: var(--rb-text);
+  font-size: 1rem;
+  line-height: 1.35;
+  margin: 1rem 0 0.5rem;
+}
+
+p,
+span,
+li,
+label,
+select,
+button {
+  font-size: 0.98rem;
+  line-height: 1.6;
+}
+
+p,
+span,
+li,
+label {
+  color: var(--rb-muted);
+}
+
+strong {
+  color: var(--rb-text);
+  font-weight: 700;
+}
+
+main > p:not(.api-status) {
+  max-width: 760px;
   color: #cbd5e1;
+  font-size: 1.05rem;
+  margin-bottom: 0.45rem;
 }
 
 .api-status {
-  margin-top: 1.5rem;
-  padding: 0.75rem 1rem;
-  border: 1px solid #2dd4bf;
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  margin: 1rem 0.45rem 0 0;
+  padding: 0.45rem 0.8rem;
+  border: 1px solid var(--rb-border-strong);
   border-radius: 999px;
-  color: #2dd4bf;
+  background: var(--rb-accent-soft);
+  color: var(--rb-accent);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+section {
+  margin-top: 1.5rem;
+  padding: 1.4rem;
+  border: 1px solid var(--rb-border);
+  border-radius: var(--rb-radius);
+  background: linear-gradient(180deg, var(--rb-card) 0%, rgba(9, 20, 24, 0.92) 100%);
+  box-shadow: var(--rb-shadow);
+}
+
+section:first-of-type {
+  margin-top: 2rem;
+}
+
+section > p {
+  margin-bottom: 1rem;
+}
+
+section > div {
+  display: grid;
+  gap: 1rem;
+}
+
+ul {
+  display: grid;
+  gap: 0.85rem;
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+li {
+  padding: 1rem;
+  border: 1px solid var(--rb-border);
+  border-radius: 14px;
+  background: var(--rb-card-soft);
+}
+
+article {
+  padding: 1rem;
+  border: 1px solid var(--rb-border);
+  border-radius: 14px;
+  background: rgba(7, 16, 19, 0.58);
+}
+
+article + article {
+  margin-top: 0.85rem;
+}
+
+button {
+  cursor: pointer;
+  border: 1px solid var(--rb-border-strong);
+  border-radius: 999px;
+  background: var(--rb-accent-soft);
+  color: var(--rb-accent);
+  font-weight: 800;
+  padding: 0.72rem 1rem;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease,
+    color 160ms ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+  border-color: var(--rb-accent);
+  background: rgba(45, 212, 191, 0.2);
+  color: #ccfbf1;
+}
+
+button:focus-visible,
+select:focus-visible {
+  outline: 3px solid rgba(45, 212, 191, 0.32);
+  outline-offset: 3px;
+}
+
+li button {
+  margin-bottom: 0.35rem;
+  border-color: transparent;
+  background: transparent;
+  color: var(--rb-text);
+  padding: 0;
+  text-align: left;
+  border-radius: 8px;
+}
+
+li button:hover {
+  transform: none;
+  background: transparent;
+  color: var(--rb-accent);
+}
+
+label {
+  display: inline-block;
+  margin: 0.45rem 0.45rem 0.45rem 0;
+  color: #dbeafe;
+  font-weight: 700;
+}
+
+select {
+  min-width: 120px;
+  margin: 0.35rem 0 0.75rem;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid var(--rb-border);
+  border-radius: 12px;
+  background: #081418;
+  color: var(--rb-text);
+}
+
+section:has(select) > button {
+  margin-top: 0.45rem;
+}
+
+section:has(h2) h2::after {
+  content: "";
+  display: block;
+  width: 56px;
+  height: 3px;
+  margin-top: 0.65rem;
+  border-radius: 999px;
+  background: var(--rb-accent);
+}
+
+section:has(h2):last-child,
+section:has(h2:nth-child(1)) {
+  scroll-margin-top: 24px;
+}
+
+@media (min-width: 820px) {
+  section > div:has(article) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  section > div:has(article) > p,
+  section > div:has(article) > h3,
+  section > div:has(article) > h4,
+  section > div:has(article) > ul {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 720px) {
+  main {
+    width: min(100% - 20px, 1180px);
+    padding: 32px 0 48px;
+  }
+
+  section {
+    padding: 1rem;
+  }
+
+  .api-status {
+    width: 100%;
+    justify-content: center;
+    margin-right: 0;
+  }
+
+  button,
+  select {
+    width: 100%;
+  }
+
+  li button {
+    width: auto;
+  }
 }
