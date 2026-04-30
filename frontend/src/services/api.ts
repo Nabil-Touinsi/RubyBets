@@ -33,3 +33,23 @@ export async function getMatches(competitionCode = "PL") {
 
   return response.json();
 }
+
+export async function getMatchDetails(matchId: number) {
+  const response = await fetch(`${API_BASE_URL}/api/matches/${matchId}`);
+
+  if (!response.ok) {
+    throw new Error("Erreur lors du chargement du détail du match.");
+  }
+
+  return response.json();
+}
+
+export async function getMatchContext(matchId: number) {
+  const response = await fetch(`${API_BASE_URL}/api/matches/${matchId}/context`);
+
+  if (!response.ok) {
+    throw new Error("Erreur lors du chargement du contexte du match.");
+  }
+
+  return response.json();
+}
