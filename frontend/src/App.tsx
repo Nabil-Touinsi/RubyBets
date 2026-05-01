@@ -234,7 +234,7 @@ function App() {
       });
   }
 
-  return (
+    return (
     <main>
       <h1>RubyBets</h1>
 
@@ -242,30 +242,30 @@ function App() {
       <p>Frontend React connecté aux routes backend métier.</p>
 
       <StatusPanel
-      apiStatus={apiStatus}
-      competitionsStatus={competitionsStatus}
-      matchesStatus={matchesStatus}
-      matchDetailsStatus={matchDetailsStatus}
-      matchContextStatus={matchContextStatus}
-      matchAnalysisStatus={matchAnalysisStatus}
-      matchPredictionsStatus={matchPredictionsStatus}
-      multiMatchStatus={multiMatchStatus}
-      glossaryStatus={glossaryStatus}
-      responsibleInfoStatus={responsibleInfoStatus}
+        apiStatus={apiStatus}
+        competitionsStatus={competitionsStatus}
+        matchesStatus={matchesStatus}
+        matchDetailsStatus={matchDetailsStatus}
+        matchContextStatus={matchContextStatus}
+        matchAnalysisStatus={matchAnalysisStatus}
+        matchPredictionsStatus={matchPredictionsStatus}
+        multiMatchStatus={multiMatchStatus}
+        glossaryStatus={glossaryStatus}
+        responsibleInfoStatus={responsibleInfoStatus}
       />
 
-        <CompetitionsSection
-      competitions={competitions}
-      onSelectCompetition={setSelectedCompetition}
+      <CompetitionsSection
+        competitions={competitions}
+        onSelectCompetition={setSelectedCompetition}
       />
 
-          <MatchesSection
+      <MatchesSection
         selectedCompetition={selectedCompetition}
         matches={matches}
         onSelectMatch={handleSelectMatch}
       />
 
-          <MultiMatchRecommendationSection
+      <MultiMatchRecommendationSection
         recommendationMatchCount={recommendationMatchCount}
         recommendationRiskLevel={recommendationRiskLevel}
         multiMatchRecommendation={multiMatchRecommendation}
@@ -279,20 +279,20 @@ function App() {
       <ResponsibleInfoSection responsibleInfo={responsibleInfo} />
 
       {selectedMatchDetails && (
-  <MatchDetailsSection matchDetails={selectedMatchDetails} />
-)}
+        <MatchDetailsSection matchDetails={selectedMatchDetails} />
+      )}
 
       {selectedMatchContext && (
-  <MatchContextSection matchContext={selectedMatchContext} />
-)}
+        <MatchContextSection matchContext={selectedMatchContext} />
+      )}
 
       {selectedMatchAnalysis && (
-  <MatchAnalysisSection matchAnalysis={selectedMatchAnalysis} />
-)}
+        <MatchAnalysisSection matchAnalysis={selectedMatchAnalysis} />
+      )}
 
       {selectedMatchPredictions && (
-  <MatchPredictionsSection matchPredictions={selectedMatchPredictions} />
-)}
+        <MatchPredictionsSection matchPredictions={selectedMatchPredictions} />
+      )}
     </main>
   );
 }
