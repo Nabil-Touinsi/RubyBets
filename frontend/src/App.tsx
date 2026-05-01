@@ -31,9 +31,14 @@ import {
   formatContextTrend,
   formatMatchStatus,
   formatPredictionStatus,
-  formatPriority,
   formatRiskLevel,
 } from "./helpers/displayText";
+import StatusPanel from "./components/StatusPanel";
+import CompetitionsSection from "./components/CompetitionsSection";
+import MatchesSection from "./components/MatchesSection";
+import MultiMatchRecommendationSection from "./components/MultiMatchRecommendationSection";
+import GlossarySection from "./components/GlossarySection";
+import ResponsibleInfoSection from "./components/ResponsibleInfoSection";
 function App() {
   // États globaux de connexion et de données principales.
   const [apiStatus, setApiStatus] = useState<string>("Vérification en cours...");
@@ -239,234 +244,42 @@ function App() {
       <p>Application d’aide à la décision football avant-match.</p>
       <p>Frontend React connecté aux routes backend métier.</p>
 
-      {/* Statuts de chargement visibles pendant les tests du MVP. */}
-      <p className="api-status">{apiStatus}</p>
-      <p className="api-status">{competitionsStatus}</p>
-      <p className="api-status">{matchesStatus}</p>
-      <p className="api-status">{matchDetailsStatus}</p>
-      <p className="api-status">{matchContextStatus}</p>
-      <p className="api-status">{matchAnalysisStatus}</p>
-      <p className="api-status">{matchPredictionsStatus}</p>
-      <p className="api-status">{multiMatchStatus}</p>
-      <p className="api-status">{glossaryStatus}</p>
-      <p className="api-status">{responsibleInfoStatus}</p>
+      <StatusPanel
+      apiStatus={apiStatus}
+      competitionsStatus={competitionsStatus}
+      matchesStatus={matchesStatus}
+      matchDetailsStatus={matchDetailsStatus}
+      matchContextStatus={matchContextStatus}
+      matchAnalysisStatus={matchAnalysisStatus}
+      matchPredictionsStatus={matchPredictionsStatus}
+      multiMatchStatus={multiMatchStatus}
+      glossaryStatus={glossaryStatus}
+      responsibleInfoStatus={responsibleInfoStatus}
+      />
 
-      <section>
-        <h2>Compétitions MVP</h2>
+        <CompetitionsSection
+      competitions={competitions}
+      onSelectCompetition={setSelectedCompetition}
+      />
 
-        {competitions.length === 0 ? (
-          <p>Aucune compétition disponible pour le moment.</p>
-        ) : (
-          <div>
-            {competitions.map((competition) => (
-              <button
-                key={competition.id}
-                type="button"
-                onClick={() => setSelectedCompetition(competition.code)}
-              >
-                {competition.name} ({competition.code})
-              </button>
-            ))}
-          </div>
-        )}
-      </section>
+          <MatchesSection
+        selectedCompetition={selectedCompetition}
+        matches={matches}
+        onSelectMatch={handleSelectMatch}
+      />
 
-      <section>
-        <h2>Matchs à venir — {selectedCompetition}</h2>
+          <MultiMatchRecommendationSection
+        recommendationMatchCount={recommendationMatchCount}
+        recommendationRiskLevel={recommendationRiskLevel}
+        multiMatchRecommendation={multiMatchRecommendation}
+        onChangeMatchCount={setRecommendationMatchCount}
+        onChangeRiskLevel={setRecommendationRiskLevel}
+        onGenerateRecommendation={handleGenerateMultiMatchRecommendation}
+      />
 
-        {matches.length === 0 ? (
-          <p>Aucun match disponible pour cette compétition.</p>
-        ) : (
-          <ul>
-            {matches.map((match) => (
-              <li key={match.id}>
-                <button type="button" onClick={() => handleSelectMatch(match.id)}>
-                  <strong>{match.home_team.name}</strong> vs{" "}
-                  <strong>{match.away_team.name}</strong>
-                </button>
-                <br />
-                <span>
-                  {match.competition.name} — Journée {match.matchday} —{" "}
-                  {new Date(match.utc_date).toLocaleString("fr-FR")}
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+      <GlossarySection glossary={glossary} />
 
-      <section>
-        <h2>Recommandation multi-matchs</h2>
-
-        <p>
-          Cette sélection est générée à partir des matchs disponibles, des
-          prédictions calculées et du niveau de risque choisi.
-        </p>
-
-        <label htmlFor="match-count">Nombre de matchs : </label>
-        <select
-          id="match-count"
-          value={recommendationMatchCount}
-          onChange={(event) => setRecommendationMatchCount(Number(event.target.value))}
-        >
-          <option value={1}>1</option>
-          <option value={2}>2</option>
-          <option value={3}>3</option>
-          <option value={4}>4</option>
-          <option value={5}>5</option>
-        </select>
-
-        <br />
-
-        <label htmlFor="risk-level">Niveau de risque : </label>
-        <select
-          id="risk-level"
-          value={recommendationRiskLevel}
-          onChange={(event) =>
-            setRecommendationRiskLevel(
-              event.target.value as "low" | "medium" | "high"
-            )
-          }
-        >
-          <option value="low">Faible</option>
-          <option value="medium">Moyen</option>
-          <option value="high">Élevé</option>
-        </select>
-
-        <br />
-
-        <button type="button" onClick={handleGenerateMultiMatchRecommendation}>
-          Générer la recommandation
-        </button>
-
-        {multiMatchRecommendation && (
-          <div>
-            <h3>Sélection recommandée</h3>
-
-            <p>
-              Compétition : {multiMatchRecommendation.request.competition_code} —
-              Niveau de risque : {formatRiskLevel(multiMatchRecommendation.request.risk_level)} —
-              Matchs sélectionnés : {multiMatchRecommendation.selected_count}
-            </p>
-
-            {multiMatchRecommendation.recommendations.map((item) => (
-              <article key={item.match.id}>
-                <h4>
-                  {item.match.home_team.name} vs {item.match.away_team.name}
-                </h4>
-
-                <p>
-                  {item.match.competition.name} — Journée {item.match.matchday} —{" "}
-                  {new Date(item.match.utc_date).toLocaleString("fr-FR")}
-                </p>
-
-                <p>
-                  Recommandation :{" "}
-                  <strong>{item.selected_prediction.label}</strong>
-                </p>
-
-                <p>Marché analysé : {item.selected_prediction.market}</p>
-                <p>
-                  Confiance :{" "}
-                  {formatConfidenceLevel(item.selected_prediction.confidence)}
-                </p>
-                <p>Risque : {formatRiskLevel(item.selected_prediction.risk)}</p>
-                <p>Score de sélection : {item.selection_score}</p>
-                <p>Justification : {item.selected_prediction.justification}</p>
-              </article>
-            ))}
-
-            <h4>Logique de sélection</h4>
-            <p>{multiMatchRecommendation.selection_logic.description}</p>
-
-            <h4>Limites</h4>
-            <ul>
-              {cleanTextItems(multiMatchRecommendation.limits).map((limit) => (
-                <li key={limit}>{limit}</li>
-              ))}
-            </ul>
-
-            <p>
-              Méthode : {multiMatchRecommendation.method} — Source :{" "}
-              {multiMatchRecommendation.source}
-            </p>
-          </div>
-        )}
-      </section>
-
-      <section>
-        <h2>Glossaire</h2>
-
-        <p>
-          Définitions pédagogiques des principaux termes utilisés dans RubyBets.
-        </p>
-
-        {glossary && glossary.items.length > 0 ? (
-          <div>
-            <p>Nombre de termes : {glossary.count}</p>
-
-            {glossary.items.map((item) => (
-              <article key={item.slug}>
-                <h3>{item.term}</h3>
-                <p>Catégorie : {item.category}</p>
-                <p>{item.definition}</p>
-              </article>
-            ))}
-          </div>
-        ) : (
-          <p>Aucun terme disponible pour le moment.</p>
-        )}
-      </section>
-
-      <section>
-        <h2>Informations responsables</h2>
-
-        <p>
-          Cette section rappelle les limites de RubyBets et son positionnement
-          comme outil d’aide à la décision.
-        </p>
-
-        {responsibleInfo ? (
-          <div>
-            <p>Nombre de messages : {responsibleInfo.count}</p>
-
-            <p>
-              Positionnement :{" "}
-              <strong>{responsibleInfo.summary.product_positioning}</strong>
-            </p>
-
-            <p>
-              Pari réel activé :{" "}
-              {responsibleInfo.summary.real_betting_enabled ? "Oui" : "Non"}
-            </p>
-
-            <p>
-              Analyse live activée :{" "}
-              {responsibleInfo.summary.live_analysis_enabled ? "Oui" : "Non"}
-            </p>
-
-            <p>
-              Données réelles utilisées :{" "}
-              {responsibleInfo.summary.uses_real_data ? "Oui" : "Non"}
-            </p>
-
-            <p>
-              Garantie de résultat :{" "}
-              {responsibleInfo.summary.guarantees_result ? "Oui" : "Non"}
-            </p>
-
-            {responsibleInfo.items.map((item) => (
-              <article key={`${item.type}-${item.title}`}>
-                <h3>{item.title}</h3>
-                <p>Priorité : {formatPriority(item.priority)}</p>
-                <p>{item.content}</p>
-              </article>
-            ))}
-          </div>
-        ) : (
-          <p>Aucune information responsable disponible pour le moment.</p>
-        )}
-      </section>
+      <ResponsibleInfoSection responsibleInfo={responsibleInfo} />
 
       {selectedMatchDetails && (
         <section>
