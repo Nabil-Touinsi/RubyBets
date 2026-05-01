@@ -1,0 +1,10 @@
+# Environnement local et fichiers sensibles
+.env
+.venv/
+
+# Caches Python
+__pycache__/
+*.pyc
+
+# Caches de tests
+.pytest_cache/
