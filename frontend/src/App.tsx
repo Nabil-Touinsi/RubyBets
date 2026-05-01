@@ -25,13 +25,7 @@ import type {
   MultiMatchRecommendationResponse,
   ResponsibleInfoResponse,
 } from "./models/rubybets";
-import {
-  cleanTextItems,
-  formatConfidenceLevel,
-  formatContextTrend,
-  formatPredictionStatus,
-  formatRiskLevel,
-} from "./helpers/displayText";
+
 import StatusPanel from "./components/StatusPanel";
 import CompetitionsSection from "./components/CompetitionsSection";
 import MatchesSection from "./components/MatchesSection";
@@ -40,6 +34,8 @@ import GlossarySection from "./components/GlossarySection";
 import ResponsibleInfoSection from "./components/ResponsibleInfoSection";
 import MatchDetailsSection from "./components/MatchDetailsSection";
 import MatchContextSection from "./components/MatchContextSection";
+import MatchAnalysisSection from "./components/MatchAnalysisSection";
+import MatchPredictionsSection from "./components/MatchPredictionsSection";
 function App() {
   // États globaux de connexion et de données principales.
   const [apiStatus, setApiStatus] = useState<string>("Vérification en cours...");
@@ -291,180 +287,12 @@ function App() {
 )}
 
       {selectedMatchAnalysis && (
-        <section>
-          <h2>Analyse pré-match</h2>
-
-          <h3>{selectedMatchAnalysis.analysis.title}</h3>
-
-          <p>
-            Tendance de contexte :{" "}
-            <strong>{formatContextTrend(selectedMatchAnalysis.analysis.context_trend)}</strong>
-          </p>
-
-          <h4>Faits observés</h4>
-          <ul>
-            {cleanTextItems(selectedMatchAnalysis.analysis.observed_facts).map(
-              (fact) => (
-                <li key={fact}>{fact}</li>
-              )
-            )}
-          </ul>
-
-          <h4>Facteurs clés</h4>
-          <ul>
-            {selectedMatchAnalysis.analysis.key_factors.map((factor) => (
-              <li key={`${factor.label}-${factor.value}`}>
-                <strong>{factor.label}</strong> : {factor.value} —{" "}
-                {factor.reading}
-              </li>
-            ))}
-          </ul>
-
-          <h4>Interprétation</h4>
-          <ul>
-            {cleanTextItems(selectedMatchAnalysis.analysis.interpretation).map(
-              (item) => (
-                <li key={item}>{item}</li>
-              )
-            )}
-          </ul>
-
-          <h4>Limites de l’analyse</h4>
-          <ul>
-            {cleanTextItems(selectedMatchAnalysis.analysis.limits).map((limit) => (
-              <li key={limit}>{limit}</li>
-            ))}
-          </ul>
-
-          <p>
-            Source : {selectedMatchAnalysis.source} — Données :{" "}
-            {selectedMatchAnalysis.data_freshness.provider}
-          </p>
-        </section>
-      )}
+  <MatchAnalysisSection matchAnalysis={selectedMatchAnalysis} />
+)}
 
       {selectedMatchPredictions && (
-        <section>
-          <h2>Prédictions avant-match</h2>
-
-          <p>
-            Statut :{" "}
-            <strong>{formatPredictionStatus(selectedMatchPredictions.predictions.status)}</strong>
-          </p>
-
-          {selectedMatchPredictions.predictions.message && (
-            <p>{selectedMatchPredictions.predictions.message}</p>
-          )}
-
-          {selectedMatchPredictions.predictions.predictions && (
-            <>
-              <article>
-                <h3>Prédiction 1X2</h3>
-                <p>
-                  <strong>
-                    {selectedMatchPredictions.predictions.predictions.one_x_two.label}
-                  </strong>
-                </p>
-                <p>
-                  Confiance :{" "}
-                  {formatConfidenceLevel(
-                    selectedMatchPredictions.predictions.predictions.one_x_two
-                      .confidence
-                  )}
-                </p>
-                <p>
-                  Risque :{" "}
-                  {formatRiskLevel(
-                    selectedMatchPredictions.predictions.predictions.one_x_two.risk
-                  )}
-                </p>
-                <p>
-                  Justification :{" "}
-                  {
-                    selectedMatchPredictions.predictions.predictions.one_x_two
-                      .justification
-                  }
-                </p>
-              </article>
-
-              <article>
-                <h3>Volume de buts</h3>
-                <p>
-                  <strong>
-                    {selectedMatchPredictions.predictions.predictions.goals.label}
-                  </strong>
-                </p>
-                <p>
-                  Confiance :{" "}
-                  {formatConfidenceLevel(
-                    selectedMatchPredictions.predictions.predictions.goals.confidence
-                  )}
-                </p>
-                <p>
-                  Risque :{" "}
-                  {formatRiskLevel(
-                    selectedMatchPredictions.predictions.predictions.goals.risk
-                  )}
-                </p>
-                <p>
-                  Justification :{" "}
-                  {
-                    selectedMatchPredictions.predictions.predictions.goals
-                      .justification
-                  }
-                </p>
-              </article>
-
-              <article>
-                <h3>BTTS</h3>
-                <p>
-                  <strong>
-                    {selectedMatchPredictions.predictions.predictions.btts.label}
-                  </strong>
-                </p>
-                <p>
-                  Confiance :{" "}
-                  {formatConfidenceLevel(
-                    selectedMatchPredictions.predictions.predictions.btts.confidence
-                  )}
-                </p>
-                <p>
-                  Risque :{" "}
-                  {formatRiskLevel(
-                    selectedMatchPredictions.predictions.predictions.btts.risk
-                  )}
-                </p>
-                <p>
-                  Justification :{" "}
-                  {
-                    selectedMatchPredictions.predictions.predictions.btts
-                      .justification
-                  }
-                </p>
-              </article>
-            </>
-          )}
-
-          {selectedMatchPredictions.predictions.limits && (
-            <>
-              <h4>Limites des prédictions</h4>
-              <ul>
-                {cleanTextItems(selectedMatchPredictions.predictions.limits).map(
-                  (limit) => (
-                    <li key={limit}>{limit}</li>
-                  )
-                )}
-              </ul>
-            </>
-          )}
-
-          <p>
-            Méthode :{" "}
-            {selectedMatchPredictions.predictions.method || "Non disponible"} —
-            Source : {selectedMatchPredictions.source}
-          </p>
-        </section>
-      )}
+  <MatchPredictionsSection matchPredictions={selectedMatchPredictions} />
+)}
     </main>
   );
 }
