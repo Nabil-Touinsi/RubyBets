@@ -29,7 +29,6 @@ import {
   cleanTextItems,
   formatConfidenceLevel,
   formatContextTrend,
-  formatMatchStatus,
   formatPredictionStatus,
   formatRiskLevel,
 } from "./helpers/displayText";
@@ -39,6 +38,8 @@ import MatchesSection from "./components/MatchesSection";
 import MultiMatchRecommendationSection from "./components/MultiMatchRecommendationSection";
 import GlossarySection from "./components/GlossarySection";
 import ResponsibleInfoSection from "./components/ResponsibleInfoSection";
+import MatchDetailsSection from "./components/MatchDetailsSection";
+import MatchContextSection from "./components/MatchContextSection";
 function App() {
   // États globaux de connexion et de données principales.
   const [apiStatus, setApiStatus] = useState<string>("Vérification en cours...");
@@ -282,105 +283,12 @@ function App() {
       <ResponsibleInfoSection responsibleInfo={responsibleInfo} />
 
       {selectedMatchDetails && (
-        <section>
-          <h2>Fiche détail match</h2>
-
-          <h3>
-            {selectedMatchDetails.match.home_team.name} vs{" "}
-            {selectedMatchDetails.match.away_team.name}
-          </h3>
-
-          <p>
-            Compétition : {selectedMatchDetails.match.competition.name} (
-            {selectedMatchDetails.match.competition.code})
-          </p>
-
-          <p>
-            Date :{" "}
-            {new Date(selectedMatchDetails.match.utc_date).toLocaleString("fr-FR")}
-          </p>
-
-          <p>Statut : {formatMatchStatus(selectedMatchDetails.match.status)}</p>
-          <p>Journée : {selectedMatchDetails.match.matchday}</p>
-          <p>Source : {selectedMatchDetails.source}</p>
-          <p>
-            Dernière mise à jour :{" "}
-            {selectedMatchDetails.data_freshness.last_updated}
-          </p>
-        </section>
-      )}
+  <MatchDetailsSection matchDetails={selectedMatchDetails} />
+)}
 
       {selectedMatchContext && (
-        <section>
-          <h2>Contexte avant-match</h2>
-
-          <h3>{selectedMatchContext.context.summary.title}</h3>
-
-          <ul>
-            {cleanTextItems(selectedMatchContext.context.summary.main_facts).map(
-              (fact) => (
-                <li key={fact}>{fact}</li>
-              )
-            )}
-          </ul>
-
-          <h4>Classement des équipes</h4>
-
-          <div>
-            {selectedMatchContext.context.home_team_standing && (
-              <article>
-                <h5>{selectedMatchContext.context.home_team_standing.team.name}</h5>
-                <p>
-                  Position :{" "}
-                  {selectedMatchContext.context.home_team_standing.position}
-                </p>
-                <p>
-                  Points : {selectedMatchContext.context.home_team_standing.points}
-                </p>
-                <p>
-                  Matchs joués :{" "}
-                  {selectedMatchContext.context.home_team_standing.played_games}
-                </p>
-                <p>
-                  Buts pour / contre :{" "}
-                  {selectedMatchContext.context.home_team_standing.goals_for} /{" "}
-                  {selectedMatchContext.context.home_team_standing.goals_against}
-                </p>
-                <p>
-                  Différence de buts :{" "}
-                  {selectedMatchContext.context.home_team_standing.goal_difference}
-                </p>
-              </article>
-            )}
-
-            {selectedMatchContext.context.away_team_standing && (
-              <article>
-                <h5>{selectedMatchContext.context.away_team_standing.team.name}</h5>
-                <p>
-                  Position :{" "}
-                  {selectedMatchContext.context.away_team_standing.position}
-                </p>
-                <p>
-                  Points : {selectedMatchContext.context.away_team_standing.points}
-                </p>
-                <p>
-                  Matchs joués :{" "}
-                  {selectedMatchContext.context.away_team_standing.played_games}
-                </p>
-                <p>
-                  Buts pour / contre :{" "}
-                  {selectedMatchContext.context.away_team_standing.goals_for} /{" "}
-                  {selectedMatchContext.context.away_team_standing.goals_against}
-                </p>
-                <p>
-                  Différence de buts :{" "}
-                  {selectedMatchContext.context.away_team_standing.goal_difference}
-                </p>
-              </article>
-            )}
-          </div>
-        </section>
-      )}
+  <MatchContextSection matchContext={selectedMatchContext} />
+)}
 
       {selectedMatchAnalysis && (
         <section>
