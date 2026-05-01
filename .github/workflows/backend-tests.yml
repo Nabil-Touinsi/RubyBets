@@ -1,0 +1,41 @@
+# Ce workflow lance automatiquement les tests backend de RubyBets à chaque push ou pull request.
+
+name: Backend tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  backend-tests:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: backend
+
+    env:
+      FOOTBALL_DATA_KEY: dummy-test-key
+      FOOTBALL_DATA_API_KEY: dummy-test-key
+      FOOTBALL_DATA_BASE_URL: https://api.football-data.org/v4
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Install backend dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run backend tests
+        run: pytestg
