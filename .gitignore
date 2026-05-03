@@ -16,3 +16,5 @@ dist/
 # OS
 .DS_Store
 Thumbs.db
+# RubyBets local API cache
+backend/app/data/cache/*.json

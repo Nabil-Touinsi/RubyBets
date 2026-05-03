@@ -1,4 +1,5 @@
-# Ce fichier vérifie automatiquement que les routes API essentielles du MVP RubyBets répondent correctement.
+# Ce fichier vérifie automatiquement les routes API principales du MVP RubyBets.
+# Il contrôle les réponses attendues sans appeler réellement les services externes (pour éviter les appels API pendant les tests, gagner du temps et ne pas polluer le cache local).
 
 from fastapi.testclient import TestClient
 
@@ -98,6 +99,7 @@ FAKE_MATCH_WITH_STANDINGS = {
 }
 
 
+# Ce test vérifie que la route de santé du backend répond correctement.
 def test_health_route_returns_ok_status():
     response = client.get("/health")
 
@@ -105,7 +107,9 @@ def test_health_route_returns_ok_status():
     assert response.json() == {"status": "ok"}
 
 
+# Ce test vérifie que la route compétitions retourne uniquement les ligues du MVP.
 def test_competitions_route_returns_mvp_competitions(monkeypatch):
+    # Ce mock simule l'appel à Football-Data pour éviter un appel API réel pendant le test.
     async def fake_get_football_data(endpoint: str):
         assert endpoint == "/competitions"
         return {
@@ -150,6 +154,22 @@ def test_competitions_route_returns_mvp_competitions(monkeypatch):
             ]
         }
 
+    # Ce mock empêche le test d'écrire un vrai fichier JSON dans le cache local.
+    def fake_save_cache(cache_name: str, data: dict):
+        assert cache_name == "competitions"
+        return {
+            "updated_at": "2026-05-03T00:00:00+00:00",
+            "source": "football-data.org",
+            "data": data,
+        }
+
+    # Ce mock force le test à ignorer tout cache existant.
+    def fake_load_cache(cache_name: str):
+        assert cache_name == "competitions"
+        return None
+
+    monkeypatch.setattr(competitions_api, "load_cache", fake_load_cache)
+    monkeypatch.setattr(competitions_api, "save_cache", fake_save_cache)
     monkeypatch.setattr(competitions_api, "get_football_data", fake_get_football_data)
 
     response = client.get("/api/competitions")
@@ -161,7 +181,9 @@ def test_competitions_route_returns_mvp_competitions(monkeypatch):
     assert data["competitions"][0]["current_season"]["current_matchday"] == 34
 
 
+# Ce test vérifie que la route matchs retourne les rencontres programmées.
 def test_matches_route_returns_scheduled_matches(monkeypatch):
+    # Ce mock simule l'appel API de récupération des matchs.
     async def fake_get_football_data(endpoint: str, params=None):
         assert endpoint == "/competitions/PL/matches"
         assert params["status"] == "SCHEDULED"
@@ -178,7 +200,9 @@ def test_matches_route_returns_scheduled_matches(monkeypatch):
     assert len(data["matches"]) == 1
 
 
+# Ce test vérifie que la fiche détail d'un match retourne les bonnes informations.
 def test_match_details_route_returns_match(monkeypatch):
+    # Ce mock simule l'appel API de récupération d'un match précis.
     async def fake_get_football_data(endpoint: str, params=None):
         assert endpoint == "/matches/538122"
         return {"match": FAKE_MATCH}
@@ -193,17 +217,19 @@ def test_match_details_route_returns_match(monkeypatch):
     assert data["data_freshness"]["last_updated"] == "2026-04-30T10:00:00Z"
 
 
+# Ce test vérifie que la route contexte retourne les classements et le résumé du match.
 def test_match_context_route_returns_context(monkeypatch):
+    # Ce mock simule la récupération d'un match enrichi avec les classements.
     async def fake_get_match_with_standings(match_id: int):
         assert match_id == 538122
         return FAKE_MATCH_WITH_STANDINGS
 
+    # Ce mock simule la génération du résumé de contexte.
+    def fake_build_context_summary(match, home_standing, away_standing):
+        return "Arsenal possède une dynamique plus favorable."
+
     monkeypatch.setattr(matches_api, "get_match_with_standings", fake_get_match_with_standings)
-    monkeypatch.setattr(
-        matches_api,
-        "build_context_summary",
-        lambda match, home_standing, away_standing: "Arsenal possède une dynamique plus favorable.",
-    )
+    monkeypatch.setattr(matches_api, "build_context_summary", fake_build_context_summary)
 
     response = client.get("/api/matches/538122/context")
     data = response.json()
@@ -215,20 +241,22 @@ def test_match_context_route_returns_context(monkeypatch):
     assert data["context"]["summary"] == "Arsenal possède une dynamique plus favorable."
 
 
+# Ce test vérifie que la route analyse retourne une analyse pré-match exploitable.
 def test_match_analysis_route_returns_analysis(monkeypatch):
+    # Ce mock simule la récupération d'un match avec ses classements.
     async def fake_get_match_with_standings(match_id: int):
         assert match_id == 538122
         return FAKE_MATCH_WITH_STANDINGS
 
-    monkeypatch.setattr(matches_api, "get_match_with_standings", fake_get_match_with_standings)
-    monkeypatch.setattr(
-        matches_api,
-        "build_prematch_analysis",
-        lambda match, home_standing, away_standing: {
+    # Ce mock simule la génération d'une analyse pré-match.
+    def fake_build_prematch_analysis(match, home_standing, away_standing):
+        return {
             "summary": "Analyse pré-match disponible.",
             "key_factors": ["forme récente", "classement", "différence de buts"],
-        },
-    )
+        }
+
+    monkeypatch.setattr(matches_api, "get_match_with_standings", fake_get_match_with_standings)
+    monkeypatch.setattr(matches_api, "build_prematch_analysis", fake_build_prematch_analysis)
 
     response = client.get("/api/matches/538122/analysis")
     data = response.json()
@@ -240,16 +268,16 @@ def test_match_analysis_route_returns_analysis(monkeypatch):
     assert data["data_used"]["away_team_standing_available"] is True
 
 
+# Ce test vérifie que la route prédictions retourne les trois marchés du MVP.
 def test_match_predictions_route_returns_predictions(monkeypatch):
+    # Ce mock simule la récupération d'un match avec ses classements.
     async def fake_get_match_with_standings(match_id: int):
         assert match_id == 538122
         return FAKE_MATCH_WITH_STANDINGS
 
-    monkeypatch.setattr(matches_api, "get_match_with_standings", fake_get_match_with_standings)
-    monkeypatch.setattr(
-        matches_api,
-        "build_predictions",
-        lambda match, home_standing, away_standing: {
+    # Ce mock simule la génération des prédictions MVP.
+    def fake_build_predictions(match, home_standing, away_standing):
+        return {
             "main_prediction": {
                 "market": "1X2",
                 "prediction": "Home win",
@@ -268,8 +296,10 @@ def test_match_predictions_route_returns_predictions(monkeypatch):
                 "confidence": "medium",
                 "risk": "medium",
             },
-        },
-    )
+        }
+
+    monkeypatch.setattr(matches_api, "get_match_with_standings", fake_get_match_with_standings)
+    monkeypatch.setattr(matches_api, "build_predictions", fake_build_predictions)
 
     response = client.get("/api/matches/538122/predictions")
     data = response.json()
@@ -281,6 +311,7 @@ def test_match_predictions_route_returns_predictions(monkeypatch):
     assert data["predictions"]["btts_prediction"]["prediction"] == "Yes"
 
 
+# Ce test vérifie que la route glossaire retourne un contenu exploitable.
 def test_glossary_route_returns_content():
     response = client.get("/api/glossary")
     data = response.json()
@@ -289,6 +320,7 @@ def test_glossary_route_returns_content():
     assert isinstance(data, (dict, list))
 
 
+# Ce test vérifie que la route informations responsables retourne un contenu exploitable.
 def test_responsible_info_route_returns_content():
     response = client.get("/api/responsible-info")
     data = response.json()
@@ -297,7 +329,9 @@ def test_responsible_info_route_returns_content():
     assert isinstance(data, (dict, list))
 
 
+# Ce test vérifie que la recommandation multi-matchs retourne une sélection cohérente.
 def test_multimatch_recommendation_route_returns_selection(monkeypatch):
+    # Ce mock simule les appels API nécessaires à la recommandation multi-matchs.
     async def fake_get_football_data(endpoint: str, params=None):
         if endpoint == "/competitions/PL/matches":
             return {"matches": [FAKE_MATCH]}
@@ -305,6 +339,7 @@ def test_multimatch_recommendation_route_returns_selection(monkeypatch):
             return {"standings": [{"table": [FAKE_HOME_STANDING, FAKE_AWAY_STANDING]}]}
         raise AssertionError(f"Endpoint inattendu : {endpoint}")
 
+    # Ce mock simule la construction finale de la recommandation multi-matchs.
     def fake_build_multimatch_recommendation_response(**kwargs):
         return {
             "competition_code": kwargs["competition_code"],
@@ -342,3 +377,62 @@ def test_multimatch_recommendation_route_returns_selection(monkeypatch):
     assert data["match_count"] == 1
     assert data["risk_level"] == "low"
     assert len(data["recommendations"]) == 1
+
+
+# Ce test vérifie qu'une compétition non supportée est refusée sur la route matchs.
+def test_matches_route_rejects_unsupported_competition():
+    response = client.get("/api/matches?competition_code=XYZ")
+
+    assert response.status_code == 400
+    assert response.json()["detail"] == "Competition not supported in RubyBets MVP."
+
+
+# Ce test vérifie qu'une compétition non supportée est refusée sur la recommandation multi-matchs.
+def test_multimatch_recommendation_rejects_unsupported_competition():
+    response = client.post(
+        "/api/recommendations/multimatch",
+        json={
+            "competition_code": "XYZ",
+            "match_count": 2,
+            "risk_level": "medium",
+        },
+    )
+
+    assert response.status_code == 400
+    assert response.json()["detail"] == "Competition not supported in RubyBets MVP."
+
+
+# Ce test vérifie qu'un nombre trop élevé de matchs est refusé.
+def test_multimatch_recommendation_rejects_too_large_match_count():
+    response = client.post(
+        "/api/recommendations/multimatch",
+        json={
+            "competition_code": "PL",
+            "match_count": 10,
+            "risk_level": "medium",
+        },
+    )
+
+    assert response.status_code == 422
+
+
+# Ce test vérifie qu'un niveau de risque invalide est refusé.
+def test_multimatch_recommendation_rejects_invalid_risk_level():
+    response = client.post(
+        "/api/recommendations/multimatch",
+        json={
+            "competition_code": "PL",
+            "match_count": 2,
+            "risk_level": "extreme",
+        },
+    )
+
+    assert response.status_code == 422
+
+
+# Schéma de communication du fichier :
+# test_api.py
+# ├── appelle app.main pour créer le client de test
+# ├── simule app.api.competitions pour tester /api/competitions sans cache réel
+# ├── simule app.api.matches pour tester les routes matchs, contexte, analyse et prédictions
+# └── simule app.api.recommendations pour tester la recommandation multi-matchs
