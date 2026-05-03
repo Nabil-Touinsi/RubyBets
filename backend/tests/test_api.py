@@ -12,6 +12,14 @@ from app.main import app
 client = TestClient(app)
 
 
+FAKE_FRESHNESS = {
+    "source": "football-data.org",
+    "from_cache": False,
+    "updated_at": "2026-05-03T00:00:00+00:00",
+    "ttl_minutes": 30,
+}
+
+
 FAKE_MATCH = {
     "area": {
         "id": 2072,
@@ -96,6 +104,10 @@ FAKE_MATCH_WITH_STANDINGS = {
     "competition_code": "PL",
     "home_standing": FAKE_HOME_STANDING,
     "away_standing": FAKE_AWAY_STANDING,
+    "data_freshness": {
+        "match": FAKE_FRESHNESS,
+        "standings": FAKE_FRESHNESS,
+    },
 }
 
 
@@ -181,15 +193,22 @@ def test_competitions_route_returns_mvp_competitions(monkeypatch):
     assert data["competitions"][0]["current_season"]["current_matchday"] == 34
 
 
-# Ce test vérifie que la route matchs retourne les rencontres programmées.
+# Ce test vérifie que la route matchs retourne les rencontres programmées sans écrire de cache réel.
 def test_matches_route_returns_scheduled_matches(monkeypatch):
-    # Ce mock simule l'appel API de récupération des matchs.
-    async def fake_get_football_data(endpoint: str, params=None):
+    # Ce mock simule le service de cache pour éviter tout appel API réel pendant le test.
+    async def fake_get_cached_football_data(
+        cache_name: str,
+        endpoint: str,
+        params=None,
+        ttl_minutes: int = 30,
+    ):
+        assert cache_name == "matches_pl_scheduled_all_start_dates_all_end_dates"
         assert endpoint == "/competitions/PL/matches"
         assert params["status"] == "SCHEDULED"
-        return {"matches": [FAKE_MATCH]}
+        assert ttl_minutes == 30
+        return {"matches": [FAKE_MATCH]}, FAKE_FRESHNESS
 
-    monkeypatch.setattr(matches_api, "get_football_data", fake_get_football_data)
+    monkeypatch.setattr(matches_api, "get_cached_football_data", fake_get_cached_football_data)
 
     response = client.get("/api/matches?competition_code=PL&status=SCHEDULED")
     data = response.json()
@@ -198,16 +217,25 @@ def test_matches_route_returns_scheduled_matches(monkeypatch):
     assert data["competition_code"] == "PL"
     assert data["count"] == 1
     assert len(data["matches"]) == 1
+    assert data["data_freshness"]["from_cache"] is False
 
 
-# Ce test vérifie que la fiche détail d'un match retourne les bonnes informations.
+# Ce test vérifie que la fiche détail d'un match retourne les bonnes informations sans cache réel.
 def test_match_details_route_returns_match(monkeypatch):
-    # Ce mock simule l'appel API de récupération d'un match précis.
-    async def fake_get_football_data(endpoint: str, params=None):
+    # Ce mock simule le service de cache pour la fiche détail d'un match.
+    async def fake_get_cached_football_data(
+        cache_name: str,
+        endpoint: str,
+        params=None,
+        ttl_minutes: int = 30,
+    ):
+        assert cache_name == "match_538122"
         assert endpoint == "/matches/538122"
-        return {"match": FAKE_MATCH}
+        assert params is None
+        assert ttl_minutes == 30
+        return {"match": FAKE_MATCH}, FAKE_FRESHNESS
 
-    monkeypatch.setattr(matches_api, "get_football_data", fake_get_football_data)
+    monkeypatch.setattr(matches_api, "get_cached_football_data", fake_get_cached_football_data)
 
     response = client.get("/api/matches/538122")
     data = response.json()
@@ -215,6 +243,7 @@ def test_match_details_route_returns_match(monkeypatch):
     assert response.status_code == 200
     assert data["match"]["id"] == 538122
     assert data["data_freshness"]["last_updated"] == "2026-04-30T10:00:00Z"
+    assert data["data_freshness"]["from_cache"] is False
 
 
 # Ce test vérifie que la route contexte retourne les classements et le résumé du match.
@@ -331,12 +360,21 @@ def test_responsible_info_route_returns_content():
 
 # Ce test vérifie que la recommandation multi-matchs retourne une sélection cohérente.
 def test_multimatch_recommendation_route_returns_selection(monkeypatch):
-    # Ce mock simule les appels API nécessaires à la recommandation multi-matchs.
-    async def fake_get_football_data(endpoint: str, params=None):
+    # Ce mock simule les lectures cache/API nécessaires à la recommandation multi-matchs.
+    async def fake_get_cached_football_data(
+        cache_name: str,
+        endpoint: str,
+        params=None,
+        ttl_minutes: int = 30,
+    ):
         if endpoint == "/competitions/PL/matches":
-            return {"matches": [FAKE_MATCH]}
+            assert cache_name == "matches_pl_scheduled_all_start_dates_all_end_dates"
+            assert ttl_minutes == 30
+            return {"matches": [FAKE_MATCH]}, FAKE_FRESHNESS
         if endpoint == "/competitions/PL/standings":
-            return {"standings": [{"table": [FAKE_HOME_STANDING, FAKE_AWAY_STANDING]}]}
+            assert cache_name == "standings_pl"
+            assert ttl_minutes == 60
+            return {"standings": [{"type": "TOTAL", "table": [FAKE_HOME_STANDING, FAKE_AWAY_STANDING]}]}, FAKE_FRESHNESS
         raise AssertionError(f"Endpoint inattendu : {endpoint}")
 
     # Ce mock simule la construction finale de la recommandation multi-matchs.
@@ -345,6 +383,7 @@ def test_multimatch_recommendation_route_returns_selection(monkeypatch):
             "competition_code": kwargs["competition_code"],
             "match_count": kwargs["match_count"],
             "risk_level": kwargs["risk_level"],
+            "data_freshness": {"provider": "football-data.org"},
             "recommendations": [
                 {
                     "match_id": 538122,
@@ -355,7 +394,7 @@ def test_multimatch_recommendation_route_returns_selection(monkeypatch):
             ],
         }
 
-    monkeypatch.setattr(recommendations_api, "get_football_data", fake_get_football_data)
+    monkeypatch.setattr(recommendations_api, "get_cached_football_data", fake_get_cached_football_data)
     monkeypatch.setattr(
         recommendations_api,
         "build_multimatch_recommendation_response",
@@ -377,6 +416,8 @@ def test_multimatch_recommendation_route_returns_selection(monkeypatch):
     assert data["match_count"] == 1
     assert data["risk_level"] == "low"
     assert len(data["recommendations"]) == 1
+    assert data["data_freshness"]["matches_cache"]["source"] == "football-data.org"
+    assert data["data_freshness"]["standings_cache"]["source"] == "football-data.org"
 
 
 # Ce test vérifie qu'une compétition non supportée est refusée sur la route matchs.
@@ -435,4 +476,4 @@ def test_multimatch_recommendation_rejects_invalid_risk_level():
 # ├── appelle app.main pour créer le client de test
 # ├── simule app.api.competitions pour tester /api/competitions sans cache réel
 # ├── simule app.api.matches pour tester les routes matchs, contexte, analyse et prédictions
-# └── simule app.api.recommendations pour tester la recommandation multi-matchs
+# └── simule app.api.recommendations pour tester la recommandation multi-matchs sans cache réel

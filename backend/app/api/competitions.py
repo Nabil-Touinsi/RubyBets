@@ -1,4 +1,5 @@
-# Ce fichier expose les compétitions RubyBets que le frontend utilisera dans le MVP, avec une première couche de cache data.
+# Ce fichier expose les compétitions RubyBets utilisées par le frontend dans le MVP.
+# Il ajoute une première couche de cache pour tracer la fraîcheur des données Football-Data.
 
 from fastapi import APIRouter
 
@@ -23,7 +24,12 @@ CACHE_NAME = "competitions"
 CACHE_TTL_MINUTES = 60
 
 
-def format_competitions_response(data: dict, from_cache: bool, updated_at: str | None):
+# Cette fonction formate la réponse des compétitions et ajoute les informations de fraîcheur.
+def format_competitions_response(
+    data: dict,
+    from_cache: bool,
+    updated_at: str | None,
+) -> dict:
     competitions = data.get("competitions", [])
 
     filtered_competitions = [
@@ -57,8 +63,9 @@ def format_competitions_response(data: dict, from_cache: bool, updated_at: str |
     }
 
 
+# Cette route retourne les compétitions du MVP en utilisant le cache si les données sont encore fraîches.
 @router.get("")
-async def get_competitions():
+async def get_competitions() -> dict:
     cached_payload = load_cache(CACHE_NAME)
 
     if cached_payload and is_cache_fresh(cached_payload, ttl_minutes=CACHE_TTL_MINUTES):
@@ -76,3 +83,10 @@ async def get_competitions():
         from_cache=False,
         updated_at=saved_payload["updated_at"],
     )
+
+
+# Schéma de communication du fichier :
+# competitions.py
+# ├── utilise cache_service.py pour lire ou écrire le cache competitions
+# ├── appelle football_data_client.py si le cache est absent ou expiré
+# └── renvoie les compétitions formatées à app.main puis au frontend

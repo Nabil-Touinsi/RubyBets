@@ -8,3 +8,6 @@ __pycache__/
 
 # Caches de tests
 .pytest_cache/
+
+# RubyBets local API cache
+app/data/cache/*.json

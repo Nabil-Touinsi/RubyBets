@@ -1,10 +1,16 @@
-# Ce fichier centralise le formatage et la récupération des données match utilisées par RubyBets.
+# Ce fichier centralise le formatage et la récupération enrichie des données match utilisées par RubyBets.
+# Il prépare des objets propres pour les routes API et réutilise le cache pour les détails match et classements.
 
 from typing import Any
 
-from app.services.football_data_client import get_football_data
+from app.services.cache_service import build_cache_name, get_cached_football_data
 
 
+MATCH_DETAIL_CACHE_TTL_MINUTES = 30
+STANDINGS_CACHE_TTL_MINUTES = 60
+
+
+# Cette fonction supprime les paramètres vides avant un appel API.
 def clean_params(params: dict[str, Any]) -> dict[str, Any]:
     return {
         key: value
@@ -13,6 +19,7 @@ def clean_params(params: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+# Cette fonction formate les données d'une équipe dans une structure stable pour le frontend.
 def format_team(team: dict[str, Any]) -> dict[str, Any]:
     return {
         "id": team.get("id"),
@@ -23,6 +30,7 @@ def format_team(team: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+# Cette fonction formate un match Football-Data dans une structure homogène pour RubyBets.
 def format_match(match: dict[str, Any]) -> dict[str, Any]:
     return {
         "id": match.get("id"),
@@ -72,6 +80,7 @@ def format_match(match: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+# Cette fonction filtre localement une liste de matchs à partir d'un nom d'équipe.
 def filter_matches_by_team(
     matches: list[dict[str, Any]],
     team: str | None,
@@ -89,6 +98,7 @@ def filter_matches_by_team(
     ]
 
 
+# Cette fonction retrouve la ligne de classement correspondant à une équipe donnée.
 def find_team_standing(
     standings: list[dict[str, Any]],
     team_id: int | None,
@@ -120,8 +130,13 @@ def find_team_standing(
     return None
 
 
+# Cette fonction récupère un match et son classement associé en utilisant le cache local.
 async def get_match_with_standings(match_id: int) -> dict[str, Any]:
-    match_data = await get_football_data(f"/matches/{match_id}")
+    match_data, match_freshness = await get_cached_football_data(
+        cache_name=build_cache_name("match", match_id),
+        endpoint=f"/matches/{match_id}",
+        ttl_minutes=MATCH_DETAIL_CACHE_TTL_MINUTES,
+    )
     match = match_data.get("match", match_data)
 
     competition_code = match.get("competition", {}).get("code")
@@ -129,10 +144,13 @@ async def get_match_with_standings(match_id: int) -> dict[str, Any]:
     away_team_id = match.get("awayTeam", {}).get("id")
 
     standings: list[dict[str, Any]] = []
+    standings_freshness: dict[str, Any] | None = None
 
     if competition_code:
-        standings_data = await get_football_data(
-            f"/competitions/{competition_code}/standings"
+        standings_data, standings_freshness = await get_cached_football_data(
+            cache_name=build_cache_name("standings", competition_code),
+            endpoint=f"/competitions/{competition_code}/standings",
+            ttl_minutes=STANDINGS_CACHE_TTL_MINUTES,
         )
         standings = standings_data.get("standings", [])
 
@@ -141,4 +159,16 @@ async def get_match_with_standings(match_id: int) -> dict[str, Any]:
         "competition_code": competition_code,
         "home_standing": find_team_standing(standings, home_team_id),
         "away_standing": find_team_standing(standings, away_team_id),
+        "data_freshness": {
+            "match": match_freshness,
+            "standings": standings_freshness,
+        },
     }
+
+
+# Schéma de communication du fichier :
+# match_service.py
+# ├── utilise cache_service.py pour récupérer les matchs et classements avec cache
+# ├── fournit des données formatées à matches.py et recommendation_service.py
+# ├── dépend des réponses Football-Data structurées par football_data_client.py
+# └── alimente les blocs contexte, analyse, prédictions et recommandation multi-matchs
