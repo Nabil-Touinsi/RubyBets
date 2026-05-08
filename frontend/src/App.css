@@ -294,3 +294,206 @@ section:has(h2:nth-child(1)) {
     width: auto;
   }
 }
+/* Bloc spécifique pour rendre la recommandation multi-matchs plus claire et professionnelle. */
+.rb-recommendation-section {
+  overflow: hidden;
+}
+
+.rb-section-header {
+  display: grid;
+  gap: 0.45rem;
+  margin-bottom: 1.2rem;
+}
+
+.rb-eyebrow {
+  color: var(--rb-accent);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.rb-section-intro {
+  max-width: 780px;
+  color: #cbd5e1;
+}
+
+.rb-recommendation-controls {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  align-items: end;
+  margin: 1.2rem 0;
+  padding: 1rem;
+  border: 1px solid var(--rb-border);
+  border-radius: 16px;
+  background: rgba(7, 16, 19, 0.48);
+}
+
+.rb-control-group {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.rb-control-group label {
+  margin: 0;
+}
+
+.rb-control-group select {
+  width: 100%;
+  margin: 0;
+}
+
+.rb-recommendation-actions {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.rb-recommendation-actions button:disabled,
+.rb-control-group select:disabled {
+  cursor: not-allowed;
+  opacity: 0.62;
+}
+
+.rb-status-pill {
+  width: fit-content;
+  padding: 0.42rem 0.7rem;
+  border: 1px solid var(--rb-border);
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.62);
+  color: #cbd5e1;
+  font-size: 0.82rem;
+}
+
+.rb-empty-state {
+  padding: 1rem;
+  border: 1px solid rgba(250, 204, 21, 0.35);
+  border-radius: 16px;
+  background: rgba(250, 204, 21, 0.08);
+}
+
+.rb-recommendation-results {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.rb-results-summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+  padding: 1rem;
+  border: 1px solid var(--rb-border-strong);
+  border-radius: 16px;
+  background: var(--rb-accent-soft);
+}
+
+.rb-results-summary p {
+  max-width: 560px;
+  text-align: right;
+}
+
+.rb-recommendation-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.rb-recommendation-card {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 1.1rem;
+}
+
+.rb-card-topline {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.rb-card-topline span,
+.rb-match-date,
+.rb-selection-score,
+.rb-technical-note {
+  color: var(--rb-muted);
+  font-size: 0.86rem;
+}
+
+.rb-prediction-highlight {
+  display: grid;
+  gap: 0.15rem;
+  padding: 0.9rem;
+  border: 1px solid var(--rb-border-strong);
+  border-radius: 14px;
+  background: var(--rb-accent-soft);
+}
+
+.rb-prediction-highlight span {
+  color: var(--rb-muted);
+  font-size: 0.8rem;
+}
+
+.rb-prediction-highlight strong {
+  color: var(--rb-accent);
+  font-size: 1.05rem;
+}
+
+.rb-metrics-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.rb-metrics-row p {
+  display: grid;
+  gap: 0.15rem;
+  padding: 0.75rem;
+  border: 1px solid var(--rb-border);
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.45);
+  font-size: 0.82rem;
+}
+
+.rb-metrics-row strong {
+  font-size: 0.9rem;
+}
+
+.rb-justification {
+  color: #cbd5e1;
+}
+
+.rb-analysis-note {
+  padding: 1rem;
+  border: 1px solid var(--rb-border);
+  border-radius: 16px;
+  background: rgba(7, 16, 19, 0.42);
+}
+
+.rb-analysis-note h4 {
+  margin-top: 0;
+}
+
+.rb-analysis-note ul {
+  margin-top: 0.75rem;
+}
+
+@media (max-width: 860px) {
+  .rb-recommendation-controls,
+  .rb-recommendation-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .rb-results-summary {
+    display: grid;
+  }
+
+  .rb-results-summary p {
+    text-align: left;
+  }
+
+  .rb-metrics-row {
+    grid-template-columns: 1fr;
+  }
+}

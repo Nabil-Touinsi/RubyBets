@@ -178,41 +178,56 @@ function App() {
       });
   }, [selectedCompetition]);
 
-  // Chargement complet d’un match : détail, contexte, analyse et prédictions.
+    // Charge les données d’un match sélectionné sans bloquer tout l’affichage si un appel API échoue.
   function handleSelectMatch(matchId: number) {
+    setSelectedMatchDetails(null);
+    setSelectedMatchContext(null);
+    setSelectedMatchAnalysis(null);
+    setSelectedMatchPredictions(null);
+
     setMatchDetailsStatus("Chargement du détail du match...");
     setMatchContextStatus("Chargement du contexte avant-match...");
     setMatchAnalysisStatus("Chargement de l’analyse pré-match...");
     setMatchPredictionsStatus("Chargement des prédictions...");
 
-    Promise.all([
+    Promise.allSettled([
       getMatchDetails(matchId),
       getMatchContext(matchId),
       getMatchAnalysis(matchId),
       getMatchPredictions(matchId),
-    ])
-      .then(([detailsData, contextData, analysisData, predictionsData]) => {
-        setSelectedMatchDetails(detailsData);
-        setSelectedMatchContext(contextData);
-        setSelectedMatchAnalysis(analysisData);
-        setSelectedMatchPredictions(predictionsData);
-
+    ]).then(([detailsResult, contextResult, analysisResult, predictionsResult]) => {
+      if (detailsResult.status === "fulfilled") {
+        setSelectedMatchDetails(detailsResult.value);
         setMatchDetailsStatus("Détail du match chargé");
-        setMatchContextStatus("Contexte avant-match chargé");
-        setMatchAnalysisStatus("Analyse pré-match chargée");
-        setMatchPredictionsStatus("Prédictions chargées");
-      })
-      .catch(() => {
+      } else {
         setSelectedMatchDetails(null);
-        setSelectedMatchContext(null);
-        setSelectedMatchAnalysis(null);
-        setSelectedMatchPredictions(null);
-
         setMatchDetailsStatus("Impossible de charger le détail du match");
+      }
+
+      if (contextResult.status === "fulfilled") {
+        setSelectedMatchContext(contextResult.value);
+        setMatchContextStatus("Contexte avant-match chargé");
+      } else {
+        setSelectedMatchContext(null);
         setMatchContextStatus("Impossible de charger le contexte avant-match");
+      }
+
+      if (analysisResult.status === "fulfilled") {
+        setSelectedMatchAnalysis(analysisResult.value);
+        setMatchAnalysisStatus("Analyse pré-match chargée");
+      } else {
+        setSelectedMatchAnalysis(null);
         setMatchAnalysisStatus("Impossible de charger l’analyse pré-match");
+      }
+
+      if (predictionsResult.status === "fulfilled") {
+        setSelectedMatchPredictions(predictionsResult.value);
+        setMatchPredictionsStatus("Prédictions chargées");
+      } else {
+        setSelectedMatchPredictions(null);
         setMatchPredictionsStatus("Impossible de charger les prédictions");
-      });
+      }
+    });
   }
 
   // Génère une recommandation multi-matchs à partir des prédictions disponibles côté backend.
@@ -272,6 +287,7 @@ function App() {
         onChangeMatchCount={setRecommendationMatchCount}
         onChangeRiskLevel={setRecommendationRiskLevel}
         onGenerateRecommendation={handleGenerateMultiMatchRecommendation}
+        multiMatchStatus={multiMatchStatus}
       />
 
       <GlossarySection glossary={glossary} />
