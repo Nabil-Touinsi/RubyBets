@@ -72,6 +72,23 @@ export type Match = {
   away_team: Team;
 };
 
+// Ce type décrit la réponse backend de vérification de santé de l’API.
+export type HealthResponse = {
+  status: string;
+};
+
+// Ce type décrit la réponse backend de la liste des compétitions.
+export type CompetitionsResponse = {
+  count: number;
+  competitions: Competition[];
+};
+
+// Ce type décrit la réponse backend de la liste des matchs à venir.
+export type MatchesResponse = {
+  count: number;
+  matches: Match[];
+};
+
 // Ce type décrit le classement d’une équipe dans une compétition.
 export type TeamStanding = {
   position: number;
