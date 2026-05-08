@@ -1,11 +1,12 @@
 // Ce composant affiche le générateur de recommandation multi-matchs de RubyBets.
-
 import type { MultiMatchRecommendationResponse } from "../models/rubybets";
 import {
   cleanTextItems,
   formatConfidenceLevel,
+  formatDateTime,
   formatRiskLevel,
 } from "../helpers/displayText";
+import DataFreshnessBlock from "./DataFreshnessBlock";
 
 type RiskLevel = "low" | "medium" | "high";
 
@@ -18,6 +19,7 @@ type MultiMatchRecommendationSectionProps = {
   onGenerateRecommendation: () => void;
 };
 
+// Ce composant permet de paramétrer, générer et afficher une recommandation multi-matchs explicable.
 function MultiMatchRecommendationSection({
   recommendationMatchCount,
   recommendationRiskLevel,
@@ -86,7 +88,7 @@ function MultiMatchRecommendationSection({
 
               <p>
                 {item.match.competition.name} — Journée {item.match.matchday} —{" "}
-                {new Date(item.match.utc_date).toLocaleString("fr-FR")}
+                {formatDateTime(item.match.utc_date)}
               </p>
 
               <p>
@@ -123,6 +125,11 @@ function MultiMatchRecommendationSection({
             Méthode : {multiMatchRecommendation.method} — Source :{" "}
             {multiMatchRecommendation.source}
           </p>
+
+          <DataFreshnessBlock
+            title="Fraîcheur des données utilisées pour la recommandation"
+            dataFreshness={multiMatchRecommendation.data_freshness}
+          />
         </div>
       )}
     </section>
@@ -130,3 +137,10 @@ function MultiMatchRecommendationSection({
 }
 
 export default MultiMatchRecommendationSection;
+
+// Schéma de communication du fichier :
+// MultiMatchRecommendationSection.tsx
+// ├── reçoit la recommandation multi-matchs depuis App.tsx
+// ├── utilise displayText.ts pour formater risque, confiance et dates
+// ├── utilise DataFreshnessBlock.tsx pour afficher la fraîcheur des données
+// └── affiche les sélections recommandées générées par le backend

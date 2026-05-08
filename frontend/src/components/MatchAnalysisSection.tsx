@@ -1,11 +1,13 @@
 // Ce composant affiche l’analyse pré-match du match sélectionné dans RubyBets.
 import type { MatchAnalysisResponse } from "../models/rubybets";
 import { cleanTextItems, formatContextTrend } from "../helpers/displayText";
+import DataFreshnessBlock from "./DataFreshnessBlock";
 
 type MatchAnalysisSectionProps = {
   matchAnalysis: MatchAnalysisResponse;
 };
 
+// Ce composant présente l’analyse explicable du match, ses limites et la fraîcheur des données utilisées.
 function MatchAnalysisSection({ matchAnalysis }: MatchAnalysisSectionProps) {
   return (
     <section>
@@ -52,8 +54,20 @@ function MatchAnalysisSection({ matchAnalysis }: MatchAnalysisSectionProps) {
         Source : {matchAnalysis.source} — Données :{" "}
         {matchAnalysis.data_freshness.provider}
       </p>
+
+      <DataFreshnessBlock
+        title="Fraîcheur des données utilisées pour l’analyse"
+        dataFreshness={matchAnalysis.data_freshness}
+      />
     </section>
   );
 }
 
 export default MatchAnalysisSection;
+
+// Schéma de communication du fichier :
+// MatchAnalysisSection.tsx
+// ├── reçoit l’analyse pré-match depuis App.tsx
+// ├── utilise displayText.ts pour formater la tendance et nettoyer les listes
+// ├── utilise DataFreshnessBlock.tsx pour afficher la fraîcheur des données
+// └── affiche les faits observés, facteurs clés, interprétation et limites fournis par le backend

@@ -1,6 +1,37 @@
 // Ce fichier centralise les modèles de données TypeScript utilisés par RubyBets côté frontend.
+// Il décrit les structures reçues depuis le backend afin de sécuriser l'affichage des données réelles.
 
-// Types utilisés pour structurer les données reçues depuis le backend.
+// Ce type décrit les informations de fraîcheur d’un cache backend simple.
+export type CacheFreshness = {
+  source: string;
+  from_cache: boolean;
+  updated_at: string | null;
+  ttl_minutes: number;
+};
+
+// Ce type décrit la fraîcheur d’une réponse simple venant d’une seule source.
+export type SimpleDataFreshness = CacheFreshness & {
+  provider?: string;
+  last_updated?: string | null;
+};
+
+// Ce type décrit la fraîcheur d’une réponse composée utilisant les données du match et du classement.
+export type MatchCompositeDataFreshness = {
+  provider: string;
+  match_last_updated: string | null;
+  match_cache: CacheFreshness | null;
+  standings_cache: CacheFreshness | null;
+};
+
+// Ce type décrit la fraîcheur d’une recommandation multi-matchs.
+export type RecommendationDataFreshness = {
+  provider: string;
+  generated_at: string;
+  matches_cache: CacheFreshness;
+  standings_cache: CacheFreshness;
+};
+
+// Ce type décrit une compétition football suivie par RubyBets.
 export type Competition = {
   id: number;
   code: string;
@@ -16,6 +47,7 @@ export type Competition = {
   };
 };
 
+// Ce type décrit une équipe affichée dans les matchs, classements et recommandations.
 export type Team = {
   id: number;
   name: string;
@@ -24,6 +56,7 @@ export type Team = {
   crest: string;
 };
 
+// Ce type décrit un match football formaté par le backend.
 export type Match = {
   id: number;
   utc_date: string;
@@ -39,6 +72,7 @@ export type Match = {
   away_team: Team;
 };
 
+// Ce type décrit le classement d’une équipe dans une compétition.
 export type TeamStanding = {
   position: number;
   team: Team;
@@ -52,15 +86,14 @@ export type TeamStanding = {
   goal_difference: number;
 };
 
+// Ce type décrit la réponse backend du détail d’un match.
 export type MatchDetailsResponse = {
   source: string;
   match: Match;
-  data_freshness: {
-    last_updated: string;
-    provider: string;
-  };
+  data_freshness: SimpleDataFreshness;
 };
 
+// Ce type décrit la réponse backend du contexte avant-match.
 export type MatchContextResponse = {
   source: string;
   match: Match;
@@ -78,18 +111,17 @@ export type MatchContextResponse = {
       away_team_position: number | null;
     };
   };
-  data_freshness: {
-    match_last_updated: string;
-    provider: string;
-  };
+  data_freshness: MatchCompositeDataFreshness;
 };
 
+// Ce type décrit un facteur clé affiché dans l’analyse pré-match.
 export type AnalysisKeyFactor = {
   label: string;
   value: number;
   reading: string;
 };
 
+// Ce type décrit la réponse backend de l’analyse pré-match.
 export type MatchAnalysisResponse = {
   source: string;
   match_id: number;
@@ -107,12 +139,10 @@ export type MatchAnalysisResponse = {
     home_team_standing_available: boolean;
     away_team_standing_available: boolean;
   };
-  data_freshness: {
-    match_last_updated: string;
-    provider: string;
-  };
+  data_freshness: MatchCompositeDataFreshness;
 };
 
+// Ce type décrit une prédiction individuelle affichée dans RubyBets.
 export type PredictionItem = {
   market: string;
   prediction: string;
@@ -122,6 +152,7 @@ export type PredictionItem = {
   justification: string;
 };
 
+// Ce type décrit la réponse backend des prédictions avant-match.
 export type MatchPredictionsResponse = {
   source: string;
   match_id: number;
@@ -152,12 +183,10 @@ export type MatchPredictionsResponse = {
     home_team_standing_available: boolean;
     away_team_standing_available: boolean;
   };
-  data_freshness: {
-    match_last_updated: string;
-    provider: string;
-  };
+  data_freshness: MatchCompositeDataFreshness;
 };
 
+// Ce type décrit une recommandation sélectionnée dans la réponse multi-matchs.
 export type MultiMatchRecommendationItem = {
   match: Match;
   selected_prediction: PredictionItem;
@@ -172,6 +201,7 @@ export type MultiMatchRecommendationItem = {
   };
 };
 
+// Ce type décrit la réponse backend du générateur de recommandation multi-matchs.
 export type MultiMatchRecommendationResponse = {
   source: string;
   method: string;
@@ -194,12 +224,10 @@ export type MultiMatchRecommendationResponse = {
     };
   };
   limits: string[];
-  data_freshness: {
-    provider: string;
-    generated_at: string;
-  };
+  data_freshness: RecommendationDataFreshness;
 };
 
+// Ce type décrit un élément du glossaire pédagogique.
 export type GlossaryItem = {
   term: string;
   slug: string;
@@ -207,6 +235,7 @@ export type GlossaryItem = {
   definition: string;
 };
 
+// Ce type décrit la réponse backend du glossaire.
 export type GlossaryResponse = {
   count: number;
   filters: {
@@ -216,6 +245,7 @@ export type GlossaryResponse = {
   items: GlossaryItem[];
 };
 
+// Ce type décrit un message responsable affiché dans RubyBets.
 export type ResponsibleInfoItem = {
   type: string;
   priority: string;
@@ -225,6 +255,7 @@ export type ResponsibleInfoItem = {
   is_active: boolean;
 };
 
+// Ce type décrit la réponse backend des informations responsables.
 export type ResponsibleInfoResponse = {
   count: number;
   items: ResponsibleInfoItem[];
@@ -236,3 +267,9 @@ export type ResponsibleInfoResponse = {
     guarantees_result: boolean;
   };
 };
+
+// Schéma de communication du fichier :
+// rubybets.ts
+// ├── utilisé par api.ts pour typer les réponses backend
+// ├── utilisé par App.tsx pour stocker les données dans les states React
+// └── utilisé par les composants frontend pour afficher matchs, analyses, prédictions et recommandations

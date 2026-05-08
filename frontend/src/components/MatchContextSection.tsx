@@ -1,12 +1,13 @@
 // Ce composant affiche le contexte avant-match du match sélectionné dans RubyBets.
-
 import type { MatchContextResponse, TeamStanding } from "../models/rubybets";
 import { cleanTextItems } from "../helpers/displayText";
+import DataFreshnessBlock from "./DataFreshnessBlock";
 
 type MatchContextSectionProps = {
   matchContext: MatchContextResponse;
 };
 
+// Ce composant affiche une carte de classement simplifiée pour une équipe.
 function TeamStandingCard({ standing }: { standing: TeamStanding }) {
   return (
     <article>
@@ -22,6 +23,7 @@ function TeamStandingCard({ standing }: { standing: TeamStanding }) {
   );
 }
 
+// Ce composant présente le contexte du match, le classement des équipes et la fraîcheur des données utilisées.
 function MatchContextSection({ matchContext }: MatchContextSectionProps) {
   return (
     <section>
@@ -46,8 +48,20 @@ function MatchContextSection({ matchContext }: MatchContextSectionProps) {
           <TeamStandingCard standing={matchContext.context.away_team_standing} />
         )}
       </div>
+
+      <DataFreshnessBlock
+        title="Fraîcheur des données utilisées pour le contexte"
+        dataFreshness={matchContext.data_freshness}
+      />
     </section>
   );
 }
 
 export default MatchContextSection;
+
+// Schéma de communication du fichier :
+// MatchContextSection.tsx
+// ├── reçoit le contexte avant-match depuis App.tsx
+// ├── utilise TeamStandingCard pour afficher les classements domicile et extérieur
+// ├── utilise DataFreshnessBlock.tsx pour afficher la fraîcheur des données
+// └── affiche les données de match et classement fournies par le backend

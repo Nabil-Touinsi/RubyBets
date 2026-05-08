@@ -6,11 +6,13 @@ import {
   formatPredictionStatus,
   formatRiskLevel,
 } from "../helpers/displayText";
+import DataFreshnessBlock from "./DataFreshnessBlock";
 
 type MatchPredictionsSectionProps = {
   matchPredictions: MatchPredictionsResponse;
 };
 
+// Ce composant présente les tendances prédictives, leurs justifications et la fraîcheur des données utilisées.
 function MatchPredictionsSection({
   matchPredictions,
 }: MatchPredictionsSectionProps) {
@@ -69,8 +71,20 @@ function MatchPredictionsSection({
         Méthode : {predictionData.method || "Non disponible"} — Source :{" "}
         {matchPredictions.source}
       </p>
+
+      <DataFreshnessBlock
+        title="Fraîcheur des données utilisées pour les prédictions"
+        dataFreshness={matchPredictions.data_freshness}
+      />
     </section>
   );
 }
 
 export default MatchPredictionsSection;
+
+// Schéma de communication du fichier :
+// MatchPredictionsSection.tsx
+// ├── reçoit les prédictions depuis App.tsx
+// ├── utilise displayText.ts pour formater confiance, risque et statuts
+// ├── utilise DataFreshnessBlock.tsx pour afficher la fraîcheur des données
+// └── affiche les tendances 1X2, buts et BTTS fournies par le backend
