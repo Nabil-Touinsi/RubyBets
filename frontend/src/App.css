@@ -1,4 +1,3 @@
-/* Ce fichier améliore l'apparence globale de la page MVP RubyBets sans modifier la logique React. */
 
 :root {
   --rb-bg: #071013;
@@ -540,3 +539,2161 @@ section:has(h2:nth-child(1)) {
     grid-template-columns: 1fr;
   }
 }
+/*
+ CSS Dashboard RubyBets
+Ce bloc ajoute le style Obsidian Teal pour l’architecture AppShell et l’écran Dashboard.
+*/
+.rb-app-shell {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, rgba(18, 184, 166, 0.18), transparent 34rem),
+    radial-gradient(circle at bottom right, rgba(20, 83, 90, 0.24), transparent 32rem),
+    #071113;
+  color: #f4fbfb;
+}
+
+.rb-app-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1.25rem 2rem;
+  background: rgba(7, 17, 19, 0.88);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+  backdrop-filter: blur(18px);
+}
+
+.rb-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.rb-brand__mark {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 1rem;
+  background: linear-gradient(135deg, #14b8a6, #0f766e);
+  color: #ecfeff;
+  box-shadow: 0 0 32px rgba(20, 184, 166, 0.35);
+}
+
+.rb-brand h1 {
+  margin: 0;
+  font-size: 1.35rem;
+  letter-spacing: -0.03em;
+}
+
+.rb-brand p {
+  margin: 0;
+  color: #93a9aa;
+}
+
+.rb-eyebrow {
+  margin: 0 0 0.45rem;
+  color: #2dd4bf;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* Navigation horizontale */
+.rb-top-navigation {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.45rem;
+}
+
+.rb-top-navigation__item {
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 999px;
+  padding: 0.7rem 0.95rem;
+  background: rgba(15, 23, 42, 0.55);
+  color: #c7dada;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    background 0.18s ease,
+    color 0.18s ease;
+}
+
+.rb-top-navigation__item:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: rgba(45, 212, 191, 0.55);
+  color: #f8ffff;
+  background: rgba(20, 184, 166, 0.12);
+}
+
+.rb-top-navigation__item--active {
+  border-color: rgba(45, 212, 191, 0.85);
+  background: linear-gradient(135deg, rgba(20, 184, 166, 0.24), rgba(15, 118, 110, 0.16));
+  color: #ecfeff;
+  box-shadow: 0 0 22px rgba(20, 184, 166, 0.16);
+}
+
+.rb-top-navigation__item:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+}
+
+.rb-screen-container {
+  width: min(1220px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 2rem 0 2.5rem;
+}
+
+.rb-status-footer {
+  width: min(1220px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 0 0 2rem;
+  opacity: 0.92;
+}
+
+/* Dashboard - écran 1 */
+.rb-dashboard-screen {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.rb-dashboard-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.8fr) minmax(280px, 0.8fr);
+  gap: 1.25rem;
+  align-items: stretch;
+}
+
+.rb-dashboard-hero__content,
+.rb-dashboard-hero__card,
+.rb-dashboard-card {
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 1.6rem;
+  background:
+    linear-gradient(145deg, rgba(15, 23, 42, 0.88), rgba(8, 47, 51, 0.72)),
+    rgba(15, 23, 42, 0.72);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+}
+
+.rb-dashboard-hero__content {
+  min-height: 22rem;
+  padding: 2.25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.rb-dashboard-hero__content::after {
+  content: "";
+  position: absolute;
+  right: -4rem;
+  bottom: -5rem;
+  width: 18rem;
+  height: 18rem;
+  border-radius: 50%;
+  background: rgba(20, 184, 166, 0.12);
+  filter: blur(2px);
+}
+
+.rb-dashboard-hero__content h2 {
+  position: relative;
+  z-index: 1;
+  max-width: 760px;
+  margin: 0;
+  color: #f8ffff;
+  font-size: clamp(2.2rem, 5vw, 4.5rem);
+  line-height: 0.96;
+  letter-spacing: -0.07em;
+}
+
+.rb-dashboard-hero__content p:not(.rb-eyebrow) {
+  position: relative;
+  z-index: 1;
+  max-width: 640px;
+  margin: 1.25rem 0 0;
+  color: #aec3c4;
+  font-size: 1.04rem;
+  line-height: 1.7;
+}
+
+.rb-dashboard-hero__actions {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin-top: 1.75rem;
+}
+
+.rb-dashboard-hero__actions button,
+.rb-dashboard-section-header button,
+.rb-dashboard-card button {
+  border: 0;
+  border-radius: 999px;
+  padding: 0.8rem 1.15rem;
+  background: linear-gradient(135deg, #14b8a6, #0f766e);
+  color: #ecfeff;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 16px 32px rgba(20, 184, 166, 0.22);
+}
+
+.rb-dashboard-hero__actions button:nth-child(2),
+.rb-dashboard-card button {
+  border: 1px solid rgba(45, 212, 191, 0.28);
+  background: rgba(20, 184, 166, 0.08);
+  box-shadow: none;
+}
+
+.rb-dashboard-hero__card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.5rem;
+  background:
+    linear-gradient(160deg, rgba(20, 184, 166, 0.18), rgba(15, 23, 42, 0.9)),
+    rgba(15, 23, 42, 0.86);
+}
+
+.rb-dashboard-hero__card h3 {
+  margin: 0;
+  color: #ecfeff;
+  font-size: 2rem;
+  letter-spacing: -0.04em;
+}
+
+.rb-dashboard-hero__card p:not(.rb-eyebrow) {
+  color: #b7caca;
+  line-height: 1.6;
+}
+
+/* Grille Dashboard */
+.rb-dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 1.25rem;
+}
+
+.rb-dashboard-card {
+  grid-column: span 4;
+  padding: 1.35rem;
+}
+
+.rb-dashboard-card--wide {
+  grid-column: span 8;
+}
+
+.rb-dashboard-card h3 {
+  margin: 0 0 0.75rem;
+  color: #f8ffff;
+  font-size: 1.35rem;
+  letter-spacing: -0.03em;
+}
+
+.rb-dashboard-card p:not(.rb-eyebrow) {
+  color: #a8bdbe;
+  line-height: 1.6;
+}
+
+.rb-dashboard-stats {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.rb-dashboard-stats div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 1rem;
+  background: rgba(2, 6, 23, 0.24);
+}
+
+.rb-dashboard-stats span {
+  color: #9fb5b6;
+}
+
+.rb-dashboard-stats strong {
+  color: #f8ffff;
+  font-size: 1.25rem;
+}
+
+.rb-dashboard-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* Harmonisation légère des composants existants dans le dashboard */
+.rb-dashboard-card section {
+  margin: 0;
+}
+
+.rb-dashboard-card section > h2,
+.rb-dashboard-card section > h3 {
+  margin-top: 0;
+}
+
+.rb-dashboard-card ul,
+.rb-dashboard-card ol {
+  padding-left: 1.1rem;
+}
+
+.rb-dashboard-card article,
+.rb-dashboard-card li {
+  border-color: rgba(148, 163, 184, 0.14);
+}
+
+/* Responsive minimal pour éviter la casse sur petits écrans */
+@media (max-width: 980px) {
+  .rb-app-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .rb-top-navigation {
+    justify-content: flex-start;
+  }
+
+  .rb-dashboard-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .rb-dashboard-card,
+  .rb-dashboard-card--wide {
+    grid-column: span 12;
+  }
+}
+
+@media (max-width: 640px) {
+  .rb-app-header {
+    padding: 1rem;
+  }
+
+  .rb-screen-container,
+  .rb-status-footer {
+    width: min(100% - 1rem, 1220px);
+  }
+
+  .rb-dashboard-hero__content,
+  .rb-dashboard-hero__card,
+  .rb-dashboard-card {
+    border-radius: 1.2rem;
+    padding: 1rem;
+  }
+
+  .rb-dashboard-hero__content h2 {
+    font-size: 2.15rem;
+  }
+}
+/*
+  CSS écran Matchs RubyBets
+  Ce bloc ajoute le style Obsidian Teal pour l’écran Matchs.
+*/
+.rb-matches-screen {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Header de page */
+.rb-page-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.65fr) minmax(260px, 0.75fr);
+  gap: 1.25rem;
+  align-items: stretch;
+}
+
+.rb-page-hero > div,
+.rb-page-hero__aside {
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 1.6rem;
+  background:
+    linear-gradient(145deg, rgba(15, 23, 42, 0.88), rgba(8, 47, 51, 0.72)),
+    rgba(15, 23, 42, 0.72);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.26);
+}
+
+.rb-page-hero > div {
+  padding: 1.9rem;
+}
+
+.rb-page-hero h2 {
+  max-width: 780px;
+  margin: 0;
+  color: #f8ffff;
+  font-size: clamp(2rem, 4vw, 3.6rem);
+  line-height: 1;
+  letter-spacing: -0.06em;
+}
+
+.rb-page-hero p:not(.rb-eyebrow) {
+  max-width: 720px;
+  margin: 1rem 0 0;
+  color: #abc0c1;
+  line-height: 1.65;
+}
+
+.rb-page-hero__aside {
+  padding: 1.4rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background:
+    linear-gradient(160deg, rgba(20, 184, 166, 0.15), rgba(15, 23, 42, 0.92)),
+    rgba(15, 23, 42, 0.82);
+}
+
+.rb-page-hero__aside h3 {
+  margin: 0.2rem 0 0;
+  color: #ecfeff;
+  font-size: 2.2rem;
+  letter-spacing: -0.04em;
+}
+
+/* Bloc filtres / compétitions */
+.rb-matches-filters {
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 1.6rem;
+  padding: 1.35rem;
+  background:
+    linear-gradient(145deg, rgba(15, 23, 42, 0.82), rgba(8, 47, 51, 0.62)),
+    rgba(15, 23, 42, 0.72);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.24);
+}
+
+.rb-matches-filters__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.rb-matches-filters__header h3 {
+  margin: 0;
+  color: #f8ffff;
+  font-size: 1.35rem;
+}
+
+.rb-matches-filters__header button {
+  border: 1px solid rgba(45, 212, 191, 0.36);
+  border-radius: 999px;
+  padding: 0.8rem 1rem;
+  background: rgba(20, 184, 166, 0.1);
+  color: #ecfeff;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+/* Harmonisation du composant Compétitions dans l’écran Matchs */
+.rb-matches-filters section {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.rb-matches-filters section h2,
+.rb-matches-filters section h3 {
+  margin-top: 0;
+}
+
+.rb-matches-filters button:not(.rb-matches-filters__header button) {
+  min-height: 2.75rem;
+}
+
+/* Layout principal Matchs */
+.rb-matches-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.rb-matches-main,
+.rb-matches-aside {
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 1.6rem;
+  background:
+    linear-gradient(145deg, rgba(15, 23, 42, 0.82), rgba(8, 47, 51, 0.6)),
+    rgba(15, 23, 42, 0.72);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.24);
+}
+
+.rb-matches-main {
+  padding: 1.35rem;
+}
+
+.rb-matches-aside {
+  position: sticky;
+  top: 7.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.15rem;
+}
+
+.rb-matches-aside article {
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 1.25rem;
+  padding: 1rem;
+  background: rgba(2, 6, 23, 0.22);
+}
+
+.rb-matches-aside h3 {
+  margin: 0 0 0.6rem;
+  color: #f8ffff;
+  font-size: 1.08rem;
+}
+
+.rb-matches-aside p,
+.rb-matches-aside li {
+  color: #abc0c1;
+  line-height: 1.55;
+}
+
+.rb-matches-aside ol {
+  margin: 0;
+  padding-left: 1.15rem;
+}
+
+/* Harmonisation du composant liste des matchs */
+.rb-matches-main section {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.rb-matches-main section > h2,
+.rb-matches-main section > h3 {
+  margin-top: 0;
+  color: #f8ffff;
+  font-size: 1.7rem;
+  letter-spacing: -0.04em;
+}
+
+.rb-matches-main article,
+.rb-matches-main li {
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-radius: 1.2rem;
+  background:
+    linear-gradient(135deg, rgba(8, 47, 51, 0.7), rgba(15, 23, 42, 0.68)),
+    rgba(2, 6, 23, 0.32);
+}
+
+.rb-matches-main button {
+  border: 1px solid rgba(45, 212, 191, 0.38);
+  border-radius: 999px;
+  padding: 0.7rem 1rem;
+  background: rgba(20, 184, 166, 0.1);
+  color: #ecfeff;
+  font-weight: 800;
+  cursor: pointer;
+  transition:
+    transform 0.18s ease,
+    background 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.rb-matches-main button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(45, 212, 191, 0.8);
+  background: rgba(20, 184, 166, 0.18);
+}
+
+/* Petits ajustements texte pour garder un rendu premium */
+.rb-matches-screen strong,
+.rb-matches-screen b {
+  color: #ffffff;
+}
+
+.rb-matches-screen a {
+  color: #5eead4;
+}
+
+/* Responsive écran Matchs */
+@media (max-width: 980px) {
+  .rb-page-hero,
+  .rb-matches-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .rb-matches-aside {
+    position: static;
+  }
+}
+
+@media (max-width: 640px) {
+  .rb-page-hero > div,
+  .rb-page-hero__aside,
+  .rb-matches-filters,
+  .rb-matches-main,
+  .rb-matches-aside {
+    border-radius: 1.2rem;
+    padding: 1rem;
+  }
+
+  .rb-matches-filters__header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .rb-page-hero h2 {
+    font-size: 2.05rem;
+  }
+}
+/*
+  CSS écran Détail match RubyBets
+  Ce bloc ajoute le style Obsidian Teal pour l’écran Fiche détail match.
+*/
+.rb-match-details-screen {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* En-tête synthétique du match */
+.rb-match-details-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.65fr) minmax(280px, 0.75fr);
+  gap: 1.25rem;
+  align-items: stretch;
+}
+
+.rb-match-details-hero > div,
+.rb-match-details-hero > aside {
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 1.6rem;
+  background:
+    linear-gradient(145deg, rgba(15, 23, 42, 0.9), rgba(8, 47, 51, 0.72)),
+    rgba(15, 23, 42, 0.74);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.26);
+}
+
+.rb-match-details-hero > div {
+  padding: 1.9rem;
+}
+
+.rb-match-details-hero > aside {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 1.4rem;
+  background:
+    linear-gradient(160deg, rgba(20, 184, 166, 0.15), rgba(15, 23, 42, 0.92)),
+    rgba(15, 23, 42, 0.84);
+}
+
+.rb-match-details-hero h2 {
+  max-width: 820px;
+  margin: 0;
+  color: #f8ffff;
+  font-size: clamp(2rem, 4vw, 3.4rem);
+  line-height: 1;
+  letter-spacing: -0.06em;
+}
+
+.rb-match-details-hero h2 span {
+  color: #2dd4bf;
+  font-size: 0.55em;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.rb-match-details-hero h3 {
+  margin: 0.2rem 0 0;
+  color: #ecfeff;
+  font-size: 1.6rem;
+  letter-spacing: -0.04em;
+}
+
+.rb-match-details-hero p:not(.rb-eyebrow) {
+  margin: 1rem 0 0;
+  color: #abc0c1;
+  line-height: 1.65;
+}
+
+/* Layout principal de la fiche match */
+.rb-match-details-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.rb-match-details-main,
+.rb-match-details-aside,
+.rb-match-context-panel {
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 1.6rem;
+  background:
+    linear-gradient(145deg, rgba(15, 23, 42, 0.84), rgba(8, 47, 51, 0.58)),
+    rgba(15, 23, 42, 0.72);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.24);
+}
+
+.rb-match-details-main,
+.rb-match-context-panel {
+  padding: 1.35rem;
+}
+
+.rb-match-details-aside {
+  position: sticky;
+  top: 7.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.15rem;
+}
+
+.rb-match-details-aside article {
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 1.25rem;
+  padding: 1rem;
+  background: rgba(2, 6, 23, 0.24);
+}
+
+.rb-match-details-aside h3 {
+  margin: 0 0 0.65rem;
+  color: #f8ffff;
+  font-size: 1.12rem;
+}
+
+.rb-match-details-aside p {
+  color: #abc0c1;
+  line-height: 1.6;
+}
+
+.rb-match-details-actions {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.rb-match-details-actions button,
+.rb-match-details-screen .rb-empty-state button {
+  border: 1px solid rgba(45, 212, 191, 0.38);
+  border-radius: 999px;
+  padding: 0.75rem 1rem;
+  background: rgba(20, 184, 166, 0.1);
+  color: #ecfeff;
+  font-weight: 800;
+  cursor: pointer;
+  transition:
+    transform 0.18s ease,
+    background 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.rb-match-details-actions button:first-child {
+  background: linear-gradient(135deg, #14b8a6, #0f766e);
+  border-color: rgba(45, 212, 191, 0.7);
+  box-shadow: 0 16px 32px rgba(20, 184, 166, 0.18);
+}
+
+.rb-match-details-actions button:hover,
+.rb-match-details-screen .rb-empty-state button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(45, 212, 191, 0.82);
+  background: rgba(20, 184, 166, 0.18);
+}
+
+/* Harmonisation des composants existants dans l’écran détail */
+.rb-match-details-main section,
+.rb-match-context-panel section {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.rb-match-details-main section > h2,
+.rb-match-details-main section > h3,
+.rb-match-context-panel section > h2,
+.rb-match-context-panel section > h3 {
+  margin-top: 0;
+  color: #f8ffff;
+  font-size: 1.7rem;
+  letter-spacing: -0.04em;
+}
+
+.rb-match-details-main article,
+.rb-match-details-main li,
+.rb-match-context-panel article,
+.rb-match-context-panel li {
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-radius: 1.2rem;
+  background:
+    linear-gradient(135deg, rgba(8, 47, 51, 0.66), rgba(15, 23, 42, 0.7)),
+    rgba(2, 6, 23, 0.28);
+}
+
+.rb-match-details-main p,
+.rb-match-context-panel p,
+.rb-match-details-main li,
+.rb-match-context-panel li {
+  color: #abc0c1;
+  line-height: 1.6;
+}
+
+.rb-match-details-main strong,
+.rb-match-context-panel strong,
+.rb-match-details-main b,
+.rb-match-context-panel b {
+  color: #ffffff;
+}
+
+.rb-match-details-main button,
+.rb-match-context-panel button {
+  border: 1px solid rgba(45, 212, 191, 0.38);
+  border-radius: 999px;
+  padding: 0.7rem 1rem;
+  background: rgba(20, 184, 166, 0.1);
+  color: #ecfeff;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+/* État vide cohérent avec les cartes */
+.rb-match-details-screen .rb-empty-state {
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-radius: 1.2rem;
+  padding: 1.1rem;
+  background: rgba(2, 6, 23, 0.26);
+}
+
+.rb-match-details-screen .rb-empty-state h3 {
+  margin: 0 0 0.6rem;
+  color: #f8ffff;
+}
+
+/* Responsive écran détail */
+@media (max-width: 980px) {
+  .rb-match-details-hero,
+  .rb-match-details-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .rb-match-details-aside {
+    position: static;
+  }
+}
+
+@media (max-width: 640px) {
+  .rb-match-details-hero > div,
+  .rb-match-details-hero > aside,
+  .rb-match-details-main,
+  .rb-match-details-aside,
+  .rb-match-context-panel {
+    border-radius: 1.2rem;
+    padding: 1rem;
+  }
+
+  .rb-match-details-hero h2 {
+    font-size: 2rem;
+  }
+}
+/*
+  CSS écran Analyse pré-match RubyBets
+  Ce bloc ajoute le style Obsidian Teal pour l’écran Analyse.
+*/
+.rb-analysis-screen {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Layout principal Analyse */
+.rb-analysis-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.rb-analysis-main,
+.rb-analysis-aside {
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 1.6rem;
+  background:
+    linear-gradient(145deg, rgba(15, 23, 42, 0.86), rgba(8, 47, 51, 0.6)),
+    rgba(15, 23, 42, 0.74);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.24);
+}
+
+.rb-analysis-main {
+  padding: 1.35rem;
+}
+
+.rb-analysis-aside {
+  position: sticky;
+  top: 7.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.15rem;
+}
+
+.rb-analysis-aside article {
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 1.25rem;
+  padding: 1rem;
+  background:
+    linear-gradient(145deg, rgba(2, 6, 23, 0.34), rgba(8, 47, 51, 0.24)),
+    rgba(2, 6, 23, 0.24);
+}
+
+.rb-analysis-aside h3 {
+  margin: 0 0 0.65rem;
+  color: #f8ffff;
+  font-size: 1.12rem;
+  letter-spacing: -0.03em;
+}
+
+.rb-analysis-aside p {
+  color: #abc0c1;
+  line-height: 1.6;
+}
+
+.rb-analysis-aside button {
+  border: 1px solid rgba(45, 212, 191, 0.42);
+  border-radius: 999px;
+  padding: 0.78rem 1rem;
+  background: linear-gradient(135deg, #14b8a6, #0f766e);
+  color: #ecfeff;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 16px 32px rgba(20, 184, 166, 0.18);
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    filter 0.18s ease;
+}
+
+.rb-analysis-aside button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(45, 212, 191, 0.82);
+  filter: brightness(1.08);
+}
+
+/* Harmonisation du composant existant MatchAnalysisSection */
+.rb-analysis-main section {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.rb-analysis-main section > h2,
+.rb-analysis-main section > h3 {
+  margin-top: 0;
+  color: #f8ffff;
+  font-size: 1.75rem;
+  letter-spacing: -0.04em;
+}
+
+.rb-analysis-main section > h2::after,
+.rb-analysis-main section > h3::after {
+  content: "";
+  display: block;
+  width: 2.7rem;
+  height: 0.16rem;
+  margin-top: 0.75rem;
+  border-radius: 999px;
+  background: #2dd4bf;
+}
+
+.rb-analysis-main article,
+.rb-analysis-main li {
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-radius: 1.2rem;
+  background:
+    linear-gradient(135deg, rgba(8, 47, 51, 0.66), rgba(15, 23, 42, 0.7)),
+    rgba(2, 6, 23, 0.28);
+}
+
+.rb-analysis-main article {
+  padding: 1rem;
+}
+
+.rb-analysis-main p,
+.rb-analysis-main li {
+  color: #abc0c1;
+  line-height: 1.6;
+}
+
+.rb-analysis-main strong,
+.rb-analysis-main b {
+  color: #ffffff;
+}
+
+.rb-analysis-main ul,
+.rb-analysis-main ol {
+  display: grid;
+  gap: 0.75rem;
+  padding-left: 1.15rem;
+}
+
+/* État vide */
+.rb-analysis-screen .rb-empty-state {
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-radius: 1.2rem;
+  padding: 1.1rem;
+  background: rgba(2, 6, 23, 0.26);
+}
+
+.rb-analysis-screen .rb-empty-state h3 {
+  margin: 0 0 0.6rem;
+  color: #f8ffff;
+}
+
+/* Ajustement des textes de la page Analyse */
+.rb-analysis-screen .rb-page-hero__aside h3 {
+  font-size: 1.55rem;
+}
+
+.rb-analysis-screen a {
+  color: #5eead4;
+}
+
+/* Responsive écran Analyse */
+@media (max-width: 980px) {
+  .rb-analysis-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .rb-analysis-aside {
+    position: static;
+  }
+}
+
+@media (max-width: 640px) {
+  .rb-analysis-main,
+  .rb-analysis-aside {
+    border-radius: 1.2rem;
+    padding: 1rem;
+  }
+}
+/*
+  CSS écran Prédictions RubyBets
+  Ce bloc ajoute le style Obsidian Teal pour l’écran Prédictions.
+*/
+.rb-predictions-screen {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Layout principal Prédictions */
+.rb-predictions-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.rb-predictions-main,
+.rb-predictions-aside {
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 1.6rem;
+  background:
+    linear-gradient(145deg, rgba(15, 23, 42, 0.88), rgba(8, 47, 51, 0.62)),
+    rgba(15, 23, 42, 0.74);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.24);
+}
+
+.rb-predictions-main {
+  padding: 1.35rem;
+}
+
+.rb-predictions-aside {
+  position: sticky;
+  top: 7.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.15rem;
+}
+
+.rb-predictions-aside article {
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 1.25rem;
+  padding: 1rem;
+  background:
+    linear-gradient(145deg, rgba(2, 6, 23, 0.34), rgba(8, 47, 51, 0.24)),
+    rgba(2, 6, 23, 0.24);
+}
+
+.rb-predictions-aside h3 {
+  margin: 0 0 0.65rem;
+  color: #f8ffff;
+  font-size: 1.12rem;
+  letter-spacing: -0.03em;
+}
+
+.rb-predictions-aside p,
+.rb-predictions-aside li {
+  color: #abc0c1;
+  line-height: 1.6;
+}
+
+.rb-predictions-aside ul {
+  display: grid;
+  gap: 0.7rem;
+  margin: 0;
+  padding-left: 1.15rem;
+}
+
+.rb-predictions-aside button {
+  border: 1px solid rgba(45, 212, 191, 0.42);
+  border-radius: 999px;
+  padding: 0.78rem 1rem;
+  background: linear-gradient(135deg, #14b8a6, #0f766e);
+  color: #ecfeff;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 16px 32px rgba(20, 184, 166, 0.18);
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    filter 0.18s ease;
+}
+
+.rb-predictions-aside button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(45, 212, 191, 0.82);
+  filter: brightness(1.08);
+}
+
+/* Harmonisation du composant existant MatchPredictionsSection */
+.rb-predictions-main section {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.rb-predictions-main section > h2,
+.rb-predictions-main section > h3 {
+  margin-top: 0;
+  color: #f8ffff;
+  font-size: 1.75rem;
+  letter-spacing: -0.04em;
+}
+
+.rb-predictions-main section > h2::after,
+.rb-predictions-main section > h3::after {
+  content: "";
+  display: block;
+  width: 2.7rem;
+  height: 0.16rem;
+  margin-top: 0.75rem;
+  border-radius: 999px;
+  background: #2dd4bf;
+}
+
+.rb-predictions-main article,
+.rb-predictions-main li {
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-radius: 1.2rem;
+  background:
+    linear-gradient(135deg, rgba(8, 47, 51, 0.66), rgba(15, 23, 42, 0.72)),
+    rgba(2, 6, 23, 0.28);
+}
+
+.rb-predictions-main article {
+  padding: 1rem;
+}
+
+.rb-predictions-main p,
+.rb-predictions-main li {
+  color: #abc0c1;
+  line-height: 1.6;
+}
+
+.rb-predictions-main strong,
+.rb-predictions-main b {
+  color: #ffffff;
+}
+
+.rb-predictions-main ul,
+.rb-predictions-main ol {
+  display: grid;
+  gap: 0.75rem;
+  padding-left: 1.15rem;
+}
+
+.rb-predictions-main button {
+  border: 1px solid rgba(45, 212, 191, 0.38);
+  border-radius: 999px;
+  padding: 0.7rem 1rem;
+  background: rgba(20, 184, 166, 0.1);
+  color: #ecfeff;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+/* Mise en valeur des badges, niveaux et libellés de prédiction */
+.rb-predictions-screen [class*="confidence"],
+.rb-predictions-screen [class*="risk"],
+.rb-predictions-screen [class*="badge"],
+.rb-predictions-screen [class*="level"] {
+  border-radius: 999px;
+  font-weight: 800;
+}
+
+.rb-predictions-screen .rb-page-hero__aside h3 {
+  font-size: 1.55rem;
+}
+
+.rb-predictions-screen a {
+  color: #5eead4;
+}
+
+/* État vide */
+.rb-predictions-screen .rb-empty-state {
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-radius: 1.2rem;
+  padding: 1.1rem;
+  background: rgba(2, 6, 23, 0.26);
+}
+
+.rb-predictions-screen .rb-empty-state h3 {
+  margin: 0 0 0.6rem;
+  color: #f8ffff;
+}
+
+/* Responsive écran Prédictions */
+@media (max-width: 980px) {
+  .rb-predictions-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .rb-predictions-aside {
+    position: static;
+  }
+}
+
+@media (max-width: 640px) {
+  .rb-predictions-main,
+  .rb-predictions-aside {
+    border-radius: 1.2rem;
+    padding: 1rem;
+  }
+}
+/*
+  CSS écran Recommandation RubyBets
+  Ce bloc ajoute le style Obsidian Teal pour l’écran Recommandation multi-matchs.
+*/
+.rb-recommendation-screen {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Layout principal Recommandation */
+.rb-recommendation-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.rb-recommendation-main,
+.rb-recommendation-aside {
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 1.6rem;
+  background:
+    linear-gradient(145deg, rgba(15, 23, 42, 0.88), rgba(8, 47, 51, 0.62)),
+    rgba(15, 23, 42, 0.74);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.24);
+}
+
+.rb-recommendation-main {
+  padding: 1.35rem;
+}
+
+.rb-recommendation-aside {
+  position: sticky;
+  top: 7.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.15rem;
+}
+
+.rb-recommendation-aside article {
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 1.25rem;
+  padding: 1rem;
+  background:
+    linear-gradient(145deg, rgba(2, 6, 23, 0.34), rgba(8, 47, 51, 0.24)),
+    rgba(2, 6, 23, 0.24);
+}
+
+.rb-recommendation-aside h3 {
+  margin: 0 0 0.65rem;
+  color: #f8ffff;
+  font-size: 1.12rem;
+  letter-spacing: -0.03em;
+}
+
+.rb-recommendation-aside p,
+.rb-recommendation-aside li {
+  color: #abc0c1;
+  line-height: 1.6;
+}
+
+/* Harmonisation du composant existant MultiMatchRecommendationSection */
+.rb-recommendation-main section {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.rb-recommendation-main section > h2,
+.rb-recommendation-main section > h3 {
+  margin-top: 0;
+  color: #f8ffff;
+  font-size: 1.75rem;
+  letter-spacing: -0.04em;
+}
+
+.rb-recommendation-main section > h2::after,
+.rb-recommendation-main section > h3::after {
+  content: "";
+  display: block;
+  width: 2.7rem;
+  height: 0.16rem;
+  margin-top: 0.75rem;
+  border-radius: 999px;
+  background: #2dd4bf;
+}
+
+.rb-recommendation-main article,
+.rb-recommendation-main li {
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-radius: 1.2rem;
+  background:
+    linear-gradient(135deg, rgba(8, 47, 51, 0.66), rgba(15, 23, 42, 0.72)),
+    rgba(2, 6, 23, 0.28);
+}
+
+.rb-recommendation-main article {
+  padding: 1rem;
+}
+
+.rb-recommendation-main p,
+.rb-recommendation-main li,
+.rb-recommendation-main label {
+  color: #abc0c1;
+  line-height: 1.6;
+}
+
+.rb-recommendation-main strong,
+.rb-recommendation-main b {
+  color: #ffffff;
+}
+
+.rb-recommendation-main ul,
+.rb-recommendation-main ol {
+  display: grid;
+  gap: 0.75rem;
+  padding-left: 1.15rem;
+}
+
+/* Inputs, selects et boutons du bloc recommandation */
+.rb-recommendation-main input,
+.rb-recommendation-main select {
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 0.9rem;
+  padding: 0.75rem 0.9rem;
+  background: rgba(2, 6, 23, 0.32);
+  color: #ecfeff;
+  outline: none;
+}
+
+.rb-recommendation-main input:focus,
+.rb-recommendation-main select:focus {
+  border-color: rgba(45, 212, 191, 0.82);
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.12);
+}
+
+.rb-recommendation-main button {
+  border: 1px solid rgba(45, 212, 191, 0.42);
+  border-radius: 999px;
+  padding: 0.78rem 1rem;
+  background: linear-gradient(135deg, #14b8a6, #0f766e);
+  color: #ecfeff;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 16px 32px rgba(20, 184, 166, 0.18);
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    filter 0.18s ease;
+}
+
+.rb-recommendation-main button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(45, 212, 191, 0.82);
+  filter: brightness(1.08);
+}
+
+/* Mise en valeur des niveaux de risque et éléments de sélection */
+.rb-recommendation-screen [class*="risk"],
+.rb-recommendation-screen [class*="score"],
+.rb-recommendation-screen [class*="badge"],
+.rb-recommendation-screen [class*="level"] {
+  border-radius: 999px;
+  font-weight: 800;
+}
+
+.rb-recommendation-screen .rb-page-hero__aside h3 {
+  font-size: 1.55rem;
+}
+
+.rb-recommendation-screen a {
+  color: #5eead4;
+}
+
+/* Responsive écran Recommandation */
+@media (max-width: 980px) {
+  .rb-recommendation-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .rb-recommendation-aside {
+    position: static;
+  }
+}
+
+@media (max-width: 640px) {
+  .rb-recommendation-main,
+  .rb-recommendation-aside {
+    border-radius: 1.2rem;
+    padding: 1rem;
+  }
+}
+/*
+  CSS écran Glossaire RubyBets
+  Ce bloc ajoute le style Obsidian Teal pour l’écran Glossaire.
+*/
+.rb-glossary-screen {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Layout principal Glossaire */
+.rb-glossary-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.rb-glossary-main,
+.rb-glossary-aside {
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 1.6rem;
+  background:
+    linear-gradient(145deg, rgba(15, 23, 42, 0.88), rgba(8, 47, 51, 0.62)),
+    rgba(15, 23, 42, 0.74);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.24);
+}
+
+.rb-glossary-main {
+  padding: 1.35rem;
+}
+
+.rb-glossary-aside {
+  position: sticky;
+  top: 7.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.15rem;
+}
+
+.rb-glossary-aside article {
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 1.25rem;
+  padding: 1rem;
+  background:
+    linear-gradient(145deg, rgba(2, 6, 23, 0.34), rgba(8, 47, 51, 0.24)),
+    rgba(2, 6, 23, 0.24);
+}
+
+.rb-glossary-aside h3 {
+  margin: 0 0 0.65rem;
+  color: #f8ffff;
+  font-size: 1.12rem;
+  letter-spacing: -0.03em;
+}
+
+.rb-glossary-aside p {
+  color: #abc0c1;
+  line-height: 1.6;
+}
+
+/* Harmonisation du composant existant GlossarySection */
+.rb-glossary-main section {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.rb-glossary-main section > h2 {
+  margin-top: 0;
+  color: #f8ffff;
+  font-size: 1.75rem;
+  letter-spacing: -0.04em;
+}
+
+.rb-glossary-main section > h2::after {
+  content: "";
+  display: block;
+  width: 2.7rem;
+  height: 0.16rem;
+  margin-top: 0.75rem;
+  border-radius: 999px;
+  background: #2dd4bf;
+}
+
+.rb-glossary-main section > p {
+  color: #abc0c1;
+}
+
+.rb-glossary-main section > div {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.rb-glossary-main article {
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-radius: 1.2rem;
+  padding: 1rem;
+  background:
+    linear-gradient(135deg, rgba(8, 47, 51, 0.66), rgba(15, 23, 42, 0.72)),
+    rgba(2, 6, 23, 0.28);
+}
+
+.rb-glossary-main article h3 {
+  margin: 0 0 0.5rem;
+  color: #f8ffff;
+  font-size: 1.18rem;
+}
+
+.rb-glossary-main article p {
+  color: #abc0c1;
+  line-height: 1.6;
+}
+
+.rb-glossary-main article p:first-of-type {
+  display: inline-flex;
+  width: fit-content;
+  margin-bottom: 0.7rem;
+  padding: 0.28rem 0.7rem;
+  border: 1px solid rgba(45, 212, 191, 0.28);
+  border-radius: 999px;
+  background: rgba(20, 184, 166, 0.1);
+  color: #99f6e4;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+/* Responsive écran Glossaire */
+@media (max-width: 980px) {
+  .rb-glossary-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .rb-glossary-aside {
+    position: static;
+  }
+}
+
+@media (max-width: 640px) {
+  .rb-glossary-main,
+  .rb-glossary-aside {
+    border-radius: 1.2rem;
+    padding: 1rem;
+  }
+}
+/*
+  CSS écran Informations responsables RubyBets
+  Ce bloc ajoute le style Obsidian Teal pour l’écran de cadre responsable.
+*/
+.rb-responsible-screen {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Layout principal Informations responsables */
+.rb-responsible-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.rb-responsible-main,
+.rb-responsible-aside {
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 1.6rem;
+  background:
+    linear-gradient(145deg, rgba(15, 23, 42, 0.9), rgba(8, 47, 51, 0.58)),
+    rgba(15, 23, 42, 0.74);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.24);
+}
+
+.rb-responsible-main {
+  padding: 1.35rem;
+}
+
+.rb-responsible-aside {
+  position: sticky;
+  top: 7.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.15rem;
+}
+
+.rb-responsible-aside article {
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 1.25rem;
+  padding: 1rem;
+  background:
+    linear-gradient(145deg, rgba(2, 6, 23, 0.36), rgba(8, 47, 51, 0.24)),
+    rgba(2, 6, 23, 0.24);
+}
+
+.rb-responsible-aside h3 {
+  margin: 0 0 0.65rem;
+  color: #f8ffff;
+  font-size: 1.12rem;
+  letter-spacing: -0.03em;
+}
+
+.rb-responsible-aside p {
+  color: #abc0c1;
+  line-height: 1.6;
+}
+
+/* Harmonisation du composant existant ResponsibleInfoSection */
+.rb-responsible-main section {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.rb-responsible-main section > h2 {
+  margin-top: 0;
+  color: #f8ffff;
+  font-size: 1.75rem;
+  letter-spacing: -0.04em;
+}
+
+.rb-responsible-main section > h2::after {
+  content: "";
+  display: block;
+  width: 2.7rem;
+  height: 0.16rem;
+  margin-top: 0.75rem;
+  border-radius: 999px;
+  background: #2dd4bf;
+}
+
+.rb-responsible-main section > p {
+  color: #abc0c1;
+  line-height: 1.6;
+}
+
+.rb-responsible-main section > div {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.rb-responsible-main section > div > p {
+  margin: 0;
+  border: 1px solid rgba(45, 212, 191, 0.16);
+  border-radius: 1rem;
+  padding: 0.85rem 1rem;
+  background: rgba(20, 184, 166, 0.08);
+  color: #c7f9f4;
+  line-height: 1.55;
+}
+
+.rb-responsible-main strong {
+  color: #ffffff;
+}
+
+.rb-responsible-main article {
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-radius: 1.2rem;
+  padding: 1rem;
+  background:
+    linear-gradient(135deg, rgba(8, 47, 51, 0.66), rgba(15, 23, 42, 0.72)),
+    rgba(2, 6, 23, 0.28);
+}
+
+.rb-responsible-main article h3 {
+  margin: 0 0 0.5rem;
+  color: #f8ffff;
+  font-size: 1.18rem;
+}
+
+.rb-responsible-main article p {
+  color: #abc0c1;
+  line-height: 1.6;
+}
+
+.rb-responsible-main article p:first-of-type {
+  display: inline-flex;
+  width: fit-content;
+  margin-bottom: 0.7rem;
+  padding: 0.28rem 0.7rem;
+  border: 1px solid rgba(251, 191, 36, 0.28);
+  border-radius: 999px;
+  background: rgba(251, 191, 36, 0.1);
+  color: #fde68a;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+/* Responsive écran Informations responsables */
+@media (max-width: 980px) {
+  .rb-responsible-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .rb-responsible-aside {
+    position: static;
+  }
+}
+
+@media (max-width: 640px) {
+  .rb-responsible-main,
+  .rb-responsible-aside {
+    border-radius: 1.2rem;
+    padding: 1rem;
+  }
+}
+/*
+  Ce bloc sécurise les grilles, cartes, boutons et textes pour éviter les débordements sur petites et moyennes largeurs.
+*/
+
+html,
+body,
+#root,
+.rb-app-shell {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+main,
+.rb-screen-container,
+.rb-status-footer,
+section,
+article,
+li,
+.rb-page-hero,
+.rb-dashboard-hero,
+.rb-dashboard-grid,
+.rb-matches-layout,
+.rb-match-details-layout,
+.rb-analysis-layout,
+.rb-predictions-layout,
+.rb-recommendation-layout,
+.rb-glossary-layout,
+.rb-responsible-layout,
+.rb-matches-main,
+.rb-match-details-main,
+.rb-analysis-main,
+.rb-predictions-main,
+.rb-recommendation-main,
+.rb-glossary-main,
+.rb-responsible-main,
+.rb-matches-aside,
+.rb-match-details-aside,
+.rb-analysis-aside,
+.rb-predictions-aside,
+.rb-recommendation-aside,
+.rb-glossary-aside,
+.rb-responsible-aside,
+.rb-predictions-grid,
+.rb-recommendation-grid,
+.rb-recommendation-controls,
+.rb-metrics-row,
+.rb-results-summary,
+.rb-prediction-card,
+.rb-recommendation-card,
+.rb-dashboard-card {
+  min-width: 0;
+  max-width: 100%;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+p,
+span,
+li,
+label,
+strong,
+button,
+select,
+.rb-status-pill,
+.rb-prediction-highlight,
+.rb-technical-note,
+.rb-justification {
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+button,
+select,
+input {
+  max-width: 100%;
+  min-width: 0;
+}
+
+button {
+  white-space: normal;
+}
+
+img,
+svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Structure responsive des headers de page */
+.rb-page-hero,
+.rb-match-details-hero,
+.rb-dashboard-hero {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+}
+
+.rb-page-hero > div,
+.rb-page-hero__aside,
+.rb-match-details-hero > div,
+.rb-match-details-hero > aside,
+.rb-dashboard-hero__content,
+.rb-dashboard-hero__card {
+  min-width: 0;
+}
+
+/* Les layouts avec colonne latérale passent plus tôt en une seule colonne. */
+@media (max-width: 1100px) {
+  .rb-matches-layout,
+  .rb-match-details-layout,
+  .rb-analysis-layout,
+  .rb-predictions-layout,
+  .rb-recommendation-layout,
+  .rb-glossary-layout,
+  .rb-responsible-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rb-matches-aside,
+  .rb-match-details-aside,
+  .rb-analysis-aside,
+  .rb-predictions-aside,
+  .rb-recommendation-aside,
+  .rb-glossary-aside,
+  .rb-responsible-aside {
+    position: static;
+  }
+}
+
+/* Dashboard : les cartes se réorganisent sans créer de colonnes trop étroites. */
+.rb-dashboard-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+}
+
+.rb-dashboard-card,
+.rb-dashboard-card--wide {
+  grid-column: auto;
+}
+
+.rb-dashboard-section-header,
+.rb-dashboard-stats div,
+.rb-card-topline,
+.rb-results-summary,
+.rb-dashboard-hero__actions {
+  flex-wrap: wrap;
+}
+
+/* Recommandation multi-matchs : contrôles, cartes et métriques fluides. */
+.rb-recommendation-controls {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
+}
+
+.rb-recommendation-actions,
+.rb-recommendation-actions button,
+.rb-recommendation-main button {
+  width: 100%;
+}
+
+.rb-recommendation-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+}
+
+.rb-results-summary {
+  display: flex;
+  align-items: flex-start;
+}
+
+.rb-results-summary p {
+  max-width: 100%;
+  text-align: left;
+}
+
+.rb-metrics-row,
+.rb-prediction-card .rb-metrics-row {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 130px), 1fr));
+}
+
+.rb-prediction-highlight,
+.rb-metrics-row p {
+  min-width: 0;
+}
+
+/* Prédictions : les trois cartes restent lisibles et passent en 2 puis 1 colonne selon la place. */
+.rb-predictions-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 245px), 1fr));
+}
+
+.rb-prediction-card {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.rb-prediction-card h3,
+.rb-prediction-highlight strong {
+  line-height: 1.25;
+}
+
+.rb-predictions-status {
+  align-items: flex-start;
+}
+
+.rb-predictions-status .rb-status-pill {
+  max-width: 100%;
+}
+
+/* Glossaire : les définitions ne gardent jamais deux colonnes si la largeur ne suffit pas. */
+.rb-glossary-main section > div {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+}
+
+.rb-glossary-main article,
+.rb-responsible-main article,
+.rb-recommendation-main article,
+.rb-predictions-main article,
+.rb-analysis-main article,
+.rb-matches-main article,
+.rb-match-details-main article {
+  min-width: 0;
+}
+
+.rb-glossary-main article p:first-of-type,
+.rb-responsible-main article p:first-of-type {
+  max-width: 100%;
+  flex-wrap: wrap;
+  white-space: normal;
+}
+
+/* Listes et blocs internes : suppression des largeurs implicites qui provoquent les chevauchements. */
+.rb-matches-main section > div,
+.rb-match-details-main section > div,
+.rb-analysis-main section > div,
+.rb-predictions-main section > div,
+.rb-recommendation-main section > div,
+.rb-glossary-main section > div,
+.rb-responsible-main section > div {
+  min-width: 0;
+}
+
+.rb-matches-main ul,
+.rb-match-details-main ul,
+.rb-analysis-main ul,
+.rb-predictions-main ul,
+.rb-recommendation-main ul,
+.rb-glossary-main ul,
+.rb-responsible-main ul,
+.rb-matches-main ol,
+.rb-match-details-main ol,
+.rb-analysis-main ol,
+.rb-predictions-main ol,
+.rb-recommendation-main ol,
+.rb-glossary-main ol,
+.rb-responsible-main ol {
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* Ajustements tablette et petit écran. */
+@media (max-width: 820px) {
+  main,
+  .rb-screen-container,
+  .rb-status-footer {
+    width: min(100% - 1rem, 1220px);
+  }
+
+  .rb-app-header {
+    align-items: stretch;
+  }
+
+  .rb-top-navigation {
+    justify-content: flex-start;
+  }
+
+  .rb-top-navigation__item {
+    flex: 1 1 auto;
+    min-width: min(100%, 9rem);
+    text-align: center;
+  }
+
+  .rb-page-hero,
+  .rb-match-details-hero,
+  .rb-dashboard-hero,
+  .rb-recommendation-controls,
+  .rb-recommendation-grid,
+  .rb-predictions-grid,
+  .rb-glossary-main section > div,
+  .rb-metrics-row,
+  .rb-prediction-card .rb-metrics-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rb-results-summary,
+  .rb-card-topline,
+  .rb-dashboard-section-header,
+  .rb-matches-filters__header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  main,
+  .rb-screen-container,
+  .rb-status-footer {
+    width: min(100% - 0.75rem, 1220px);
+  }
+
+  .rb-app-header,
+  .rb-page-hero > div,
+  .rb-page-hero__aside,
+  .rb-dashboard-hero__content,
+  .rb-dashboard-hero__card,
+  .rb-dashboard-card,
+  .rb-matches-filters,
+  .rb-matches-main,
+  .rb-matches-aside,
+  .rb-match-details-main,
+  .rb-match-details-aside,
+  .rb-match-context-panel,
+  .rb-analysis-main,
+  .rb-analysis-aside,
+  .rb-predictions-main,
+  .rb-predictions-aside,
+  .rb-recommendation-main,
+  .rb-recommendation-aside,
+  .rb-glossary-main,
+  .rb-glossary-aside,
+  .rb-responsible-main,
+  .rb-responsible-aside {
+    padding: 0.9rem;
+    border-radius: 1rem;
+  }
+
+  .rb-page-hero h2,
+  .rb-match-details-hero h2,
+  .rb-dashboard-hero__content h2 {
+    font-size: clamp(1.75rem, 10vw, 2.15rem);
+    line-height: 1.05;
+    letter-spacing: -0.05em;
+  }
+
+  .rb-recommendation-main button,
+  .rb-recommendation-actions button,
+  .rb-dashboard-hero__actions button,
+  .rb-dashboard-section-header button,
+  .rb-dashboard-card button,
+  .rb-matches-filters__header button,
+  .rb-match-details-actions button,
+  .rb-analysis-aside button,
+  .rb-predictions-aside button {
+    width: 100%;
+  }
+
+  .rb-status-pill,
+  .api-status {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+}
+
+@media (max-width: 420px) {
+  p,
+  span,
+  li,
+  label,
+  select,
+  button {
+    font-size: 0.92rem;
+  }
+
+  .rb-page-hero h2,
+  .rb-match-details-hero h2,
+  .rb-dashboard-hero__content h2 {
+    font-size: 1.65rem;
+  }
+
+  .rb-recommendation-controls,
+  .rb-prediction-card,
+  .rb-recommendation-card,
+  .rb-glossary-main article,
+  .rb-responsible-main article {
+    padding: 0.85rem;
+  }
+}
+
+/*
+  Schéma de communication CSS :
+  App.css
+  ├── style les écrans React de src/screens/
+  ├── harmonise les composants existants de src/components/
+  ├── sécurise les grilles, cartes, boutons et textes en responsive
+  └── conserve la direction visuelle Obsidian Teal du MVP RubyBets
+*/

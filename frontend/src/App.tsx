@@ -1,4 +1,4 @@
-// Ce fichier affiche la page principale temporaire de RubyBets avec compétitions, matchs, analyse, prédictions, recommandation multi-matchs, glossaire et informations responsables.
+// Ce fichier pilote la navigation multi-écrans MVP de RubyBets en conservant les appels API et composants existants.
 
 import { useEffect, useState } from "react";
 import "./App.css";
@@ -25,18 +25,23 @@ import type {
   MultiMatchRecommendationResponse,
   ResponsibleInfoResponse,
 } from "./models/rubybets";
-
+import AppShell from "./layout/AppShell";
+import type { AppScreen } from "./types/navigation";
+import { NAVIGATION_ITEMS } from "./types/navigation";
+import DashboardScreen from "./screens/DashboardScreen";
+import MatchesScreen from "./screens/MatchesScreen";
+import MatchDetailsScreen from "./screens/MatchDetailsScreen";
+import AnalysisScreen from "./screens/AnalysisScreen";
+import PredictionsScreen from "./screens/PredictionsScreen";
+import RecommendationScreen from "./screens/RecommendationScreen";
 import StatusPanel from "./components/StatusPanel";
-import CompetitionsSection from "./components/CompetitionsSection";
-import MatchesSection from "./components/MatchesSection";
-import MultiMatchRecommendationSection from "./components/MultiMatchRecommendationSection";
-import GlossarySection from "./components/GlossarySection";
-import ResponsibleInfoSection from "./components/ResponsibleInfoSection";
-import MatchDetailsSection from "./components/MatchDetailsSection";
-import MatchContextSection from "./components/MatchContextSection";
-import MatchAnalysisSection from "./components/MatchAnalysisSection";
-import MatchPredictionsSection from "./components/MatchPredictionsSection";
+import GlossaryScreen from "./screens/GlossaryScreen";
+import ResponsibleInfoScreen from "./screens/ResponsibleInfoScreen";
+
 function App() {
+  // État de navigation interne utilisé pour afficher un écran MVP à la fois.
+  const [currentScreen, setCurrentScreen] = useState<AppScreen>("dashboard");
+
   // États globaux de connexion et de données principales.
   const [apiStatus, setApiStatus] = useState<string>("Vérification en cours...");
   const [competitions, setCompetitions] = useState<Competition[]>([]);
@@ -110,7 +115,14 @@ function App() {
     "Aucune recommandation multi-matchs générée"
   );
 
-  // Chargement initial : vérification backend + récupération des compétitions.
+  const hasSelectedMatch = Boolean(
+    selectedMatchDetails ||
+      selectedMatchContext ||
+      selectedMatchAnalysis ||
+      selectedMatchPredictions
+  );
+
+  // Chargement initial : vérification backend + récupération des données transversales.
   useEffect(() => {
     getHealth()
       .then((data) => {
@@ -178,8 +190,16 @@ function App() {
       });
   }, [selectedCompetition]);
 
-    // Charge les données d’un match sélectionné sans bloquer tout l’affichage si un appel API échoue.
+  // Change la compétition active et ouvre l’écran Matchs.
+  function handleSelectCompetition(competitionCode: string) {
+    setSelectedCompetition(competitionCode);
+    setCurrentScreen("matches");
+  }
+
+  // Charge les données d’un match sélectionné sans bloquer tout l’affichage si un appel API échoue.
   function handleSelectMatch(matchId: number) {
+    setCurrentScreen("match-details");
+
     setSelectedMatchDetails(null);
     setSelectedMatchContext(null);
     setSelectedMatchAnalysis(null);
@@ -249,68 +269,159 @@ function App() {
       });
   }
 
+  // Affiche un écran d’attente lorsqu’une page dépend d’un match sélectionné.
+  function renderMatchRequiredState(title: string) {
     return (
-    <main>
-      <h1>RubyBets</h1>
+      <section>
+        <h2>{title}</h2>
+        <p>Sélectionne d’abord un match depuis l’écran Matchs.</p>
+        <button type="button" onClick={() => setCurrentScreen("matches")}>
+          Aller aux matchs
+        </button>
+      </section>
+    );
+  }
 
-      <p>Application d’aide à la décision football avant-match.</p>
-      <p>Frontend React connecté aux routes backend métier.</p>
+  // Affiche le contenu correspondant à l’écran actif.
+  function renderCurrentScreen() {
+    if (currentScreen === "dashboard") {
+      return (
+        <DashboardScreen
+          apiStatus={apiStatus}
+          competitions={competitions}
+          matches={matches}
+          selectedCompetition={selectedCompetition}
+          onSelectCompetition={handleSelectCompetition}
+          onSelectMatch={handleSelectMatch}
+          onNavigate={setCurrentScreen}
+        />
+      );
+    }
 
-      <StatusPanel
-        apiStatus={apiStatus}
-        competitionsStatus={competitionsStatus}
-        matchesStatus={matchesStatus}
-        matchDetailsStatus={matchDetailsStatus}
-        matchContextStatus={matchContextStatus}
-        matchAnalysisStatus={matchAnalysisStatus}
-        matchPredictionsStatus={matchPredictionsStatus}
-        multiMatchStatus={multiMatchStatus}
-        glossaryStatus={glossaryStatus}
-        responsibleInfoStatus={responsibleInfoStatus}
-      />
+    if (currentScreen === "matches") {
+      return (
+        <MatchesScreen
+          competitions={competitions}
+          matches={matches}
+          selectedCompetition={selectedCompetition}
+          matchesStatus={matchesStatus}
+          onSelectCompetition={handleSelectCompetition}
+          onSelectMatch={handleSelectMatch}
+          onNavigate={setCurrentScreen}
+        />
+      );
+    }
 
-      <CompetitionsSection
-        competitions={competitions}
-        onSelectCompetition={setSelectedCompetition}
-      />
+    if (currentScreen === "match-details") {
+      if (!hasSelectedMatch) {
+        return renderMatchRequiredState("Détail match");
+      }
 
-      <MatchesSection
-        selectedCompetition={selectedCompetition}
-        matches={matches}
-        onSelectMatch={handleSelectMatch}
-      />
+      return (
+        <MatchDetailsScreen
+          matchDetails={selectedMatchDetails}
+          matchContext={selectedMatchContext}
+          matchDetailsStatus={matchDetailsStatus}
+          matchContextStatus={matchContextStatus}
+          onNavigate={setCurrentScreen}
+        />
+      );
+    }
 
-      <MultiMatchRecommendationSection
-        recommendationMatchCount={recommendationMatchCount}
-        recommendationRiskLevel={recommendationRiskLevel}
-        multiMatchRecommendation={multiMatchRecommendation}
-        onChangeMatchCount={setRecommendationMatchCount}
-        onChangeRiskLevel={setRecommendationRiskLevel}
-        onGenerateRecommendation={handleGenerateMultiMatchRecommendation}
-        multiMatchStatus={multiMatchStatus}
-      />
+    if (currentScreen === "analysis") {
+      if (!hasSelectedMatch) {
+        return renderMatchRequiredState("Analyse pré-match");
+      }
 
-      <GlossarySection glossary={glossary} />
+      return (
+        <AnalysisScreen
+          matchAnalysis={selectedMatchAnalysis}
+          matchAnalysisStatus={matchAnalysisStatus}
+          onNavigate={setCurrentScreen}
+        />
+      );
+    }
 
-      <ResponsibleInfoSection responsibleInfo={responsibleInfo} />
+    if (currentScreen === "predictions") {
+      if (!hasSelectedMatch) {
+        return renderMatchRequiredState("Prédictions");
+      }
 
-      {selectedMatchDetails && (
-        <MatchDetailsSection matchDetails={selectedMatchDetails} />
-      )}
+      return (
+        <PredictionsScreen
+          matchPredictions={selectedMatchPredictions}
+          matchPredictionsStatus={matchPredictionsStatus}
+          onNavigate={setCurrentScreen}
+        />
+      );
+    }
 
-      {selectedMatchContext && (
-        <MatchContextSection matchContext={selectedMatchContext} />
-      )}
+    if (currentScreen === "recommendation") {
+      return (
+        <RecommendationScreen
+          recommendationMatchCount={recommendationMatchCount}
+          recommendationRiskLevel={recommendationRiskLevel}
+          multiMatchRecommendation={multiMatchRecommendation}
+          multiMatchStatus={multiMatchStatus}
+          onChangeMatchCount={setRecommendationMatchCount}
+          onChangeRiskLevel={setRecommendationRiskLevel}
+          onGenerateRecommendation={handleGenerateMultiMatchRecommendation}
+        />
+      );
+    }
 
-      {selectedMatchAnalysis && (
-        <MatchAnalysisSection matchAnalysis={selectedMatchAnalysis} />
-      )}
+    if (currentScreen === "glossary") {
+  return (
+    <GlossaryScreen
+      glossary={glossary}
+      glossaryStatus={glossaryStatus}
+    />
+      );
+    }
 
-      {selectedMatchPredictions && (
-        <MatchPredictionsSection matchPredictions={selectedMatchPredictions} />
-      )}
-    </main>
+    if (currentScreen === "responsible") {
+  return (
+    <ResponsibleInfoScreen
+      responsibleInfo={responsibleInfo}
+      responsibleInfoStatus={responsibleInfoStatus}
+    />
+    );
+  }
+
+return null;
+  }
+
+  return (
+    <AppShell
+      currentScreen={currentScreen}
+      navigationItems={NAVIGATION_ITEMS}
+      hasSelectedMatch={hasSelectedMatch}
+      onNavigate={setCurrentScreen}
+      statusNode={
+        <StatusPanel
+          apiStatus={apiStatus}
+          competitionsStatus={competitionsStatus}
+          matchesStatus={matchesStatus}
+          matchDetailsStatus={matchDetailsStatus}
+          matchContextStatus={matchContextStatus}
+          matchAnalysisStatus={matchAnalysisStatus}
+          matchPredictionsStatus={matchPredictionsStatus}
+          multiMatchStatus={multiMatchStatus}
+          glossaryStatus={glossaryStatus}
+          responsibleInfoStatus={responsibleInfoStatus}
+        />
+      }
+    >
+      {renderCurrentScreen()}
+    </AppShell>
   );
 }
 
 export default App;
+
+// Schéma de communication du fichier :
+// App.tsx
+// ├── appelle services/api.ts pour récupérer les données backend
+// ├── pilote la navigation via currentScreen
+// ├── utilise AppShell.tsx pour structurer l’application
+// └── affiche les écrans du dossier screens/ ou les composants existants selon l’écran actif
