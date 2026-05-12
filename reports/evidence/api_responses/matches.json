@@ -1,0 +1,1307 @@
+﻿{
+    "source":  "football-data.org",
+    "competition_code":  "PL",
+    "filters":  {
+                    "status":  "SCHEDULED",
+                    "date_from":  null,
+                    "date_to":  null,
+                    "team":  null
+                },
+    "count":  22,
+    "matches":  [
+                    {
+                        "id":  538143,
+                        "utc_date":  "2026-05-11T19:00:00Z",
+                        "status":  "TIMED",
+                        "matchday":  36,
+                        "stage":  "REGULAR_SEASON",
+                        "group":  null,
+                        "last_updated":  "2026-05-11T01:32:00Z",
+                        "area":  {
+                                     "id":  2072,
+                                     "name":  "England",
+                                     "code":  "ENG",
+                                     "flag":  "https://crests.football-data.org/770.svg"
+                                 },
+                        "competition":  {
+                                            "id":  2021,
+                                            "code":  "PL",
+                                            "name":  "Premier League",
+                                            "type":  "LEAGUE",
+                                            "emblem":  "https://crests.football-data.org/PL.png"
+                                        },
+                        "season":  {
+                                       "id":  2403,
+                                       "start_date":  "2025-08-15",
+                                       "end_date":  "2026-05-24",
+                                       "current_matchday":  36,
+                                       "winner":  null
+                                   },
+                        "home_team":  {
+                                          "id":  73,
+                                          "name":  "Tottenham Hotspur FC",
+                                          "short_name":  "Tottenham",
+                                          "tla":  "TOT",
+                                          "crest":  "https://crests.football-data.org/73.png"
+                                      },
+                        "away_team":  {
+                                          "id":  341,
+                                          "name":  "Leeds United FC",
+                                          "short_name":  "Leeds United",
+                                          "tla":  "LEE",
+                                          "crest":  "https://crests.football-data.org/341.png"
+                                      },
+                        "score":  {
+                                      "winner":  null,
+                                      "duration":  "REGULAR",
+                                      "full_time":  {
+                                                        "home":  null,
+                                                        "away":  null
+                                                    },
+                                      "half_time":  {
+                                                        "home":  null,
+                                                        "away":  null
+                                                    }
+                                  },
+                        "referees":  [
+                                         {
+                                             "id":  23568,
+                                             "name":  "Jarred Gillett",
+                                             "type":  "REFEREE",
+                                             "nationality":  "Australia"
+                                         }
+                                     ]
+                    },
+                    {
+                        "id":  538091,
+                        "utc_date":  "2026-05-13T19:00:00Z",
+                        "status":  "TIMED",
+                        "matchday":  31,
+                        "stage":  "REGULAR_SEASON",
+                        "group":  null,
+                        "last_updated":  "2026-05-11T01:32:00Z",
+                        "area":  {
+                                     "id":  2072,
+                                     "name":  "England",
+                                     "code":  "ENG",
+                                     "flag":  "https://crests.football-data.org/770.svg"
+                                 },
+                        "competition":  {
+                                            "id":  2021,
+                                            "code":  "PL",
+                                            "name":  "Premier League",
+                                            "type":  "LEAGUE",
+                                            "emblem":  "https://crests.football-data.org/PL.png"
+                                        },
+                        "season":  {
+                                       "id":  2403,
+                                       "start_date":  "2025-08-15",
+                                       "end_date":  "2026-05-24",
+                                       "current_matchday":  36,
+                                       "winner":  null
+                                   },
+                        "home_team":  {
+                                          "id":  65,
+                                          "name":  "Manchester City FC",
+                                          "short_name":  "Man City",
+                                          "tla":  "MCI",
+                                          "crest":  "https://crests.football-data.org/65.png"
+                                      },
+                        "away_team":  {
+                                          "id":  354,
+                                          "name":  "Crystal Palace FC",
+                                          "short_name":  "Crystal Palace",
+                                          "tla":  "CRY",
+                                          "crest":  "https://crests.football-data.org/354.png"
+                                      },
+                        "score":  {
+                                      "winner":  null,
+                                      "duration":  "REGULAR",
+                                      "full_time":  {
+                                                        "home":  null,
+                                                        "away":  null
+                                                    },
+                                      "half_time":  {
+                                                        "home":  null,
+                                                        "away":  null
+                                                    }
+                                  },
+                        "referees":  [
+                                         {
+                                             "id":  11494,
+                                             "name":  "Stuart Attwell",
+                                             "type":  "REFEREE",
+                                             "nationality":  "England"
+                                         }
+                                     ]
+                    },
+                    {
+                        "id":  538146,
+                        "utc_date":  "2026-05-15T19:00:00Z",
+                        "status":  "TIMED",
+                        "matchday":  37,
+                        "stage":  "REGULAR_SEASON",
+                        "group":  null,
+                        "last_updated":  "2026-05-09T01:32:02Z",
+                        "area":  {
+                                     "id":  2072,
+                                     "name":  "England",
+                                     "code":  "ENG",
+                                     "flag":  "https://crests.football-data.org/770.svg"
+                                 },
+                        "competition":  {
+                                            "id":  2021,
+                                            "code":  "PL",
+                                            "name":  "Premier League",
+                                            "type":  "LEAGUE",
+                                            "emblem":  "https://crests.football-data.org/PL.png"
+                                        },
+                        "season":  {
+                                       "id":  2403,
+                                       "start_date":  "2025-08-15",
+                                       "end_date":  "2026-05-24",
+                                       "current_matchday":  36,
+                                       "winner":  null
+                                   },
+                        "home_team":  {
+                                          "id":  58,
+                                          "name":  "Aston Villa FC",
+                                          "short_name":  "Aston Villa",
+                                          "tla":  "AVL",
+                                          "crest":  "https://crests.football-data.org/58.png"
+                                      },
+                        "away_team":  {
+                                          "id":  64,
+                                          "name":  "Liverpool FC",
+                                          "short_name":  "Liverpool",
+                                          "tla":  "LIV",
+                                          "crest":  "https://crests.football-data.org/64.png"
+                                      },
+                        "score":  {
+                                      "winner":  null,
+                                      "duration":  "REGULAR",
+                                      "full_time":  {
+                                                        "home":  null,
+                                                        "away":  null
+                                                    },
+                                      "half_time":  {
+                                                        "home":  null,
+                                                        "away":  null
+                                                    }
+                                  },
+                        "referees":  [
+
+                                     ]
+                    },
+                    {
+                        "id":  538152,
+                        "utc_date":  "2026-05-17T11:30:00Z",
+                        "status":  "TIMED",
+                        "matchday":  37,
+                        "stage":  "REGULAR_SEASON",
+                        "group":  null,
+                        "last_updated":  "2026-05-11T01:32:02Z",
+                        "area":  {
+                                     "id":  2072,
+                                     "name":  "England",
+                                     "code":  "ENG",
+                                     "flag":  "https://crests.football-data.org/770.svg"
+                                 },
+                        "competition":  {
+                                            "id":  2021,
+                                            "code":  "PL",
+                                            "name":  "Premier League",
+                                            "type":  "LEAGUE",
+                                            "emblem":  "https://crests.football-data.org/PL.png"
+                                        },
+                        "season":  {
+                                       "id":  2403,
+                                       "start_date":  "2025-08-15",
+                                       "end_date":  "2026-05-24",
+                                       "current_matchday":  36,
+                                       "winner":  null
+                                   },
+                        "home_team":  {
+                                          "id":  66,
+                                          "name":  "Manchester United FC",
+                                          "short_name":  "Man United",
+                                          "tla":  "MUN",
+                                          "crest":  "https://crests.football-data.org/66.png"
+                                      },
+                        "away_team":  {
+                                          "id":  351,
+                                          "name":  "Nottingham Forest FC",
+                                          "short_name":  "Nottingham",
+                                          "tla":  "NOT",
+                                          "crest":  "https://crests.football-data.org/351.png"
+                                      },
+                        "score":  {
+                                      "winner":  null,
+                                      "duration":  "REGULAR",
+                                      "full_time":  {
+                                                        "home":  null,
+                                                        "away":  null
+                                                    },
+                                      "half_time":  {
+                                                        "home":  null,
+                                                        "away":  null
+                                                    }
+                                  },
+                        "referees":  [
+
+                                     ]
+                    },
+                    {
+                        "id":  538148,
+                        "utc_date":  "2026-05-17T14:00:00Z",
+                        "status":  "TIMED",
+                        "matchday":  37,
+                        "stage":  "REGULAR_SEASON",
+                        "group":  null,
+                        "last_updated":  "2026-05-11T01:32:02Z",
+                        "area":  {
+                                     "id":  2072,
+                                     "name":  "England",
+                                     "code":  "ENG",
+                                     "flag":  "https://crests.football-data.org/770.svg"
+                                 },
+                        "competition":  {
+                                            "id":  2021,
+                                            "code":  "PL",
+                                            "name":  "Premier League",
+                                            "type":  "LEAGUE",
+                                            "emblem":  "https://crests.football-data.org/PL.png"
+                                        },
+                        "season":  {
+                                       "id":  2403,
+                                       "start_date":  "2025-08-15",
+                                       "end_date":  "2026-05-24",
+                                       "current_matchday":  36,
+                                       "winner":  null
+                                   },
+                        "home_team":  {
+                                          "id":  402,
+                                          "name":  "Brentford FC",
+                                          "short_name":  "Brentford",
+                                          "tla":  "BRE",
+                                          "crest":  "https://crests.football-data.org/402.png"
+                                      },
+                        "away_team":  {
+                                          "id":  354,
+                                          "name":  "Crystal Palace FC",
+                                          "short_name":  "Crystal Palace",
+                                          "tla":  "CRY",
+                                          "crest":  "https://crests.football-data.org/354.png"
+                                      },
+                        "score":  {
+                                      "winner":  null,
+                                      "duration":  "REGULAR",
+                                      "full_time":  {
+                                                        "home":  null,
+                                                        "away":  null
+                                                    },
+                                      "half_time":  {
+                                                        "home":  null,
+                                                        "away":  null
+                                                    }
+                                  },
+                        "referees":  [
+
+                                     ]
+                    },
+                    {
+                        "id":  538150,
+                        "utc_date":  "2026-05-17T14:00:00Z",
+                        "status":  "TIMED",
+                        "matchday":  37,
+                        "stage":  "REGULAR_SEASON",
+                        "group":  null,
+                        "last_updated":  "2026-05-11T01:32:02Z",
+                        "area":  {
+                                     "id":  2072,
+                                     "name":  "England",
+                                     "code":  "ENG",
+                                     "flag":  "https://crests.football-data.org/770.svg"
+                                 },
+                        "competition":  {
+                                            "id":  2021,
+                                            "code":  "PL",
+                                            "name":  "Premier League",
+                                            "type":  "LEAGUE",
+                                            "emblem":  "https://crests.football-data.org/PL.png"
+                                        },
+                        "season":  {
+                                       "id":  2403,
+                                       "start_date":  "2025-08-15",
+                                       "end_date":  "2026-05-24",
+                                       "current_matchday":  36,
+                                       "winner":  null
+                                   },
+                        "home_team":  {
+                                          "id":  62,
+                                          "name":  "Everton FC",
+                                          "short_name":  "Everton",
+                                          "tla":  "EVE",
+                                          "crest":  "https://crests.football-data.org/62.png"
+                                      },
+                        "away_team":  {
+                                          "id":  71,
+                                          "name":  "Sunderland AFC",
+                                          "short_name":  "Sunderland",
+                                          "tla":  "SUN",
+                                          "crest":  "https://crests.football-data.org/71.png"
+                                      },
+                        "score":  {
+                                      "winner":  null,
+                                      "duration":  "REGULAR",
+                                      "full_time":  {
+                                                        "home":  null,
+                                                        "away":  null
+                                                    },
+                                      "half_time":  {
+                                                        "home":  null,
+                                                        "away":  null
+                                                    }
+                                  },
+                        "referees":  [
+
+                                     ]
+                    },
+                    {
+                        "id":  538151,
+                        "utc_date":  "2026-05-17T14:00:00Z",
+                        "status":  "TIMED",
+                        "matchday":  37,
+                        "stage":  "REGULAR_SEASON",
+                        "group":  null,
+                        "last_updated":  "2026-05-11T01:32:02Z",
+                        "area":  {
+                                     "id":  2072,
+                                     "name":  "England",
+                                     "code":  "ENG",
+                                     "flag":  "https://crests.football-data.org/770.svg"
+                                 },
+                        "competition":  {
+                                            "id":  2021,
+                                            "code":  "PL",
+                                            "name":  "Premier League",
+                                            "type":  "LEAGUE",
+                                            "emblem":  "https://crests.football-data.org/PL.png"
+                                        },
+                        "season":  {
+                                       "id":  2403,
+                                       "start_date":  "2025-08-15",
+                                       "end_date":  "2026-05-24",
+                                       "current_matchday":  36,
+                                       "winner":  null
+                                   },
+                        "home_team":  {
+                                          "id":  341,
+                                          "name":  "Leeds United FC",
+                                          "short_name":  "Leeds United",
+                                          "tla":  "LEE",
+                                          "crest":  "https://crests.football-data.org/341.png"
+                                      },
+                        "away_team":  {
+                                          "id":  397,
+                                          "name":  "Brighton \u0026 Hove Albion FC",
+                                          "short_name":  "Brighton Hove",
+                                          "tla":  "BHA",
+                                          "crest":  "https://crests.football-data.org/397.png"
+                                      },
+                        "score":  {
+                                      "winner":  null,
+                                      "duration":  "REGULAR",
+                                      "full_time":  {
+                                                        "home":  null,
+                                                        "away":  null
+                                                    },
+                                      "half_time":  {
+                                                        "home":  null,
+                                                        "away":  null
+                                                    }
+                                  },
+                        "referees":  [
+
+                                     ]
+                    },
+                    {
+                        "id":  538154,
+                        "utc_date":  "2026-05-17T14:00:00Z",
+                        "status":  "TIMED",
+                        "matchday":  37,
+                        "stage":  "REGULAR_SEASON",
+                        "group":  null,
+                        "last_updated":  "2026-05-11T01:32:02Z",
+                        "area":  {
+                                     "id":  2072,
+                                     "name":  "England",
+                                     "code":  "ENG",
+                                     "flag":  "https://crests.football-data.org/770.svg"
+                                 },
+                        "competition":  {
+                                            "id":  2021,
+                                            "code":  "PL",
+                                            "name":  "Premier League",
+                                            "type":  "LEAGUE",
+                                            "emblem":  "https://crests.football-data.org/PL.png"
+                                        },
+                        "season":  {
+                                       "id":  2403,
+                                       "start_date":  "2025-08-15",
+                                       "end_date":  "2026-05-24",
+                                       "current_matchday":  36,
+                                       "winner":  null
+                                   },
+                        "home_team":  {
+                                          "id":  76,
+                                          "name":  "Wolverhampton Wanderers FC",
+                                          "short_name":  "Wolverhampton",
+                                          "tla":  "WOL",
+                                          "crest":  "https://crests.football-data.org/76.png"
+                                      },
+                        "away_team":  {
+                                          "id":  63,
+                                          "name":  "Fulham FC",
+                                          "short_name":  "Fulham",
+                                          "tla":  "FUL",
+                                          "crest":  "https://crests.football-data.org/63.png"
+                                      },
+                        "score":  {
+                                      "winner":  null,
+                                      "duration":  "REGULAR",
+                                      "full_time":  {
+                                                        "home":  null,
+                                                        "away":  null
+                                                    },
+                                      "half_time":  {
+                                                        "home":  null,
+                                                        "away":  null
+                                                    }
+                                  },
+                        "referees":  [
+
+                                     ]
+                    },
+                    {
+                        "id":  538153,
+                        "utc_date":  "2026-05-17T16:30:00Z",
+                        "status":  "TIMED",
+                        "matchday":  37,
+                        "stage":  "REGULAR_SEASON",
+                        "group":  null,
+                        "last_updated":  "2026-05-11T01:32:03Z",
+                        "area":  {
+                                     "id":  2072,
+                                     "name":  "England",
+                                     "code":  "ENG",
+                                     "flag":  "https://crests.football-data.org/770.svg"
+                                 },
+                        "competition":  {
+                                            "id":  2021,
+                                            "code":  "PL",
+                                            "name":  "Premier League",
+                                            "type":  "LEAGUE",
+                                            "emblem":  "https://crests.football-data.org/PL.png"
+                                        },
+                        "season":  {
+                                       "id":  2403,
+                                       "start_date":  "2025-08-15",
+                                       "end_date":  "2026-05-24",
+                                       "current_matchday":  36,
+                                       "winner":  null
+                                   },
+                        "home_team":  {
+                                          "id":  67,
+                                          "name":  "Newcastle United FC",
+                                          "short_name":  "Newcastle",
+                                          "tla":  "NEW",
+                                          "crest":  "https://crests.football-data.org/67.png"
+                                      },
+                        "away_team":  {
+                                          "id":  563,
+                                          "name":  "West Ham United FC",
+                                          "short_name":  "West Ham",
+                                          "tla":  "WHU",
+                                          "crest":  "https://crests.football-data.org/563.png"
+                                      },
+                        "score":  {
+                                      "winner":  null,
+                                      "duration":  "REGULAR",
+                                      "full_time":  {
+                                                        "home":  null,
+                                                        "away":  null
+                                                    },
+                                      "half_time":  {
+                                                        "home":  null,
+                                                        "away":  null
+                                                    }
+                                  },
+                        "referees":  [
+
+                                     ]
+                    },
+                    {
+                        "id":  538147,
+                        "utc_date":  "2026-05-18T19:00:00Z",
+                        "status":  "TIMED",
+                        "matchday":  37,
+                        "stage":  "REGULAR_SEASON",
+                        "group":  null,
+                        "last_updated":  "2026-04-29T15:21:22Z",
+                        "area":  {
+                                     "id":  2072,
+                                     "name":  "England",
+                                     "code":  "ENG",
+                                     "flag":  "https://crests.football-data.org/770.svg"
+                                 },
+                        "competition":  {
+                                            "id":  2021,
+                                            "code":  "PL",
+                                            "name":  "Premier League",
+                                            "type":  "LEAGUE",
+                                            "emblem":  "https://crests.football-data.org/PL.png"
+                                        },
+                        "season":  {
+                                       "id":  2403,
+                                       "start_date":  "2025-08-15",
+                                       "end_date":  "2026-05-24",
+                                       "current_matchday":  36,
+                                       "winner":  null
+                                   },
+                        "home_team":  {
+                                          "id":  57,
+                                          "name":  "Arsenal FC",
+                                          "short_name":  "Arsenal",
+                                          "tla":  "ARS",
+                                          "crest":  "https://crests.football-data.org/57.png"
+                                      },
+                        "away_team":  {
+                                          "id":  328,
+                                          "name":  "Burnley FC",
+                                          "short_name":  "Burnley",
+                                          "tla":  "BUR",
+                                          "crest":  "https://crests.football-data.org/328.png"
+                                      },
+                        "score":  {
+                                      "winner":  null,
+                                      "duration":  "REGULAR",
+                                      "full_time":  {
+                                                        "home":  null,
+                                                        "away":  null
+                                                    },
+                                      "half_time":  {
+                                                        "home":  null,
+                                                        "away":  null
+                                                    }
+                                  },
+                        "referees":  [
+
+                                     ]
+                    },
+                    {
+                        "id":  538145,
+                        "utc_date":  "2026-05-19T18:30:00Z",
+                        "status":  "TIMED",
+                        "matchday":  37,
+                        "stage":  "REGULAR_SEASON",
+                        "group":  null,
+                        "last_updated":  "2026-05-11T00:21:01Z",
+                        "area":  {
+                                     "id":  2072,
+                                     "name":  "England",
+                                     "code":  "ENG",
+                                     "flag":  "https://crests.football-data.org/770.svg"
+                                 },
+                        "competition":  {
+                                            "id":  2021,
+                                            "code":  "PL",
+                                            "name":  "Premier League",
+                                            "type":  "LEAGUE",
+                                            "emblem":  "https://crests.football-data.org/PL.png"
+                                        },
+                        "season":  {
+                                       "id":  2403,
+                                       "start_date":  "2025-08-15",
+                                       "end_date":  "2026-05-24",
+                                       "current_matchday":  36,
+                                       "winner":  null
+                                   },
+                        "home_team":  {
+                                          "id":  1044,
+                                          "name":  "AFC Bournemouth",
+                                          "short_name":  "Bournemouth",
+                                          "tla":  "BOU",
+                                          "crest":  "https://crests.football-data.org/bournemouth.png"
+                                      },
+                        "away_team":  {
+                                          "id":  65,
+                                          "name":  "Manchester City FC",
+                                          "short_name":  "Man City",
+                                          "tla":  "MCI",
+                                          "crest":  "https://crests.football-data.org/65.png"
+                                      },
+                        "score":  {
+                                      "winner":  null,
+                                      "duration":  "REGULAR",
+                                      "full_time":  {
+                                                        "home":  null,
+                                                        "away":  null
+                                                    },
+                                      "half_time":  {
+                                                        "home":  null,
+                                                        "away":  null
+                                                    }
+                                  },
+                        "referees":  [
+
+                                     ]
+                    },
+                    {
+                        "id":  538149,
+                        "utc_date":  "2026-05-19T19:15:00Z",
+                        "status":  "TIMED",
+                        "matchday":  37,
+                        "stage":  "REGULAR_SEASON",
+                        "group":  null,
+                        "last_updated":  "2026-04-29T15:21:22Z",
+                        "area":  {
+                                     "id":  2072,
+                                     "name":  "England",
+                                     "code":  "ENG",
+                                     "flag":  "https://crests.football-data.org/770.svg"
+                                 },
+                        "competition":  {
+                                            "id":  2021,
+                                            "code":  "PL",
+                                            "name":  "Premier League",
+                                            "type":  "LEAGUE",
+                                            "emblem":  "https://crests.football-data.org/PL.png"
+                                        },
+                        "season":  {
+                                       "id":  2403,
+                                       "start_date":  "2025-08-15",
+                                       "end_date":  "2026-05-24",
+                                       "current_matchday":  36,
+                                       "winner":  null
+                                   },
+                        "home_team":  {
+                                          "id":  61,
+                                          "name":  "Chelsea FC",
+                                          "short_name":  "Chelsea",
+                                          "tla":  "CHE",
+                                          "crest":  "https://crests.football-data.org/61.png"
+                                      },
+                        "away_team":  {
+                                          "id":  73,
+                                          "name":  "Tottenham Hotspur FC",
+                                          "short_name":  "Tottenham",
+                                          "tla":  "TOT",
+                                          "crest":  "https://crests.football-data.org/73.png"
+                                      },
+                        "score":  {
+                                      "winner":  null,
+                                      "duration":  "REGULAR",
+                                      "full_time":  {
+                                                        "home":  null,
+                                                        "away":  null
+                                                    },
+                                      "half_time":  {
+                                                        "home":  null,
+                                                        "away":  null
+                                                    }
+                                  },
+                        "referees":  [
+
+                                     ]
+                    },
+                    {
+                        "id":  538155,
+                        "utc_date":  "2026-05-24T15:00:00Z",
+                        "status":  "TIMED",
+                        "matchday":  38,
+                        "stage":  "REGULAR_SEASON",
+                        "group":  null,
+                        "last_updated":  "2025-12-29T15:20:57Z",
+                        "area":  {
+                                     "id":  2072,
+                                     "name":  "England",
+                                     "code":  "ENG",
+                                     "flag":  "https://crests.football-data.org/770.svg"
+                                 },
+                        "competition":  {
+                                            "id":  2021,
+                                            "code":  "PL",
+                                            "name":  "Premier League",
+                                            "type":  "LEAGUE",
+                                            "emblem":  "https://crests.football-data.org/PL.png"
+                                        },
+                        "season":  {
+                                       "id":  2403,
+                                       "start_date":  "2025-08-15",
+                                       "end_date":  "2026-05-24",
+                                       "current_matchday":  36,
+                                       "winner":  null
+                                   },
+                        "home_team":  {
+                                          "id":  71,
+                                          "name":  "Sunderland AFC",
+                                          "short_name":  "Sunderland",
+                                          "tla":  "SUN",
+                                          "crest":  "https://crests.football-data.org/71.png"
+                                      },
+                        "away_team":  {
+                                          "id":  61,
+                                          "name":  "Chelsea FC",
+                                          "short_name":  "Chelsea",
+                                          "tla":  "CHE",
+                                          "crest":  "https://crests.football-data.org/61.png"
+                                      },
+                        "score":  {
+                                      "winner":  null,
+                                      "duration":  "REGULAR",
+                                      "full_time":  {
+                                                        "home":  null,
+                                                        "away":  null
+                                                    },
+                                      "half_time":  {
+                                                        "home":  null,
+                                                        "away":  null
+                                                    }
+                                  },
+                        "referees":  [
+
+                                     ]
+                    },
+                    {
+                        "id":  538156,
+                        "utc_date":  "2026-05-24T15:00:00Z",
+                        "status":  "TIMED",
+                        "matchday":  38,
+                        "stage":  "REGULAR_SEASON",
+                        "group":  null,
+                        "last_updated":  "2026-05-11T00:21:01Z",
+                        "area":  {
+                                     "id":  2072,
+                                     "name":  "England",
+                                     "code":  "ENG",
+                                     "flag":  "https://crests.football-data.org/770.svg"
+                                 },
+                        "competition":  {
+                                            "id":  2021,
+                                            "code":  "PL",
+                                            "name":  "Premier League",
+                                            "type":  "LEAGUE",
+                                            "emblem":  "https://crests.football-data.org/PL.png"
+                                        },
+                        "season":  {
+                                       "id":  2403,
+                                       "start_date":  "2025-08-15",
+                                       "end_date":  "2026-05-24",
+                                       "current_matchday":  36,
+                                       "winner":  null
+                                   },
+                        "home_team":  {
+                                          "id":  397,
+                                          "name":  "Brighton \u0026 Hove Albion FC",
+                                          "short_name":  "Brighton Hove",
+                                          "tla":  "BHA",
+                                          "crest":  "https://crests.football-data.org/397.png"
+                                      },
+                        "away_team":  {
+                                          "id":  66,
+                                          "name":  "Manchester United FC",
+                                          "short_name":  "Man United",
+                                          "tla":  "MUN",
+                                          "crest":  "https://crests.football-data.org/66.png"
+                                      },
+                        "score":  {
+                                      "winner":  null,
+                                      "duration":  "REGULAR",
+                                      "full_time":  {
+                                                        "home":  null,
+                                                        "away":  null
+                                                    },
+                                      "half_time":  {
+                                                        "home":  null,
+                                                        "away":  null
+                                                    }
+                                  },
+                        "referees":  [
+
+                                     ]
+                    },
+                    {
+                        "id":  538157,
+                        "utc_date":  "2026-05-24T15:00:00Z",
+                        "status":  "TIMED",
+                        "matchday":  38,
+                        "stage":  "REGULAR_SEASON",
+                        "group":  null,
+                        "last_updated":  "2025-12-29T15:20:57Z",
+                        "area":  {
+                                     "id":  2072,
+                                     "name":  "England",
+                                     "code":  "ENG",
+                                     "flag":  "https://crests.football-data.org/770.svg"
+                                 },
+                        "competition":  {
+                                            "id":  2021,
+                                            "code":  "PL",
+                                            "name":  "Premier League",
+                                            "type":  "LEAGUE",
+                                            "emblem":  "https://crests.football-data.org/PL.png"
+                                        },
+                        "season":  {
+                                       "id":  2403,
+                                       "start_date":  "2025-08-15",
+                                       "end_date":  "2026-05-24",
+                                       "current_matchday":  36,
+                                       "winner":  null
+                                   },
+                        "home_team":  {
+                                          "id":  354,
+                                          "name":  "Crystal Palace FC",
+                                          "short_name":  "Crystal Palace",
+                                          "tla":  "CRY",
+                                          "crest":  "https://crests.football-data.org/354.png"
+                                      },
+                        "away_team":  {
+                                          "id":  57,
+                                          "name":  "Arsenal FC",
+                                          "short_name":  "Arsenal",
+                                          "tla":  "ARS",
+                                          "crest":  "https://crests.football-data.org/57.png"
+                                      },
+                        "score":  {
+                                      "winner":  null,
+                                      "duration":  "REGULAR",
+                                      "full_time":  {
+                                                        "home":  null,
+                                                        "away":  null
+                                                    },
+                                      "half_time":  {
+                                                        "home":  null,
+                                                        "away":  null
+                                                    }
+                                  },
+                        "referees":  [
+
+                                     ]
+                    },
+                    {
+                        "id":  538158,
+                        "utc_date":  "2026-05-24T15:00:00Z",
+                        "status":  "TIMED",
+                        "matchday":  38,
+                        "stage":  "REGULAR_SEASON",
+                        "group":  null,
+                        "last_updated":  "2026-05-11T00:21:01Z",
+                        "area":  {
+                                     "id":  2072,
+                                     "name":  "England",
+                                     "code":  "ENG",
+                                     "flag":  "https://crests.football-data.org/770.svg"
+                                 },
+                        "competition":  {
+                                            "id":  2021,
+                                            "code":  "PL",
+                                            "name":  "Premier League",
+                                            "type":  "LEAGUE",
+                                            "emblem":  "https://crests.football-data.org/PL.png"
+                                        },
+                        "season":  {
+                                       "id":  2403,
+                                       "start_date":  "2025-08-15",
+                                       "end_date":  "2026-05-24",
+                                       "current_matchday":  36,
+                                       "winner":  null
+                                   },
+                        "home_team":  {
+                                          "id":  328,
+                                          "name":  "Burnley FC",
+                                          "short_name":  "Burnley",
+                                          "tla":  "BUR",
+                                          "crest":  "https://crests.football-data.org/328.png"
+                                      },
+                        "away_team":  {
+                                          "id":  76,
+                                          "name":  "Wolverhampton Wanderers FC",
+                                          "short_name":  "Wolverhampton",
+                                          "tla":  "WOL",
+                                          "crest":  "https://crests.football-data.org/76.png"
+                                      },
+                        "score":  {
+                                      "winner":  null,
+                                      "duration":  "REGULAR",
+                                      "full_time":  {
+                                                        "home":  null,
+                                                        "away":  null
+                                                    },
+                                      "half_time":  {
+                                                        "home":  null,
+                                                        "away":  null
+                                                    }
+                                  },
+                        "referees":  [
+
+                                     ]
+                    },
+                    {
+                        "id":  538159,
+                        "utc_date":  "2026-05-24T15:00:00Z",
+                        "status":  "TIMED",
+                        "matchday":  38,
+                        "stage":  "REGULAR_SEASON",
+                        "group":  null,
+                        "last_updated":  "2025-12-29T15:20:57Z",
+                        "area":  {
+                                     "id":  2072,
+                                     "name":  "England",
+                                     "code":  "ENG",
+                                     "flag":  "https://crests.football-data.org/770.svg"
+                                 },
+                        "competition":  {
+                                            "id":  2021,
+                                            "code":  "PL",
+                                            "name":  "Premier League",
+                                            "type":  "LEAGUE",
+                                            "emblem":  "https://crests.football-data.org/PL.png"
+                                        },
+                        "season":  {
+                                       "id":  2403,
+                                       "start_date":  "2025-08-15",
+                                       "end_date":  "2026-05-24",
+                                       "current_matchday":  36,
+                                       "winner":  null
+                                   },
+                        "home_team":  {
+                                          "id":  63,
+                                          "name":  "Fulham FC",
+                                          "short_name":  "Fulham",
+                                          "tla":  "FUL",
+                                          "crest":  "https://crests.football-data.org/63.png"
+                                      },
+                        "away_team":  {
+                                          "id":  67,
+                                          "name":  "Newcastle United FC",
+                                          "short_name":  "Newcastle",
+                                          "tla":  "NEW",
+                                          "crest":  "https://crests.football-data.org/67.png"
+                                      },
+                        "score":  {
+                                      "winner":  null,
+                                      "duration":  "REGULAR",
+                                      "full_time":  {
+                                                        "home":  null,
+                                                        "away":  null
+                                                    },
+                                      "half_time":  {
+                                                        "home":  null,
+                                                        "away":  null
+                                                    }
+                                  },
+                        "referees":  [
+
+                                     ]
+                    },
+                    {
+                        "id":  538160,
+                        "utc_date":  "2026-05-24T15:00:00Z",
+                        "status":  "TIMED",
+                        "matchday":  38,
+                        "stage":  "REGULAR_SEASON",
+                        "group":  null,
+                        "last_updated":  "2025-12-29T15:20:57Z",
+                        "area":  {
+                                     "id":  2072,
+                                     "name":  "England",
+                                     "code":  "ENG",
+                                     "flag":  "https://crests.football-data.org/770.svg"
+                                 },
+                        "competition":  {
+                                            "id":  2021,
+                                            "code":  "PL",
+                                            "name":  "Premier League",
+                                            "type":  "LEAGUE",
+                                            "emblem":  "https://crests.football-data.org/PL.png"
+                                        },
+                        "season":  {
+                                       "id":  2403,
+                                       "start_date":  "2025-08-15",
+                                       "end_date":  "2026-05-24",
+                                       "current_matchday":  36,
+                                       "winner":  null
+                                   },
+                        "home_team":  {
+                                          "id":  64,
+                                          "name":  "Liverpool FC",
+                                          "short_name":  "Liverpool",
+                                          "tla":  "LIV",
+                                          "crest":  "https://crests.football-data.org/64.png"
+                                      },
+                        "away_team":  {
+                                          "id":  402,
+                                          "name":  "Brentford FC",
+                                          "short_name":  "Brentford",
+                                          "tla":  "BRE",
+                                          "crest":  "https://crests.football-data.org/402.png"
+                                      },
+                        "score":  {
+                                      "winner":  null,
+                                      "duration":  "REGULAR",
+                                      "full_time":  {
+                                                        "home":  null,
+                                                        "away":  null
+                                                    },
+                                      "half_time":  {
+                                                        "home":  null,
+                                                        "away":  null
+                                                    }
+                                  },
+                        "referees":  [
+
+                                     ]
+                    },
+                    {
+                        "id":  538161,
+                        "utc_date":  "2026-05-24T15:00:00Z",
+                        "status":  "TIMED",
+                        "matchday":  38,
+                        "stage":  "REGULAR_SEASON",
+                        "group":  null,
+                        "last_updated":  "2026-05-11T00:21:01Z",
+                        "area":  {
+                                     "id":  2072,
+                                     "name":  "England",
+                                     "code":  "ENG",
+                                     "flag":  "https://crests.football-data.org/770.svg"
+                                 },
+                        "competition":  {
+                                            "id":  2021,
+                                            "code":  "PL",
+                                            "name":  "Premier League",
+                                            "type":  "LEAGUE",
+                                            "emblem":  "https://crests.football-data.org/PL.png"
+                                        },
+                        "season":  {
+                                       "id":  2403,
+                                       "start_date":  "2025-08-15",
+                                       "end_date":  "2026-05-24",
+                                       "current_matchday":  36,
+                                       "winner":  null
+                                   },
+                        "home_team":  {
+                                          "id":  65,
+                                          "name":  "Manchester City FC",
+                                          "short_name":  "Man City",
+                                          "tla":  "MCI",
+                                          "crest":  "https://crests.football-data.org/65.png"
+                                      },
+                        "away_team":  {
+                                          "id":  58,
+                                          "name":  "Aston Villa FC",
+                                          "short_name":  "Aston Villa",
+                                          "tla":  "AVL",
+                                          "crest":  "https://crests.football-data.org/58.png"
+                                      },
+                        "score":  {
+                                      "winner":  null,
+                                      "duration":  "REGULAR",
+                                      "full_time":  {
+                                                        "home":  null,
+                                                        "away":  null
+                                                    },
+                                      "half_time":  {
+                                                        "home":  null,
+                                                        "away":  null
+                                                    }
+                                  },
+                        "referees":  [
+
+                                     ]
+                    },
+                    {
+                        "id":  538162,
+                        "utc_date":  "2026-05-24T15:00:00Z",
+                        "status":  "TIMED",
+                        "matchday":  38,
+                        "stage":  "REGULAR_SEASON",
+                        "group":  null,
+                        "last_updated":  "2025-12-29T15:20:57Z",
+                        "area":  {
+                                     "id":  2072,
+                                     "name":  "England",
+                                     "code":  "ENG",
+                                     "flag":  "https://crests.football-data.org/770.svg"
+                                 },
+                        "competition":  {
+                                            "id":  2021,
+                                            "code":  "PL",
+                                            "name":  "Premier League",
+                                            "type":  "LEAGUE",
+                                            "emblem":  "https://crests.football-data.org/PL.png"
+                                        },
+                        "season":  {
+                                       "id":  2403,
+                                       "start_date":  "2025-08-15",
+                                       "end_date":  "2026-05-24",
+                                       "current_matchday":  36,
+                                       "winner":  null
+                                   },
+                        "home_team":  {
+                                          "id":  351,
+                                          "name":  "Nottingham Forest FC",
+                                          "short_name":  "Nottingham",
+                                          "tla":  "NOT",
+                                          "crest":  "https://crests.football-data.org/351.png"
+                                      },
+                        "away_team":  {
+                                          "id":  1044,
+                                          "name":  "AFC Bournemouth",
+                                          "short_name":  "Bournemouth",
+                                          "tla":  "BOU",
+                                          "crest":  "https://crests.football-data.org/bournemouth.png"
+                                      },
+                        "score":  {
+                                      "winner":  null,
+                                      "duration":  "REGULAR",
+                                      "full_time":  {
+                                                        "home":  null,
+                                                        "away":  null
+                                                    },
+                                      "half_time":  {
+                                                        "home":  null,
+                                                        "away":  null
+                                                    }
+                                  },
+                        "referees":  [
+
+                                     ]
+                    },
+                    {
+                        "id":  538163,
+                        "utc_date":  "2026-05-24T15:00:00Z",
+                        "status":  "TIMED",
+                        "matchday":  38,
+                        "stage":  "REGULAR_SEASON",
+                        "group":  null,
+                        "last_updated":  "2025-12-29T15:20:57Z",
+                        "area":  {
+                                     "id":  2072,
+                                     "name":  "England",
+                                     "code":  "ENG",
+                                     "flag":  "https://crests.football-data.org/770.svg"
+                                 },
+                        "competition":  {
+                                            "id":  2021,
+                                            "code":  "PL",
+                                            "name":  "Premier League",
+                                            "type":  "LEAGUE",
+                                            "emblem":  "https://crests.football-data.org/PL.png"
+                                        },
+                        "season":  {
+                                       "id":  2403,
+                                       "start_date":  "2025-08-15",
+                                       "end_date":  "2026-05-24",
+                                       "current_matchday":  36,
+                                       "winner":  null
+                                   },
+                        "home_team":  {
+                                          "id":  73,
+                                          "name":  "Tottenham Hotspur FC",
+                                          "short_name":  "Tottenham",
+                                          "tla":  "TOT",
+                                          "crest":  "https://crests.football-data.org/73.png"
+                                      },
+                        "away_team":  {
+                                          "id":  62,
+                                          "name":  "Everton FC",
+                                          "short_name":  "Everton",
+                                          "tla":  "EVE",
+                                          "crest":  "https://crests.football-data.org/62.png"
+                                      },
+                        "score":  {
+                                      "winner":  null,
+                                      "duration":  "REGULAR",
+                                      "full_time":  {
+                                                        "home":  null,
+                                                        "away":  null
+                                                    },
+                                      "half_time":  {
+                                                        "home":  null,
+                                                        "away":  null
+                                                    }
+                                  },
+                        "referees":  [
+
+                                     ]
+                    },
+                    {
+                        "id":  538164,
+                        "utc_date":  "2026-05-24T15:00:00Z",
+                        "status":  "TIMED",
+                        "matchday":  38,
+                        "stage":  "REGULAR_SEASON",
+                        "group":  null,
+                        "last_updated":  "2026-05-11T00:21:01Z",
+                        "area":  {
+                                     "id":  2072,
+                                     "name":  "England",
+                                     "code":  "ENG",
+                                     "flag":  "https://crests.football-data.org/770.svg"
+                                 },
+                        "competition":  {
+                                            "id":  2021,
+                                            "code":  "PL",
+                                            "name":  "Premier League",
+                                            "type":  "LEAGUE",
+                                            "emblem":  "https://crests.football-data.org/PL.png"
+                                        },
+                        "season":  {
+                                       "id":  2403,
+                                       "start_date":  "2025-08-15",
+                                       "end_date":  "2026-05-24",
+                                       "current_matchday":  36,
+                                       "winner":  null
+                                   },
+                        "home_team":  {
+                                          "id":  563,
+                                          "name":  "West Ham United FC",
+                                          "short_name":  "West Ham",
+                                          "tla":  "WHU",
+                                          "crest":  "https://crests.football-data.org/563.png"
+                                      },
+                        "away_team":  {
+                                          "id":  341,
+                                          "name":  "Leeds United FC",
+                                          "short_name":  "Leeds United",
+                                          "tla":  "LEE",
+                                          "crest":  "https://crests.football-data.org/341.png"
+                                      },
+                        "score":  {
+                                      "winner":  null,
+                                      "duration":  "REGULAR",
+                                      "full_time":  {
+                                                        "home":  null,
+                                                        "away":  null
+                                                    },
+                                      "half_time":  {
+                                                        "home":  null,
+                                                        "away":  null
+                                                    }
+                                  },
+                        "referees":  [
+
+                                     ]
+                    }
+                ],
+    "data_freshness":  {
+                           "source":  "football-data.org",
+                           "from_cache":  false,
+                           "updated_at":  "2026-05-11T17:07:31.519298+00:00",
+                           "ttl_minutes":  30,
+                           "provider":  "football-data.org",
+                           "last_updated":  null
+                       }
+}

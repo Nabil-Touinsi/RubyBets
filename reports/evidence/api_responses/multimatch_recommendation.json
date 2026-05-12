@@ -1,0 +1,284 @@
+{
+  "source": "football-data.org",
+  "method": "rules_based_multimatch_selection_v1",
+  "request": {
+    "competition_code": "PL",
+    "match_count": 3,
+    "risk_level": "medium",
+    "date_from": null,
+    "date_to": null
+  },
+  "available_matches_count": 22,
+  "selected_count": 3,
+  "recommendations": [
+    {
+      "match": {
+        "id": 538143,
+        "utc_date": "2026-05-11T19:00:00Z",
+        "status": "TIMED",
+        "matchday": 36,
+        "stage": "REGULAR_SEASON",
+        "group": null,
+        "last_updated": "2026-05-11T01:32:00Z",
+        "area": {
+          "id": 2072,
+          "name": "England",
+          "code": "ENG",
+          "flag": "https://crests.football-data.org/770.svg"
+        },
+        "competition": {
+          "id": 2021,
+          "code": "PL",
+          "name": "Premier League",
+          "type": "LEAGUE",
+          "emblem": "https://crests.football-data.org/PL.png"
+        },
+        "season": {
+          "id": 2403,
+          "start_date": "2025-08-15",
+          "end_date": "2026-05-24",
+          "current_matchday": 36,
+          "winner": null
+        },
+        "home_team": {
+          "id": 73,
+          "name": "Tottenham Hotspur FC",
+          "short_name": "Tottenham",
+          "tla": "TOT",
+          "crest": "https://crests.football-data.org/73.png"
+        },
+        "away_team": {
+          "id": 341,
+          "name": "Leeds United FC",
+          "short_name": "Leeds United",
+          "tla": "LEE",
+          "crest": "https://crests.football-data.org/341.png"
+        },
+        "score": {
+          "winner": null,
+          "duration": "REGULAR",
+          "full_time": {
+            "home": null,
+            "away": null
+          },
+          "half_time": {
+            "home": null,
+            "away": null
+          }
+        },
+        "referees": [
+          {
+            "id": 23568,
+            "name": "Jarred Gillett",
+            "type": "REFEREE",
+            "nationality": "Australia"
+          }
+        ]
+      },
+      "selected_prediction": {
+        "market": "GOALS",
+        "prediction": "OVER_2_5_TREND",
+        "label": "Tendance vers un match avec plusieurs buts",
+        "confidence": "medium",
+        "risk": "medium",
+        "justification": "La moyenne combinée des buts observés est de 2.83 par match."
+      },
+      "selection_score": 85,
+      "prediction_key": "goals",
+      "method": "rules_based_scoring_v1",
+      "data_used": {
+        "match_details": true,
+        "competition_standings": true,
+        "home_team_standing_available": true,
+        "away_team_standing_available": true
+      }
+    },
+    {
+      "match": {
+        "id": 538091,
+        "utc_date": "2026-05-13T19:00:00Z",
+        "status": "TIMED",
+        "matchday": 31,
+        "stage": "REGULAR_SEASON",
+        "group": null,
+        "last_updated": "2026-05-11T01:32:00Z",
+        "area": {
+          "id": 2072,
+          "name": "England",
+          "code": "ENG",
+          "flag": "https://crests.football-data.org/770.svg"
+        },
+        "competition": {
+          "id": 2021,
+          "code": "PL",
+          "name": "Premier League",
+          "type": "LEAGUE",
+          "emblem": "https://crests.football-data.org/PL.png"
+        },
+        "season": {
+          "id": 2403,
+          "start_date": "2025-08-15",
+          "end_date": "2026-05-24",
+          "current_matchday": 36,
+          "winner": null
+        },
+        "home_team": {
+          "id": 65,
+          "name": "Manchester City FC",
+          "short_name": "Man City",
+          "tla": "MCI",
+          "crest": "https://crests.football-data.org/65.png"
+        },
+        "away_team": {
+          "id": 354,
+          "name": "Crystal Palace FC",
+          "short_name": "Crystal Palace",
+          "tla": "CRY",
+          "crest": "https://crests.football-data.org/354.png"
+        },
+        "score": {
+          "winner": null,
+          "duration": "REGULAR",
+          "full_time": {
+            "home": null,
+            "away": null
+          },
+          "half_time": {
+            "home": null,
+            "away": null
+          }
+        },
+        "referees": [
+          {
+            "id": 11494,
+            "name": "Stuart Attwell",
+            "type": "REFEREE",
+            "nationality": "England"
+          }
+        ]
+      },
+      "selected_prediction": {
+        "market": "1X2",
+        "prediction": "HOME_TEAM_TREND",
+        "label": "Tendance favorable à Manchester City FC",
+        "confidence": "medium",
+        "risk": "medium",
+        "justification": "Manchester City FC possède un avantage au classement, en points et en différence de buts."
+      },
+      "selection_score": 85,
+      "prediction_key": "one_x_two",
+      "method": "rules_based_scoring_v1",
+      "data_used": {
+        "match_details": true,
+        "competition_standings": true,
+        "home_team_standing_available": true,
+        "away_team_standing_available": true
+      }
+    },
+    {
+      "match": {
+        "id": 538146,
+        "utc_date": "2026-05-15T19:00:00Z",
+        "status": "TIMED",
+        "matchday": 37,
+        "stage": "REGULAR_SEASON",
+        "group": null,
+        "last_updated": "2026-05-09T01:32:02Z",
+        "area": {
+          "id": 2072,
+          "name": "England",
+          "code": "ENG",
+          "flag": "https://crests.football-data.org/770.svg"
+        },
+        "competition": {
+          "id": 2021,
+          "code": "PL",
+          "name": "Premier League",
+          "type": "LEAGUE",
+          "emblem": "https://crests.football-data.org/PL.png"
+        },
+        "season": {
+          "id": 2403,
+          "start_date": "2025-08-15",
+          "end_date": "2026-05-24",
+          "current_matchday": 36,
+          "winner": null
+        },
+        "home_team": {
+          "id": 58,
+          "name": "Aston Villa FC",
+          "short_name": "Aston Villa",
+          "tla": "AVL",
+          "crest": "https://crests.football-data.org/58.png"
+        },
+        "away_team": {
+          "id": 64,
+          "name": "Liverpool FC",
+          "short_name": "Liverpool",
+          "tla": "LIV",
+          "crest": "https://crests.football-data.org/64.png"
+        },
+        "score": {
+          "winner": null,
+          "duration": "REGULAR",
+          "full_time": {
+            "home": null,
+            "away": null
+          },
+          "half_time": {
+            "home": null,
+            "away": null
+          }
+        },
+        "referees": []
+      },
+      "selected_prediction": {
+        "market": "GOALS",
+        "prediction": "OVER_2_5_TREND",
+        "label": "Tendance vers un match avec plusieurs buts",
+        "confidence": "medium",
+        "risk": "medium",
+        "justification": "La moyenne combinée des buts observés est de 2.83 par match."
+      },
+      "selection_score": 85,
+      "prediction_key": "goals",
+      "method": "rules_based_scoring_v1",
+      "data_used": {
+        "match_details": true,
+        "competition_standings": true,
+        "home_team_standing_available": true,
+        "away_team_standing_available": true
+      }
+    }
+  ],
+  "selection_logic": {
+    "description": "RubyBets sélectionne les matchs dont les prédictions sont les plus cohérentes avec le niveau de risque demandé. Cette sélection repose sur un scoring explicable basé sur la confiance, le risque, le marché analysé et les données réelles disponibles.",
+    "risk_levels": {
+      "low": "Priorité aux recommandations plus prudentes et aux tendances 1X2.",
+      "medium": "Équilibre entre prudence, lisibilité et potentiel analytique.",
+      "high": "Acceptation de recommandations plus incertaines, notamment sur BTTS."
+    }
+  },
+  "limits": [
+    "Cette sélection recommandée ne constitue pas une incitation au pari.",
+    "RubyBets ne permet aucun pari réel.",
+    "Le moteur actuel est une première version explicable basée sur des règles et des données réelles.",
+    "Les absences, compositions probables, actualités et forme détaillée ne sont pas encore intégrées."
+  ],
+  "data_freshness": {
+    "provider": "football-data.org",
+    "generated_at": "2026-05-11T17:21:58.296839+00:00",
+    "matches_cache": {
+      "source": "football-data.org",
+      "from_cache": true,
+      "updated_at": "2026-05-11T17:07:31.519298+00:00",
+      "ttl_minutes": 30
+    },
+    "standings_cache": {
+      "source": "football-data.org",
+      "from_cache": true,
+      "updated_at": "2026-05-11T17:08:37.719176+00:00",
+      "ttl_minutes": 60
+    }
+  }
+}

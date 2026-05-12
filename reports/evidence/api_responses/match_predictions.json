@@ -1,0 +1,71 @@
+{
+  "source": "football-data.org",
+  "match_id": 538143,
+  "predictions": {
+    "status": "available",
+    "method": "rules_based_scoring_v1",
+    "inputs": {
+      "home_team_position": 17,
+      "away_team_position": 16,
+      "position_gap": 1,
+      "points_gap": 6,
+      "goal_difference_gap": 4,
+      "average_goal_context": 2.83,
+      "home_goals_for_avg": 1.29,
+      "away_goals_for_avg": 1.34
+    },
+    "predictions": {
+      "one_x_two": {
+        "market": "1X2",
+        "prediction": "BALANCED_TREND",
+        "label": "Tendance prudente / match à surveiller",
+        "confidence": "low",
+        "risk": "high",
+        "justification": "Les écarts disponibles ne sont pas assez nets pour orienter fortement la lecture du match."
+      },
+      "goals": {
+        "market": "GOALS",
+        "prediction": "OVER_2_5_TREND",
+        "label": "Tendance vers un match avec plusieurs buts",
+        "confidence": "medium",
+        "risk": "medium",
+        "justification": "La moyenne combinée des buts observés est de 2.83 par match."
+      },
+      "btts": {
+        "market": "BTTS",
+        "prediction": "BTTS_NO_CLEAR_TREND",
+        "label": "BTTS incertain",
+        "confidence": "low",
+        "risk": "high",
+        "justification": "Les moyennes offensives disponibles ne permettent pas de dégager une tendance forte."
+      }
+    },
+    "limits": [
+      "Ces prédictions sont des tendances analytiques, pas des certitudes.",
+      "Le moteur actuel est une première version explicable basée sur des règles et des données réelles.",
+      "Les absences, compositions probables, forme détaillée et actualités ne sont pas encore intégrées."
+    ]
+  },
+  "data_used": {
+    "match_details": true,
+    "competition_standings": true,
+    "home_team_standing_available": true,
+    "away_team_standing_available": true
+  },
+  "data_freshness": {
+    "provider": "football-data.org",
+    "match_last_updated": "2026-05-11T01:32:00Z",
+    "match_cache": {
+      "source": "football-data.org",
+      "from_cache": true,
+      "updated_at": "2026-05-11T17:08:36.952522+00:00",
+      "ttl_minutes": 30
+    },
+    "standings_cache": {
+      "source": "football-data.org",
+      "from_cache": true,
+      "updated_at": "2026-05-11T17:08:37.719176+00:00",
+      "ttl_minutes": 60
+    }
+  }
+}

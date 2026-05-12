@@ -554,3 +554,33 @@ RubyBets dispose aujourd’hui d’un socle MVP solide :
 - un versioning clair par tags.
 
 La suite du travail doit rester progressive : vérifier l’intégration frontend, corriger les éventuels écarts d’affichage, puis seulement ensuite envisager les améliorations de prédiction ou les futures briques IA.
+
+---
+
+## 19. Mise à jour de suivi — 11/05/2026
+
+Tâche réalisée :
+
+```
+P1 — Améliorer le bloc Prédictions côté interface
+```
+
+Fichiers concernés :
+
+```
+frontend/src/components/MatchPredictionsSection.tsx
+frontend/src/App.css
+```
+
+Résultat obtenu :
+
+```
+Affichage des prédictions sous forme de cartes lisibles :
+- Prédiction 1X2
+- Volume de buts
+- BTTS
+- Confiance
+- Risque
+- Justification
+- Rappel responsable
+```

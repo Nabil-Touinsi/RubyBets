@@ -1,0 +1,95 @@
+﻿{
+    "count":  6,
+    "competitions":  [
+                         {
+                             "id":  2021,
+                             "code":  "PL",
+                             "name":  "Premier League",
+                             "country":  "England",
+                             "type":  "LEAGUE",
+                             "emblem":  "https://crests.football-data.org/PL.png",
+                             "current_season":  {
+                                                    "id":  2403,
+                                                    "start_date":  "2025-08-15",
+                                                    "end_date":  "2026-05-24",
+                                                    "current_matchday":  36
+                                                }
+                         },
+                         {
+                             "id":  2001,
+                             "code":  "CL",
+                             "name":  "UEFA Champions League",
+                             "country":  "Europe",
+                             "type":  "CUP",
+                             "emblem":  "https://crests.football-data.org/CL.png",
+                             "current_season":  {
+                                                    "id":  2454,
+                                                    "start_date":  "2025-09-16",
+                                                    "end_date":  "2026-05-30",
+                                                    "current_matchday":  8
+                                                }
+                         },
+                         {
+                             "id":  2015,
+                             "code":  "FL1",
+                             "name":  "Ligue 1",
+                             "country":  "France",
+                             "type":  "LEAGUE",
+                             "emblem":  "https://crests.football-data.org/FL1.png",
+                             "current_season":  {
+                                                    "id":  2420,
+                                                    "start_date":  "2025-08-17",
+                                                    "end_date":  "2026-05-16",
+                                                    "current_matchday":  33
+                                                }
+                         },
+                         {
+                             "id":  2002,
+                             "code":  "BL1",
+                             "name":  "Bundesliga",
+                             "country":  "Germany",
+                             "type":  "LEAGUE",
+                             "emblem":  "https://crests.football-data.org/BL1.png",
+                             "current_season":  {
+                                                    "id":  2414,
+                                                    "start_date":  "2025-08-22",
+                                                    "end_date":  "2026-05-16",
+                                                    "current_matchday":  33
+                                                }
+                         },
+                         {
+                             "id":  2019,
+                             "code":  "SA",
+                             "name":  "Serie A",
+                             "country":  "Italy",
+                             "type":  "LEAGUE",
+                             "emblem":  "https://crests.football-data.org/c111.png",
+                             "current_season":  {
+                                                    "id":  2395,
+                                                    "start_date":  "2025-08-24",
+                                                    "end_date":  "2026-05-24",
+                                                    "current_matchday":  36
+                                                }
+                         },
+                         {
+                             "id":  2014,
+                             "code":  "PD",
+                             "name":  "Primera Division",
+                             "country":  "Spain",
+                             "type":  "LEAGUE",
+                             "emblem":  "https://crests.football-data.org/laliga.png",
+                             "current_season":  {
+                                                    "id":  2429,
+                                                    "start_date":  "2025-08-17",
+                                                    "end_date":  "2026-05-24",
+                                                    "current_matchday":  35
+                                                }
+                         }
+                     ],
+    "data_freshness":  {
+                           "source":  "football-data.org",
+                           "from_cache":  true,
+                           "updated_at":  "2026-05-11T16:34:53.436410+00:00",
+                           "ttl_minutes":  60
+                       }
+}
