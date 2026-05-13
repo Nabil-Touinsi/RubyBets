@@ -5863,12 +5863,1245 @@ section.rb-screen-container > .rb-home-dashboard > * {
 .rb-matches-screen--refined .rb-match-team__name {
   min-width: 0;
 }
+/*
+  Correctif écran Détail match Phase 23D
+  Ce bloc refond l’écran Détail match pour l’aligner avec la maquette Obsidian Teal sans modifier l’API.
+*/
+
+.rb-detail-screen,
+.rb-detail-screen * {
+  box-sizing: border-box;
+}
+
+.rb-detail-screen {
+  display: grid;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+  color: #f8ffff;
+}
+
+.rb-detail-screen :is(h2, h3, h4, p, span, strong, small, li, button) {
+  overflow-wrap: normal !important;
+  word-break: normal !important;
+}
+
+.rb-detail-screen section,
+.rb-detail-screen article {
+  margin: 0;
+  box-shadow: none;
+}
+
+.rb-detail-screen section:has(h2) h2::after,
+.rb-detail-screen section:has(h3) h3::after {
+  content: none;
+}
+
+.rb-detail-kicker {
+  margin: 0;
+  color: #2dd4bf !important;
+  font-size: 0.64rem;
+  font-weight: 950;
+  letter-spacing: 0.14em;
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+
+.rb-detail-topbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  min-width: 0;
+  padding: 2px 2px 4px;
+}
+
+.rb-detail-topbar__left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.rb-detail-topbar__left button {
+  min-height: 26px;
+  margin: 0;
+  padding: 0.34rem 0.62rem;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 999px;
+  background: rgba(2, 6, 23, 0.18);
+  color: #c7dada;
+  font-size: 0.68rem;
+  font-weight: 800;
+  box-shadow: none;
+  white-space: nowrap;
+}
+
+.rb-detail-topbar__left span {
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 850;
+}
+
+.rb-detail-topbar__left strong {
+  color: #2dd4bf;
+  font-size: 0.68rem;
+  font-weight: 900;
+}
+
+.rb-detail-topbar__freshness {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #9fb5b6;
+  font-size: 0.66rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.rb-detail-topbar__freshness span {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #22c55e;
+  box-shadow: 0 0 12px rgba(34, 197, 94, 0.48);
+}
+
+.rb-detail-hero,
+.rb-detail-card,
+.rb-detail-action-card,
+.rb-detail-empty-state {
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  background:
+    linear-gradient(145deg, rgba(15, 23, 42, 0.88), rgba(8, 47, 51, 0.52)),
+    rgba(15, 23, 42, 0.74);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.2);
+}
+
+.rb-detail-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(230px, 0.74fr) minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+  min-height: 122px;
+  padding: 16px 20px;
+  border-radius: 16px;
+}
+
+.rb-detail-team {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+.rb-detail-team--home {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.rb-detail-team--away {
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.rb-detail-team h2 {
+  margin: 0;
+  color: #ffffff;
+  font-size: clamp(1.15rem, 1.7vw, 1.45rem);
+  font-weight: 950;
+  line-height: 1.1;
+  letter-spacing: -0.045em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rb-detail-team p {
+  margin-top: 4px;
+  color: #9fb5b6;
+  font-size: 0.72rem;
+  font-weight: 750;
+}
+
+.rb-detail-team-logo {
+  position: relative;
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 68px;
+  height: 68px;
+  overflow: hidden;
+  border: 1px solid rgba(45, 212, 191, 0.24);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 50% 20%, rgba(45, 212, 191, 0.18), transparent 64%),
+    rgba(2, 6, 23, 0.46);
+}
+
+.rb-detail-team-logo__fallback {
+  color: #99f6e4 !important;
+  font-size: 0.76rem;
+  font-weight: 950;
+}
+
+.rb-detail-team-logo img {
+  position: absolute;
+  inset: 8px;
+  width: calc(100% - 16px);
+  height: calc(100% - 16px);
+  object-fit: contain;
+}
+
+.rb-detail-hero-center {
+  display: grid;
+  gap: 5px;
+  justify-items: center;
+  min-width: 0;
+  text-align: center;
+}
+
+.rb-detail-vs {
+  display: inline-grid;
+  place-items: center;
+  width: 42px;
+  height: 26px;
+  border: 1px solid rgba(45, 212, 191, 0.28);
+  border-radius: 999px;
+  background: rgba(20, 184, 166, 0.1);
+  color: #99f6e4 !important;
+  font-size: 0.62rem;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+}
+
+.rb-detail-hero-center strong {
+  color: #ffffff;
+  font-size: 0.82rem;
+  font-weight: 950;
+}
+
+.rb-detail-hero-center p,
+.rb-detail-hero-center small {
+  color: #9fb5b6;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.rb-detail-main-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 330px;
+  gap: 12px;
+  width: 100%;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.rb-detail-main-column,
+.rb-detail-side-column {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  align-content: start;
+}
+
+.rb-detail-side-column {
+  position: sticky;
+  top: 92px;
+}
+
+.rb-detail-card,
+.rb-detail-empty-state {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 14px;
+}
+
+.rb-detail-card__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.rb-detail-card__header h3 {
+  margin: 4px 0 0;
+  color: #ffffff;
+  font-size: 1.02rem;
+  font-weight: 950;
+  line-height: 1.15;
+  letter-spacing: -0.035em;
+}
+
+.rb-detail-soft-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 24px;
+  padding: 0.22rem 0.58rem;
+  border: 1px solid rgba(45, 212, 191, 0.24);
+  border-radius: 999px;
+  background: rgba(20, 184, 166, 0.1);
+  color: #99f6e4 !important;
+  font-size: 0.62rem;
+  font-weight: 950;
+  white-space: nowrap;
+}
+
+.rb-detail-info-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.rb-detail-info-tile,
+.rb-detail-context-summary,
+.rb-detail-facts-card,
+.rb-detail-standing-card,
+.rb-detail-news-item {
+  min-width: 0;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  background:
+    linear-gradient(145deg, rgba(2, 6, 23, 0.3), rgba(8, 47, 51, 0.18)),
+    rgba(2, 6, 23, 0.18);
+}
+
+.rb-detail-info-tile {
+  display: grid;
+  gap: 4px;
+  padding: 11px;
+  border-radius: 12px;
+}
+
+.rb-detail-info-tile span {
+  color: #9fb5b6;
+  font-size: 0.66rem;
+  font-weight: 800;
+}
+
+.rb-detail-info-tile strong {
+  color: #ffffff;
+  font-size: 0.82rem;
+  font-weight: 950;
+  line-height: 1.2;
+}
+
+.rb-detail-info-tile small {
+  color: #819798;
+  font-size: 0.62rem;
+  font-weight: 700;
+}
+
+.rb-detail-context-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 10px;
+}
+
+.rb-detail-context-summary,
+.rb-detail-facts-card {
+  padding: 12px;
+  border-radius: 12px;
+}
+
+.rb-detail-context-summary p,
+.rb-detail-facts-card p {
+  color: #a9c1c2;
+  font-size: 0.76rem;
+  line-height: 1.5;
+}
+
+.rb-detail-mini-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.rb-detail-mini-metrics span {
+  display: grid;
+  gap: 2px;
+  padding: 8px;
+  border: 1px solid rgba(45, 212, 191, 0.12);
+  border-radius: 10px;
+  background: rgba(20, 184, 166, 0.07);
+  color: #9fb5b6;
+  font-size: 0.64rem;
+  font-weight: 800;
+}
+
+.rb-detail-mini-metrics strong {
+  color: #2dd4bf;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.rb-detail-facts-card h4,
+.rb-detail-standing-card h4 {
+  margin: 0 0 8px;
+  color: #ffffff;
+  font-size: 0.86rem;
+  line-height: 1.15;
+}
+
+.rb-detail-facts-card ul {
+  display: grid;
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rb-detail-facts-card li {
+  position: relative;
+  min-width: 0;
+  padding: 0 0 0 17px;
+  border: 0;
+  background: transparent;
+  color: #b9cdce;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.rb-detail-facts-card li::before {
+  content: "";
+  position: absolute;
+  left: 1px;
+  top: 0.48rem;
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #22c55e;
+  box-shadow: 0 0 12px rgba(34, 197, 94, 0.35);
+}
+
+.rb-detail-standing-wrapper {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.rb-detail-standing-card {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 12px;
+}
+
+.rb-detail-standing-card__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.rb-detail-standing-card__header h4 {
+  margin: 4px 0 0;
+}
+
+.rb-detail-standing-card__header > strong {
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  min-width: 38px;
+  height: 30px;
+  border: 1px solid rgba(45, 212, 191, 0.22);
+  border-radius: 999px;
+  background: rgba(20, 184, 166, 0.1);
+  color: #2dd4bf;
+  font-size: 0.82rem;
+}
+
+.rb-detail-standing-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.rb-detail-standing-metric {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 7px;
+  border-radius: 9px;
+  background: rgba(15, 23, 42, 0.42);
+}
+
+.rb-detail-standing-metric span {
+  color: #8fa8a9;
+  font-size: 0.58rem;
+  font-weight: 800;
+}
+
+.rb-detail-standing-metric strong {
+  color: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 950;
+}
+
+.rb-detail-standing-card--empty p {
+  color: #a9c1c2;
+  font-size: 0.76rem;
+}
+
+.rb-detail-freshness-box {
+  overflow: hidden;
+  border: 1px solid rgba(45, 212, 191, 0.1);
+  border-radius: 12px;
+  background: rgba(2, 6, 23, 0.18);
+}
+
+.rb-detail-freshness-box section,
+.rb-detail-freshness-box article,
+.rb-detail-freshness-box div {
+  max-width: 100%;
+  box-shadow: none !important;
+}
+
+.rb-detail-news-list {
+  display: grid;
+  gap: 8px;
+}
+
+.rb-detail-news-item {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  padding: 10px;
+  border-radius: 12px;
+}
+
+.rb-detail-news-item__icon {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(45, 212, 191, 0.14);
+  border-radius: 999px;
+  background: rgba(20, 184, 166, 0.09);
+  color: #2dd4bf !important;
+  font-size: 0.86rem;
+}
+
+.rb-detail-news-item strong {
+  color: #ffffff;
+  font-size: 0.76rem;
+  line-height: 1.2;
+}
+
+.rb-detail-news-item p,
+.rb-detail-responsible-card p {
+  margin-top: 3px;
+  color: #a9c1c2;
+  font-size: 0.7rem;
+  font-weight: 650;
+  line-height: 1.45;
+}
+
+.rb-detail-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.rb-detail-action-card {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+  min-width: 0;
+  padding: 14px;
+  border-radius: 14px;
+}
+
+.rb-detail-action-card__icon {
+  display: inline-grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border: 1px solid rgba(45, 212, 191, 0.18);
+  border-radius: 16px;
+  background: rgba(20, 184, 166, 0.12);
+  color: #2dd4bf !important;
+  font-size: 1.25rem;
+  font-weight: 950;
+}
+
+.rb-detail-action-card h3 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 0.96rem;
+  line-height: 1.15;
+}
+
+.rb-detail-action-card p {
+  max-width: 520px;
+  margin-top: 3px;
+  color: #a9c1c2;
+  font-size: 0.74rem;
+  line-height: 1.45;
+}
+
+.rb-detail-action-card button,
+.rb-detail-empty-state button {
+  width: fit-content;
+  min-height: 30px;
+  margin-top: 8px;
+  padding: 0.44rem 0.76rem;
+  border: 1px solid rgba(45, 212, 191, 0.38);
+  border-radius: 8px;
+  background: rgba(20, 184, 166, 0.12);
+  color: #ecfeff;
+  font-size: 0.68rem;
+  font-weight: 950;
+  line-height: 1;
+  box-shadow: none;
+  white-space: nowrap;
+}
+
+.rb-detail-action-card button:hover,
+.rb-detail-empty-state button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(45, 212, 191, 0.75);
+  background: rgba(20, 184, 166, 0.2);
+}
+
+.rb-detail-footer-note {
+  display: inline-flex;
+  justify-content: center;
+  justify-self: center;
+  width: fit-content;
+  max-width: min(100%, 760px);
+  margin: 0;
+  padding: 0.42rem 0.72rem;
+  border: 1px solid rgba(45, 212, 191, 0.14);
+  border-radius: 999px;
+  background: rgba(2, 6, 23, 0.2);
+  color: #8fa8a9 !important;
+  font-size: 0.66rem;
+  font-weight: 650;
+  line-height: 1.35;
+  text-align: center;
+}
+
+.rb-detail-empty-state {
+  padding: 18px;
+}
+
+.rb-detail-empty-state h2,
+.rb-detail-empty-state h3 {
+  margin: 4px 0 0;
+  color: #ffffff;
+}
+
+.rb-detail-empty-state p {
+  color: #a9c1c2;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+/* Neutralisation ciblée des anciennes règles globales */
+.rb-detail-screen section:not(.rb-screen-container) > div:has(article) {
+  grid-template-columns: unset;
+}
+
+.rb-detail-screen .rb-detail-info-grid,
+.rb-detail-screen .rb-detail-context-grid,
+.rb-detail-screen .rb-detail-standing-wrapper,
+.rb-detail-screen .rb-detail-actions-grid,
+.rb-detail-screen .rb-detail-main-grid {
+  display: grid !important;
+}
+
+/* Responsive Détail match */
+@media (max-width: 1180px) {
+  .rb-detail-main-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rb-detail-side-column {
+    position: static;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .rb-detail-responsible-card {
+    align-self: stretch;
+  }
+}
+
+@media (max-width: 980px) {
+  .rb-detail-hero {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: stretch;
+  }
+
+  .rb-detail-team,
+  .rb-detail-team--home,
+  .rb-detail-team--away {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .rb-detail-team--home {
+    flex-direction: column-reverse;
+  }
+
+  .rb-detail-team--away {
+    flex-direction: column;
+  }
+
+  .rb-detail-context-grid,
+  .rb-detail-standing-wrapper,
+  .rb-detail-actions-grid,
+  .rb-detail-side-column {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rb-detail-info-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .rb-detail-standing-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .rb-detail-topbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .rb-detail-topbar__freshness {
+    white-space: normal;
+  }
+}
+
+@media (max-width: 640px) {
+  .rb-detail-screen {
+    gap: 10px;
+  }
+
+  .rb-detail-hero,
+  .rb-detail-card,
+  .rb-detail-action-card,
+  .rb-detail-empty-state {
+    padding: 12px;
+    border-radius: 12px;
+  }
+
+  .rb-detail-info-grid,
+  .rb-detail-mini-metrics,
+  .rb-detail-standing-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rb-detail-card__header,
+  .rb-detail-standing-card__header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rb-detail-soft-badge {
+    width: fit-content;
+  }
+
+  .rb-detail-team-logo {
+    width: 58px;
+    height: 58px;
+    border-radius: 16px;
+  }
+
+  .rb-detail-team h2 {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+  }
+
+  .rb-detail-action-card {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rb-detail-action-card__icon {
+    width: 44px;
+    height: 44px;
+  }
+
+  .rb-detail-action-card button,
+  .rb-detail-empty-state button {
+    width: 100%;
+  }
+
+  .rb-detail-footer-note {
+    width: 100%;
+    border-radius: 12px;
+    text-align: left;
+  }
+}
+/*
+  Correctif écran Détail match 23D.8
+  Ce bloc rapproche le rendu de la maquette : dashboard compact, cartes horizontales, stats en grille et actualités latérales.
+*/
+
+section.rb-screen-container:has(.rb-detail-screen--mockup) {
+  width: min(1320px, calc(100% - 24px)) !important;
+  max-width: 1320px !important;
+  padding-top: 18px !important;
+}
+
+.rb-detail-screen--mockup {
+  gap: 10px !important;
+}
+
+.rb-detail-screen--mockup .rb-detail-topbar {
+  max-width: 100%;
+  margin: 0;
+  padding: 0 4px 4px;
+}
+
+.rb-detail-screen--mockup .rb-detail-hero {
+  min-height: 116px;
+  padding: 14px 20px;
+  border-radius: 12px;
+  background:
+    linear-gradient(145deg, rgba(15, 23, 42, 0.92), rgba(8, 47, 51, 0.58)),
+    rgba(2, 6, 23, 0.34);
+}
+
+.rb-detail-screen--mockup .rb-detail-team-logo {
+  width: 72px;
+  height: 72px;
+  border-radius: 18px;
+}
+
+.rb-detail-screen--mockup .rb-detail-team h2 {
+  font-size: clamp(1rem, 1.55vw, 1.35rem);
+}
+
+.rb-detail-screen--mockup .rb-detail-hero-center {
+  gap: 4px;
+}
+
+.rb-detail-screen--mockup .rb-detail-vs {
+  width: 38px;
+  height: 24px;
+}
+
+.rb-detail-dashboard-grid {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.rb-detail-dashboard-grid__main {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.rb-detail-context-row {
+  display: grid !important;
+  grid-template-columns: minmax(0, 0.95fr) minmax(320px, 0.75fr) !important;
+  gap: 10px;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.rb-detail-screen--mockup .rb-detail-card,
+.rb-detail-screen--mockup .rb-detail-action-card,
+.rb-detail-screen--mockup .rb-detail-empty-state {
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: none;
+}
+
+.rb-detail-screen--mockup .rb-detail-card__header h3 {
+  margin-top: 3px;
+  font-size: 0.96rem;
+  line-height: 1.08;
+}
+
+.rb-detail-context-card {
+  min-height: 118px;
+}
+
+.rb-detail-context-card > p {
+  color: #a9c1c2;
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
+
+.rb-detail-context-chips {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.rb-detail-context-chips span {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  padding: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 9px;
+  background: rgba(15, 23, 42, 0.36);
+  color: #9fb5b6;
+  font-size: 0.62rem;
+  font-weight: 800;
+}
+
+.rb-detail-context-chips strong {
+  color: #2dd4bf;
+  font-size: 0.74rem;
+  line-height: 1;
+}
+
+.rb-detail-form-card {
+  min-height: 118px;
+}
+
+.rb-detail-form-score {
+  display: inline-grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border: 7px solid rgba(45, 212, 191, 0.72);
+  border-radius: 999px;
+  color: #99f6e4 !important;
+  font-size: 0.76rem;
+  font-weight: 950;
+}
+
+.rb-detail-form-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.rb-detail-form-columns > div {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.rb-detail-form-columns strong {
+  color: #ffffff;
+  font-size: 0.72rem;
+  text-align: center;
+}
+
+.rb-detail-form-columns small {
+  color: #8fa8a9;
+  font-size: 0.62rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.rb-detail-form-sequence {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+}
+
+.rb-detail-form-badge {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  color: #ffffff !important;
+  font-size: 0.62rem;
+  font-weight: 950;
+}
+
+.rb-detail-form-badge--v {
+  background: rgba(34, 197, 94, 0.72);
+}
+
+.rb-detail-form-badge--n {
+  background: rgba(148, 163, 184, 0.46);
+}
+
+.rb-detail-form-badge--d {
+  background: rgba(239, 68, 68, 0.72);
+}
+
+.rb-detail-stats-section {
+  gap: 10px;
+}
+
+.rb-detail-stat-grid {
+  display: grid !important;
+  grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+  gap: 9px;
+}
+
+.rb-detail-stat-card {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  margin: 0 !important;
+  padding: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 10px;
+  background:
+    linear-gradient(145deg, rgba(2, 6, 23, 0.34), rgba(8, 47, 51, 0.2)),
+    rgba(2, 6, 23, 0.16);
+}
+
+.rb-detail-stat-card__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  align-items: center;
+}
+
+.rb-detail-stat-card__header strong {
+  color: #ffffff;
+  font-size: 0.68rem;
+  line-height: 1.1;
+}
+
+.rb-detail-stat-card__header span {
+  color: #6f8586;
+  font-size: 0.62rem;
+}
+
+.rb-detail-stat-card__values {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.rb-detail-stat-card__values p {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+}
+
+.rb-detail-stat-card__values strong {
+  color: #2dd4bf;
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.rb-detail-stat-card__values span,
+.rb-detail-stat-card small {
+  color: #8fa8a9;
+  font-size: 0.58rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.rb-detail-meta-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.rb-detail-meta-strip span {
+  display: inline-flex;
+  gap: 5px;
+  align-items: center;
+  min-height: 26px;
+  padding: 0.26rem 0.55rem;
+  border: 1px solid rgba(45, 212, 191, 0.12);
+  border-radius: 999px;
+  background: rgba(20, 184, 166, 0.07);
+  color: #9fb5b6;
+  font-size: 0.62rem;
+  font-weight: 800;
+}
+
+.rb-detail-meta-strip strong {
+  color: #ecfeff;
+  font-size: 0.62rem;
+}
+
+.rb-detail-bottom-grid {
+  display: grid !important;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1fr) minmax(300px, 0.9fr) !important;
+  gap: 10px;
+}
+
+.rb-detail-availability-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 8px;
+}
+
+.rb-detail-availability-grid article {
+  margin: 0 !important;
+  padding: 9px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 10px;
+  background: rgba(2, 6, 23, 0.18);
+}
+
+.rb-detail-availability-grid strong {
+  color: #ffffff;
+  font-size: 0.72rem;
+}
+
+.rb-detail-availability-grid p,
+.rb-detail-responsible-card p,
+.rb-detail-news-item p {
+  color: #a9c1c2;
+  font-size: 0.68rem;
+  line-height: 1.38;
+}
+
+.rb-detail-news {
+  min-height: 100%;
+}
+
+.rb-detail-news-list {
+  gap: 7px;
+}
+
+.rb-detail-news-item {
+  grid-template-columns: 30px minmax(0, 1fr);
+  gap: 8px;
+  padding: 8px;
+  border-radius: 10px;
+}
+
+.rb-detail-news-item__icon {
+  width: 30px;
+  height: 30px;
+  font-size: 0.78rem;
+}
+
+.rb-detail-news-item strong {
+  font-size: 0.7rem;
+}
+
+.rb-detail-actions-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 10px;
+  margin: 0 !important;
+}
+
+.rb-detail-action-card {
+  min-height: 82px;
+  padding: 12px;
+}
+
+.rb-detail-action-card__icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+}
+
+.rb-detail-action-card h3 {
+  font-size: 0.9rem;
+}
+
+.rb-detail-action-card p {
+  font-size: 0.68rem;
+}
+
+.rb-detail-action-card button {
+  min-height: 28px;
+  margin-top: 6px;
+  font-size: 0.64rem;
+}
+
+.rb-detail-footer-note {
+  margin-top: 0;
+  font-size: 0.62rem;
+}
+
+/* Neutralisation des anciennes grilles qui éloignaient le rendu de la maquette */
+.rb-detail-screen--mockup section:not(.rb-screen-container) > div:has(article) {
+  grid-template-columns: unset;
+}
+
+.rb-detail-screen--mockup .rb-detail-context-row,
+.rb-detail-screen--mockup .rb-detail-stat-grid,
+.rb-detail-screen--mockup .rb-detail-bottom-grid,
+.rb-detail-screen--mockup .rb-detail-actions-grid,
+.rb-detail-screen--mockup .rb-detail-availability-grid {
+  display: grid !important;
+}
+
+/* Responsive écran Détail match */
+@media (max-width: 1180px) {
+  .rb-detail-stat-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+
+  .rb-detail-bottom-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
+
+@media (max-width: 980px) {
+  .rb-detail-context-row,
+  .rb-detail-actions-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .rb-detail-context-chips,
+  .rb-detail-stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 640px) {
+  section.rb-screen-container:has(.rb-detail-screen--mockup) {
+    width: min(100% - 14px, 100%) !important;
+  }
+
+  .rb-detail-context-chips,
+  .rb-detail-stat-grid,
+  .rb-detail-availability-grid,
+  .rb-detail-form-columns {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .rb-detail-screen--mockup .rb-detail-hero {
+    padding: 12px;
+  }
+
+  .rb-detail-screen--mockup .rb-detail-team-logo {
+    width: 58px;
+    height: 58px;
+  }
+
+  .rb-detail-card__header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rb-detail-soft-badge {
+    width: fit-content;
+  }
+}
 
 /*
-  Schéma de communication CSS du correctif 22M.6 :
+  Schéma de communication CSS du correctif 23D.8 :
   App.css
-  ├── neutralise la règle globale section > div:has(article)
-  ├── force MatchesSection.tsx à afficher une seule ligne par match
-  ├── empêche les lignes de passer sous la sidebar
-  └── ne modifie ni backend, ni API, ni logique métier
+  ├── rapproche MatchDetailsScreen.tsx de la maquette compacte
+  ├── transforme MatchContextSection.tsx en bloc Contexte + Forme récente
+  ├── transforme MatchDetailsSection.tsx en grille de statistiques disponibles
+  ├── conserve MatchNewsSection.tsx comme zone actualités préparée
+  └── ne modifie ni backend, ni services/api.ts, ni models/rubybets.ts
 */
