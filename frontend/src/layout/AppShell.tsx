@@ -13,7 +13,7 @@ type AppShellProps = {
   onNavigate: (screen: AppScreen) => void;
 };
 
-// Ce composant encadre tous les écrans MVP avec un header commun et une navigation stable.
+// Ce composant encadre tous les écrans MVP avec un header compact, une navigation stable et le contenu courant.
 function AppShell({
   currentScreen,
   navigationItems,
@@ -25,21 +25,27 @@ function AppShell({
   return (
     <main className="rb-app-shell">
       <header className="rb-app-header">
-        <div className="rb-brand">
-          <span className="rb-brand__mark">◆</span>
-          <div>
-            <p className="rb-eyebrow">RubyBets MVP</p>
-            <h1>RubyBets</h1>
-            <p>Application d’aide à la décision football avant-match.</p>
+        <div className="rb-app-header__inner">
+          <div className="rb-brand" aria-label="RubyBets MVP">
+            <span className="rb-brand__mark">◆</span>
+            <div className="rb-brand__text">
+              <p className="rb-eyebrow">RubyBets MVP</p>
+              <h1>RubyBets</h1>
+              <p>Application d’aide à la décision football avant-match.</p>
+            </div>
+          </div>
+
+          <div className="rb-app-header__right">
+            <TopNavigation
+              currentScreen={currentScreen}
+              items={navigationItems}
+              hasSelectedMatch={hasSelectedMatch}
+              onNavigate={onNavigate}
+            />
+
+            <span className="rb-header-badge">Aide à la décision avant-match</span>
           </div>
         </div>
-
-        <TopNavigation
-          currentScreen={currentScreen}
-          items={navigationItems}
-          hasSelectedMatch={hasSelectedMatch}
-          onNavigate={onNavigate}
-        />
       </header>
 
       <section className="rb-screen-container">{children}</section>
@@ -53,6 +59,6 @@ export default AppShell;
 
 // Schéma de communication du fichier :
 // AppShell.tsx
-// ├── utilise TopNavigation.tsx pour afficher le menu
-// ├── reçoit l’écran actif et les contenus depuis App.tsx
-// └── encadre les futurs écrans du dossier screens/
+// ├── utilise TopNavigation.tsx pour afficher le menu principal
+// ├── reçoit l’écran actif, le statut et les contenus depuis App.tsx
+// └── encadre les écrans du dossier screens/ sans modifier les appels API
