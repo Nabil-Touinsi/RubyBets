@@ -7811,3 +7811,1198 @@ section.rb-screen-container:has(.rb-analysis-screen--mockup) {
     text-align: left;
   }
 }
+/*
+  Correctif écran Prédictions Phase 25P
+  Ce bloc refond l’écran Prédictions en dashboard compact proche de la maquette sans modifier le backend.
+*/
+
+section.rb-screen-container:has(.rb-predictions-screen--mockup) {
+  width: min(1320px, calc(100% - 24px)) !important;
+  max-width: 1320px !important;
+  padding-top: 18px !important;
+}
+
+.rb-predictions-screen--mockup,
+.rb-predictions-screen--mockup * {
+  box-sizing: border-box;
+}
+
+.rb-predictions-screen--mockup {
+  display: grid;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+  color: #f8ffff;
+}
+
+.rb-predictions-screen--mockup :is(h2, h3, h4, p, span, strong, small, li, button) {
+  overflow-wrap: normal !important;
+  word-break: normal !important;
+}
+
+.rb-predictions-screen--mockup section,
+.rb-predictions-screen--mockup article,
+.rb-predictions-screen--mockup main,
+.rb-predictions-screen--mockup ul,
+.rb-predictions-screen--mockup li {
+  margin: 0;
+  box-shadow: none;
+}
+
+.rb-predictions-screen--mockup section:has(h2) h2::after,
+.rb-predictions-screen--mockup section:has(h3) h3::after {
+  content: none;
+}
+
+.rb-prediction-kicker {
+  margin: 0;
+  color: #2dd4bf !important;
+  font-size: 0.64rem;
+  font-weight: 950;
+  letter-spacing: 0.14em;
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+
+.rb-prediction-topbar {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 0 2px 2px;
+}
+
+.rb-prediction-topbar h2 {
+  margin: 0;
+  color: #ffffff;
+  font-size: clamp(1.35rem, 2vw, 1.72rem);
+  line-height: 1.05;
+  letter-spacing: -0.045em;
+}
+
+.rb-prediction-topbar button {
+  width: fit-content;
+  min-height: 28px;
+  margin: 0;
+  padding: 0.38rem 0.72rem;
+  border: 1px solid rgba(45, 212, 191, 0.22);
+  border-radius: 999px;
+  background: rgba(20, 184, 166, 0.08);
+  color: #99f6e4;
+  font-size: 0.68rem;
+  font-weight: 900;
+  line-height: 1;
+  white-space: nowrap !important;
+  box-shadow: none;
+}
+
+.rb-prediction-topbar button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(45, 212, 191, 0.58);
+  background: rgba(20, 184, 166, 0.14);
+}
+
+.rb-prediction-hero,
+.rb-prediction-card,
+.rb-prediction-main-card,
+.rb-prediction-summary-card,
+.rb-prediction-side-card,
+.rb-prediction-global-reading,
+.rb-prediction-main-section {
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-radius: 12px;
+  background:
+    linear-gradient(145deg, rgba(15, 23, 42, 0.9), rgba(8, 47, 51, 0.56)),
+    rgba(15, 23, 42, 0.74);
+}
+
+.rb-prediction-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(190px, 0.75fr) minmax(0, 1.2fr) repeat(3, minmax(100px, 0.42fr));
+  gap: 12px;
+  align-items: center;
+  min-height: 86px;
+  padding: 12px 16px;
+}
+
+.rb-prediction-hero--empty {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 4px;
+}
+
+.rb-prediction-hero--empty h2 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 1rem;
+}
+
+.rb-prediction-hero--empty p:not(.rb-prediction-kicker) {
+  color: #a9c1c2;
+  font-size: 0.72rem;
+}
+
+.rb-prediction-hero__team {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.rb-prediction-hero__team--home {
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.rb-prediction-hero__team--away {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.rb-prediction-hero__team div,
+.rb-prediction-hero__meta {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.rb-prediction-hero__team span,
+.rb-prediction-hero__meta span,
+.rb-prediction-hero__center span {
+  color: #8fa8a9 !important;
+  font-size: 0.6rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.rb-prediction-hero__team strong,
+.rb-prediction-hero__meta strong {
+  min-width: 0;
+  color: #ffffff;
+  font-size: 0.82rem;
+  font-weight: 950;
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rb-prediction-team-logo {
+  position: relative;
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 50px;
+  height: 50px;
+  overflow: hidden;
+  border: 1px solid rgba(45, 212, 191, 0.24);
+  border-radius: 14px;
+  background:
+    radial-gradient(circle at 50% 20%, rgba(45, 212, 191, 0.18), transparent 64%),
+    rgba(2, 6, 23, 0.48);
+}
+
+.rb-prediction-team-logo__fallback {
+  color: #99f6e4 !important;
+  font-size: 0.68rem;
+  font-weight: 950;
+}
+
+.rb-prediction-team-logo img {
+  position: absolute;
+  inset: 7px;
+  width: calc(100% - 14px);
+  height: calc(100% - 14px);
+  object-fit: contain;
+}
+
+.rb-prediction-hero__center {
+  display: grid;
+  gap: 3px;
+  justify-items: center;
+  min-width: 0;
+  text-align: center;
+}
+
+.rb-prediction-hero__center strong {
+  display: inline-grid;
+  place-items: center;
+  min-width: 36px;
+  height: 22px;
+  border: 1px solid rgba(45, 212, 191, 0.28);
+  border-radius: 999px;
+  background: rgba(20, 184, 166, 0.1);
+  color: #99f6e4;
+  font-size: 0.58rem;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+}
+
+.rb-prediction-hero__center p {
+  color: #8fa8a9;
+  font-size: 0.62rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.rb-prediction-hero__meta {
+  min-height: 46px;
+  padding: 8px 10px;
+  border-left: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.rb-prediction-dashboard-grid {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 10px;
+  min-width: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.rb-prediction-dashboard-grid__main,
+.rb-prediction-dashboard-grid__side {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  align-content: start;
+}
+
+.rb-prediction-dashboard-grid__side {
+  position: sticky;
+  top: 92px;
+}
+
+.rb-prediction-main-section {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  padding: 12px;
+}
+
+.rb-prediction-section-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.rb-prediction-section-header h3 {
+  margin: 3px 0 0;
+  color: #ffffff;
+  font-size: 1rem;
+  line-height: 1.1;
+  letter-spacing: -0.035em;
+}
+
+.rb-prediction-section-header p:not(.rb-prediction-kicker) {
+  margin-top: 4px;
+  color: #a9c1c2;
+  font-size: 0.7rem;
+  line-height: 1.38;
+}
+
+.rb-prediction-soft-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 22px;
+  padding: 0.22rem 0.56rem;
+  border: 1px solid rgba(45, 212, 191, 0.24);
+  border-radius: 999px;
+  background: rgba(20, 184, 166, 0.1);
+  color: #99f6e4 !important;
+  font-size: 0.6rem;
+  font-weight: 950;
+  line-height: 1;
+  white-space: nowrap !important;
+}
+
+.rb-prediction-message {
+  padding: 9px;
+  border: 1px solid rgba(251, 191, 36, 0.18);
+  border-radius: 10px;
+  background: rgba(251, 191, 36, 0.07);
+}
+
+.rb-prediction-message p {
+  color: #fde68a;
+  font-size: 0.7rem;
+  line-height: 1.4;
+}
+
+.rb-prediction-card-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.rb-prediction-main-card {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  padding: 12px;
+}
+
+.rb-prediction-main-card__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.rb-prediction-main-card__header h3 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 0.9rem;
+  line-height: 1.1;
+}
+
+.rb-prediction-main-card__header span {
+  color: #8fa8a9;
+  font-size: 0.62rem;
+  font-weight: 800;
+}
+
+.rb-prediction-main-card__highlight {
+  display: grid;
+  gap: 3px;
+}
+
+.rb-prediction-main-card__highlight span {
+  color: #8fa8a9;
+  font-size: 0.62rem;
+  font-weight: 800;
+}
+
+.rb-prediction-main-card__highlight strong {
+  color: #2dd4bf;
+  font-size: 1.14rem;
+  font-weight: 950;
+  line-height: 1.1;
+}
+
+.rb-prediction-card-gauge {
+  display: grid;
+  place-items: center;
+  justify-self: center;
+  width: 92px;
+  height: 92px;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at center, #0b171b 0 50%, transparent 51%),
+    conic-gradient(#2dd4bf var(--rb-card-confidence), rgba(148, 163, 184, 0.18) 0);
+}
+
+.rb-prediction-card-gauge div {
+  display: grid;
+  place-items: center;
+  width: 66px;
+  height: 66px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.92);
+}
+
+.rb-prediction-card-gauge strong {
+  color: #ffffff;
+  font-size: 0.84rem;
+  line-height: 1;
+}
+
+.rb-prediction-card-gauge span {
+  color: #9fb5b6;
+  font-size: 0.56rem;
+  font-weight: 800;
+}
+
+.rb-prediction-main-card > p {
+  color: #a9c1c2;
+  font-size: 0.66rem;
+  line-height: 1.38;
+}
+
+.rb-prediction-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.rb-prediction-card-tags span,
+.rb-prediction-global-tags span,
+.rb-prediction-meta-strip span {
+  display: inline-flex;
+  gap: 5px;
+  align-items: center;
+  min-height: 22px;
+  padding: 0.22rem 0.48rem;
+  border: 1px solid rgba(45, 212, 191, 0.12);
+  border-radius: 999px;
+  background: rgba(20, 184, 166, 0.07);
+  color: #9fb5b6;
+  font-size: 0.58rem;
+  font-weight: 800;
+}
+
+.rb-prediction-card-tags span:last-child {
+  border-color: rgba(251, 146, 60, 0.18);
+  background: rgba(251, 146, 60, 0.07);
+}
+
+.rb-prediction-global-reading {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  padding: 12px;
+}
+
+.rb-prediction-global-reading__icon {
+  display: inline-grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border: 1px solid rgba(45, 212, 191, 0.16);
+  border-radius: 14px;
+  background: rgba(20, 184, 166, 0.1);
+  color: #2dd4bf;
+  font-weight: 950;
+}
+
+.rb-prediction-global-reading h3 {
+  margin: 3px 0 0;
+  color: #ffffff;
+  font-size: 0.98rem;
+  line-height: 1.1;
+}
+
+.rb-prediction-global-reading p:not(.rb-prediction-kicker) {
+  margin-top: 5px;
+  color: #a9c1c2;
+  font-size: 0.7rem;
+  line-height: 1.42;
+}
+
+.rb-prediction-global-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.rb-prediction-global-tags strong,
+.rb-prediction-meta-strip strong {
+  color: #ecfeff;
+  font-size: 0.58rem;
+}
+
+.rb-prediction-limit-list {
+  display: grid;
+  gap: 5px;
+  margin-top: 8px;
+  padding: 0;
+  list-style: none;
+}
+
+.rb-prediction-limit-list li {
+  padding: 0 0 0 14px;
+  border: 0;
+  background: transparent;
+  color: #8fa8a9;
+  font-size: 0.62rem;
+  line-height: 1.32;
+  position: relative;
+}
+
+.rb-prediction-limit-list li::before {
+  content: "";
+  position: absolute;
+  left: 1px;
+  top: 0.42rem;
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: #facc15;
+}
+
+.rb-prediction-meta-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.rb-prediction-summary-card,
+.rb-prediction-side-card,
+.rb-prediction-empty-state {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  padding: 12px;
+}
+
+.rb-prediction-summary-card__header h3,
+.rb-prediction-side-card h3,
+.rb-prediction-empty-state h3 {
+  margin: 3px 0 0;
+  color: #ffffff;
+  font-size: 0.98rem;
+  line-height: 1.1;
+}
+
+.rb-prediction-gauge {
+  display: grid;
+  place-items: center;
+  justify-self: center;
+  width: 150px;
+  height: 150px;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at center, #0b171b 0 51%, transparent 52%),
+    conic-gradient(#2dd4bf var(--rb-prediction-score), rgba(148, 163, 184, 0.17) 0);
+}
+
+.rb-prediction-gauge div {
+  display: grid;
+  place-items: center;
+  width: 102px;
+  height: 102px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.94);
+}
+
+.rb-prediction-gauge strong {
+  color: #ffffff;
+  font-size: 1.75rem;
+  font-weight: 950;
+  line-height: 1;
+}
+
+.rb-prediction-gauge span {
+  color: #9fb5b6;
+  font-size: 0.62rem;
+  font-weight: 850;
+  text-align: center;
+}
+
+.rb-prediction-summary-text,
+.rb-prediction-side-card p,
+.rb-prediction-empty-state p {
+  color: #a9c1c2;
+  font-size: 0.68rem;
+  line-height: 1.4;
+}
+
+.rb-prediction-summary-metrics {
+  display: grid;
+  gap: 7px;
+}
+
+.rb-prediction-summary-metrics p,
+.rb-prediction-summary-list p {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+  padding: 7px 0;
+  border-top: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.rb-prediction-summary-metrics span,
+.rb-prediction-summary-list span {
+  color: #9fb5b6;
+  font-size: 0.64rem;
+  font-weight: 800;
+}
+
+.rb-prediction-summary-metrics strong {
+  color: #ffffff;
+  font-size: 0.64rem;
+  font-weight: 950;
+  text-align: right;
+}
+
+.rb-prediction-summary-list {
+  display: grid;
+  gap: 2px;
+}
+
+.rb-prediction-summary-list p {
+  grid-template-columns: 18px minmax(0, 1fr);
+  color: #a9c1c2;
+  font-size: 0.66rem;
+  line-height: 1.35;
+}
+
+.rb-prediction-summary-list p span {
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border: 1px solid rgba(45, 212, 191, 0.14);
+  border-radius: 999px;
+  background: rgba(20, 184, 166, 0.08);
+  color: #2dd4bf !important;
+  font-size: 0.58rem;
+}
+
+.rb-prediction-footer-note {
+  display: inline-flex;
+  justify-content: center;
+  justify-self: center;
+  width: fit-content;
+  max-width: min(100%, 760px);
+  margin: 0;
+  padding: 0.42rem 0.72rem;
+  border: 1px solid rgba(45, 212, 191, 0.14);
+  border-radius: 999px;
+  background: rgba(2, 6, 23, 0.2);
+  color: #8fa8a9 !important;
+  font-size: 0.62rem;
+  font-weight: 650;
+  line-height: 1.35;
+  text-align: center;
+}
+
+/* Neutralisation ciblée des anciennes règles de l’écran Prédictions */
+.rb-predictions-screen--mockup .rb-page-hero,
+.rb-predictions-screen--mockup .rb-predictions-layout,
+.rb-predictions-screen--mockup .rb-predictions-main,
+.rb-predictions-screen--mockup .rb-predictions-aside {
+  display: initial;
+}
+
+.rb-predictions-screen--mockup section:not(.rb-screen-container) > div:has(article) {
+  grid-template-columns: unset;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-dashboard-grid,
+.rb-predictions-screen--mockup .rb-prediction-card-grid,
+.rb-predictions-screen--mockup .rb-prediction-global-tags,
+.rb-predictions-screen--mockup .rb-prediction-meta-strip {
+  display: grid !important;
+}
+
+/* Responsive écran Prédictions */
+@media (max-width: 1180px) {
+  .rb-prediction-dashboard-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .rb-prediction-dashboard-grid__side {
+    position: static;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .rb-prediction-card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .rb-prediction-hero {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+
+  .rb-prediction-hero__meta {
+    border-left: 0;
+    border-top: 1px solid rgba(148, 163, 184, 0.1);
+  }
+}
+
+@media (max-width: 900px) {
+  .rb-prediction-topbar {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: flex-start;
+  }
+
+  .rb-prediction-topbar button {
+    width: fit-content;
+  }
+
+  .rb-prediction-hero,
+  .rb-prediction-dashboard-grid__side,
+  .rb-prediction-card-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .rb-prediction-hero__team,
+  .rb-prediction-hero__team--home,
+  .rb-prediction-hero__team--away {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .rb-prediction-hero__team--away {
+    flex-direction: row-reverse;
+  }
+
+  .rb-prediction-global-reading {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  section.rb-screen-container:has(.rb-predictions-screen--mockup) {
+    width: min(100% - 14px, 100%) !important;
+  }
+
+  .rb-predictions-screen--mockup {
+    gap: 9px;
+  }
+
+  .rb-prediction-hero,
+  .rb-prediction-main-section,
+  .rb-prediction-main-card,
+  .rb-prediction-summary-card,
+  .rb-prediction-side-card,
+  .rb-prediction-global-reading {
+    padding: 10px;
+    border-radius: 11px;
+  }
+
+  .rb-prediction-section-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rb-prediction-soft-badge {
+    width: fit-content;
+  }
+
+  .rb-prediction-team-logo {
+    width: 46px;
+    height: 46px;
+  }
+
+  .rb-prediction-hero__team strong {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+  }
+
+  .rb-prediction-card-gauge {
+    width: 84px;
+    height: 84px;
+  }
+
+  .rb-prediction-gauge {
+    width: 132px;
+    height: 132px;
+  }
+
+  .rb-prediction-footer-note {
+    width: 100%;
+    border-radius: 12px;
+    text-align: left;
+  }
+}
+
+section.rb-screen-container:has(.rb-predictions-screen--mockup) {
+  width: min(1240px, calc(100% - 24px)) !important;
+  max-width: 1240px !important;
+  padding-top: 14px !important;
+  padding-bottom: 16px !important;
+}
+
+.rb-predictions-screen--mockup {
+  gap: 10px !important;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-dashboard-grid {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 292px !important;
+  gap: 10px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Topbar plus proche de la maquette */
+.rb-predictions-screen--mockup .rb-prediction-topbar {
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) auto !important;
+  gap: 12px !important;
+  align-items: center !important;
+  padding: 0 2px 2px !important;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-topbar h2 {
+  margin: 0 !important;
+  color: #ffffff !important;
+  font-size: 1.45rem !important;
+  line-height: 1 !important;
+  letter-spacing: -0.045em !important;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-topbar button {
+  min-height: 28px !important;
+  padding: 0.38rem 0.72rem !important;
+  border-radius: 999px !important;
+  font-size: 0.66rem !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-hero {
+  display: grid !important;
+  grid-template-columns:
+    minmax(150px, 1.05fr)
+    minmax(120px, 0.55fr)
+    minmax(150px, 1.05fr)
+    repeat(3, minmax(86px, 0.45fr)) !important;
+  gap: 10px !important;
+  align-items: center !important;
+  min-height: 74px !important;
+  padding: 10px 14px !important;
+  border-radius: 10px !important;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-team-logo {
+  width: 42px !important;
+  height: 42px !important;
+  border-radius: 12px !important;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-team-logo img {
+  inset: 6px !important;
+  width: calc(100% - 12px) !important;
+  height: calc(100% - 12px) !important;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-hero__team {
+  gap: 8px !important;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-hero__team strong,
+.rb-predictions-screen--mockup .rb-prediction-hero__meta strong {
+  font-size: 0.74rem !important;
+  line-height: 1.12 !important;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-hero__team span,
+.rb-predictions-screen--mockup .rb-prediction-hero__meta span,
+.rb-predictions-screen--mockup .rb-prediction-hero__center span,
+.rb-predictions-screen--mockup .rb-prediction-hero__center p {
+  font-size: 0.56rem !important;
+  line-height: 1.2 !important;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-hero__center strong {
+  min-width: 32px !important;
+  height: 20px !important;
+  font-size: 0.54rem !important;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-hero__meta {
+  min-height: 42px !important;
+  padding: 6px 9px !important;
+}
+
+/* Bloc principal : densité et alignement */
+.rb-predictions-screen--mockup .rb-prediction-main-section {
+  gap: 9px !important;
+  padding: 10px !important;
+  border-radius: 10px !important;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-section-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+  align-items: flex-start !important;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-section-header h3 {
+  margin: 2px 0 0 !important;
+  font-size: 0.96rem !important;
+  line-height: 1.05 !important;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-section-header p:not(.rb-prediction-kicker) {
+  margin-top: 4px !important;
+  font-size: 0.66rem !important;
+  line-height: 1.35 !important;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-card-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 9px !important;
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-main-card {
+  display: grid !important;
+  grid-template-rows: auto auto 78px minmax(42px, 1fr) auto !important;
+  gap: 8px !important;
+  min-width: 0 !important;
+  min-height: 222px !important;
+  padding: 10px !important;
+  border-radius: 10px !important;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-main-card__header h3 {
+  font-size: 0.82rem !important;
+  line-height: 1.05 !important;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-main-card__header span,
+.rb-predictions-screen--mockup .rb-prediction-main-card__highlight span {
+  font-size: 0.56rem !important;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-main-card__highlight strong {
+  font-size: 1rem !important;
+  line-height: 1.08 !important;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-card-gauge {
+  align-self: center !important;
+  justify-self: center !important;
+  width: 76px !important;
+  height: 76px !important;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-card-gauge div {
+  width: 54px !important;
+  height: 54px !important;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-card-gauge strong {
+  font-size: 0.72rem !important;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-card-gauge span {
+  font-size: 0.5rem !important;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-main-card > p {
+  font-size: 0.6rem !important;
+  line-height: 1.34 !important;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-card-tags {
+  gap: 5px !important;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-card-tags span {
+  min-height: 20px !important;
+  padding: 0.2rem 0.42rem !important;
+  font-size: 0.52rem !important;
+}
+
+/* Lecture globale : format carte horizontale */
+.rb-predictions-screen--mockup .rb-prediction-global-reading {
+  display: grid !important;
+  grid-template-columns: 42px minmax(0, 1fr) !important;
+  gap: 10px !important;
+  align-items: start !important;
+  padding: 10px !important;
+  border-radius: 10px !important;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-global-reading__icon {
+  width: 42px !important;
+  height: 42px !important;
+  border-radius: 12px !important;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-global-reading h3 {
+  margin: 2px 0 0 !important;
+  font-size: 0.92rem !important;
+  line-height: 1.08 !important;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-global-reading p:not(.rb-prediction-kicker) {
+  margin-top: 5px !important;
+  font-size: 0.64rem !important;
+  line-height: 1.38 !important;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-global-tags {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 6px !important;
+  margin-top: 8px !important;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-global-tags span {
+  min-height: 21px !important;
+  padding: 0.2rem 0.46rem !important;
+  font-size: 0.54rem !important;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-meta-strip {
+  display: none !important;
+}
+
+/* Sidebar : alignement, largeur et baromètre  */
+.rb-predictions-screen--mockup .rb-prediction-dashboard-grid__side {
+  display: grid !important;
+  gap: 10px !important;
+  position: sticky !important;
+  top: 86px !important;
+  align-content: start !important;
+  min-width: 0 !important;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-summary-card,
+.rb-predictions-screen--mockup .rb-prediction-side-card {
+  gap: 9px !important;
+  padding: 10px !important;
+  border-radius: 10px !important;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-summary-card__header h3,
+.rb-predictions-screen--mockup .rb-prediction-side-card h3 {
+  margin: 2px 0 0 !important;
+  font-size: 0.92rem !important;
+  line-height: 1.08 !important;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-gauge {
+  width: 128px !important;
+  height: 128px !important;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-gauge div {
+  width: 88px !important;
+  height: 88px !important;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-gauge strong {
+  font-size: 1.45rem !important;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-gauge span {
+  font-size: 0.56rem !important;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-summary-text,
+.rb-predictions-screen--mockup .rb-prediction-side-card p {
+  font-size: 0.62rem !important;
+  line-height: 1.36 !important;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-summary-metrics {
+  gap: 5px !important;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-summary-metrics p {
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  gap: 6px !important;
+  padding: 6px 0 !important;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-summary-metrics span,
+.rb-predictions-screen--mockup .rb-prediction-summary-metrics strong {
+  font-size: 0.58rem !important;
+  line-height: 1.22 !important;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-summary-list {
+  gap: 3px !important;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-summary-list p {
+  grid-template-columns: 17px minmax(0, 1fr) !important;
+  gap: 7px !important;
+  padding: 6px 0 !important;
+  font-size: 0.6rem !important;
+  line-height: 1.32 !important;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-summary-list p span {
+  width: 17px !important;
+  height: 17px !important;
+  font-size: 0.52rem !important;
+}
+
+/* Footer responsable */
+.rb-predictions-screen--mockup .rb-prediction-footer-note {
+  margin-top: 0 !important;
+  padding: 0.38rem 0.68rem !important;
+  font-size: 0.58rem !important;
+}
+
+/* Breakpoints corrigés : on ne casse plus la grille trop tôt */
+@media (max-width: 1040px) {
+  .rb-predictions-screen--mockup .rb-prediction-dashboard-grid {
+    grid-template-columns: minmax(0, 1fr) 260px !important;
+  }
+
+  .rb-predictions-screen--mockup .rb-prediction-card-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+
+  .rb-predictions-screen--mockup .rb-prediction-hero {
+    grid-template-columns:
+      minmax(130px, 1fr)
+      minmax(110px, 0.6fr)
+      minmax(130px, 1fr)
+      repeat(3, minmax(76px, 0.45fr)) !important;
+  }
+}
+
+@media (max-width: 860px) {
+  .rb-predictions-screen--mockup .rb-prediction-dashboard-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .rb-predictions-screen--mockup .rb-prediction-dashboard-grid__side {
+    position: static !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .rb-predictions-screen--mockup .rb-prediction-card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .rb-predictions-screen--mockup .rb-prediction-hero {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 640px) {
+  section.rb-screen-container:has(.rb-predictions-screen--mockup) {
+    width: min(100% - 14px, 100%) !important;
+  }
+
+  .rb-predictions-screen--mockup .rb-prediction-topbar,
+  .rb-predictions-screen--mockup .rb-prediction-hero,
+  .rb-predictions-screen--mockup .rb-prediction-card-grid,
+  .rb-predictions-screen--mockup .rb-prediction-dashboard-grid__side {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .rb-predictions-screen--mockup .rb-prediction-hero__team,
+  .rb-predictions-screen--mockup .rb-prediction-hero__team--home,
+  .rb-predictions-screen--mockup .rb-prediction-hero__team--away {
+    justify-content: center !important;
+    text-align: center !important;
+  }
+
+  .rb-predictions-screen--mockup .rb-prediction-hero__team--away {
+    flex-direction: row-reverse !important;
+  }
+
+  .rb-predictions-screen--mockup .rb-prediction-global-reading {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .rb-predictions-screen--mockup .rb-prediction-main-card {
+    min-height: auto !important;
+  }
+
+  .rb-predictions-screen--mockup .rb-prediction-footer-note {
+    width: 100% !important;
+    border-radius: 12px !important;
+    text-align: left !important;
+  }
+}

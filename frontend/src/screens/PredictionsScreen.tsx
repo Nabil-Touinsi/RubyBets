@@ -1,90 +1,253 @@
-// Ce fichier affiche l’écran Prédictions de RubyBets avec une structure dédiée proche de la maquette MVP.
+// Ce fichier affiche l’écran Prédictions.
 
-import type { MatchPredictionsResponse } from "../models/rubybets";
+import type {
+  Match,
+  MatchContextResponse,
+  MatchDetailsResponse,
+  MatchPredictionsResponse,
+  Team,
+} from "../models/rubybets";
 import type { AppScreen } from "../types/navigation";
+import { formatMatchStatus } from "../helpers/displayText";
 import MatchPredictionsSection from "../components/MatchPredictionsSection";
+import PredictionSummaryPanel from "../components/PredictionSummaryPanel";
 
 type PredictionsScreenProps = {
   matchPredictions: MatchPredictionsResponse | null;
+  matchDetails: MatchDetailsResponse | null;
+  matchContext: MatchContextResponse | null;
   matchPredictionsStatus: string;
   onNavigate: (screen: AppScreen) => void;
 };
 
-// Ce composant structure les prédictions avec une zone principale, une synthèse et des rappels responsables.
+// Cette fonction récupère le match disponible depuis les données déjà chargées côté frontend.
+function getSelectedMatch(
+  matchDetails: MatchDetailsResponse | null,
+  matchContext: MatchContextResponse | null,
+): Match | null {
+  return matchDetails?.match ?? matchContext?.match ?? null;
+}
+
+// Cette fonction formate une date courte pour le hero.
+function formatShortDate(value: string) {
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "Date à confirmer";
+  }
+
+  return new Intl.DateTimeFormat("fr-FR", {
+    weekday: "short",
+    day: "2-digit",
+    month: "short",
+  }).format(date);
+}
+
+// Cette fonction formate l’heure locale du match.
+function formatKickoffTime(value: string) {
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "Heure à confirmer";
+  }
+
+  return new Intl.DateTimeFormat("fr-FR", {
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
+}
+
+// Cette fonction prépare un fallback court si le logo d’équipe est absent.
+function getTeamInitials(team: Team) {
+  if (team.tla) {
+    return team.tla;
+  }
+
+  return (team.short_name || team.name)
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((word) => word.charAt(0).toUpperCase())
+    .join("");
+}
+
+// Ce composant affiche un logo d’équipe avec fallback texte.
+function PredictionTeamLogo({ team }: { team: Team }) {
+  return (
+    <span className="rb-prediction-team-logo" aria-label={`Logo ${team.name}`}>
+      <span className="rb-prediction-team-logo__fallback">
+        {getTeamInitials(team)}
+      </span>
+
+      {team.crest ? (
+        <img
+          src={team.crest}
+          alt=""
+          loading="lazy"
+          onError={(event) => {
+            event.currentTarget.style.display = "none";
+          }}
+        />
+      ) : null}
+    </span>
+  );
+}
+
+// Ce composant affiche le hero compact du match sélectionné.
+function PredictionMatchHero({ match }: { match: Match | null }) {
+  if (!match) {
+    return (
+      <section className="rb-prediction-hero rb-prediction-hero--empty">
+        <p className="rb-prediction-kicker">Match sélectionné</p>
+        <h2>Données du match en cours de chargement</h2>
+        <p>
+          Les équipes, logos et informations de match seront affichés dès que les
+          données seront disponibles.
+        </p>
+      </section>
+    );
+  }
+
+  return (
+    <section className="rb-prediction-hero">
+      <div className="rb-prediction-hero__team rb-prediction-hero__team--home">
+        <PredictionTeamLogo team={match.home_team} />
+        <div>
+          <span>{match.competition.name}</span>
+          <strong>{match.home_team.short_name || match.home_team.name}</strong>
+        </div>
+      </div>
+
+      <div className="rb-prediction-hero__center">
+        <span>
+          {formatShortDate(match.utc_date)} · {formatKickoffTime(match.utc_date)}
+        </span>
+        <strong>VS</strong>
+        <p>
+          Journée {match.matchday} · {formatMatchStatus(match.status)}
+        </p>
+      </div>
+
+      <div className="rb-prediction-hero__team rb-prediction-hero__team--away">
+        <div>
+          <span>Adversaire</span>
+          <strong>{match.away_team.short_name || match.away_team.name}</strong>
+        </div>
+        <PredictionTeamLogo team={match.away_team} />
+      </div>
+
+      <div className="rb-prediction-hero__meta">
+        <span>Compétition</span>
+        <strong>{match.competition.name}</strong>
+      </div>
+
+      <div className="rb-prediction-hero__meta">
+        <span>Journée</span>
+        <strong>{match.matchday}</strong>
+      </div>
+
+      <div className="rb-prediction-hero__meta">
+        <span>Statut</span>
+        <strong>{formatMatchStatus(match.status)}</strong>
+      </div>
+    </section>
+  );
+}
+
+// Cette fonction prépare les éléments courts de résumé responsable.
+function getSummaryItems(matchPredictions: MatchPredictionsResponse | null) {
+  const predictions = matchPredictions?.predictions.predictions;
+
+  if (!predictions) {
+    return [
+      "Les données prédictives ne sont pas encore disponibles.",
+      "La lecture doit rester prudente.",
+      "Aucun résultat sportif n’est garanti.",
+    ];
+  }
+
+  return [
+    `Tendance 1X2 : ${predictions.one_x_two.label}.`,
+    `Volume de buts : ${predictions.goals.label}.`,
+    `BTTS : ${predictions.btts.label}.`,
+    "Ces prédictions ne constituent pas un conseil d’investissement.",
+  ];
+}
+
+// Ce composant affiche la carte de résumé située sous le baromètre.
+function PredictionResponsibleSummary({
+  matchPredictions,
+}: {
+  matchPredictions: MatchPredictionsResponse | null;
+}) {
+  const items = getSummaryItems(matchPredictions);
+
+  return (
+    <section className="rb-prediction-side-card">
+      <p className="rb-prediction-kicker">En résumé</p>
+      <h3>Lecture responsable</h3>
+
+      <div className="rb-prediction-summary-list">
+        {items.map((item) => (
+          <p key={item}>
+            <span>◎</span>
+            {item}
+          </p>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// Ce composant structure l’écran Prédictions avec hero, cartes, baromètre et résumé.
 function PredictionsScreen({
   matchPredictions,
+  matchDetails,
+  matchContext,
   matchPredictionsStatus,
   onNavigate,
 }: PredictionsScreenProps) {
+  const selectedMatch = getSelectedMatch(matchDetails, matchContext);
+
   return (
-    <div className="rb-predictions-screen">
-      <section className="rb-page-hero">
-        <div>
-          <p className="rb-eyebrow">Prédictions</p>
-          <h2>Lire les tendances avant-match avec prudence</h2>
-          <p>
-            RubyBets présente les marchés principaux du MVP : 1X2, volume de
-            buts et BTTS, avec un niveau de confiance, un niveau de risque et une
-            justification explicable.
-          </p>
-        </div>
+    <div className="rb-predictions-screen rb-predictions-screen--mockup">
+      <header className="rb-prediction-topbar">
+        <button type="button" onClick={() => onNavigate("matches")}>
+          ← Retour aux matchs
+        </button>
 
-        <aside className="rb-page-hero__aside">
-          <p className="rb-eyebrow">Scoring V1</p>
-          <h3>Règles métier</h3>
-          <p>
-            La V1 n’est pas un modèle Machine Learning entraîné : elle repose sur
-            un scoring explicable basé sur données réelles.
-          </p>
-        </aside>
-      </section>
+        <h2>Prédictions</h2>
 
-      <section className="rb-predictions-layout">
-        <div className="rb-predictions-main">
+        <button type="button" onClick={() => onNavigate("analysis")}>
+          Voir l’analyse du match
+        </button>
+      </header>
+
+      <PredictionMatchHero match={selectedMatch} />
+
+      <main className="rb-prediction-dashboard-grid">
+        <div className="rb-prediction-dashboard-grid__main">
           {matchPredictions ? (
             <MatchPredictionsSection matchPredictions={matchPredictions} />
           ) : (
-            <article className="rb-empty-state">
-              <p className="rb-eyebrow">Prédictions</p>
+            <article className="rb-prediction-card rb-prediction-empty-state">
+              <p className="rb-prediction-kicker">Prédictions</p>
               <h3>Prédictions indisponibles</h3>
               <p>{matchPredictionsStatus}</p>
             </article>
           )}
         </div>
 
-        <aside className="rb-predictions-aside">
-          <article>
-            <p className="rb-eyebrow">Marchés MVP</p>
-            <h3>3 lectures principales</h3>
-            <ul>
-              <li>1X2 : domicile, nul ou extérieur</li>
-              <li>Volume de buts : tendance offensive</li>
-              <li>BTTS : les deux équipes marquent</li>
-            </ul>
-          </article>
-
-          <article>
-            <p className="rb-eyebrow">Interprétation</p>
-            <h3>Confiance ≠ certitude</h3>
-            <p>
-              Le niveau de confiance indique la solidité relative du signal. Il
-              ne garantit jamais le résultat sportif.
-            </p>
-          </article>
-
-          <article>
-            <p className="rb-eyebrow">Étape suivante</p>
-            <h3>Recommandation multi-matchs</h3>
-            <p>
-              Utilisez ensuite ces tendances pour générer une sélection
-              analytique selon un niveau de risque choisi.
-            </p>
-            <button type="button" onClick={() => onNavigate("recommendation")}>
-              Générer une recommandation
-            </button>
-          </article>
+        <aside className="rb-prediction-dashboard-grid__side">
+          <PredictionSummaryPanel matchPredictions={matchPredictions} />
+          <PredictionResponsibleSummary matchPredictions={matchPredictions} />
         </aside>
-      </section>
+      </main>
+
+      <p className="rb-prediction-footer-note">
+        Outil d’aide à la décision. Les prédictions proposées ne constituent pas
+        un conseil d’investissement ou un pari.
+      </p>
     </div>
   );
 }
@@ -93,7 +256,8 @@ export default PredictionsScreen;
 
 // Schéma de communication du fichier :
 // PredictionsScreen.tsx
-// ├── reçoit les prédictions depuis App.tsx
-// ├── utilise MatchPredictionsSection.tsx pour afficher les marchés MVP
-// ├── ajoute une colonne de lecture responsable
-// └── déclenche la navigation vers RecommendationScreen via onNavigate
+// ├── reçoit matchPredictions, matchDetails et matchContext depuis App.tsx
+// ├── affiche le hero du match à partir des données déjà chargées
+// ├── utilise MatchPredictionsSection.tsx pour les cartes principales
+// ├── utilise PredictionSummaryPanel.tsx pour la synthèse globale avec baromètre
+// └── conserve la navigation vers Matchs et Analyse via onNavigate

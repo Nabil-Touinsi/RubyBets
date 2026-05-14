@@ -350,11 +350,13 @@ function App() {
       }
 
       return (
-        <PredictionsScreen
-          matchPredictions={selectedMatchPredictions}
-          matchPredictionsStatus={matchPredictionsStatus}
-          onNavigate={setCurrentScreen}
-        />
+              <PredictionsScreen
+        matchPredictions={selectedMatchPredictions}
+        matchDetails={selectedMatchDetails}
+        matchContext={selectedMatchContext}
+        matchPredictionsStatus={matchPredictionsStatus}
+        onNavigate={setCurrentScreen}
+      />
       );
     }
 
