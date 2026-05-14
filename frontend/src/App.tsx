@@ -335,10 +335,12 @@ function App() {
 
       return (
         <AnalysisScreen
-          matchAnalysis={selectedMatchAnalysis}
-          matchAnalysisStatus={matchAnalysisStatus}
-          onNavigate={setCurrentScreen}
-        />
+      matchAnalysis={selectedMatchAnalysis}
+      matchDetails={selectedMatchDetails}
+      matchContext={selectedMatchContext}
+      matchAnalysisStatus={matchAnalysisStatus}
+      onNavigate={setCurrentScreen}
+      />
       );
     }
 

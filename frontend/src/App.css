@@ -7095,13 +7095,719 @@ section.rb-screen-container:has(.rb-detail-screen--mockup) {
     width: fit-content;
   }
 }
-
 /*
-  Schéma de communication CSS du correctif 23D.8 :
-  App.css
-  ├── rapproche MatchDetailsScreen.tsx de la maquette compacte
-  ├── transforme MatchContextSection.tsx en bloc Contexte + Forme récente
-  ├── transforme MatchDetailsSection.tsx en grille de statistiques disponibles
-  ├── conserve MatchNewsSection.tsx comme zone actualités préparée
-  └── ne modifie ni backend, ni services/api.ts, ni models/rubybets.ts
+  Correctif écran Analyse Phase 24A
+  Ce bloc refond l’écran Analyse en dashboard compact proche de la maquette, sans modifier le backend.
 */
+
+section.rb-screen-container:has(.rb-analysis-screen--mockup) {
+  width: min(1320px, calc(100% - 24px)) !important;
+  max-width: 1320px !important;
+  padding-top: 18px !important;
+}
+
+.rb-analysis-screen--mockup,
+.rb-analysis-screen--mockup * {
+  box-sizing: border-box;
+}
+
+.rb-analysis-screen--mockup {
+  display: grid;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+  color: #f8ffff;
+}
+
+.rb-analysis-screen--mockup :is(h2, h3, h4, p, span, strong, small, li, button) {
+  overflow-wrap: normal !important;
+  word-break: normal !important;
+}
+
+.rb-analysis-screen--mockup section,
+.rb-analysis-screen--mockup article,
+.rb-analysis-screen--mockup main,
+.rb-analysis-screen--mockup ul,
+.rb-analysis-screen--mockup li {
+  margin: 0;
+  box-shadow: none;
+}
+
+.rb-analysis-screen--mockup section:has(h2) h2::after,
+.rb-analysis-screen--mockup section:has(h3) h3::after {
+  content: none;
+}
+
+.rb-analysis-kicker {
+  margin: 0;
+  color: #2dd4bf !important;
+  font-size: 0.64rem;
+  font-weight: 950;
+  letter-spacing: 0.14em;
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+
+.rb-analysis-topbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: end;
+  padding: 0 2px 2px;
+}
+
+.rb-analysis-topbar > div {
+  display: grid;
+  gap: 4px;
+}
+
+.rb-analysis-topbar h2 {
+  margin: 0;
+  color: #ffffff;
+  font-size: clamp(1.35rem, 2vw, 1.75rem);
+  line-height: 1.05;
+  letter-spacing: -0.045em;
+}
+
+.rb-analysis-topbar button {
+  width: fit-content;
+  min-height: 28px;
+  margin: 0;
+  padding: 0.38rem 0.72rem;
+  border: 1px solid rgba(45, 212, 191, 0.22);
+  border-radius: 999px;
+  background: rgba(20, 184, 166, 0.08);
+  color: #99f6e4;
+  font-size: 0.68rem;
+  font-weight: 900;
+  line-height: 1;
+  white-space: nowrap !important;
+  box-shadow: none;
+}
+
+.rb-analysis-topbar button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(45, 212, 191, 0.58);
+  background: rgba(20, 184, 166, 0.14);
+}
+
+.rb-analysis-hero,
+.rb-analysis-card,
+.rb-analysis-takeaways {
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-radius: 12px;
+  background:
+    linear-gradient(145deg, rgba(15, 23, 42, 0.9), rgba(8, 47, 51, 0.56)),
+    rgba(15, 23, 42, 0.74);
+}
+
+.rb-analysis-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 0.78fr) minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+  min-height: 92px;
+  padding: 14px 20px;
+}
+
+.rb-analysis-hero--empty {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 4px;
+}
+
+.rb-analysis-hero--empty h2 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 1rem;
+}
+
+.rb-analysis-hero--empty p:not(.rb-analysis-kicker) {
+  color: #a9c1c2;
+  font-size: 0.72rem;
+}
+
+.rb-analysis-hero-team {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.rb-analysis-hero-team--home {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.rb-analysis-hero-team--away {
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.rb-analysis-hero-team strong {
+  min-width: 0;
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 950;
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rb-analysis-team-logo {
+  position: relative;
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  overflow: hidden;
+  border: 1px solid rgba(45, 212, 191, 0.24);
+  border-radius: 15px;
+  background:
+    radial-gradient(circle at 50% 20%, rgba(45, 212, 191, 0.18), transparent 64%),
+    rgba(2, 6, 23, 0.48);
+}
+
+.rb-analysis-team-logo__fallback {
+  color: #99f6e4 !important;
+  font-size: 0.7rem;
+  font-weight: 950;
+}
+
+.rb-analysis-team-logo img {
+  position: absolute;
+  inset: 7px;
+  width: calc(100% - 14px);
+  height: calc(100% - 14px);
+  object-fit: contain;
+}
+
+.rb-analysis-hero-center {
+  display: grid;
+  gap: 3px;
+  justify-items: center;
+  min-width: 0;
+  text-align: center;
+}
+
+.rb-analysis-hero-center > span {
+  color: #a9c1c2 !important;
+  font-size: 0.66rem;
+  font-weight: 800;
+}
+
+.rb-analysis-hero-center > strong {
+  display: inline-grid;
+  place-items: center;
+  min-width: 36px;
+  height: 22px;
+  border: 1px solid rgba(45, 212, 191, 0.28);
+  border-radius: 999px;
+  background: rgba(20, 184, 166, 0.1);
+  color: #99f6e4;
+  font-size: 0.58rem;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+}
+
+.rb-analysis-hero-center p {
+  color: #8fa8a9;
+  font-size: 0.64rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.rb-analysis-dashboard-grid {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 330px;
+  gap: 10px;
+  min-width: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.rb-analysis-dashboard-grid__main,
+.rb-analysis-dashboard-grid__side,
+.rb-analysis-main-section {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  align-content: start;
+}
+
+.rb-analysis-dashboard-grid__side {
+  position: sticky;
+  top: 92px;
+}
+
+.rb-analysis-card {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  padding: 12px;
+}
+
+.rb-analysis-card__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.rb-analysis-card__header h3 {
+  margin: 3px 0 0;
+  color: #ffffff;
+  font-size: 0.96rem;
+  font-weight: 950;
+  line-height: 1.1;
+  letter-spacing: -0.035em;
+}
+
+.rb-analysis-soft-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 22px;
+  padding: 0.22rem 0.56rem;
+  border: 1px solid rgba(45, 212, 191, 0.24);
+  border-radius: 999px;
+  background: rgba(20, 184, 166, 0.1);
+  color: #99f6e4 !important;
+  font-size: 0.6rem;
+  font-weight: 950;
+  line-height: 1;
+  white-space: nowrap !important;
+}
+
+.rb-analysis-summary-card > p,
+.rb-analysis-empty-state > p,
+.rb-analysis-reading-item p,
+.rb-analysis-news-item p,
+.rb-analysis-interpretation-list p,
+.rb-analysis-limits-grid p {
+  color: #a9c1c2;
+  font-size: 0.7rem;
+  font-weight: 650;
+  line-height: 1.42;
+}
+
+.rb-analysis-data-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.rb-analysis-data-strip span {
+  display: inline-flex;
+  gap: 5px;
+  align-items: center;
+  min-height: 24px;
+  padding: 0.24rem 0.52rem;
+  border: 1px solid rgba(45, 212, 191, 0.12);
+  border-radius: 999px;
+  background: rgba(20, 184, 166, 0.07);
+  color: #9fb5b6;
+  font-size: 0.6rem;
+  font-weight: 800;
+}
+
+.rb-analysis-data-strip strong {
+  color: #ecfeff;
+  font-size: 0.6rem;
+}
+
+.rb-analysis-content-grid {
+  display: grid !important;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1fr);
+  gap: 10px;
+}
+
+.rb-analysis-observed-list {
+  display: grid;
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rb-analysis-observed-list li {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.rb-analysis-observed-list li > span {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: rgba(20, 184, 166, 0.12);
+  color: #2dd4bf !important;
+  font-size: 0.62rem;
+  font-weight: 950;
+}
+
+.rb-analysis-observed-list p {
+  color: #b9cdce;
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.rb-analysis-interpretation-list {
+  display: grid;
+  gap: 7px;
+}
+
+.rb-analysis-interpretation-list p,
+.rb-analysis-limits-grid p {
+  padding: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 10px;
+  background: rgba(2, 6, 23, 0.2);
+}
+
+.rb-analysis-factor-grid {
+  display: grid !important;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.rb-analysis-factor-card {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 10px;
+  background:
+    linear-gradient(145deg, rgba(2, 6, 23, 0.32), rgba(8, 47, 51, 0.2)),
+    rgba(2, 6, 23, 0.16);
+}
+
+.rb-analysis-factor-card > div {
+  display: grid;
+  gap: 5px;
+}
+
+.rb-analysis-factor-card strong {
+  color: #ffffff;
+  font-size: 0.72rem;
+  line-height: 1.14;
+}
+
+.rb-analysis-factor-card span {
+  width: fit-content;
+  min-height: 20px;
+  padding: 0.18rem 0.46rem;
+  border: 1px solid rgba(45, 212, 191, 0.18);
+  border-radius: 999px;
+  background: rgba(20, 184, 166, 0.08);
+  color: #99f6e4;
+  font-size: 0.56rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.rb-analysis-factor-card p {
+  color: #a9c1c2;
+  font-size: 0.66rem;
+  font-weight: 650;
+  line-height: 1.36;
+}
+
+.rb-analysis-limits-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.rb-analysis-data-strip--freshness {
+  border-top: 1px solid rgba(148, 163, 184, 0.1);
+  padding-top: 8px;
+}
+
+.rb-analysis-reading-list,
+.rb-analysis-news-list {
+  display: grid;
+  gap: 8px;
+}
+
+.rb-analysis-reading-item,
+.rb-analysis-news-item {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+  min-width: 0;
+  padding: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 10px;
+  background: rgba(2, 6, 23, 0.18);
+}
+
+.rb-analysis-reading-item > span,
+.rb-analysis-news-item__icon {
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid rgba(45, 212, 191, 0.14);
+  border-radius: 999px;
+  background: rgba(20, 184, 166, 0.09);
+  color: #2dd4bf !important;
+  font-size: 0.74rem;
+  font-weight: 950;
+}
+
+.rb-analysis-reading-item strong,
+.rb-analysis-news-item strong {
+  color: #ffffff;
+  font-size: 0.7rem;
+  line-height: 1.15;
+}
+
+.rb-analysis-confidence-box {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 10px;
+  align-items: center;
+  padding: 9px;
+  border: 1px solid rgba(45, 212, 191, 0.16);
+  border-radius: 10px;
+  background: rgba(20, 184, 166, 0.07);
+}
+
+.rb-analysis-confidence-box span {
+  color: #9fb5b6;
+  font-size: 0.62rem;
+  font-weight: 900;
+}
+
+.rb-analysis-confidence-box strong {
+  grid-row: 1 / 3;
+  grid-column: 2;
+  display: inline-grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border: 6px solid rgba(45, 212, 191, 0.72);
+  border-radius: 999px;
+  color: #99f6e4;
+  font-size: 0.72rem;
+  font-weight: 950;
+}
+
+.rb-analysis-confidence-box p {
+  color: #8fa8a9;
+  font-size: 0.62rem;
+  line-height: 1.3;
+}
+
+.rb-analysis-takeaways {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+}
+
+.rb-analysis-takeaways__title {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.rb-analysis-takeaways__title > span {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: rgba(250, 204, 21, 0.1);
+  color: #facc15 !important;
+  font-size: 0.72rem;
+}
+
+.rb-analysis-takeaways h3 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 0.9rem;
+  line-height: 1.1;
+}
+
+.rb-analysis-takeaways__grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.rb-analysis-takeaways__grid p {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  gap: 7px;
+  align-items: start;
+  min-width: 0;
+  padding: 9px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 10px;
+  background: rgba(2, 6, 23, 0.18);
+  color: #a9c1c2;
+  font-size: 0.66rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.rb-analysis-takeaways__grid p span {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: rgba(20, 184, 166, 0.1);
+  color: #2dd4bf !important;
+  font-size: 0.62rem;
+  font-weight: 950;
+}
+
+.rb-analysis-footer-note {
+  display: inline-flex;
+  justify-content: center;
+  justify-self: center;
+  width: fit-content;
+  max-width: min(100%, 760px);
+  margin: 0;
+  padding: 0.42rem 0.72rem;
+  border: 1px solid rgba(45, 212, 191, 0.14);
+  border-radius: 999px;
+  background: rgba(2, 6, 23, 0.2);
+  color: #8fa8a9 !important;
+  font-size: 0.62rem;
+  font-weight: 650;
+  line-height: 1.35;
+  text-align: center;
+}
+
+/* Neutralisation ciblée des anciennes règles de l’écran Analyse */
+.rb-analysis-screen--mockup .rb-page-hero,
+.rb-analysis-screen--mockup .rb-analysis-layout,
+.rb-analysis-screen--mockup .rb-analysis-main,
+.rb-analysis-screen--mockup .rb-analysis-aside {
+  display: initial;
+}
+
+.rb-analysis-screen--mockup section:not(.rb-screen-container) > div:has(article) {
+  grid-template-columns: unset;
+}
+
+.rb-analysis-screen--mockup .rb-analysis-dashboard-grid,
+.rb-analysis-screen--mockup .rb-analysis-content-grid,
+.rb-analysis-screen--mockup .rb-analysis-factor-grid,
+.rb-analysis-screen--mockup .rb-analysis-limits-grid,
+.rb-analysis-screen--mockup .rb-analysis-takeaways__grid {
+  display: grid !important;
+}
+
+/* Responsive écran Analyse */
+@media (max-width: 1180px) {
+  .rb-analysis-dashboard-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .rb-analysis-dashboard-grid__side {
+    position: static;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .rb-analysis-factor-grid,
+  .rb-analysis-takeaways__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .rb-analysis-topbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .rb-analysis-hero,
+  .rb-analysis-content-grid,
+  .rb-analysis-dashboard-grid__side,
+  .rb-analysis-limits-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .rb-analysis-hero-team,
+  .rb-analysis-hero-team--home,
+  .rb-analysis-hero-team--away {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .rb-analysis-hero-team--home {
+    flex-direction: column;
+  }
+
+  .rb-analysis-hero-team--away {
+    flex-direction: column-reverse;
+  }
+}
+
+@media (max-width: 640px) {
+  section.rb-screen-container:has(.rb-analysis-screen--mockup) {
+    width: min(100% - 14px, 100%) !important;
+  }
+
+  .rb-analysis-screen--mockup {
+    gap: 9px;
+  }
+
+  .rb-analysis-hero,
+  .rb-analysis-card,
+  .rb-analysis-takeaways {
+    padding: 10px;
+    border-radius: 11px;
+  }
+
+  .rb-analysis-card__header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rb-analysis-soft-badge {
+    width: fit-content;
+  }
+
+  .rb-analysis-factor-grid,
+  .rb-analysis-takeaways__grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .rb-analysis-team-logo {
+    width: 48px;
+    height: 48px;
+  }
+
+  .rb-analysis-hero-team strong {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+  }
+
+  .rb-analysis-footer-note {
+    width: 100%;
+    border-radius: 12px;
+    text-align: left;
+  }
+}
