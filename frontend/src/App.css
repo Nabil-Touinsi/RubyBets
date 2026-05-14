@@ -482,21 +482,31 @@ section:has(h2:nth-child(1)) {
 }
 
 @media (max-width: 860px) {
-  .rb-recommendation-controls,
-  .rb-recommendation-grid {
-    grid-template-columns: 1fr;
+  .rb-reco-hero {
+    grid-template-columns: minmax(0, 1fr) !important;
   }
 
-  .rb-results-summary {
-    display: grid;
+  .rb-reco-visual {
+    min-height: 120px;
   }
 
-  .rb-results-summary p {
+  .rb-reco-pitch-visual__field {
+    right: 50%;
+    transform: translateX(50%) perspective(520px) rotateX(10deg);
+  }
+
+  .rb-reco-sidebar,
+  .rb-reco-controls-panel,
+  .rb-reco-results-header {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .rb-reco-results-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .rb-reco-results-stats p {
     text-align: left;
-  }
-
-  .rb-metrics-row {
-    grid-template-columns: 1fr;
   }
 }
 /* Bloc spécifique pour rendre les prédictions avant-match plus lisibles et professionnelles. */
@@ -9004,5 +9014,851 @@ section.rb-screen-container:has(.rb-predictions-screen--mockup) {
     width: 100% !important;
     border-radius: 12px !important;
     text-align: left !important;
+  }
+}
+/*
+  Correctif écran Recommandation Phase 26R
+  Ce bloc refond l’écran Recommandation en dashboard compact proche de la maquette sans modifier le backend.
+*/
+
+section.rb-screen-container:has(.rb-recommendation-screen--mockup) {
+  width: min(1240px, calc(100% - 24px)) !important;
+  max-width: 1240px !important;
+  padding-top: 14px !important;
+  padding-bottom: 16px !important;
+}
+
+.rb-recommendation-screen--mockup,
+.rb-recommendation-screen--mockup * {
+  box-sizing: border-box;
+}
+
+.rb-recommendation-screen--mockup {
+  display: grid !important;
+  gap: 10px !important;
+  width: 100%;
+  min-width: 0;
+  color: #f8ffff;
+}
+
+.rb-recommendation-screen--mockup :is(h2, h3, h4, p, span, strong, small, li, button) {
+  overflow-wrap: normal !important;
+  word-break: normal !important;
+}
+
+.rb-recommendation-screen--mockup section,
+.rb-recommendation-screen--mockup article,
+.rb-recommendation-screen--mockup div,
+.rb-recommendation-screen--mockup p {
+  box-shadow: none;
+}
+
+.rb-recommendation-screen--mockup section:has(h2) h2::after,
+.rb-recommendation-screen--mockup section:has(h3) h3::after {
+  content: none;
+}
+
+.rb-reco-kicker {
+  margin: 0;
+  color: #2dd4bf !important;
+  font-size: 0.62rem;
+  font-weight: 950;
+  letter-spacing: 0.14em;
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+
+.rb-reco-hero,
+.rb-reco-generator-panel,
+.rb-reco-results-panel,
+.rb-reco-side-card {
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-radius: 12px;
+  background:
+    linear-gradient(145deg, rgba(15, 23, 42, 0.9), rgba(8, 47, 51, 0.56)),
+    rgba(15, 23, 42, 0.74);
+}
+
+/* Hero */
+.rb-reco-hero {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 380px;
+  gap: 14px;
+  align-items: stretch;
+  min-height: 116px;
+  margin: 0 !important;
+  padding: 16px 18px !important;
+  overflow: hidden;
+}
+
+.rb-reco-hero__copy {
+  display: grid;
+  align-content: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.rb-reco-hero__copy h2 {
+  margin: 0 !important;
+  color: #ffffff !important;
+  font-size: clamp(1.4rem, 2.2vw, 1.9rem);
+  line-height: 1.05;
+  letter-spacing: -0.055em;
+}
+
+.rb-reco-hero__copy p:not(.rb-reco-kicker) {
+  max-width: 760px;
+  color: #a9c1c2;
+  font-size: 0.72rem;
+  font-weight: 650;
+  line-height: 1.45;
+}
+
+/* Visuel décoratif */
+.rb-reco-visual {
+  position: relative;
+  min-height: 100px;
+  overflow: hidden;
+  border-radius: 10px;
+  background:
+    radial-gradient(circle at 70% 30%, rgba(45, 212, 191, 0.12), transparent 24%),
+    radial-gradient(circle at 30% 70%, rgba(45, 212, 191, 0.08), transparent 24%),
+    linear-gradient(135deg, rgba(2, 6, 23, 0.18), rgba(8, 47, 51, 0.34));
+}
+
+.rb-reco-pitch-visual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rb-reco-pitch-visual__glow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 60% 35%, rgba(45, 212, 191, 0.14), transparent 20%),
+    radial-gradient(circle at 78% 50%, rgba(45, 212, 191, 0.1), transparent 18%);
+  pointer-events: none;
+}
+
+.rb-reco-pitch-visual__field {
+  position: absolute;
+  right: 18px;
+  top: 12px;
+  width: 230px;
+  height: 92px;
+  border-radius: 14px;
+  transform: perspective(520px) rotateY(-14deg) rotateX(10deg) rotateZ(-2deg);
+  background:
+    linear-gradient(180deg, rgba(11, 40, 45, 0.78), rgba(7, 27, 32, 0.92));
+  box-shadow:
+    inset 0 0 0 1px rgba(45, 212, 191, 0.12),
+    0 10px 24px rgba(0, 0, 0, 0.22);
+}
+
+.rb-reco-pitch-line {
+  position: absolute;
+  border-color: rgba(153, 246, 228, 0.42);
+  border-style: solid;
+  box-sizing: border-box;
+}
+
+.rb-reco-pitch-line--outer {
+  inset: 8px;
+  border-width: 1px;
+  border-radius: 10px;
+}
+
+.rb-reco-pitch-line--mid {
+  top: 8px;
+  bottom: 8px;
+  left: 50%;
+  width: 0;
+  border-left-width: 1px;
+}
+
+.rb-reco-pitch-line--center-circle {
+  top: 50%;
+  left: 50%;
+  width: 28px;
+  height: 28px;
+  border-width: 1px;
+  border-radius: 999px;
+  transform: translate(-50%, -50%);
+}
+
+.rb-reco-pitch-line--box-left {
+  top: 24px;
+  left: 8px;
+  width: 34px;
+  height: 44px;
+  border-width: 1px;
+  border-right: none;
+}
+
+.rb-reco-pitch-line--box-right {
+  top: 24px;
+  right: 8px;
+  width: 34px;
+  height: 44px;
+  border-width: 1px;
+  border-left: none;
+}
+
+.rb-reco-pitch-line--goal-left {
+  top: 35px;
+  left: 2px;
+  width: 10px;
+  height: 22px;
+  border-width: 1px;
+  border-right: none;
+}
+
+.rb-reco-pitch-line--goal-right {
+  top: 35px;
+  right: 2px;
+  width: 10px;
+  height: 22px;
+  border-width: 1px;
+  border-left: none;
+}
+
+.rb-reco-pitch-node {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: #2dd4bf;
+  box-shadow: 0 0 10px rgba(45, 212, 191, 0.7);
+}
+
+.rb-reco-pitch-node--one { left: 20%; top: 32%; }
+.rb-reco-pitch-node--two { left: 34%; top: 60%; }
+.rb-reco-pitch-node--three { left: 50%; top: 48%; }
+.rb-reco-pitch-node--four { left: 68%; top: 34%; }
+.rb-reco-pitch-node--five { left: 80%; top: 62%; }
+
+
+/* Layout principal */
+.rb-reco-layout {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 10px;
+  align-items: start;
+  min-width: 0;
+}
+
+.rb-reco-main,
+.rb-reco-sidebar {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.rb-reco-sidebar {
+  position: sticky;
+  top: 86px;
+}
+
+/* Générateur */
+.rb-reco-generator-panel {
+  display: grid !important;
+  gap: 10px;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+.rb-reco-controls-panel {
+  display: grid !important;
+  grid-template-columns: minmax(210px, 0.8fr) minmax(250px, 0.9fr) minmax(250px, 1fr);
+  gap: 10px;
+  align-items: end;
+  min-width: 0;
+  margin: 0;
+  padding: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-radius: 12px;
+  background:
+    linear-gradient(145deg, rgba(15, 23, 42, 0.85), rgba(8, 47, 51, 0.48)),
+    rgba(15, 23, 42, 0.7);
+}
+
+.rb-reco-segment-group {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+}
+
+.rb-reco-segment-group > span {
+  color: #9fb5b6;
+  font-size: 0.62rem;
+  font-weight: 850;
+}
+
+.rb-reco-segment-group > div {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  padding: 4px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 10px;
+  background: rgba(2, 6, 23, 0.22);
+}
+
+.rb-reco-segment-group:nth-child(2) > div {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.rb-reco-segment-group button {
+  min-height: 30px;
+  margin: 0;
+  padding: 0.32rem 0.48rem;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: #a9c1c2;
+  font-size: 0.64rem;
+  font-weight: 900;
+  line-height: 1;
+  box-shadow: none;
+  white-space: nowrap !important;
+}
+
+.rb-reco-segment-group button:hover:not(:disabled),
+.rb-reco-segment--active {
+  border-color: rgba(45, 212, 191, 0.4) !important;
+  background: rgba(20, 184, 166, 0.2) !important;
+  color: #ecfeff !important;
+}
+
+.rb-reco-action-box {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.rb-reco-action-box button {
+  width: 100%;
+  min-height: 38px;
+  margin: 0;
+  padding: 0.55rem 0.8rem;
+  border: 1px solid rgba(45, 212, 191, 0.62);
+  border-radius: 8px;
+  background: linear-gradient(135deg, #14b8a6, #0f766e);
+  color: #ecfeff;
+  font-size: 0.72rem;
+  font-weight: 950;
+  line-height: 1;
+  box-shadow: none;
+  white-space: nowrap !important;
+}
+
+.rb-reco-action-box button:disabled,
+.rb-reco-segment-group button:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+.rb-reco-action-box p {
+  display: flex;
+  justify-content: center;
+  gap: 7px;
+  align-items: center;
+  margin: 0;
+  color: #9fb5b6;
+  font-size: 0.62rem;
+  font-weight: 700;
+}
+
+/* Résultats */
+.rb-reco-results-panel {
+  display: grid;
+  gap: 10px;
+  margin: 0 !important;
+  padding: 12px !important;
+}
+
+.rb-reco-results-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: start;
+}
+
+.rb-reco-results-header h3 {
+  margin: 3px 0 0;
+  color: #ffffff;
+  font-size: 0.98rem;
+  line-height: 1.1;
+  letter-spacing: -0.035em;
+}
+
+.rb-reco-results-stats {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  gap: 10px;
+}
+
+.rb-reco-results-stats p {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  text-align: right;
+}
+
+.rb-reco-results-stats span {
+  color: #8fa8a9;
+  font-size: 0.56rem;
+  font-weight: 850;
+}
+
+.rb-reco-results-stats strong {
+  color: #2dd4bf;
+  font-size: 0.82rem;
+  line-height: 1;
+}
+
+.rb-reco-empty-state {
+  display: grid;
+  gap: 6px;
+  padding: 14px;
+  border: 1px solid rgba(251, 191, 36, 0.18);
+  border-radius: 10px;
+  background: rgba(251, 191, 36, 0.06);
+}
+
+.rb-reco-empty-state h3 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 0.9rem;
+}
+
+.rb-reco-empty-state p {
+  color: #fde68a;
+  font-size: 0.68rem;
+  line-height: 1.38;
+}
+
+.rb-reco-table {
+  display: grid;
+  gap: 0;
+  overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, 0.13);
+  border-radius: 10px;
+}
+
+.rb-reco-table-head,
+.rb-reco-table-row {
+  display: grid !important;
+  grid-template-columns: minmax(235px, 1.25fr) minmax(150px, 0.85fr) 86px 78px minmax(190px, 1fr);
+  gap: 10px;
+  align-items: center;
+  min-width: 0;
+}
+
+.rb-reco-table-head {
+  padding: 9px 10px;
+  background: rgba(2, 6, 23, 0.28);
+}
+
+.rb-reco-table-head span {
+  color: #8fa8a9;
+  font-size: 0.58rem;
+  font-weight: 950;
+}
+
+.rb-reco-table-row {
+  margin: 0 !important;
+  padding: 9px 10px;
+  border: 0;
+  border-top: 1px solid rgba(148, 163, 184, 0.1);
+  border-radius: 0;
+  background: rgba(2, 6, 23, 0.14);
+}
+
+.rb-reco-table-cell {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.rb-reco-table-cell strong {
+  color: #ffffff;
+  font-size: 0.68rem;
+  font-weight: 950;
+  line-height: 1.18;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rb-reco-table-cell p {
+  color: #a9c1c2;
+  font-size: 0.58rem;
+  font-weight: 650;
+  line-height: 1.3;
+  display: -webkit-box;
+  overflow: hidden;
+  line-clamp: 2;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.rb-reco-match-cell {
+  grid-template-columns: 88px minmax(0, 1fr);
+  gap: 9px;
+  align-items: center;
+}
+
+.rb-reco-match-meta {
+  display: grid;
+  gap: 2px;
+}
+
+.rb-reco-match-meta strong {
+  font-size: 0.62rem;
+}
+
+.rb-reco-match-meta span {
+  color: #8fa8a9;
+  font-size: 0.54rem;
+  line-height: 1.2;
+}
+
+.rb-reco-fixture {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) 24px 24px minmax(0, 1fr);
+  gap: 5px;
+  align-items: center;
+  min-width: 0;
+}
+
+.rb-reco-team-logo {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  overflow: hidden;
+  border: 1px solid rgba(45, 212, 191, 0.18);
+  border-radius: 999px;
+  background: rgba(2, 6, 23, 0.46);
+}
+
+.rb-reco-team-logo__fallback {
+  color: #99f6e4;
+  font-size: 0.5rem;
+  font-weight: 950;
+}
+
+.rb-reco-team-logo img {
+  position: absolute;
+  inset: 4px;
+  width: calc(100% - 8px);
+  height: calc(100% - 8px);
+  object-fit: contain;
+}
+
+.rb-reco-team-name {
+  color: #ffffff !important;
+  font-size: 0.62rem;
+  font-weight: 900;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rb-reco-vs {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 18px;
+  border: 1px solid rgba(45, 212, 191, 0.24);
+  border-radius: 999px;
+  color: #99f6e4 !important;
+  font-size: 0.48rem;
+  font-weight: 950;
+}
+
+.rb-reco-market-badge,
+.rb-reco-risk-badge {
+  width: fit-content;
+  max-width: 100%;
+  min-height: 19px;
+  padding: 0.18rem 0.42rem;
+  border: 1px solid rgba(45, 212, 191, 0.16);
+  border-radius: 999px;
+  background: rgba(20, 184, 166, 0.08);
+  color: #99f6e4 !important;
+  font-size: 0.5rem;
+  font-weight: 900;
+  line-height: 1;
+  white-space: nowrap !important;
+}
+
+.rb-reco-confidence-cell {
+  justify-items: center;
+}
+
+.rb-reco-confidence-ring {
+  display: inline-grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at center, #0b171b 0 50%, transparent 51%),
+    conic-gradient(#2dd4bf var(--rb-reco-confidence), rgba(148, 163, 184, 0.17) 0);
+  color: #ffffff !important;
+  font-size: 0.62rem;
+  font-weight: 950;
+}
+
+.rb-reco-confidence-cell small {
+  color: #8fa8a9;
+  font-size: 0.52rem;
+  font-weight: 800;
+}
+
+.rb-reco-risk-badge--low {
+  border-color: rgba(34, 197, 94, 0.22);
+  background: rgba(34, 197, 94, 0.08);
+}
+
+.rb-reco-risk-badge--medium {
+  border-color: rgba(250, 204, 21, 0.22);
+  background: rgba(250, 204, 21, 0.08);
+  color: #fde68a !important;
+}
+
+.rb-reco-risk-badge--high {
+  border-color: rgba(248, 113, 113, 0.22);
+  background: rgba(248, 113, 113, 0.08);
+  color: #fecaca !important;
+}
+
+.rb-reco-limits {
+  display: grid;
+  gap: 6px;
+}
+
+.rb-reco-limits p {
+  display: flex;
+  gap: 7px;
+  align-items: flex-start;
+  margin: 0;
+  padding: 8px 10px;
+  border: 1px solid rgba(45, 212, 191, 0.12);
+  border-radius: 10px;
+  background: rgba(20, 184, 166, 0.06);
+  color: #9fb5b6;
+  font-size: 0.62rem;
+  line-height: 1.35;
+}
+
+/* Sidebar */
+.rb-reco-side-card {
+  display: grid;
+  gap: 10px;
+  margin: 0 !important;
+  padding: 12px !important;
+}
+
+.rb-reco-side-card__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.rb-reco-side-card__header h3,
+.rb-reco-side-card h3 {
+  margin: 3px 0 0;
+  color: #ffffff;
+  font-size: 0.96rem;
+  line-height: 1.1;
+  letter-spacing: -0.035em;
+}
+
+.rb-reco-side-card__header > span {
+  color: #9fb5b6 !important;
+  font-size: 0.78rem;
+}
+
+.rb-reco-side-list {
+  display: grid;
+  gap: 7px;
+}
+
+.rb-reco-side-item {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  gap: 7px;
+  align-items: start;
+  margin: 0;
+  color: #a9c1c2;
+  font-size: 0.64rem;
+  line-height: 1.35;
+}
+
+.rb-reco-side-item span {
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border: 1px solid rgba(45, 212, 191, 0.18);
+  border-radius: 999px;
+  background: rgba(20, 184, 166, 0.08);
+  color: #2dd4bf !important;
+  font-size: 0.52rem;
+  line-height: 1;
+}
+
+.rb-reco-side-note,
+.rb-reco-side-card p {
+  color: #a9c1c2;
+  font-size: 0.66rem;
+  line-height: 1.42;
+}
+
+.rb-reco-side-card--responsible strong {
+  width: fit-content;
+  color: #5eead4;
+  font-size: 0.72rem;
+}
+
+.rb-reco-footer-note {
+  display: inline-flex;
+  justify-content: center;
+  justify-self: center;
+  width: fit-content;
+  max-width: min(100%, 760px);
+  margin: 0;
+  padding: 0.38rem 0.68rem;
+  border: 1px solid rgba(45, 212, 191, 0.14);
+  border-radius: 999px;
+  background: rgba(2, 6, 23, 0.2);
+  color: #8fa8a9 !important;
+  font-size: 0.6rem;
+  font-weight: 650;
+  line-height: 1.35;
+  text-align: center;
+}
+
+/* Neutralisation ciblée des anciens styles Recommandation */
+.rb-recommendation-screen--mockup .rb-page-hero,
+.rb-recommendation-screen--mockup .rb-recommendation-layout,
+.rb-recommendation-screen--mockup .rb-recommendation-main,
+.rb-recommendation-screen--mockup .rb-recommendation-aside {
+  display: initial;
+}
+
+.rb-recommendation-screen--mockup section:not(.rb-screen-container) > div:has(article) {
+  grid-template-columns: unset;
+}
+
+.rb-recommendation-screen--mockup .rb-reco-layout,
+.rb-recommendation-screen--mockup .rb-reco-controls-panel,
+.rb-recommendation-screen--mockup .rb-reco-table-head,
+.rb-recommendation-screen--mockup .rb-reco-table-row,
+.rb-recommendation-screen--mockup .rb-reco-fixture {
+  display: grid !important;
+}
+
+/* Responsive */
+@media (max-width: 1120px) {
+  .rb-reco-layout {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .rb-reco-sidebar {
+    position: static;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .rb-reco-controls-panel {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .rb-reco-action-box {
+    grid-column: 1 / -1;
+  }
+
+  .rb-reco-table-head {
+    display: none !important;
+  }
+
+  .rb-reco-table-row {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .rb-reco-match-cell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 860px) {
+  .rb-reco-hero {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .rb-reco-visual {
+    min-height: 120px;
+  }
+
+  .rb-reco-sidebar,
+  .rb-reco-controls-panel,
+  .rb-reco-results-header {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .rb-reco-results-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .rb-reco-results-stats p {
+    text-align: left;
+  }
+}
+
+@media (max-width: 640px) {
+  section.rb-screen-container:has(.rb-recommendation-screen--mockup) {
+    width: min(100% - 14px, 100%) !important;
+  }
+
+  .rb-reco-hero,
+  .rb-reco-controls-panel,
+  .rb-reco-results-panel,
+  .rb-reco-side-card {
+    padding: 10px !important;
+    border-radius: 11px;
+  }
+
+  .rb-reco-segment-group > div,
+  .rb-reco-results-stats {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rb-reco-action-box button {
+    white-space: normal !important;
+  }
+
+  .rb-reco-fixture {
+    grid-template-columns: 26px minmax(0, 1fr) !important;
+  }
+
+  .rb-reco-vs {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+
+  .rb-reco-footer-note {
+    width: 100%;
+    border-radius: 12px;
+    text-align: left;
   }
 }
