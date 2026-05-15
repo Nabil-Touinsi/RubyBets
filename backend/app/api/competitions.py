@@ -1,10 +1,11 @@
 # Ce fichier expose les compétitions RubyBets utilisées par le frontend dans le MVP.
-# Il ajoute une première couche de cache pour tracer la fraîcheur des données Football-Data.
+# Il ajoute le cache et une persistance PostgreSQL progressive sans changer la réponse API.
 
 from fastapi import APIRouter
 
 from app.services.cache_service import is_cache_fresh, load_cache, save_cache
 from app.services.football_data_client import get_football_data
+from app.services.persistence_service import try_persist_competitions
 
 
 router = APIRouter(prefix="/api/competitions", tags=["Competitions"])
@@ -63,30 +64,35 @@ def format_competitions_response(
     }
 
 
-# Cette route retourne les compétitions du MVP en utilisant le cache si les données sont encore fraîches.
+# Cette route retourne les compétitions du MVP et tente de les persister sans bloquer l'API.
 @router.get("")
 async def get_competitions() -> dict:
     cached_payload = load_cache(CACHE_NAME)
 
     if cached_payload and is_cache_fresh(cached_payload, ttl_minutes=CACHE_TTL_MINUTES):
-        return format_competitions_response(
+        response = format_competitions_response(
             data=cached_payload.get("data", {}),
             from_cache=True,
             updated_at=cached_payload.get("updated_at"),
         )
+        try_persist_competitions(response["competitions"])
+        return response
 
     data = await get_football_data("/competitions")
     saved_payload = save_cache(CACHE_NAME, data)
 
-    return format_competitions_response(
+    response = format_competitions_response(
         data=saved_payload["data"],
         from_cache=False,
         updated_at=saved_payload["updated_at"],
     )
+    try_persist_competitions(response["competitions"])
+    return response
 
 
 # Schéma de communication du fichier :
 # competitions.py
 # ├── utilise cache_service.py pour lire ou écrire le cache competitions
 # ├── appelle football_data_client.py si le cache est absent ou expiré
+# ├── appelle persistence_service.py pour stocker les compétitions dans PostgreSQL
 # └── renvoie les compétitions formatées à app.main puis au frontend

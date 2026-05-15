@@ -1,5 +1,5 @@
 # Ce fichier expose les routes API des matchs RubyBets pour le MVP.
-# Il applique le cache data sur les listes de matchs et les fiches match pour limiter les appels Football-Data.
+# Il applique le cache data et persiste progressivement les équipes sans casser les réponses API.
 
 from typing import Any
 
@@ -18,6 +18,7 @@ from app.services.match_service import (
     format_match,
     get_match_with_standings,
 )
+from app.services.persistence_service import try_persist_matches, try_persist_teams
 
 
 router = APIRouter(prefix="/api/matches", tags=["Matches"])
@@ -59,6 +60,21 @@ def build_matches_cache_name(
         date_from or "all_start_dates",
         date_to or "all_end_dates",
     )
+
+
+# Cette fonction extrait les équipes domicile et extérieur depuis les matchs Football-Data.
+def extract_teams_from_matches(matches: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    teams_by_external_id: dict[int, dict[str, Any]] = {}
+
+    for match in matches:
+        for team_key in ("homeTeam", "awayTeam"):
+            team = match.get(team_key) or {}
+            external_id = team.get("id")
+
+            if external_id:
+                teams_by_external_id[external_id] = team
+
+    return list(teams_by_external_id.values())
 
 
 # Cette fonction prépare les métadonnées de fraîcheur visibles dans les réponses liées aux matchs.
@@ -107,6 +123,9 @@ async def get_matches(
     )
 
     raw_matches = data.get("matches", [])
+    try_persist_teams(extract_teams_from_matches(raw_matches))
+    try_persist_matches(raw_matches)
+
     filtered_matches = filter_matches_by_team(raw_matches, team)
     formatted_matches = [format_match(match) for match in filtered_matches]
 
@@ -254,4 +273,5 @@ async def get_match_predictions(match_id: int) -> dict[str, Any]:
 # ├── utilise cache_service.py pour les listes de matchs et les fiches match
 # ├── utilise match_service.py pour enrichir contexte, analyse et prédictions avec les classements
 # ├── utilise analysis_service.py pour générer les synthèses et prédictions explicables
+# ├── utilise persistence_service.py pour stocker progressivement les équipes en PostgreSQL
 # └── renvoie les données formatées à app.main puis au frontend
