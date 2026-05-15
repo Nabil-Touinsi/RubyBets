@@ -2006,153 +2006,7 @@ Ce bloc ajoute le style Obsidian Teal pour l’architecture AppShell et l’écr
     padding: 1rem;
   }
 }
-/*
-  CSS écran Glossaire RubyBets
-  Ce bloc ajoute le style Obsidian Teal pour l’écran Glossaire.
-*/
-.rb-glossary-screen {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
 
-/* Layout principal Glossaire */
-.rb-glossary-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 320px;
-  gap: 1.25rem;
-  align-items: start;
-}
-
-.rb-glossary-main,
-.rb-glossary-aside {
-  border: 1px solid rgba(148, 163, 184, 0.16);
-  border-radius: 1.6rem;
-  background:
-    linear-gradient(145deg, rgba(15, 23, 42, 0.88), rgba(8, 47, 51, 0.62)),
-    rgba(15, 23, 42, 0.74);
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.24);
-}
-
-.rb-glossary-main {
-  padding: 1.35rem;
-}
-
-.rb-glossary-aside {
-  position: sticky;
-  top: 7.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  padding: 1.15rem;
-}
-
-.rb-glossary-aside article {
-  border: 1px solid rgba(148, 163, 184, 0.14);
-  border-radius: 1.25rem;
-  padding: 1rem;
-  background:
-    linear-gradient(145deg, rgba(2, 6, 23, 0.34), rgba(8, 47, 51, 0.24)),
-    rgba(2, 6, 23, 0.24);
-}
-
-.rb-glossary-aside h3 {
-  margin: 0 0 0.65rem;
-  color: #f8ffff;
-  font-size: 1.12rem;
-  letter-spacing: -0.03em;
-}
-
-.rb-glossary-aside p {
-  color: #abc0c1;
-  line-height: 1.6;
-}
-
-/* Harmonisation du composant existant GlossarySection */
-.rb-glossary-main section {
-  margin: 0;
-  padding: 0;
-  border: 0;
-  background: transparent;
-}
-
-.rb-glossary-main section > h2 {
-  margin-top: 0;
-  color: #f8ffff;
-  font-size: 1.75rem;
-  letter-spacing: -0.04em;
-}
-
-.rb-glossary-main section > h2::after {
-  content: "";
-  display: block;
-  width: 2.7rem;
-  height: 0.16rem;
-  margin-top: 0.75rem;
-  border-radius: 999px;
-  background: #2dd4bf;
-}
-
-.rb-glossary-main section > p {
-  color: #abc0c1;
-}
-
-.rb-glossary-main section > div {
-  display: grid;
-  gap: 0.9rem;
-}
-
-.rb-glossary-main article {
-  border: 1px solid rgba(148, 163, 184, 0.15);
-  border-radius: 1.2rem;
-  padding: 1rem;
-  background:
-    linear-gradient(135deg, rgba(8, 47, 51, 0.66), rgba(15, 23, 42, 0.72)),
-    rgba(2, 6, 23, 0.28);
-}
-
-.rb-glossary-main article h3 {
-  margin: 0 0 0.5rem;
-  color: #f8ffff;
-  font-size: 1.18rem;
-}
-
-.rb-glossary-main article p {
-  color: #abc0c1;
-  line-height: 1.6;
-}
-
-.rb-glossary-main article p:first-of-type {
-  display: inline-flex;
-  width: fit-content;
-  margin-bottom: 0.7rem;
-  padding: 0.28rem 0.7rem;
-  border: 1px solid rgba(45, 212, 191, 0.28);
-  border-radius: 999px;
-  background: rgba(20, 184, 166, 0.1);
-  color: #99f6e4;
-  font-size: 0.82rem;
-  font-weight: 800;
-}
-
-/* Responsive écran Glossaire */
-@media (max-width: 980px) {
-  .rb-glossary-layout {
-    grid-template-columns: 1fr;
-  }
-
-  .rb-glossary-aside {
-    position: static;
-  }
-}
-
-@media (max-width: 640px) {
-  .rb-glossary-main,
-  .rb-glossary-aside {
-    border-radius: 1.2rem;
-    padding: 1rem;
-  }
-}
 /*
   CSS écran Informations responsables RubyBets
   Ce bloc ajoute le style Obsidian Teal pour l’écran de cadre responsable.
@@ -9857,6 +9711,1409 @@ section.rb-screen-container:has(.rb-recommendation-screen--mockup) {
   }
 
   .rb-reco-footer-note {
+    width: 100%;
+    border-radius: 12px;
+    text-align: left;
+  }
+}
+/*
+  Correctif Glossaire 24G.3
+  Ce bloc isole complètement l’écran Glossaire avec la classe rb-glossary-screen--mockup.
+  Objectif : reproduire la maquette sans casser les autres écrans RubyBets.
+*/
+
+section.rb-screen-container:has(.rb-glossary-screen--mockup) {
+  width: min(1240px, calc(100% - 24px)) !important;
+  max-width: 1240px !important;
+  padding-top: 18px !important;
+  padding-bottom: 14px !important;
+}
+
+.rb-glossary-screen:has(.rb-glossary-screen--mockup) {
+  display: block !important;
+  width: 100%;
+  min-width: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  gap: 0 !important;
+}
+
+.rb-glossary-screen:has(.rb-glossary-screen--mockup) > .rb-page-hero {
+  display: none !important;
+}
+
+.rb-glossary-screen:has(.rb-glossary-screen--mockup) > .rb-glossary-layout {
+  display: block !important;
+  width: 100%;
+  min-width: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.rb-glossary-screen:has(.rb-glossary-screen--mockup) .rb-glossary-main {
+  width: 100%;
+  min-width: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.rb-glossary-screen:has(.rb-glossary-screen--mockup) .rb-glossary-layout > .rb-glossary-aside {
+  display: none !important;
+}
+
+.rb-glossary-screen--mockup,
+.rb-glossary-screen--mockup * {
+  box-sizing: border-box;
+}
+
+.rb-glossary-screen--mockup {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: 14px;
+  width: 100%;
+  min-width: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: #f8ffff;
+}
+
+.rb-glossary-screen--mockup :is(h2, h3, h4, p, span, strong, small, button, input, label) {
+  overflow-wrap: normal !important;
+  word-break: normal !important;
+}
+
+.rb-glossary-screen--mockup section:has(h2) h2::after,
+.rb-glossary-screen--mockup section:has(h3) h3::after,
+.rb-glossary-screen--mockup h2::after,
+.rb-glossary-screen--mockup h3::after {
+  content: none !important;
+}
+
+.rb-glossary-mockup-topbar {
+  display: flex !important;
+  grid-template-columns: unset !important;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  width: 100%;
+  min-width: 0;
+  padding: 0 2px;
+}
+
+.rb-glossary-mockup-title {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 0;
+}
+
+.rb-glossary-mockup-title__icon {
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid rgba(45, 212, 191, 0.35);
+  border-radius: 8px;
+  background: rgba(20, 184, 166, 0.1);
+  color: #2dd4bf !important;
+  font-size: 0.72rem;
+  line-height: 1;
+}
+
+.rb-glossary-mockup-title h2 {
+  margin: 0 !important;
+  color: #ffffff;
+  font-size: 1.32rem;
+  font-weight: 950;
+  line-height: 1.05;
+  letter-spacing: -0.045em;
+}
+
+.rb-glossary-mockup-title p {
+  margin: 4px 0 0 !important;
+  color: #8fa8a9;
+  font-size: 0.72rem;
+  font-weight: 650;
+  line-height: 1.35;
+}
+
+.rb-glossary-mockup-search {
+  position: relative;
+  display: block !important;
+  flex: 0 0 465px;
+  min-width: 0;
+  margin: 0 !important;
+}
+
+.rb-glossary-mockup-search span {
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  z-index: 1;
+  transform: translateY(-50%);
+  color: #8fa8a9 !important;
+  font-size: 0.78rem;
+  line-height: 1;
+}
+
+.rb-glossary-mockup-search input {
+  width: 100%;
+  height: 46px;
+  min-width: 0;
+  margin: 0;
+  padding: 0 14px 0 38px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 9px;
+  background: rgba(2, 6, 23, 0.22);
+  color: #ecfeff;
+  font-size: 0.74rem;
+  font-weight: 700;
+  outline: none;
+}
+
+.rb-glossary-mockup-search input::placeholder {
+  color: #748b8c;
+}
+
+.rb-glossary-mockup-search input:focus {
+  border-color: rgba(45, 212, 191, 0.65);
+  box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.09);
+}
+
+.rb-glossary-mockup-board {
+  display: grid !important;
+  grid-template-columns: 280px minmax(0, 1fr) 295px !important;
+  gap: 16px;
+  align-items: start;
+  width: 100%;
+  min-width: 0;
+}
+
+.rb-glossary-mockup-index,
+.rb-glossary-mockup-detail,
+.rb-glossary-mockup-help-card,
+.rb-glossary-mockup-empty-state {
+  min-width: 0;
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-radius: 10px;
+  background:
+    linear-gradient(145deg, rgba(15, 23, 42, 0.82), rgba(8, 47, 51, 0.46)),
+    rgba(2, 6, 23, 0.24);
+  box-shadow: none !important;
+}
+
+.rb-glossary-mockup-index {
+  display: grid;
+  gap: 0;
+  overflow: hidden;
+  padding: 0;
+}
+
+.rb-glossary-mockup-index__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 14px 16px 10px;
+}
+
+.rb-glossary-mockup-index__header strong {
+  color: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 950;
+  line-height: 1.1;
+}
+
+.rb-glossary-mockup-index__header span {
+  display: inline-grid;
+  place-items: center;
+  min-width: 25px;
+  height: 20px;
+  padding: 0 6px;
+  border: 1px solid rgba(45, 212, 191, 0.22);
+  border-radius: 999px;
+  background: rgba(20, 184, 166, 0.1);
+  color: #99f6e4 !important;
+  font-size: 0.58rem;
+  font-weight: 950;
+}
+
+.rb-glossary-mockup-list {
+  display: grid;
+  min-width: 0;
+}
+
+.rb-glossary-mockup-term {
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr);
+  gap: 9px;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  margin: 0;
+  padding: 8px 16px;
+  border: 0;
+  border-left: 3px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  text-align: left;
+}
+
+.rb-glossary-mockup-term:hover {
+  transform: none;
+  background: rgba(20, 184, 166, 0.07);
+  filter: none;
+}
+
+.rb-glossary-mockup-term--active {
+  border-left-color: #2dd4bf;
+  background: rgba(20, 184, 166, 0.14);
+}
+
+.rb-glossary-mockup-term__marker {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid rgba(45, 212, 191, 0.2);
+  border-radius: 7px;
+  background: rgba(20, 184, 166, 0.1);
+  color: #2dd4bf !important;
+  font-size: 0.5rem;
+  font-weight: 950;
+  line-height: 1;
+}
+
+.rb-glossary-mockup-term__content {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.rb-glossary-mockup-term__content strong {
+  display: block;
+  min-width: 0;
+  color: #c7f9f4;
+  font-size: 0.76rem;
+  font-weight: 850;
+  line-height: 1.12;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rb-glossary-mockup-term__content small {
+  display: block;
+  min-width: 0;
+  color: #7f9596;
+  font-size: 0.62rem;
+  font-weight: 650;
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rb-glossary-mockup-empty-mini {
+  display: grid;
+  gap: 4px;
+  padding: 14px 16px;
+}
+
+.rb-glossary-mockup-empty-mini strong {
+  color: #ffffff;
+  font-size: 0.78rem;
+}
+
+.rb-glossary-mockup-empty-mini p {
+  color: #8fa8a9;
+  font-size: 0.68rem;
+  line-height: 1.35;
+}
+
+.rb-glossary-mockup-detail {
+  display: grid;
+  gap: 18px;
+  min-height: 515px;
+  padding: 22px;
+}
+
+.rb-glossary-mockup-detail__hero {
+  display: grid;
+  grid-template-columns: 70px minmax(0, 1fr);
+  gap: 18px;
+  align-items: center;
+  min-width: 0;
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+}
+
+.rb-glossary-mockup-detail__marker {
+  display: inline-grid;
+  place-items: center;
+  width: 70px;
+  height: 70px;
+  border: 1px solid rgba(45, 212, 191, 0.28);
+  border-radius: 15px;
+  background:
+    radial-gradient(circle at 50% 18%, rgba(45, 212, 191, 0.2), transparent 64%),
+    rgba(20, 184, 166, 0.11);
+  color: #2dd4bf !important;
+  font-size: 1.25rem;
+  font-weight: 950;
+  line-height: 1;
+}
+
+.rb-glossary-mockup-detail h3 {
+  margin: 0 !important;
+  color: #ffffff;
+  font-size: clamp(1.75rem, 3vw, 2.35rem);
+  font-weight: 950;
+  line-height: 1;
+  letter-spacing: -0.06em;
+}
+
+.rb-glossary-mockup-detail__hero p {
+  margin: 5px 0 0 !important;
+  color: #8fa8a9;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.rb-glossary-mockup-definition {
+  display: grid;
+  gap: 8px;
+}
+
+.rb-glossary-mockup-definition h4,
+.rb-glossary-mockup-example h4,
+.rb-glossary-mockup-help-card h3 {
+  margin: 0 !important;
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 950;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.rb-glossary-mockup-definition p {
+  color: #a9c1c2;
+  font-size: 0.78rem;
+  font-weight: 650;
+  line-height: 1.55;
+  overflow-wrap: anywhere !important;
+}
+
+.rb-glossary-mockup-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  min-width: 0;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+}
+
+.rb-glossary-mockup-pills span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 0.35rem 0.72rem;
+  border: 1px solid rgba(45, 212, 191, 0.16);
+  border-radius: 10px;
+  background: rgba(20, 184, 166, 0.08);
+  color: #a9c1c2 !important;
+  font-size: 0.68rem;
+  font-weight: 750;
+  line-height: 1.2;
+}
+
+.rb-glossary-mockup-pills strong {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: rgba(45, 212, 191, 0.22);
+  color: #99f6e4;
+  font-size: 0.66rem;
+  font-weight: 950;
+}
+
+.rb-glossary-mockup-example {
+  display: grid;
+  gap: 10px;
+}
+
+.rb-glossary-mockup-example > p {
+  color: #a9c1c2;
+  font-size: 0.76rem;
+  font-weight: 650;
+  line-height: 1.48;
+}
+
+.rb-glossary-mockup-example__card {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, 0.13);
+  border-radius: 10px;
+  background: rgba(2, 6, 23, 0.18);
+}
+
+.rb-glossary-mockup-example__card div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  padding: 12px;
+  border-right: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.rb-glossary-mockup-example__card div:last-child {
+  border-right: 0;
+}
+
+.rb-glossary-mockup-example__card span {
+  color: #2dd4bf !important;
+  font-size: 0.58rem;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.rb-glossary-mockup-example__card strong {
+  color: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.rb-glossary-mockup-example__note {
+  color: #8fa8a9 !important;
+  font-size: 0.72rem !important;
+  line-height: 1.5 !important;
+}
+
+.rb-glossary-mockup-help {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+  align-self: start;
+}
+
+.rb-glossary-mockup-help-card {
+  display: grid;
+  gap: 10px;
+  margin: 0 !important;
+  padding: 18px;
+}
+
+.rb-glossary-mockup-help-card h3::before {
+  content: "ⓘ";
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+  border: 1px solid rgba(45, 212, 191, 0.3);
+  border-radius: 999px;
+  color: #2dd4bf;
+  font-size: 0.62rem;
+}
+
+.rb-glossary-mockup-help-card p {
+  color: #a9c1c2;
+  font-size: 0.76rem;
+  font-weight: 650;
+  line-height: 1.5;
+}
+
+.rb-glossary-mockup-popular-list {
+  display: grid;
+  gap: 0;
+  min-width: 0;
+}
+
+.rb-glossary-mockup-popular-list button {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: 9px;
+  align-items: center;
+  width: 100%;
+  min-height: 34px;
+  margin: 0;
+  padding: 7px 0;
+  border: 0;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  text-align: left;
+}
+
+.rb-glossary-mockup-popular-list button:hover {
+  transform: none;
+  background: transparent;
+  filter: none;
+}
+
+.rb-glossary-mockup-popular-list span {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: rgba(20, 184, 166, 0.12);
+  color: #2dd4bf !important;
+  font-size: 0.62rem;
+  font-weight: 950;
+}
+
+.rb-glossary-mockup-popular-list strong {
+  min-width: 0;
+  color: #a9c1c2;
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rb-glossary-mockup-empty-state {
+  padding: 18px;
+}
+
+.rb-glossary-mockup-empty-state h3 {
+  margin: 0 !important;
+  color: #ffffff;
+  font-size: 1rem;
+}
+
+.rb-glossary-mockup-empty-state p {
+  margin-top: 6px;
+  color: #a9c1c2;
+  font-size: 0.78rem;
+}
+
+.rb-glossary-mockup-footer-note {
+  display: inline-flex;
+  justify-self: center;
+  max-width: min(100%, 760px);
+  margin: 2px auto 0 !important;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid rgba(45, 212, 191, 0.12);
+  border-radius: 999px;
+  background: rgba(2, 6, 23, 0.18);
+  color: #8fa8a9 !important;
+  font-size: 0.64rem;
+  font-weight: 650;
+  line-height: 1.35;
+  text-align: center;
+}
+
+/* Neutralisation ciblée des règles globales qui forçaient les div du glossaire. */
+.rb-glossary-main .rb-glossary-screen--mockup > .rb-glossary-mockup-topbar {
+  display: flex !important;
+  grid-template-columns: unset !important;
+}
+
+.rb-glossary-main .rb-glossary-screen--mockup > .rb-glossary-mockup-board {
+  display: grid !important;
+  grid-template-columns: 280px minmax(0, 1fr) 295px !important;
+}
+
+.rb-glossary-screen--mockup article + article {
+  margin-top: 0 !important;
+}
+
+/* Responsive Glossaire */
+@media (max-width: 1120px) {
+  .rb-glossary-mockup-board,
+  .rb-glossary-main .rb-glossary-screen--mockup > .rb-glossary-mockup-board {
+    grid-template-columns: 240px minmax(0, 1fr) !important;
+  }
+
+  .rb-glossary-mockup-help {
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 860px) {
+  .rb-glossary-mockup-topbar,
+  .rb-glossary-main .rb-glossary-screen--mockup > .rb-glossary-mockup-topbar {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .rb-glossary-mockup-search {
+    flex: none;
+    width: 100%;
+  }
+
+  .rb-glossary-mockup-board,
+  .rb-glossary-main .rb-glossary-screen--mockup > .rb-glossary-mockup-board {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .rb-glossary-mockup-list {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 0 12px 10px;
+    scrollbar-width: none;
+  }
+
+  .rb-glossary-mockup-list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .rb-glossary-mockup-term {
+    flex: 0 0 210px;
+    border-left: 0;
+    border-radius: 10px;
+  }
+
+  .rb-glossary-mockup-help {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rb-glossary-mockup-example__card {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rb-glossary-mockup-example__card div {
+    border-right: 0;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+  }
+
+  .rb-glossary-mockup-example__card div:last-child {
+    border-bottom: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  section.rb-screen-container:has(.rb-glossary-screen--mockup) {
+    width: min(100% - 14px, 100%) !important;
+    padding-top: 14px !important;
+  }
+
+  .rb-glossary-mockup-detail,
+  .rb-glossary-mockup-help-card,
+  .rb-glossary-mockup-empty-state {
+    padding: 14px;
+  }
+
+  .rb-glossary-mockup-detail__hero {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .rb-glossary-mockup-detail__marker {
+    width: 54px;
+    height: 54px;
+    border-radius: 13px;
+    font-size: 0.95rem;
+  }
+
+  .rb-glossary-mockup-detail h3 {
+    font-size: 1.6rem;
+  }
+
+  .rb-glossary-mockup-pills {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rb-glossary-mockup-footer-note {
+    width: 100%;
+    border-radius: 12px;
+    text-align: left;
+  }
+}
+
+/*
+  Correctif Glossaire final 24G.4
+  Ce bloc reconstruit uniquement l’écran Glossaire avec des classes rb-glossary-v2-* pour éviter les conflits CSS existants.
+*/
+section.rb-screen-container:has(.rb-glossary-v2) {
+  width: min(1240px, calc(100% - 24px)) !important;
+  max-width: 1240px !important;
+  padding-top: 18px !important;
+  padding-bottom: 14px !important;
+}
+
+section.rb-screen-container > .rb-glossary-screen:has(.rb-glossary-v2) {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.rb-glossary-v2,
+.rb-glossary-v2 * {
+  box-sizing: border-box;
+}
+
+.rb-glossary-v2 {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: 14px;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  color: #f8ffff;
+}
+
+.rb-glossary-v2 :is(h2, h3, h4, p, span, strong, small, button, input, label) {
+  margin-top: 0;
+  overflow-wrap: normal !important;
+  word-break: normal !important;
+  hyphens: none !important;
+}
+
+.rb-glossary-v2 :is(article, aside, div, header) {
+  min-width: 0;
+}
+
+.rb-glossary-v2 h2::after,
+.rb-glossary-v2 h3::after,
+.rb-glossary-v2 h4::after {
+  content: none !important;
+}
+
+.rb-glossary-v2__header {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 460px !important;
+  gap: 18px;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  padding: 0 2px;
+}
+
+.rb-glossary-v2__title {
+  display: flex !important;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 0;
+}
+
+.rb-glossary-v2__title-icon {
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid rgba(45, 212, 191, 0.36);
+  border-radius: 8px;
+  background: rgba(20, 184, 166, 0.1);
+  color: #2dd4bf !important;
+  font-size: 0.76rem;
+  line-height: 1;
+}
+
+.rb-glossary-v2__title h2 {
+  margin: 0 !important;
+  color: #ffffff;
+  font-size: 1.34rem;
+  font-weight: 950;
+  line-height: 1.05;
+  letter-spacing: -0.045em;
+}
+
+.rb-glossary-v2__title p {
+  margin: 4px 0 0 !important;
+  color: #8fa8a9;
+  font-size: 0.72rem;
+  font-weight: 650;
+  line-height: 1.35;
+}
+
+.rb-glossary-v2__search {
+  position: relative;
+  display: block !important;
+  width: 100%;
+  min-width: 0;
+  margin: 0 !important;
+}
+
+.rb-glossary-v2__search span {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  z-index: 1;
+  transform: translateY(-50%);
+  color: #8fa8a9 !important;
+  font-size: 0.78rem;
+  line-height: 1;
+}
+
+.rb-glossary-v2__search input {
+  width: 100%;
+  height: 46px;
+  min-width: 0;
+  margin: 0;
+  padding: 0 14px 0 40px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 9px;
+  background: rgba(2, 6, 23, 0.22);
+  color: #ecfeff;
+  font-size: 0.74rem;
+  font-weight: 700;
+  outline: none;
+}
+
+.rb-glossary-v2__search input::placeholder {
+  color: #748b8c;
+}
+
+.rb-glossary-v2__search input:focus {
+  border-color: rgba(45, 212, 191, 0.65);
+  box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.09);
+}
+
+.rb-glossary-v2__board {
+  display: grid !important;
+  grid-template-columns: 280px minmax(0, 1fr) 295px !important;
+  gap: 16px;
+  align-items: start;
+  width: 100%;
+  min-width: 0;
+}
+
+.rb-glossary-v2__index,
+.rb-glossary-v2__detail,
+.rb-glossary-v2__help-card,
+.rb-glossary-v2__empty-state {
+  min-width: 0;
+  margin: 0 !important;
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-radius: 10px;
+  background:
+    linear-gradient(145deg, rgba(15, 23, 42, 0.82), rgba(8, 47, 51, 0.46)),
+    rgba(2, 6, 23, 0.24);
+  box-shadow: none !important;
+}
+
+.rb-glossary-v2__index {
+  display: grid !important;
+  gap: 0;
+  overflow: hidden;
+  padding: 0 !important;
+}
+
+.rb-glossary-v2__index-header {
+  display: flex !important;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 14px 16px 10px;
+}
+
+.rb-glossary-v2__index-header strong {
+  color: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 950;
+  line-height: 1.1;
+}
+
+.rb-glossary-v2__index-header span {
+  display: inline-grid;
+  place-items: center;
+  min-width: 25px;
+  height: 20px;
+  padding: 0 6px;
+  border: 1px solid rgba(45, 212, 191, 0.22);
+  border-radius: 999px;
+  background: rgba(20, 184, 166, 0.1);
+  color: #99f6e4 !important;
+  font-size: 0.58rem;
+  font-weight: 950;
+}
+
+.rb-glossary-v2__list {
+  display: grid !important;
+  min-width: 0;
+}
+
+.rb-glossary-v2__term {
+  display: grid !important;
+  grid-template-columns: 26px minmax(0, 1fr);
+  gap: 9px;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  margin: 0;
+  padding: 8px 16px;
+  border: 0;
+  border-left: 3px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: inherit;
+  text-align: left;
+}
+
+.rb-glossary-v2__term:hover {
+  transform: none;
+  background: rgba(20, 184, 166, 0.07);
+  filter: none;
+}
+
+.rb-glossary-v2__term--active {
+  border-left-color: #2dd4bf;
+  background: rgba(20, 184, 166, 0.14);
+}
+
+.rb-glossary-v2__term-marker {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid rgba(45, 212, 191, 0.2);
+  border-radius: 7px;
+  background: rgba(20, 184, 166, 0.1);
+  color: #2dd4bf !important;
+  font-size: 0.5rem;
+  font-weight: 950;
+  line-height: 1;
+}
+
+.rb-glossary-v2__term-content {
+  display: grid !important;
+  gap: 2px;
+  min-width: 0;
+}
+
+.rb-glossary-v2__term-content strong {
+  display: block;
+  min-width: 0;
+  color: #c7f9f4;
+  font-size: 0.76rem;
+  font-weight: 850;
+  line-height: 1.12;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rb-glossary-v2__term-content small {
+  display: block;
+  min-width: 0;
+  color: #7f9596;
+  font-size: 0.62rem;
+  font-weight: 650;
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rb-glossary-v2__detail {
+  display: grid !important;
+  gap: 18px;
+  min-height: 515px;
+  padding: 22px !important;
+}
+
+.rb-glossary-v2__detail-top {
+  display: grid !important;
+  grid-template-columns: 70px minmax(0, 1fr);
+  gap: 18px;
+  align-items: center;
+  min-width: 0;
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+}
+
+.rb-glossary-v2__detail-marker {
+  display: inline-grid;
+  place-items: center;
+  width: 70px;
+  height: 70px;
+  border: 1px solid rgba(45, 212, 191, 0.28);
+  border-radius: 15px;
+  background:
+    radial-gradient(circle at 50% 18%, rgba(45, 212, 191, 0.2), transparent 64%),
+    rgba(20, 184, 166, 0.11);
+  color: #2dd4bf !important;
+  font-size: 1.25rem;
+  font-weight: 950;
+  line-height: 1;
+}
+
+.rb-glossary-v2__detail h3 {
+  margin: 0 !important;
+  color: #ffffff;
+  font-size: clamp(1.75rem, 3vw, 2.35rem);
+  font-weight: 950;
+  line-height: 1;
+  letter-spacing: -0.06em;
+}
+
+.rb-glossary-v2__detail-top p {
+  margin: 5px 0 0 !important;
+  color: #8fa8a9;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.rb-glossary-v2__definition {
+  display: grid !important;
+  gap: 8px;
+}
+
+.rb-glossary-v2__definition h4,
+.rb-glossary-v2__example h4,
+.rb-glossary-v2__help-card h3 {
+  margin: 0 !important;
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 950;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.rb-glossary-v2__definition p {
+  color: #a9c1c2;
+  font-size: 0.78rem;
+  font-weight: 650;
+  line-height: 1.55;
+  overflow-wrap: normal !important;
+}
+
+.rb-glossary-v2__chips {
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: 10px;
+  min-width: 0;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+}
+
+.rb-glossary-v2__chips span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 0.35rem 0.72rem;
+  border: 1px solid rgba(45, 212, 191, 0.16);
+  border-radius: 10px;
+  background: rgba(20, 184, 166, 0.08);
+  color: #a9c1c2 !important;
+  font-size: 0.68rem;
+  font-weight: 750;
+  line-height: 1.2;
+}
+
+.rb-glossary-v2__chips strong {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: rgba(45, 212, 191, 0.22);
+  color: #99f6e4;
+  font-size: 0.66rem;
+  font-weight: 950;
+}
+
+.rb-glossary-v2__example {
+  display: grid !important;
+  gap: 10px;
+}
+
+.rb-glossary-v2__example > p {
+  color: #a9c1c2;
+  font-size: 0.76rem;
+  font-weight: 650;
+  line-height: 1.48;
+}
+
+.rb-glossary-v2__example-card {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, 0.13);
+  border-radius: 10px;
+  background: rgba(2, 6, 23, 0.18);
+}
+
+.rb-glossary-v2__example-card div {
+  display: grid !important;
+  gap: 4px;
+  min-width: 0;
+  padding: 12px;
+  border-right: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.rb-glossary-v2__example-card div:last-child {
+  border-right: 0;
+}
+
+.rb-glossary-v2__example-card span {
+  color: #2dd4bf !important;
+  font-size: 0.58rem;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.rb-glossary-v2__example-card strong {
+  color: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.rb-glossary-v2__note {
+  color: #8fa8a9 !important;
+  font-size: 0.72rem !important;
+  line-height: 1.5 !important;
+}
+
+.rb-glossary-v2__help {
+  display: grid !important;
+  gap: 16px;
+  min-width: 0;
+  align-self: start;
+}
+
+.rb-glossary-v2__help-card {
+  display: grid !important;
+  gap: 10px;
+  padding: 18px !important;
+}
+
+.rb-glossary-v2__help-card h3::before {
+  content: "ⓘ";
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+  border: 1px solid rgba(45, 212, 191, 0.3);
+  border-radius: 999px;
+  color: #2dd4bf;
+  font-size: 0.62rem;
+}
+
+.rb-glossary-v2__help-card p {
+  color: #a9c1c2;
+  font-size: 0.76rem;
+  font-weight: 650;
+  line-height: 1.5;
+}
+
+.rb-glossary-v2__popular-list {
+  display: grid !important;
+  gap: 0;
+  min-width: 0;
+}
+
+.rb-glossary-v2__popular-list button {
+  display: grid !important;
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: 9px;
+  align-items: center;
+  width: 100%;
+  min-height: 34px;
+  margin: 0;
+  padding: 7px 0;
+  border: 0;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  text-align: left;
+}
+
+.rb-glossary-v2__popular-list button:hover {
+  transform: none;
+  background: transparent;
+  filter: none;
+}
+
+.rb-glossary-v2__popular-list span {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: rgba(20, 184, 166, 0.12);
+  color: #2dd4bf !important;
+  font-size: 0.62rem;
+  font-weight: 950;
+}
+
+.rb-glossary-v2__popular-list strong {
+  min-width: 0;
+  color: #a9c1c2;
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rb-glossary-v2__mini-empty,
+.rb-glossary-v2__empty-state {
+  display: grid !important;
+  gap: 6px;
+  padding: 18px !important;
+}
+
+.rb-glossary-v2__empty-state h3,
+.rb-glossary-v2__mini-empty strong {
+  margin: 0 !important;
+  color: #ffffff;
+  font-size: 1rem;
+}
+
+.rb-glossary-v2__empty-state p,
+.rb-glossary-v2__mini-empty p {
+  margin: 0 !important;
+  color: #a9c1c2;
+  font-size: 0.78rem;
+}
+
+.rb-glossary-v2__footer-note {
+  display: inline-flex;
+  justify-self: center;
+  max-width: min(100%, 760px);
+  margin: 2px auto 0 !important;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid rgba(45, 212, 191, 0.12);
+  border-radius: 999px;
+  background: rgba(2, 6, 23, 0.18);
+  color: #8fa8a9 !important;
+  font-size: 0.64rem;
+  font-weight: 650;
+  line-height: 1.35;
+  text-align: center;
+}
+
+@media (max-width: 1120px) {
+  .rb-glossary-v2__board {
+    grid-template-columns: 240px minmax(0, 1fr) !important;
+  }
+
+  .rb-glossary-v2__help {
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 860px) {
+  .rb-glossary-v2__header {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .rb-glossary-v2__board {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .rb-glossary-v2__list {
+    display: flex !important;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 0 12px 10px;
+    scrollbar-width: none;
+  }
+
+  .rb-glossary-v2__list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .rb-glossary-v2__term {
+    flex: 0 0 210px;
+    border-left: 0;
+    border-radius: 10px;
+  }
+
+  .rb-glossary-v2__help {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rb-glossary-v2__example-card {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rb-glossary-v2__example-card div {
+    border-right: 0;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+  }
+
+  .rb-glossary-v2__example-card div:last-child {
+    border-bottom: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  section.rb-screen-container:has(.rb-glossary-v2) {
+    width: min(100% - 14px, 100%) !important;
+    padding-top: 14px !important;
+  }
+
+  .rb-glossary-v2__detail,
+  .rb-glossary-v2__help-card,
+  .rb-glossary-v2__empty-state {
+    padding: 14px !important;
+  }
+
+  .rb-glossary-v2__detail-top {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .rb-glossary-v2__detail-marker {
+    width: 54px;
+    height: 54px;
+    border-radius: 13px;
+    font-size: 0.95rem;
+  }
+
+  .rb-glossary-v2__detail h3 {
+    font-size: 1.6rem;
+  }
+
+  .rb-glossary-v2__chips {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rb-glossary-v2__footer-note {
     width: 100%;
     border-radius: 12px;
     text-align: left;
