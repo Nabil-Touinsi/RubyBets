@@ -1,0 +1,166 @@
+BEGIN
+ league_code | total_batches | total_raw_rows 
+-------------+---------------+----------------
+ D1          |            25 |           7651
+ E0          |            25 |           9501
+ F1          |            25 |           9105
+ I1          |            25 |           9218
+ SP1         |            25 |           9500
+(5 rows)
+
+ league_code | total_raw_matches 
+-------------+-------------------
+ D1          |              7651
+ E0          |              9501
+ F1          |              9105
+ I1          |              9218
+ SP1         |              9500
+(5 rows)
+
+ league_code | total_clean_matches 
+-------------+---------------------
+ D1          |                7650
+ E0          |                9500
+ F1          |                9103
+ I1          |                9204
+ SP1         |                9500
+(5 rows)
+
+  result  | total_matches 
+----------+---------------
+ HOME_WIN |         20556
+ AWAY_WIN |         12759
+ DRAW     |         11642
+(3 rows)
+
+ total_features | total_targets | home_form_nulls | away_form_nulls | home_scored_nulls | away_scored_nulls | home_conceded_nulls | away_conceded_nulls 
+----------------+---------------+-----------------+-----------------+-------------------+-------------------+---------------------+---------------------
+          44957 |         44957 |             217 |             217 |               217 |               217 |                 217 |                 217
+(1 row)
+
+ home_form_min | home_form_max | away_form_min | away_form_max 
+---------------+---------------+---------------+---------------
+          0.00 |         15.00 |          0.00 |         15.00
+(1 row)
+
+ league_code |  season   | match_date | home_team  |   away_team   | home_form_points_last_5 | away_form_points_last_5 | target_result 
+-------------+-----------+------------+------------+---------------+-------------------------+-------------------------+---------------
+ F1          | 2000_2001 | 2000-07-28 | Marseille  | Troyes        |                         |                         | HOME_WIN
+ F1          | 2000_2001 | 2000-07-28 | Paris SG   | Strasbourg    |                         |                         | HOME_WIN
+ F1          | 2000_2001 | 2000-07-29 | Auxerre    | Sedan         |                         |                         | AWAY_WIN
+ F1          | 2000_2001 | 2000-07-29 | Bordeaux   | Metz          |                         |                         | DRAW
+ F1          | 2000_2001 | 2000-07-29 | Guingamp   | St Etienne    |                         |                         | DRAW
+ F1          | 2000_2001 | 2000-07-29 | Lille      | Monaco        |                         |                         | DRAW
+ F1          | 2000_2001 | 2000-07-29 | Lyon       | Rennes        |                         |                         | DRAW
+ F1          | 2000_2001 | 2000-07-29 | Nantes     | Lens          |                         |                         | AWAY_WIN
+ F1          | 2000_2001 | 2000-07-29 | Toulouse   | Bastia        |                         |                         | AWAY_WIN
+ F1          | 2000_2001 | 2000-08-03 | Sedan      | Lyon          |                         |                         | DRAW
+ F1          | 2000_2001 | 2000-08-04 | Monaco     | Nantes        |                         |                         | AWAY_WIN
+ F1          | 2000_2001 | 2000-08-04 | St Etienne | Marseille     |                         |                         | HOME_WIN
+ F1          | 2000_2001 | 2000-08-05 | Bastia     | Bordeaux      |                         |                         | HOME_WIN
+ F1          | 2000_2001 | 2000-08-05 | Lens       | Guingamp      |                         |                         | HOME_WIN
+ F1          | 2000_2001 | 2000-08-05 | Metz       | Auxerre       |                         |                         | AWAY_WIN
+ F1          | 2000_2001 | 2000-08-05 | Rennes     | Paris SG      |                         |                         | DRAW
+ F1          | 2000_2001 | 2000-08-05 | Strasbourg | Lille         |                         |                         | AWAY_WIN
+ F1          | 2000_2001 | 2000-08-05 | Troyes     | Toulouse      |                         |                         | DRAW
+ D1          | 2000_2001 | 2000-08-11 | Dortmund   | Hansa Rostock |                         |                         | HOME_WIN
+ F1          | 2000_2001 | 2000-08-12 | Auxerre    | Bastia        |                    0.00 |                    3.00 | HOME_WIN
+(20 rows)
+
+ total_model_runs 
+------------------
+                0
+(1 row)
+
+ROLLBACK
+
+
+$sql = @'
+-- Role du fichier : requetes SQL de preuve pour controler le pipeline data ML de RubyBets.
+-- Objectif : prouver C2 avec des requetes utiles sur le schema ML.
+
+-- 1) Controle des batches importes par ligue
+SELECT
+    league_code,
+    COUNT(*) AS total_batches,
+    SUM(row_count) AS total_raw_rows
+FROM ml.import_batches
+GROUP BY league_code
+ORDER BY league_code;
+
+-- 2) Controle des lignes brutes par ligue
+SELECT
+    ib.league_code,
+    COUNT(rm.id) AS total_raw_matches
+FROM ml.import_batches ib
+JOIN ml.raw_matches rm ON rm.import_batch_id = ib.id
+GROUP BY ib.league_code
+ORDER BY ib.league_code;
+
+-- 3) Controle des matchs nettoyes par ligue
+SELECT
+    league_code,
+    COUNT(*) AS total_clean_matches
+FROM ml.clean_matches
+WHERE is_valid = true
+GROUP BY league_code
+ORDER BY league_code;
+
+-- 4) Repartition globale des resultats
+SELECT
+    result,
+    COUNT(*) AS total_matches
+FROM ml.clean_matches
+WHERE is_valid = true
+GROUP BY result
+ORDER BY total_matches DESC;
+
+-- 5) Controle des features generees
+SELECT
+    COUNT(*) AS total_features,
+    COUNT(target_result) AS total_targets,
+    COUNT(*) - COUNT(home_form_points_last_5) AS home_form_nulls,
+    COUNT(*) - COUNT(away_form_points_last_5) AS away_form_nulls,
+    COUNT(*) - COUNT(home_goals_scored_avg_last_5) AS home_scored_nulls,
+    COUNT(*) - COUNT(away_goals_scored_avg_last_5) AS away_scored_nulls,
+    COUNT(*) - COUNT(home_goals_conceded_avg_last_5) AS home_conceded_nulls,
+    COUNT(*) - COUNT(away_goals_conceded_avg_last_5) AS away_conceded_nulls
+FROM ml.features;
+
+-- 6) Controle des plages de forme recente
+SELECT
+    MIN(home_form_points_last_5) AS home_form_min,
+    MAX(home_form_points_last_5) AS home_form_max,
+    MIN(away_form_points_last_5) AS away_form_min,
+    MAX(away_form_points_last_5) AS away_form_max
+FROM ml.features
+WHERE home_form_points_last_5 IS NOT NULL
+  AND away_form_points_last_5 IS NOT NULL;
+
+-- 7) Jointure entre matchs nettoyes et features
+SELECT
+    cm.league_code,
+    cm.season,
+    cm.match_date,
+    cm.home_team,
+    cm.away_team,
+    f.home_form_points_last_5,
+    f.away_form_points_last_5,
+    f.target_result
+FROM ml.clean_matches cm
+JOIN ml.features f ON f.clean_match_id = cm.id
+WHERE cm.is_valid = true
+ORDER BY cm.match_date
+LIMIT 20;
+
+-- 8) Controle des executions de modeles
+SELECT
+    COUNT(*) AS total_model_runs
+FROM ml.model_runs;
+'@
+
+[System.IO.File]::WriteAllText(
+    "backend\sql\ml_queries.sql",
+    $sql,
+    (New-Object System.Text.UTF8Encoding($false))
+)

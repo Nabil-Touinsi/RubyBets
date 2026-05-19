@@ -1,104 +1,103 @@
-# README — État du projet RubyBets
+# RubyBets — Application Data & IA d’aide à la décision football
 
-## 1. Présentation générale
+## 1. Présentation du projet
 
-RubyBets est une application web de fin d’étude Data & IA conçue comme un outil d’aide à la décision football avant-match.
+RubyBets est une application web de fin d’étude Data & IA conçue pour aider à analyser des matchs de football avant leur coup d’envoi.
 
-Le projet ne permet pas de parier directement et ne doit pas être présenté comme un bookmaker. Son objectif est de centraliser des données football réelles, de les analyser et de produire des tendances explicables afin d’aider l’utilisateur à mieux comprendre un match avant son coup d’envoi.
+Le projet ne permet pas de parier, n’est pas un bookmaker et ne promet aucun résultat sportif. L’objectif est de centraliser des données football réelles, de produire une lecture claire avant-match et de présenter des recommandations analytiques explicables.
 
-Le projet est aligné avec le référentiel RNCP Développeur IA niveau 6.
-
-Positionnement à retenir :
-
-```
-RubyBets ne permet pas de parier.
-RubyBets n’est pas un bookmaker.
-RubyBets utilise des données réelles, récentes et exploitables.
-RubyBets propose une analyse explicable avant-match.
-La V1 n’est pas un modèle Machine Learning entraîné.
-```
-
-Formulation officielle à utiliser :
+Formulation officielle du MVP :
 
 ```
 Première version du moteur d’analyse : scoring explicable basé sur règles métier et données réelles.
 ```
 
----
-
-## 2. Cadrage fonctionnel et RNCP
-
-La première phase du projet a consisté à formaliser toute la base documentaire et fonctionnelle de RubyBets.
-
-Les documents produits ou cadrés couvrent notamment :
-
-- le plan fonctionnel global ;
-- le cadrage produit ;
-- la définition du MVP ;
-- les parcours utilisateur ;
-- l’arborescence des écrans ;
-- le contenu détaillé des écrans ;
-- le zoning fonctionnel ;
-- la direction UI ;
-- la validation des maquettes ;
-- le découpage technique ;
-- le choix de stack technique ;
-- l’architecture globale ;
-- le modèle de données ;
-- la spécification API ;
-- la stratégie data ;
-- le cadrage IA et logique prédictive ;
-- le plan de développement ;
-- la stratégie de tests ;
-- la structure du support de soutenance.
-
-Objectif de cette phase : construire un projet défendable comme un vrai produit Data & IA, et non comme une simple démonstration technique.
+Le Machine Learning entraîné est traité comme une évolution progressive, après constitution et contrôle d’un dataset historique propre.
 
 ---
 
-## 3. Choix techniques validés
+## 2. Objectif pédagogique et conformité RNCP
 
-La stack retenue pour le MVP est la suivante :
+RubyBets est construit pour répondre aux attentes du référentiel RNCP Développeur IA niveau 6 et aux consignes de coaching ECE / Simplon.
+
+Le dépôt doit prouver :
+
+- la collecte de données réelles ;
+- la présence de données brutes dans `data/ml/raw/` ;
+- le nettoyage et la normalisation des données ;
+- l’existence de requêtes SQL utiles et documentées ;
+- la reproductibilité par des commandes claires ;
+- la traçabilité par GitHub ;
+- la présence de preuves dans `reports/evidence/`.
+
+Principe de soutenance :
 
 ```
-Frontend : React + TypeScript + Vite
-Backend : Python + FastAPI
-Source data principale : Football-Data.org
-Tests : pytest
-CI/CD : GitHub Actions
-Versioning : Git + tags GitHub
-```
-
-La base PostgreSQL reste prévue dans l’architecture cible. Dans l’état actuel du projet, le dossier `database` existe, mais le fichier `schema.sql` est encore vide.
-
-Le projet fonctionne actuellement principalement avec :
-
-```
-API Football-Data.org
-+ cache local JSON
-+ backend FastAPI
-+ frontend React
+Donnée collectée → donnée contrôlée → donnée exploitable → compétence prouvée.
 ```
 
 ---
 
-## 4. Mise en place du backend
+## 3. Stack technique
 
-Le backend a été structuré proprement avec une séparation entre routes API, services métier, configuration et tests.
+| Bloc                  | Technologie                  | Rôle                                        |
+|-----------------------|------------------------------|---------------------------------------------|
+| Frontend              | React + TypeScript + Vite    | Interface utilisateur multi-écrans          |
+| Backend               | Python + FastAPI             | API REST, orchestration métier, scoring V1  |
+| Base de données       | PostgreSQL                   | Stockage structuré des données MVP et ML    |
+| Connecteur PostgreSQL | psycopg                      | Connexion Python vers PostgreSQL            |
+| Données historiques   | Football-Data.co.uk          | Datasets CSV historiques pour le pipeline ML|
+| Données API MVP       | Football-Data.org            | Matchs, compétitions et données avant-match |
+| Tests                 | pytest + npm run build       | Validation backend et frontend              |
+| Versioning            | Git + GitHub                 | Traçabilité, commits et preuves             |
+-----------------------------------------------------------------------------------------------------
+---
 
-Structure principale :
+## 4. Structure principale du projet
 
 ```
-backend/
-├── app/
-│   ├── api/
-│   ├── core/
-│   ├── data/cache/
-│   └── services/
-└── tests/
+RubyBets/
+├── .github/workflows/                  # CI backend et frontend
+├── backend/                            # API FastAPI et scripts data / ML
+│   ├── app/
+│   │   ├── api/                        # Routes FastAPI
+│   │   ├── core/                       # Configuration
+│   │   └── services/                   # Services métier, data, scoring, persistance
+│   ├── scripts/ml/                     # Scripts collecte, import, nettoyage, features
+│   ├── sql/queries.sql                 # Requêtes SQL de preuve C2
+│   ├── tests/                          # Tests backend
+│   └── requirements.txt
+├── data/ml/raw/                        # CSV historiques bruts par ligue
+├── database/schema/                    # Schémas SQL PostgreSQL
+│   ├── schema.sql                      # Tables MVP
+│   └── ml_schema.sql                   # Tables ML
+├── docs/                               # Documentation technique et RNCP
+├── frontend/                           # Application React / TypeScript / Vite
+├── reports/evidence/                   # Preuves soutenance
+└── README.md
 ```
 
-Routes backend disponibles dans le MVP actuel :
+---
+
+## 5. Positionnement responsable
+
+RubyBets respecte les règles suivantes :
+
+```
+Aucun pari réel dans l’application.
+Aucune intégration bookmaker.
+Aucune promesse de résultat.
+Aucune donnée fictive pour masquer une absence de source.
+Aucune clé API ou mot de passe versionné dans Git.
+```
+
+Les recommandations affichées sont des aides analytiques. Elles doivent toujours être présentées avec prudence, confiance, risque et justification.
+
+---
+
+## 6. Backend FastAPI
+
+### Routes principales
 
 ```
 GET  /health
@@ -114,473 +113,411 @@ GET  /api/responsible-info
 GET  /api/data-sources
 ```
 
-Services backend principaux :
+### Services principaux
 
 ```
-cache_service.py
-football_data_client.py
-match_service.py
-analysis_service.py
-recommendation_service.py
-```
-
-Ces services permettent de séparer la récupération des données, la logique métier, l’analyse, la recommandation et le cache.
-
----
-
-## 5. Branchement des données réelles
-
-Le projet utilise actuellement Football-Data.org comme source principale de données réelles.
-
-Les données branchées couvrent progressivement :
-
-- les compétitions ;
-- les matchs à venir ;
-- le détail d’un match ;
-- le contexte d’un match ;
-- les classements ;
-- l’analyse pré-match ;
-- les prédictions principales ;
-- la recommandation multi-matchs.
-
-Le principe retenu est de ne pas utiliser de données fictives pour les routes métier principales.
-
----
-
-## 6. Moteur d’analyse actuel
-
-Le moteur actuel de RubyBets n’est pas encore un modèle de Machine Learning entraîné sur un historique de matchs.
-
-Il ne fonctionne donc pas encore selon la logique suivante :
-
-```
-Je prends 10 000 anciens matchs
-→ j’entraîne un modèle ML
-→ le modèle apprend automatiquement des tendances
-→ il prédit les futurs matchs
-```
-
-À la place, la V1 fonctionne avec une logique explicable :
-
-```
-Je récupère des données réelles sur un match
-→ je compare les équipes
-→ j’applique des règles métier
-→ je calcule une tendance
-→ j’explique pourquoi cette tendance ressort
-```
-
-Le moteur repose actuellement sur deux méthodes :
-
-```
-rules_based_scoring_v1
-rules_based_multimatch_selection_v1
-```
-
-### 6.1 rules_based_scoring_v1
-
-`rules_based_scoring_v1` est la méthode utilisée pour analyser un seul match.
-
-Pour un match donné, RubyBets regarde par exemple :
-
-```
-classement de l’équipe domicile
-classement de l’équipe extérieure
-écart de points
-différence de buts
-moyenne de buts
-forme générale disponible
-```
-
-Ensuite, le moteur applique des règles métier simples.
-
-Exemple de logique :
-
-```
-Si l’équipe A est mieux classée,
-si elle a plus de points,
-si sa différence de buts est meilleure,
-alors elle possède un avantage contextuel.
-```
-
-Le moteur peut alors produire une tendance du type :
-
-```
-Tendance favorable à l’équipe domicile
-Confiance : moyenne
-Risque : moyen
-Justification : l’équipe possède un avantage au classement, en points et en différence de buts.
-```
-
-Cette sortie n’est pas une certitude. C’est une lecture analytique basée sur des règles métier et des données réelles.
-
-### 6.2 rules_based_multimatch_selection_v1
-
-`rules_based_multimatch_selection_v1` est la méthode utilisée pour générer une sélection recommandée sur plusieurs matchs.
-
-Elle ne prédit pas directement un seul match. Elle sélectionne plusieurs recommandations déjà calculées en fonction du niveau de risque demandé par l’utilisateur.
-
-Exemple :
-
-```
-L’utilisateur demande 3 matchs avec un niveau de risque moyen.
-```
-
-RubyBets va alors regarder plusieurs matchs disponibles et retenir ceux qui correspondent le mieux aux critères :
-
-```
-confiance compatible ;
-risque compatible ;
-données disponibles ;
-recommandation lisible ;
-cohérence globale de la sélection.
-```
-
-Le résultat est une sélection multi-matchs structurée, sans prise de pari réelle.
-
----
-
-## 7. Sorties actuelles du moteur
-
-Le moteur actuel produit :
-
-- une tendance 1X2 ;
-- une tendance sur le volume de buts ;
-- une tendance BTTS ;
-- un niveau de confiance ;
-- un niveau de risque ;
-- une justification lisible ;
-- des limites responsables.
-
-Cette logique est cohérente avec une première version explicable et défendable en soutenance.
-
-Phrase à retenir pour l’oral :
-
-```
-Dans cette première version, RubyBets intègre un moteur de scoring explicable basé sur des règles métier et des données réelles. Le Machine Learning sera intégré dans une phase ultérieure, après constitution d’un dataset historique propre.
+backend/app/services/cache_service.py
+backend/app/services/database_service.py
+backend/app/services/football_data_client.py
+backend/app/services/match_service.py
+backend/app/services/analysis_service.py
+backend/app/services/recommendation_service.py
+backend/app/services/persistence_service.py
 ```
 
 ---
 
-## 8. Frontend React
+## 7. Frontend React
 
-Le frontend a été initialisé avec React, TypeScript et Vite.
+Le frontend est organisé en écrans et composants afin de correspondre aux maquettes MVP.
 
-Plusieurs composants ont été créés ou séparés afin d’éviter un fichier `App.tsx` trop lourd.
+Écrans principaux :
+
+```
+DashboardScreen.tsx
+MatchesScreen.tsx
+MatchDetailsScreen.tsx
+AnalysisScreen.tsx
+PredictionsScreen.tsx
+RecommendationScreen.tsx
+GlossaryScreen.tsx
+ResponsibleInfoScreen.tsx
+```
 
 Composants principaux :
 
 ```
-CompetitionsSection.tsx
 MatchesSection.tsx
 MatchDetailsSection.tsx
-MatchContextSection.tsx
 MatchAnalysisSection.tsx
 MatchPredictionsSection.tsx
 MultiMatchRecommendationSection.tsx
 GlossarySection.tsx
 ResponsibleInfoSection.tsx
-StatusPanel.tsx
+DataFreshnessBlock.tsx
 ```
 
-Le frontend consomme les routes backend via :
+Le frontend consomme le backend via :
 
 ```
-src/services/api.ts
+frontend/src/services/api.ts
 ```
 
 Les types TypeScript sont centralisés dans :
 
 ```
-src/models/rubybets.ts
+frontend/src/models/rubybets.ts
 ```
-
-L’objectif est d’avoir une interface branchée sur les vraies réponses API, avec une structure maintenable et cohérente avec les écrans MVP.
 
 ---
 
-## 9. Refactorisation et qualité du code
+## 8. Base de données PostgreSQL
 
-Plusieurs passes de nettoyage ont été réalisées :
+Base locale utilisée :
 
-- extraction de composants frontend ;
-- extraction de services backend ;
-- centralisation de constantes ;
-- nettoyage des fichiers Python suivis par Git ;
-- amélioration du `.gitignore` ;
-- structuration des tests backend ;
-- ajout de commentaires en haut des fichiers ;
-- ajout de commentaires avant les fonctions importantes ;
-- ajout de schémas de communication en fin de fichier lorsque nécessaire.
+```
+rubybets_db
+```
+
+Schéma MVP :
+
+```
+database/schema/schema.sql
+```
+
+Tables MVP principales :
+
+```
+competitions
+teams
+matches
+predictions
+recommendations
+recommendation_items
+```
+
+Schéma ML :
+
+```
+database/schema/ml_schema.sql
+```
+
+Tables ML principales :
+
+```
+ml.import_batches
+ml.raw_matches
+ml.clean_matches
+ml.features
+ml.model_runs
+```
+
+Commandes de création des schémas :
+
+```powershell
+psql -d rubybets_db -f database\schema\schema.sql
+psql -d rubybets_db -f database\schema\ml_schema.sql
+```
 
 ---
 
-## 10. Tests et intégration continue
+## 9. Données historiques ML
 
-Une logique de validation professionnelle a été mise en place.
-
-Éléments validés :
+Les datasets historiques sont stockés dans :
 
 ```
-pytest côté backend
-npm run build côté frontend
-GitHub Actions
+data/ml/raw/
 ```
 
-État stable connu :
+Ligues intégrées :
+
+| Ligue | Code source  | Période               |
+|----------------|-----|-----------------------|
+| Premier League | E0  | 2000/2001 à 2024/2025 |
+| Ligue 1        | F1  | 2000/2001 à 2024/2025 |
+| Bundesliga     | D1  | 2000/2001 à 2024/2025 |
+| Serie A        | I1  | 2000/2001 à 2024/2025 |
+| La Liga        | SP1 | 2000/2001 à 2024/2025 |
+
+Volumes contrôlés après nettoyage :
+
+| Ligue | Matchs propres  |
+|----------------|--------|
+| Bundesliga     | 7 650  |
+| Premier League | 9 500  |
+| Ligue 1        | 9 103  |
+| Serie A        | 9 204  |
+| La Liga        | 9 500  |
+| Total          | 44 957 |
+
+Répartition globale des résultats :
+
+| Résultat | Nombre |
+|----------|--------|
+| HOME_WIN | 20 556 |
+| DRAW     | 11 642 |
+| AWAY_WIN | 12 759 |
+
+---
+
+## 10. Pipeline data / ML
+
+### Scripts disponibles
 
 ```
-Backend tests : OK
-Frontend build : OK
-GitHub Actions : vert
+backend/scripts/ml/download_league_datasets.py
+backend/scripts/ml/download_premier_league_datasets.py
+backend/scripts/ml/import_raw_matches.py
+backend/scripts/ml/clean_raw_matches.py
+backend/scripts/ml/build_match_features.py
 ```
 
-Dernier résultat confirmé côté backend :
+### Télécharger les datasets historiques
+
+Télécharger toutes les ligues configurées :
+
+```powershell
+python backend\scripts\ml\download_league_datasets.py --start-year 2000 --end-year 2024
+```
+
+Télécharger une seule ligue :
+
+```powershell
+python backend\scripts\ml\download_league_datasets.py --league ligue_1 --start-year 2024 --end-year 2024
+```
+
+### Importer un fichier brut en base
+
+Exemple pour une saison Premier League :
+
+```powershell
+python backend\scripts\ml\import_raw_matches.py --csv data\ml\raw\premier_league\E0_2024_2025.csv --season 2024_2025 --league-code E0
+```
+
+### Nettoyer un batch importé
+
+```powershell
+python backend\scripts\ml\clean_raw_matches.py --source-file E0_2024_2025.csv
+```
+
+### Générer les features ML
+
+```powershell
+python backend\scripts\ml\build_match_features.py
+```
+
+Résultat validé lors de ML :
+
+```
+Matchs nettoyés chargés : 44 957
+Features insérées dans ml.features : 44 957
+Matchs sans historique domicile : 217
+Matchs sans historique extérieur : 217
+Règle anti-fuite respectée.
+```
+
+---
+
+## 11. Features ML actuellement créées
+
+Le fichier suivant génère les premières variables explicatives :
+
+```
+backend/scripts/ml/build_match_features.py
+```
+
+Features créées :
+
+```
+home_form_points_last_5
+away_form_points_last_5
+home_goals_scored_avg_last_5
+away_goals_scored_avg_last_5
+home_goals_conceded_avg_last_5
+away_goals_conceded_avg_last_5
+home_advantage
+target_result
+```
+
+Règle anti-fuite : les features d’un match sont calculées uniquement avec les matchs joués avant ce match. Le résultat du match courant est conservé uniquement comme cible `target_result`.
+
+---
+
+## 12. Requêtes SQL de preuve C2
+
+Les requêtes SQL sont stockées dans :
+
+```
+backend/sql/queries.sql
+```
+
+Elles permettent de démontrer :
+
+- la sélection de colonnes utiles ;
+- le filtrage métier ;
+- les jointures entre tables ;
+- les agrégations ;
+- le contrôle des doublons ;
+- la lecture des prédictions ;
+- la lecture des recommandations multi-matchs.
+
+Ce fichier sert de preuve pour C2, à condition d’ajouter aussi une capture ou un export de résultat dans `reports/evidence/`.
+
+---
+
+## 13. Preuves disponibles
+
+Dossier principal :
+
+```
+reports/evidence/
+```
+
+Preuves API :
+
+```
+reports/evidence/api_responses/health.json
+reports/evidence/api_responses/competitions.json
+reports/evidence/api_responses/matches.json
+reports/evidence/api_responses/match_predictions.json
+reports/evidence/api_responses/multimatch_recommendation.json
+```
+
+Preuves de build et tests :
+
+```
+reports/evidence/build_logs/backend_tests.txt
+reports/evidence/build_logs/frontend_build.txt
+```
+
+Captures déjà produites :
+
+```
+reports/evidence/screenshots/01_ui_dashboard.png
+reports/evidence/screenshots/02_ui_matches_list.png
+reports/evidence/screenshots/03_ui_match_details.png
+reports/evidence/screenshots/04_ui_predictions_block.png
+reports/evidence/screenshots/05_ui_multimatch_recommendation.png
+reports/evidence/screenshots/06_ui_responsible_info.png
+reports/evidence/screenshots/07_swagger_endpoints.png
+reports/evidence/screenshots/08_project_tree_docs_evidence.png
+reports/evidence/screenshots/09_git_status_before_commit.png
+reports/evidence/monitoring/07_health_monitoring.png
+```
+
+---
+
+## 14. Documentation projet
+
+Documents Markdown disponibles :
+
+```
+docs/api_documentation.md
+docs/application_monitoring.md
+docs/incident_log.md
+docs/rncp_evidence_matrix.md
+docs/scoring_engine.md
+docs/specs_data.md
+```
+
+```
+docs/data_dictionary.md
+docs/cleaning_rules.md
+```
+
+```
+reports/evidence/data_quality/01_raw_vs_clean_summary.md
+reports/evidence/sql/01_queries_execution.png
+reports/evidence/sql/02_sql_results_summary.csv
+reports/evidence/screenshots/c1_collecte_terminal.png
+reports/evidence/screenshots/c2_sql_execution.png
+reports/evidence/screenshots/c3_cleaning_before_after.png
+```
+
+---
+
+## 15. Installation backend
+
+Depuis le dossier `backend` :
+
+```powershell
+cd backend
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+```
+
+Créer un fichier `backend/.env` local non versionné :
+
+```
+FOOTBALL_DATA_API_KEY=...
+FOOTBALL_DATA_BASE_URL=https://api.football-data.org/v4
+DATABASE_URL=postgresql://USER:PASSWORD@localhost:5432/rubybets_db
+```
+
+Lancer le backend :
+
+```powershell
+python -m uvicorn app.main:app --reload
+```
+
+Tester la disponibilité :
+
+```powershell
+Invoke-RestMethod http://127.0.0.1:8000/health
+```
+
+Résultat attendu :
+
+```json
+{
+  "status": "ok"
+}
+```
+
+---
+
+## 16. Installation frontend
+
+Depuis le dossier `frontend` :
+
+```powershell
+cd frontend
+npm install
+npm run dev
+```
+
+Build de validation :
+
+```powershell
+npm run build
+```
+
+---
+
+## 17. Tests et validation
+
+Backend :
+
+```powershell
+cd backend
+python -m pytest
+```
+
+Résultat stable déjà obtenu :
 
 ```
 14 passed
 ```
 
----
+Frontend :
 
-## 11. Tags GitHub créés
-
-Les versions stables du projet ont été taguées progressivement :
-
-```
-rubybets-v0.1
-rubybets-v0.2-refactor
-rubybets-v0.3-backend-refactor
-rubybets-v0.4-backend-tests
-rubybets-v0.5-backend-ci
-rubybets-v0.6-frontend-ci
-rubybets-v0.7-backend-data-cache
+```powershell
+cd frontend
+npm run build
 ```
 
-Dernier tag validé :
-
-```
-rubybets-v0.7-backend-data-cache
-```
-
-Dernier commit associé :
-
-```
-Add reusable cache layer for football data
-```
+Résultat attendu : compilation TypeScript + build Vite sans erreur.
 
 ---
 
-## 12. Dernière phase réalisée : cache backend et data_freshness
-
-La dernière grande phase a porté sur la stabilisation du cache backend et de la fraîcheur des données.
-
-Routes vérifiées :
-
-```
-GET  /api/competitions                   OK
-GET  /api/matches                        OK
-GET  /api/matches/{match_id}             OK
-GET  /api/matches/{match_id}/context     OK
-GET  /api/matches/{match_id}/analysis    OK
-GET  /api/matches/{match_id}/predictions OK
-POST /api/recommendations/multimatch     OK
-```
-
-Comportement vérifié :
-
-```
-Premier appel API réel : from_cache = false
-Deuxième appel API : from_cache = true
-```
-
-Le cache local fonctionne et permet de limiter les appels répétés vers Football-Data.org.
-
----
-
-## 13. Gestion des fichiers cache
-
-Les fichiers JSON de cache sont générés localement dans :
-
-```
-backend/app/data/cache/
-```
-
-Exemples de fichiers générés :
-
-```
-competitions.json
-match_538126.json
-matches_pl_scheduled_all_start_dates_all_end_dates.json
-standings_pl.json
-```
-
-Ces fichiers sont ignorés par Git.
-
-Validation effectuée :
-
-```
-git status --short : vide
-fichiers JSON du cache visibles uniquement en fichiers ignorés
-```
-
-Conclusion : les caches réels ne polluent pas le dépôt Git.
-
----
-
-## 14. Décision sur data_freshness
-
-Toutes les routes prioritaires exposent une information de fraîcheur des données.
-
-Une différence de structure a été observée entre les routes simples et les routes composées.
-
-Décision retenue :
-
-```
-Routes simples → data_freshness direct
-Routes combinées → data_freshness composite
-```
-
-Routes simples :
-
-```
-/api/competitions
-/api/matches
-/api/matches/{match_id}
-```
-
-Elles exposent une fraîcheur directe :
-
-```
-source
-from_cache
-updated_at
-ttl_minutes
-```
-
-Routes combinées :
-
-```
-/api/matches/{match_id}/context
-/api/matches/{match_id}/analysis
-/api/matches/{match_id}/predictions
-/api/recommendations/multimatch
-```
-
-Elles exposent une fraîcheur composite, car elles combinent plusieurs données :
-
-```
-match_cache
-standings_cache
-matches_cache
-```
-
-Cette différence n’est pas considérée comme un bug. Elle est justifiable techniquement et professionnellement.
-
----
-
-## 15. Diagnostic encodage
-
-Lors des tests PowerShell, certains accents apparaissaient sous forme cassée :
-
-```
-prÃ©dictions
-donnÃ©es
-Ã©quipes
-```
-
-Un test Python direct sur la réponse HTTP a confirmé que le backend renvoie bien du UTF-8 correct.
-
-Résultat du diagnostic :
-
-```text
-contains_mojibake = False
-```
-
-Conclusion : le problème venait uniquement de l’affichage PowerShell, pas du backend.
-
-Aucune correction côté code n’est nécessaire pour l’encodage.
-
----
-
-## 16. État actuel du projet
-
-État stable actuel :
-
-```text
-Backend stable
-Frontend branché
-Cache stable
-Tests backend OK
-Build frontend OK
-Git propre au dernier contrôle
-Tag v0.7 créé
-Données réelles Football-Data.org utilisées
-Pas de ML entraîné annoncé
-Moteur explicable basé sur règles métier
-```
-
-Le socle data backend est maintenant suffisamment stable pour passer à la vérification côté frontend.
-
----
-
-## 17. Prochaine étape logique
-
-La prochaine micro-phase recommandée est :
-
-```
-Vérifier que le frontend consomme correctement les réponses backend actuelles,
-notamment data_freshness, confidence, risk, predictions et recommendations.
-```
-
-Avant toute nouvelle fonctionnalité IA ou ML, la priorité reste de vérifier que le frontend affiche correctement les données déjà stabilisées côté backend.
-
----
-
-## 18. Résumé final
-
-RubyBets dispose aujourd’hui d’un socle MVP solide :
-
-- une documentation produit et RNCP structurée ;
-- un backend FastAPI fonctionnel ;
-- des routes API métier stables ;
-- une source réelle Football-Data.org ;
-- un cache backend local contrôlé ;
-- un moteur de scoring explicable ;
-- une recommandation multi-matchs basée sur règles ;
-- un frontend React déjà branché ;
-- des tests backend validés ;
-- une CI GitHub verte ;
-- un versioning clair par tags.
-
-La suite du travail doit rester progressive : vérifier l’intégration frontend, corriger les éventuels écarts d’affichage, puis seulement ensuite envisager les améliorations de prédiction ou les futures briques IA.
-
----
-
-## 19. Mise à jour de suivi — 11/05/2026
-
-Tâche réalisée :
-
-```
-P1 — Améliorer le bloc Prédictions côté interface
-```
-
-Fichiers concernés :
-
-```
-frontend/src/components/MatchPredictionsSection.tsx
-frontend/src/App.css
-```
-
-Résultat obtenu :
-
-```
-Affichage des prédictions sous forme de cartes lisibles :
-- Prédiction 1X2
-- Volume de buts
-- BTTS
-- Confiance
-- Risque
-- Justification
-- Rappel responsable
-```
