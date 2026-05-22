@@ -1,0 +1,25 @@
+RubyBets - ML baseline 1X2 - RandomForest_balanced
+
+Model: RandomForest_balanced
+Parameters: {'bootstrap': True, 'ccp_alpha': 0.0, 'class_weight': 'balanced', 'criterion': 'gini', 'max_depth': 12, 'max_features': 'sqrt', 'max_leaf_nodes': None, 'max_samples': None, 'min_impurity_decrease': 0.0, 'min_samples_leaf': 20, 'min_samples_split': 2, 'min_weight_fraction_leaf': 0.0, 'monotonic_cst': None, 'n_estimators': 200, 'n_jobs': -1, 'oob_score': False, 'random_state': 42, 'verbose': 0, 'warm_start': False}
+Training duration seconds: 1.1520
+Accuracy: 0.4417
+F1 macro: 0.4205
+F1 weighted: 0.4415
+
+Confusion matrix labels: HOME_WIN, DRAW, AWAY_WIN
+[[1114  525  680]
+ [ 476  351  516]
+ [ 389  383  884]]
+
+Classification report:
+              precision    recall  f1-score   support
+
+    HOME_WIN       0.56      0.48      0.52      2319
+        DRAW       0.28      0.26      0.27      1343
+    AWAY_WIN       0.42      0.53      0.47      1656
+
+    accuracy                           0.44      5318
+   macro avg       0.42      0.43      0.42      5318
+weighted avg       0.45      0.44      0.44      5318
+

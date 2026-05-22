@@ -1,0 +1,5 @@
+model,accuracy,f1_macro,f1_weighted,training_duration_seconds
+DummyClassifier_most_frequent,0.4361,0.2024,0.2648,0.0206
+LogisticRegression_balanced,0.4669,0.4266,0.4525,0.1457
+RandomForest_balanced,0.4417,0.4205,0.4415,1.152
+XGBoost_classifier,0.4872,0.3501,0.4038,1.457

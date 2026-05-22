@@ -1,6 +1,11 @@
-fastapi
+﻿fastapi
 uvicorn[standard]
 httpx
 pydantic-settings
 pytest
 psycopg[binary]
+pandas==3.0.3
+scikit-learn==1.8.0
+joblib==1.5.3
+
+xgboost==3.2.0
