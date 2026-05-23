@@ -36,7 +36,7 @@ def build_features_from_database_row(row: dict[str, Any]) -> dict[str, float]:
     }
 
 
-# Recupere une ligne de features ML depuis PostgreSQL a partir de son id.
+# Recupere une ligne de features ML depuis PostgreSQL a partir de son id technique.
 def fetch_ml_feature_row_by_id(feature_id: int) -> dict[str, Any] | None:
     query = """
         SELECT
@@ -65,13 +65,37 @@ def fetch_ml_feature_row_by_id(feature_id: int) -> dict[str, Any] | None:
             return dict(zip(column_names, row))
 
 
+# Recupere une ligne de features ML depuis PostgreSQL a partir du clean_match_id.
+def fetch_ml_feature_row_by_clean_match_id(clean_match_id: int) -> dict[str, Any] | None:
+    query = """
+        SELECT
+            id,
+            clean_match_id,
+            home_form_points_last_5,
+            away_form_points_last_5,
+            home_goals_scored_avg_last_5,
+            away_goals_scored_avg_last_5,
+            home_goals_conceded_avg_last_5,
+            away_goals_conceded_avg_last_5,
+            target_result
+        FROM ml.features
+        WHERE clean_match_id = %s;
+    """
+
+    with get_database_connection() as connection:
+        with connection.cursor() as cursor:
+            cursor.execute(query, (clean_match_id,))
+            row = cursor.fetchone()
+
+            if row is None:
+                return None
+
+            column_names = [column.name for column in cursor.description]
+            return dict(zip(column_names, row))
+
+
 # Prepare les features et les metadonnees necessaires pour une prediction ML 1X2.
-def get_ml_1x2_features_by_id(feature_id: int) -> dict[str, Any]:
-    row = fetch_ml_feature_row_by_id(feature_id)
-
-    if row is None:
-        raise LookupError(f"Aucune ligne ml.features trouvee pour id={feature_id}")
-
+def build_ml_1x2_feature_payload(row: dict[str, Any]) -> dict[str, Any]:
     return {
         "feature_id": row["id"],
         "clean_match_id": row["clean_match_id"],
@@ -80,9 +104,32 @@ def get_ml_1x2_features_by_id(feature_id: int) -> dict[str, Any]:
     }
 
 
+# Prepare les features ML 1X2 depuis l'id technique de la table ml.features.
+def get_ml_1x2_features_by_id(feature_id: int) -> dict[str, Any]:
+    row = fetch_ml_feature_row_by_id(feature_id)
+
+    if row is None:
+        raise LookupError(f"Aucune ligne ml.features trouvee pour id={feature_id}")
+
+    return build_ml_1x2_feature_payload(row)
+
+
+# Prepare les features ML 1X2 depuis le clean_match_id du match nettoye.
+def get_ml_1x2_features_by_clean_match_id(clean_match_id: int) -> dict[str, Any]:
+    row = fetch_ml_feature_row_by_clean_match_id(clean_match_id)
+
+    if row is None:
+        raise LookupError(
+            f"Aucune ligne ml.features trouvee pour clean_match_id={clean_match_id}"
+        )
+
+    return build_ml_1x2_feature_payload(row)
+
+
 # Schema de communication :
 # ml_feature_service.py
 #   -> lit PostgreSQL ml.features
+#   -> recupere les features par id ou par clean_match_id
 #   -> extrait les 6 features ML attendues
 #   -> prepare un dictionnaire exploitable par ml_1x2_prediction_service.py
 #   -> sera appele par la route API experimentale ML
