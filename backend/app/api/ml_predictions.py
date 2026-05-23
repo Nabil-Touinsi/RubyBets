@@ -3,10 +3,11 @@
 
 from typing import Any
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
 from app.services.ml_1x2_prediction_service import predict_1x2_result
+from app.services.ml_feature_service import get_ml_1x2_features_by_id
 
 
 router = APIRouter(prefix="/api/ml", tags=["Experimental ML"])
@@ -44,10 +45,30 @@ async def predict_1x2_from_features(
     }
 
 
+# Expose une prédiction ML 1X2 expérimentale à partir d'une ligne ml.features stockée en base.
+@router.post("/1x2/predict/from-feature/{feature_id}")
+async def predict_1x2_from_database_feature(feature_id: int) -> dict[str, Any]:
+    try:
+        feature_source = get_ml_1x2_features_by_id(feature_id)
+    except LookupError as error:
+        raise HTTPException(status_code=404, detail=str(error)) from error
+
+    prediction_result = predict_1x2_result(feature_source["features"])
+
+    return {
+        "source": "rubybets_ml_baseline",
+        "scope": "experimental",
+        "message": "Experimental ML baseline from database features. This endpoint does not replace the explainable V1 scoring engine.",
+        "feature_source": feature_source,
+        "result": prediction_result,
+    }
+
+
 # Schéma de communication :
 # ml_predictions.py
-#   -> reçoit 6 features numériques depuis une requête POST
-#   -> appelle ml_1x2_prediction_service.py
-#   -> charge models/ml/1x2/best_1x2_model.joblib
+#   -> reçoit soit 6 features numériques depuis une requête POST
+#   -> soit récupère une ligne ml.features depuis PostgreSQL
+#   -> appelle ml_feature_service.py si la prédiction part de la base
+#   -> appelle ml_1x2_prediction_service.py pour charger le modèle ML
 #   -> retourne une prédiction expérimentale 1X2
 #   -> est enregistré dans app/main.py
