@@ -1,4 +1,4 @@
-# Dictionnaire de données — RubyBets
+﻿# Dictionnaire de données — RubyBets
 
 > Rôle du fichier : décrire les principales tables et colonnes utilisées dans le pipeline data / ML de RubyBets afin de rendre les données compréhensibles et traçables.
 
@@ -105,3 +105,45 @@ Il permet de prouver que les données ne sont pas seulement collectées, mais au
 
 
 Cette organisation permet de relier les données collectées, les traitements de nettoyage, les variables explicatives et les futurs modèles de manière claire et traçable.
+
+<!-- RUBYBETS_ML_1X2_UPDATE_START -->
+
+## Complement dictionnaire - tables ML 1X2
+
+### Table `ml.features`
+
+| Colonne | Type logique | Description |
+|---|---|---|
+| `id` | Identifiant technique | Identifiant de la ligne de features. |
+| `clean_match_id` | Cle de liaison | Identifiant du match nettoye associe. |
+| `home_form_points_last_5` | Numerique | Points pris recemment par l'equipe a domicile sur les 5 derniers matchs. |
+| `away_form_points_last_5` | Numerique | Points pris recemment par l'equipe exterieure sur les 5 derniers matchs. |
+| `home_goals_scored_avg_last_5` | Numerique | Moyenne de buts marques recemment par l'equipe a domicile. |
+| `away_goals_scored_avg_last_5` | Numerique | Moyenne de buts marques recemment par l'equipe exterieure. |
+| `home_goals_conceded_avg_last_5` | Numerique | Moyenne de buts encaisses recemment par l'equipe a domicile. |
+| `away_goals_conceded_avg_last_5` | Numerique | Moyenne de buts encaisses recemment par l'equipe exterieure. |
+| `target_result` | Categorie | Resultat reel du match : `HOME_WIN`, `DRAW`, `AWAY_WIN`. |
+
+### Payload attendu par le modele ML
+
+Le modele `LogisticRegression_balanced` attend exactement les 6 features numeriques suivantes :
+
+```text
+home_form_points_last_5
+away_form_points_last_5
+home_goals_scored_avg_last_5
+away_goals_scored_avg_last_5
+home_goals_conceded_avg_last_5
+away_goals_conceded_avg_last_5
+```
+
+### Sortie ML experimentale
+
+| Champ | Description |
+|---|---|
+| `predicted_class` | Classe 1X2 predite par le modele. |
+| `probabilities` | Probabilites experimentales pour `HOME_WIN`, `DRAW`, `AWAY_WIN`. |
+| `responsible_note` | Rappel indiquant que la baseline ML ne remplace pas le scoring V1 et ne garantit aucun resultat. |
+
+<!-- RUBYBETS_ML_1X2_UPDATE_END -->
+

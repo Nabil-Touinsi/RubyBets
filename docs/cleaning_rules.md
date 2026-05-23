@@ -1,4 +1,4 @@
-# Règles de nettoyage des données — RubyBets
+﻿# Règles de nettoyage des données — RubyBets
 
 > Rôle du fichier : décrire les règles utilisées pour transformer les données historiques brutes en données propres, normalisées et exploitables dans le pipeline data / ML de RubyBets.
 
@@ -146,3 +146,33 @@ Il permet de prouver que les données ne sont pas seulement collectées, mais au
 | Ne pas masquer les données manquantes              | Garder une approche transparente et professionnelle  |
 
 Cette organisation permet de relier les données brutes, les règles de nettoyage, les données propres et les futures features ML de manière claire et traçable.
+
+<!-- RUBYBETS_ML_1X2_UPDATE_START -->
+
+## Complement nettoyage - preparation ML 1X2
+
+La baseline ML utilise uniquement les lignes dont les features rolling sont disponibles.
+
+### Regles appliquees
+
+1. Importer les donnees historiques Football-Data.co.uk dans `ml.raw_matches`.
+2. Nettoyer les matchs exploitables dans `ml.clean_matches`.
+3. Generer les variables rolling dans `ml.features`.
+4. Exclure de l'entrainement les lignes qui possedent au moins une feature ML manquante parmi les 6 variables retenues.
+5. Conserver `target_result` comme cible supervisee.
+6. Utiliser un split chronologique pour eviter de tester le modele sur un passe deja vu.
+
+### Resultat du nettoyage ML
+
+| Etape | Nombre de lignes |
+|---|---:|
+| Dataset initial | 44 957 |
+| Lignes supprimees pour valeurs manquantes | 337 |
+| Dataset entrainable | 44 620 |
+
+### Limite assumee
+
+Les premieres rencontres de certaines equipes ou saisons peuvent manquer de contexte rolling suffisant. Leur exclusion est normale pour cette baseline, car le modele doit recevoir un vecteur de features complet.
+
+<!-- RUBYBETS_ML_1X2_UPDATE_END -->
+

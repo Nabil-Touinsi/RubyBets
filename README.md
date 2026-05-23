@@ -1,4 +1,4 @@
-# RubyBets — Application Data & IA d’aide à la décision football
+﻿# RubyBets — Application Data & IA d’aide à la décision football
 
 ## 1. Présentation du projet
 
@@ -520,4 +520,41 @@ npm run build
 Résultat attendu : compilation TypeScript + build Vite sans erreur.
 
 ---
+
+<!-- RUBYBETS_ML_1X2_UPDATE_START -->
+
+## Machine Learning experimental - baseline 1X2
+
+RubyBets dispose maintenant d'une baseline Machine Learning experimentale pour le resultat 1X2.
+
+### Etat actuel
+
+- Source ML : donnees historiques Football-Data.co.uk.
+- Tables utilisees : `ml.raw_matches`, `ml.clean_matches`, `ml.features`.
+- Modele retenu : `LogisticRegression_balanced`.
+- Artefact : `models/ml/1x2/best_1x2_model.joblib`.
+- API : routes experimentales `/api/ml/1x2/*`.
+- Tests : `backend/tests/test_ml_1x2.py`.
+- Preuves : `reports/evidence/ml_training/01` a `24`.
+
+### Commandes de validation
+
+```powershell
+cd C:\dev_classe\RNCP\RubyBets\backend
+python -m pytest tests\test_ml_1x2.py
+python -m pytest
+```
+
+Resultats attendus apres la phase batch ML :
+
+```text
+tests/test_ml_1x2.py -> 9 passed
+backend complet -> 23 passed
+```
+
+### Cadre responsable
+
+Le ML est experimental. Il ne remplace pas le scoring explicable V1, ne constitue pas une promesse de resultat et n'est pas integre au frontend MVP pour le moment.
+
+<!-- RUBYBETS_ML_1X2_UPDATE_END -->
 

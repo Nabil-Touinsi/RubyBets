@@ -1,4 +1,4 @@
-# Stratégie data — RubyBets
+﻿# Stratégie data — RubyBets
 
 Ce document décrit l’état réel de la chaîne data du MVP RubyBets.
 
@@ -295,3 +295,65 @@ Ces limites sont acceptées pour le MVP, mais elles doivent être clairement exp
 ## 
 
 Dans la V1, RubyBets utilise une chaîne data courte et maîtrisée : les données football sont récupérées depuis une API réelle, stabilisées par un cache backend, exposées par FastAPI, puis utilisées par un moteur de scoring explicable. La base SQL et le dataset historique ML sont prévus comme étapes de consolidation après le MVP, afin de renforcer la persistance, les requêtes d’analyse et l’entraînement futur d’un modèle.
+
+<!-- RUBYBETS_ML_1X2_UPDATE_START -->
+
+## Mise a jour data - pipeline ML historique 1X2
+
+La phase ML s'appuie sur les donnees historiques Football-Data.co.uk et sur les tables PostgreSQL du schema `ml`.
+
+### Tables ML utilisees
+
+| Table | Role |
+|---|---|
+| `ml.raw_matches` | Stockage des lignes CSV historiques brutes importees. |
+| `ml.clean_matches` | Stockage des matchs nettoyes et normalises. |
+| `ml.features` | Stockage des variables numeriques exploitees par la baseline ML 1X2. |
+
+### Volume dataset baseline
+
+| Element | Valeur |
+|---|---:|
+| Lignes initiales | 44 957 |
+| Lignes supprimees pour features rolling manquantes | 337 |
+| Lignes entrainables | 44 620 |
+
+### Decoupage temporel
+
+| Lot | Saisons |
+|---|---|
+| Train | 2000_2001 a 2021_2022 |
+| Test | 2022_2023 a 2024_2025 |
+
+Ce split chronologique simule mieux le vrai usage : le modele apprend sur le passe et est evalue sur des saisons plus recentes.
+
+### Colonnes exploitees pour la baseline
+
+- `home_form_points_last_5`
+- `away_form_points_last_5`
+- `home_goals_scored_avg_last_5`
+- `away_goals_scored_avg_last_5`
+- `home_goals_conceded_avg_last_5`
+- `away_goals_conceded_avg_last_5`
+- `target_result`
+
+### Acces aux features depuis l'API
+
+Le service `backend/app/services/ml_feature_service.py` permet de lire `ml.features` selon trois usages :
+
+- recuperation par `feature_id` ;
+- recuperation par `clean_match_id` ;
+- recuperation batch par liste de `clean_match_id`.
+
+### Preuves data / ML associees
+
+Les preuves de chargement, nettoyage, entrainement, evaluation et inference sont archivees dans :
+
+```text
+reports/evidence/ml_training/
+```
+
+Les preuves 01 a 24 couvrent la progression complete : dataset, entrainement, choix du modele, rechargement, service backend, API, PostgreSQL, clean_match_id, batch et tests globaux.
+
+<!-- RUBYBETS_ML_1X2_UPDATE_END -->
+
