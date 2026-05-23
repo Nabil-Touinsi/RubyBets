@@ -209,6 +209,101 @@ def test_experimental_ml_1x2_api_from_clean_match_returns_404_when_missing(
     assert response.status_code == 404
     assert "Aucune ligne ml.features trouvee pour clean_match_id=999999" in data["detail"]
 
+    # Vérifie que la route API batch peut produire plusieurs prédictions depuis plusieurs clean_match_id simulés.
+def test_experimental_ml_1x2_batch_api_from_clean_matches_returns_valid_predictions(
+    monkeypatch,
+):
+    def fake_get_ml_1x2_features_by_clean_match_ids(clean_match_ids: list[int]) -> list[dict]:
+        assert clean_match_ids == [10086, 10087]
+
+        first_feature_source = build_sample_database_feature_source()
+
+        second_feature_source = {
+            "feature_id": 21,
+            "clean_match_id": 10087,
+            "target_result": "DRAW",
+            "features": build_sample_1x2_features(),
+        }
+
+        return [first_feature_source, second_feature_source]
+
+    monkeypatch.setattr(
+        ml_predictions,
+        "get_ml_1x2_features_by_clean_match_ids",
+        fake_get_ml_1x2_features_by_clean_match_ids,
+    )
+
+    response = client.post(
+        "/api/ml/1x2/predict/batch/from-clean-matches",
+        json={"clean_match_ids": [10086, 10087]},
+    )
+    data = response.json()
+
+    assert response.status_code == 200
+
+    assert data["source"] == "rubybets_ml_baseline"
+    assert data["scope"] == "experimental"
+    assert "batch from clean match features" in data["message"]
+    assert "does not replace the explainable V1 scoring engine" in data["message"]
+
+    assert data["requested_count"] == 2
+    assert data["returned_count"] == 2
+    assert len(data["predictions"]) == 2
+
+    for prediction in data["predictions"]:
+        feature_source = prediction["feature_source"]
+        result = prediction["result"]
+
+        assert feature_source["clean_match_id"] in [10086, 10087]
+        assert feature_source["target_result"] in ["HOME_WIN", "DRAW", "AWAY_WIN"]
+
+        assert result["status"] == "experimental_ml_baseline"
+        assert result["model_name"] == "LogisticRegression_balanced"
+        assert result["target"] == "1X2"
+        assert result["predicted_class"] in ["HOME_WIN", "DRAW", "AWAY_WIN"]
+        assert set(result["probabilities"].keys()) == {"HOME_WIN", "DRAW", "AWAY_WIN"}
+
+        assert "model_path" not in result
+        assert "C:\\dev_classe" not in str(result)
+        assert "ne garantit aucun resultat sportif" in result["responsible_note"]
+
+
+# Vérifie que la route API batch retourne 400 si la liste clean_match_ids est vide.
+def test_experimental_ml_1x2_batch_api_from_clean_matches_returns_400_when_empty():
+    response = client.post(
+        "/api/ml/1x2/predict/batch/from-clean-matches",
+        json={"clean_match_ids": []},
+    )
+    data = response.json()
+
+    assert response.status_code == 400
+    assert "clean_match_ids ne doit pas etre vide" in data["detail"]
+
+
+# Vérifie que la route API batch retourne 404 si au moins un clean_match_id est introuvable.
+def test_experimental_ml_1x2_batch_api_from_clean_matches_returns_404_when_missing(
+    monkeypatch,
+):
+    def fake_get_ml_1x2_features_by_clean_match_ids(clean_match_ids: list[int]) -> list[dict]:
+        raise LookupError(
+            f"Aucune ligne ml.features trouvee pour clean_match_id(s)={clean_match_ids}"
+        )
+
+    monkeypatch.setattr(
+        ml_predictions,
+        "get_ml_1x2_features_by_clean_match_ids",
+        fake_get_ml_1x2_features_by_clean_match_ids,
+    )
+
+    response = client.post(
+        "/api/ml/1x2/predict/batch/from-clean-matches",
+        json={"clean_match_ids": [999999]},
+    )
+    data = response.json()
+
+    assert response.status_code == 404
+    assert "Aucune ligne ml.features trouvee pour clean_match_id(s)=[999999]" in data["detail"]
+
 # Schéma de communication :
 # test_ml_1x2.py
 #   -> teste app/services/ml_1x2_prediction_service.py

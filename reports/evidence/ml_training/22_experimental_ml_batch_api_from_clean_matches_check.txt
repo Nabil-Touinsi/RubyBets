@@ -1,0 +1,117 @@
+﻿{
+    "source":  "rubybets_ml_baseline",
+    "scope":  "experimental",
+    "message":  "Experimental ML baseline batch from clean match features. This endpoint does not replace the explainable V1 scoring engine.",
+    "requested_count":  3,
+    "returned_count":  3,
+    "predictions":  [
+                        {
+                            "feature_source":  {
+                                                   "feature_id":  20,
+                                                   "clean_match_id":  10086,
+                                                   "target_result":  "HOME_WIN",
+                                                   "features":  {
+                                                                    "home_form_points_last_5":  0.0,
+                                                                    "away_form_points_last_5":  3.0,
+                                                                    "home_goals_scored_avg_last_5":  0.0,
+                                                                    "away_goals_scored_avg_last_5":  1.0,
+                                                                    "home_goals_conceded_avg_last_5":  1.0,
+                                                                    "away_goals_conceded_avg_last_5":  0.0
+                                                                }
+                                               },
+                            "result":  {
+                                           "status":  "experimental_ml_baseline",
+                                           "model_name":  "LogisticRegression_balanced",
+                                           "target":  "1X2",
+                                           "predicted_class":  "AWAY_WIN",
+                                           "probabilities":  {
+                                                                 "AWAY_WIN":  0.4808,
+                                                                 "DRAW":  0.3548,
+                                                                 "HOME_WIN":  0.1644
+                                                             },
+                                           "features_used":  [
+                                                                 "home_form_points_last_5",
+                                                                 "away_form_points_last_5",
+                                                                 "home_goals_scored_avg_last_5",
+                                                                 "away_goals_scored_avg_last_5",
+                                                                 "home_goals_conceded_avg_last_5",
+                                                                 "away_goals_conceded_avg_last_5"
+                                                             ],
+                                           "model_artifact":  "models/ml/1x2/best_1x2_model.joblib",
+                                           "responsible_note":  "Baseline ML experimentale. Ne remplace pas le scoring explicable V1 et ne garantit aucun resultat sportif."
+                                       }
+                        },
+                        {
+                            "feature_source":  {
+                                                   "feature_id":  21,
+                                                   "clean_match_id":  10087,
+                                                   "target_result":  "DRAW",
+                                                   "features":  {
+                                                                    "home_form_points_last_5":  1.0,
+                                                                    "away_form_points_last_5":  0.0,
+                                                                    "home_goals_scored_avg_last_5":  1.0,
+                                                                    "away_goals_scored_avg_last_5":  1.0,
+                                                                    "home_goals_conceded_avg_last_5":  1.0,
+                                                                    "away_goals_conceded_avg_last_5":  3.0
+                                                                }
+                                               },
+                            "result":  {
+                                           "status":  "experimental_ml_baseline",
+                                           "model_name":  "LogisticRegression_balanced",
+                                           "target":  "1X2",
+                                           "predicted_class":  "HOME_WIN",
+                                           "probabilities":  {
+                                                                 "AWAY_WIN":  0.2558,
+                                                                 "DRAW":  0.3445,
+                                                                 "HOME_WIN":  0.3997
+                                                             },
+                                           "features_used":  [
+                                                                 "home_form_points_last_5",
+                                                                 "away_form_points_last_5",
+                                                                 "home_goals_scored_avg_last_5",
+                                                                 "away_goals_scored_avg_last_5",
+                                                                 "home_goals_conceded_avg_last_5",
+                                                                 "away_goals_conceded_avg_last_5"
+                                                             ],
+                                           "model_artifact":  "models/ml/1x2/best_1x2_model.joblib",
+                                           "responsible_note":  "Baseline ML experimentale. Ne remplace pas le scoring explicable V1 et ne garantit aucun resultat sportif."
+                                       }
+                        },
+                        {
+                            "feature_source":  {
+                                                   "feature_id":  22,
+                                                   "clean_match_id":  10088,
+                                                   "target_result":  "AWAY_WIN",
+                                                   "features":  {
+                                                                    "home_form_points_last_5":  1.0,
+                                                                    "away_form_points_last_5":  3.0,
+                                                                    "home_goals_scored_avg_last_5":  2.0,
+                                                                    "away_goals_scored_avg_last_5":  5.0,
+                                                                    "home_goals_conceded_avg_last_5":  2.0,
+                                                                    "away_goals_conceded_avg_last_5":  2.0
+                                                                }
+                                               },
+                            "result":  {
+                                           "status":  "experimental_ml_baseline",
+                                           "model_name":  "LogisticRegression_balanced",
+                                           "target":  "1X2",
+                                           "predicted_class":  "AWAY_WIN",
+                                           "probabilities":  {
+                                                                 "AWAY_WIN":  0.6635,
+                                                                 "DRAW":  0.2288,
+                                                                 "HOME_WIN":  0.1078
+                                                             },
+                                           "features_used":  [
+                                                                 "home_form_points_last_5",
+                                                                 "away_form_points_last_5",
+                                                                 "home_goals_scored_avg_last_5",
+                                                                 "away_goals_scored_avg_last_5",
+                                                                 "home_goals_conceded_avg_last_5",
+                                                                 "away_goals_conceded_avg_last_5"
+                                                             ],
+                                           "model_artifact":  "models/ml/1x2/best_1x2_model.joblib",
+                                           "responsible_note":  "Baseline ML experimentale. Ne remplace pas le scoring explicable V1 et ne garantit aucun resultat sportif."
+                                       }
+                        }
+                    ]
+}
