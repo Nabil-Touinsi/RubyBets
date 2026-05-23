@@ -10,6 +10,7 @@ from app.api.matches import router as matches_router
 from app.api.recommendations import router as recommendations_router
 from app.api.glossary import router as glossary_router
 from app.api.responsible_info import router as responsible_info_router
+from app.api.ml_predictions import router as ml_predictions_router
 
 app = FastAPI(
     title=settings.app_name,
@@ -31,3 +32,4 @@ app.include_router(matches_router)
 app.include_router(recommendations_router)
 app.include_router(glossary_router)
 app.include_router(responsible_info_router)
+app.include_router(ml_predictions_router)

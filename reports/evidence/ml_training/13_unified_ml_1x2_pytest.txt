@@ -1,0 +1,24 @@
+﻿RubyBets - Unified ML 1X2 tests
+
+Command executed:
+python -m pytest tests\test_ml_1x2.py
+
+Result:
+2 passed in 2.90s
+
+Tested file:
+backend/tests/test_ml_1x2.py
+
+Covered layers:
+- Internal ML 1X2 inference service
+- Experimental FastAPI ML endpoint POST /api/ml/1x2/predict
+
+Files covered:
+- backend/app/services/ml_1x2_prediction_service.py
+- backend/app/api/ml_predictions.py
+- backend/app/main.py
+- models/ml/1x2/best_1x2_model.joblib
+
+Conclusion:
+OK - The ML 1X2 baseline is tested both at service level and API level.
+OK - The endpoint remains experimental and does not replace the explainable V1 scoring engine.
