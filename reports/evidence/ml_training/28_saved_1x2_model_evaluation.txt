@@ -1,0 +1,76 @@
+RubyBets - Saved ML 1X2 model evaluation
+28 - Evaluation du modèle sauvegardé
+
+Positionnement :
+Cette évaluation concerne la baseline ML 1X2 expérimentale.
+Elle ne remplace pas le scoring explicable V1 et ne garantit aucun résultat sportif.
+
+Model artifact:
+models\ml\1x2\best_1x2_model.joblib
+
+Features used:
+home_form_points_last_5, away_form_points_last_5, home_goals_scored_avg_last_5, away_goals_scored_avg_last_5, home_goals_conceded_avg_last_5, away_goals_conceded_avg_last_5
+
+Target column:
+target_result
+
+Dataset control:
+Rows loaded from PostgreSQL: 44957
+Rows removed because of missing features: 337
+Rows remaining after preparation: 44620
+
+Target distribution after preparation:
+target_result
+HOME_WIN    20414
+AWAY_WIN    12646
+DRAW        11560
+
+Evaluation split:
+Test seasons: 2022_2023, 2023_2024, 2024_2025
+Test rows: 5318
+
+Test leagues:
+league_code
+D1      914
+E0     1136
+F1      992
+I1     1136
+SP1    1140
+
+Test seasons distribution:
+season
+2022_2023    1820
+2023_2024    1748
+2024_2025    1750
+
+Test target distribution:
+target_result
+HOME_WIN    2319
+AWAY_WIN    1656
+DRAW        1343
+
+Evaluation metrics:
+Accuracy: 0.4669
+F1 macro: 0.4266
+F1 weighted: 0.4525
+
+Confusion matrix labels: HOME_WIN, DRAW, AWAY_WIN
+[[1178  355  786]
+ [ 495  240  608]
+ [ 384  207 1065]]
+
+Classification report:
+              precision    recall  f1-score   support
+
+    HOME_WIN       0.57      0.51      0.54      2319
+        DRAW       0.30      0.18      0.22      1343
+    AWAY_WIN       0.43      0.64      0.52      1656
+
+    accuracy                           0.47      5318
+   macro avg       0.44      0.44      0.43      5318
+weighted avg       0.46      0.47      0.45      5318
+
+
+Conclusion:
+Le modèle sauvegardé a été rechargé et évalué sans relancer l’entraînement complet.
+Cette preuve confirme la reproductibilité technique de la baseline ML 1X2 expérimentale.

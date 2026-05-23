@@ -1,0 +1,73 @@
+{
+  "project": "RubyBets",
+  "model_scope": "experimental_ml_baseline",
+  "model_name": "LogisticRegression_balanced",
+  "target": "1X2",
+  "target_classes": [
+    "HOME_WIN",
+    "DRAW",
+    "AWAY_WIN"
+  ],
+  "model_artifact": "models/ml/1x2/best_1x2_model.joblib",
+  "features_used": [
+    "home_form_points_last_5",
+    "away_form_points_last_5",
+    "home_goals_scored_avg_last_5",
+    "away_goals_scored_avg_last_5",
+    "home_goals_conceded_avg_last_5",
+    "away_goals_conceded_avg_last_5"
+  ],
+  "excluded_features": [
+    {
+      "name": "home_advantage",
+      "reason": "Excluded from the first baseline because it is constant in the current dataset and does not add discriminating information."
+    }
+  ],
+  "data_source": {
+    "source_name": "Football-Data.co.uk",
+    "database_schema": "ml",
+    "feature_table": "ml.features",
+    "clean_match_table": "ml.clean_matches"
+  },
+  "dataset_summary": {
+    "rows_loaded": 44957,
+    "rows_removed_missing_features": 337,
+    "rows_after_preparation": 44620
+  },
+  "split_strategy": {
+    "type": "chronological",
+    "train_seasons": "2000_2001 to 2021_2022",
+    "test_seasons": [
+      "2022_2023",
+      "2023_2024",
+      "2024_2025"
+    ],
+    "test_rows": 5318
+  },
+  "evaluation_results": {
+    "accuracy": 0.4669,
+    "f1_macro": 0.4266,
+    "f1_weighted": 0.4525,
+    "class_observations": {
+      "HOME_WIN": "Best predicted class overall, with acceptable baseline performance.",
+      "DRAW": "Weakest class. The model has difficulty identifying draws, which is a known limitation of this first baseline.",
+      "AWAY_WIN": "Predicted more often than DRAW, with acceptable recall but moderate precision."
+    }
+  },
+  "evaluation_proofs": [
+    "reports/evidence/ml_training/28_saved_1x2_model_evaluation.txt",
+    "reports/evidence/ml_training/29_backend_full_pytest_after_saved_model_evaluation.txt"
+  ],
+  "related_files": [
+    "backend/scripts/ml/train_1x2_models.py",
+    "backend/scripts/ml/evaluate_saved_1x2_model.py",
+    "backend/tests/test_evaluate_saved_1x2_model.py",
+    "backend/app/services/ml_1x2_prediction_service.py",
+    "backend/app/api/ml_predictions.py",
+    "docs/ml_baseline_1x2.md"
+  ],
+  "responsible_positioning": {
+    "status": "experimental",
+    "message": "This ML baseline is an experimental technical layer. It does not replace the explainable V1 scoring engine and does not guarantee any sports result."
+  }
+}

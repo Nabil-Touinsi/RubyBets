@@ -79,5 +79,29 @@ Les routes suivantes exposent une baseline ML experimentale basee sur `LogisticR
 | Tests ML batch | `reports/evidence/ml_training/23_ml_1x2_pytest_batch_from_clean_matches.txt` |
 | Validation backend globale | `reports/evidence/ml_training/24_backend_full_pytest_after_batch_ml_api.txt` |
 
-<!-- RUBYBETS_ML_1X2_UPDATE_END -->
+## Endpoint de statut ML 1X2 expérimental
+
+### `GET /api/ml/1x2/status`
+
+Cet endpoint permet de vérifier l’état technique de la baseline ML 1X2 expérimentale.
+
+Il retourne notamment :
+
+- la disponibilité du modèle sauvegardé ;
+- la disponibilité du fichier de métadonnées ;
+- le nom du modèle retenu ;
+- la cible `1X2` ;
+- les classes prédites ;
+- les features attendues ;
+- les scores principaux d’évaluation ;
+- les preuves associées ;
+- le rappel du positionnement expérimental.
+
+Fichiers liés :
+
+- `models/ml/1x2/best_1x2_model.joblib`
+- `models/ml/1x2/model_metadata.json`
+- `backend/app/api/ml_predictions.py`
+
+Important : cet endpoint reste une route technique de contrôle. Il ne remplace pas le scoring explicable V1 et n’intègre pas encore la baseline ML dans le frontend.
 

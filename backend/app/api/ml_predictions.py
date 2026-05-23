@@ -1,6 +1,7 @@
 # Role du fichier :
 # Cette route expose la baseline ML 1X2 experimentale sans remplacer le scoring explicable V1.
 
+import json
 from pathlib import Path
 from typing import Any
 
@@ -20,6 +21,7 @@ router = APIRouter(prefix="/api/ml", tags=["Experimental ML"])
 
 ML_1X2_MODEL_NAME = "LogisticRegression_balanced"
 ML_1X2_MODEL_ARTIFACT = "models/ml/1x2/best_1x2_model.joblib"
+ML_1X2_MODEL_METADATA = "models/ml/1x2/model_metadata.json"
 ML_1X2_EXPECTED_FEATURES = [
     "home_form_points_last_5",
     "away_form_points_last_5",
@@ -50,21 +52,54 @@ def build_features_from_request(request: ML1X2PredictionRequest) -> dict[str, fl
     return request.model_dump()
 
 
-# Expose le statut technique de la baseline ML 1X2 experimentale.
+# Charge les metadonnees du modele ML 1X2 si le fichier JSON existe.
+def load_ml_1x2_model_metadata(metadata_path: Path) -> dict[str, Any]:
+    if not metadata_path.exists():
+        return {}
+
+    with metadata_path.open("r", encoding="utf-8") as metadata_file:
+        return json.load(metadata_file)
+
+
+# Expose le statut technique enrichi de la baseline ML 1X2 experimentale.
 @router.get("/1x2/status")
 async def get_ml_1x2_status() -> dict[str, Any]:
     project_root = Path(__file__).resolve().parents[3]
     model_path = project_root / ML_1X2_MODEL_ARTIFACT
+    metadata_path = project_root / ML_1X2_MODEL_METADATA
+
+    model_available = model_path.exists()
+    metadata_available = metadata_path.exists()
+    metadata = load_ml_1x2_model_metadata(metadata_path)
 
     return {
         "source": "rubybets_ml_baseline",
         "scope": "experimental",
-        "status": "available" if model_path.exists() else "missing_model_artifact",
-        "model_name": ML_1X2_MODEL_NAME,
-        "target": "1X2",
+        "status": "available" if model_available else "missing_model_artifact",
+        "model_available": model_available,
+        "metadata_available": metadata_available,
+        "model_name": metadata.get("model_name", ML_1X2_MODEL_NAME),
+        "target": metadata.get("target", "1X2"),
+        "target_classes": metadata.get(
+            "target_classes",
+            ["HOME_WIN", "DRAW", "AWAY_WIN"],
+        ),
         "model_artifact": ML_1X2_MODEL_ARTIFACT,
-        "features_expected": ML_1X2_EXPECTED_FEATURES,
-        "message": "Experimental ML baseline status. This endpoint does not replace the explainable V1 scoring engine.",
+        "model_metadata": ML_1X2_MODEL_METADATA,
+        "features_expected": metadata.get(
+            "features_used",
+            ML_1X2_EXPECTED_FEATURES,
+        ),
+        "evaluation_results": metadata.get("evaluation_results", {}),
+        "evaluation_proofs": metadata.get("evaluation_proofs", []),
+        "responsible_positioning": metadata.get(
+            "responsible_positioning",
+            {
+                "status": "experimental",
+                "message": "This ML baseline is an experimental technical layer. It does not replace the explainable V1 scoring engine and does not guarantee any sports result.",
+            },
+        ),
+        "message": "Experimental ML baseline status with model metadata. This endpoint does not replace the explainable V1 scoring engine.",
         "responsible_note": "Baseline ML experimentale. Ne remplace pas le scoring explicable V1 et ne garantit aucun resultat sportif.",
     }
 
@@ -158,7 +193,8 @@ async def predict_1x2_batch_from_clean_matches(
 
 # Schema de communication :
 # ml_predictions.py
-#   -> expose le statut technique du modele ML 1X2 experimental
+#   -> expose le statut technique enrichi du modele ML 1X2 experimental
+#   -> lit models/ml/1x2/model_metadata.json pour enrichir GET /api/ml/1x2/status
 #   -> recoit soit 6 features numeriques depuis une requete POST
 #   -> soit recupere une ligne ml.features depuis PostgreSQL par feature_id
 #   -> soit recupere une ligne ml.features depuis PostgreSQL par clean_match_id

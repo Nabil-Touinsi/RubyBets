@@ -71,5 +71,58 @@ POST /api/ml/1x2/predict/batch/from-clean-matches
 
 Cette baseline reste experimentale. Elle ne remplace pas le scoring explicable V1, ne garantit aucun resultat sportif et n'est pas integree au frontend pour le moment.
 
-<!-- RUBYBETS_ML_1X2_UPDATE_END -->
+## Évaluation reproductible du modèle sauvegardé
 
+Un script dédié permet de recharger le modèle ML 1X2 sauvegardé sans relancer l’entraînement complet.
+
+Script concerné :
+
+`backend/scripts/ml/evaluate_saved_1x2_model.py`
+
+Modèle rechargé :
+
+`models/ml/1x2/best_1x2_model.joblib`
+
+Le script relit les données depuis PostgreSQL, applique les 6 features officielles de la baseline 1X2, filtre les saisons de test `2022_2023`, `2023_2024` et `2024_2025`, puis génère une preuve d’évaluation.
+
+Preuve générée :
+
+`reports/evidence/ml_training/28_saved_1x2_model_evaluation.txt`
+
+Résultat constaté :
+
+- Accuracy : `0.4669`
+- F1 macro : `0.4266`
+- F1 weighted : `0.4525`
+
+Cette étape confirme que la baseline ML expérimentale est reproductible techniquement, tout en restant séparée du scoring explicable V1.
+
+## Métadonnées du modèle sauvegardé
+
+Une fiche de métadonnées accompagne le modèle ML 1X2 sauvegardé afin de tracer clairement son périmètre, ses features, ses scores, ses limites et les preuves associées.
+
+Fichier concerné :
+
+`models/ml/1x2/model_metadata.json`
+
+Cette fiche permet de comprendre rapidement le modèle retenu sans devoir relire tous les logs d’entraînement ou d’évaluation.
+
+## Endpoint de statut enrichi
+
+L’endpoint expérimental suivant permet maintenant de vérifier l’état technique du modèle ML 1X2 sauvegardé :
+
+`GET /api/ml/1x2/status`
+
+Il retourne désormais :
+
+- la disponibilité du modèle sauvegardé ;
+- la disponibilité du fichier de métadonnées ;
+- le nom du modèle retenu ;
+- la cible `1X2` ;
+- les classes prédites ;
+- les 6 features utilisées ;
+- les scores principaux ;
+- les preuves associées ;
+- le rappel du positionnement expérimental.
+
+Cette route reste strictement technique. Elle sert à contrôler la disponibilité de la baseline ML et à documenter son état, sans intégrer le ML au frontend et sans remplacer le scoring explicable V1.
