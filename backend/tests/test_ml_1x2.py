@@ -304,6 +304,35 @@ def test_experimental_ml_1x2_batch_api_from_clean_matches_returns_404_when_missi
     assert response.status_code == 404
     assert "Aucune ligne ml.features trouvee pour clean_match_id(s)=[999999]" in data["detail"]
 
+# Vérifie que la route de statut ML 1X2 expose correctement la disponibilité du modèle expérimental.
+def test_experimental_ml_1x2_status_api_returns_model_status():
+    response = client.get("/api/ml/1x2/status")
+    data = response.json()
+
+    assert response.status_code == 200
+
+    assert data["source"] == "rubybets_ml_baseline"
+    assert data["scope"] == "experimental"
+    assert data["status"] == "available"
+    assert data["model_name"] == "LogisticRegression_balanced"
+    assert data["target"] == "1X2"
+
+    assert data["model_artifact"] == "models/ml/1x2/best_1x2_model.joblib"
+
+    assert data["features_expected"] == [
+        "home_form_points_last_5",
+        "away_form_points_last_5",
+        "home_goals_scored_avg_last_5",
+        "away_goals_scored_avg_last_5",
+        "home_goals_conceded_avg_last_5",
+        "away_goals_conceded_avg_last_5",
+    ]
+
+    assert "does not replace the explainable V1 scoring engine" in data["message"]
+    assert "ne garantit aucun resultat sportif" in data["responsible_note"]
+
+    assert "C:\\dev_classe" not in str(data)
+    assert "model_path" not in data
 # Schéma de communication :
 # test_ml_1x2.py
 #   -> teste app/services/ml_1x2_prediction_service.py

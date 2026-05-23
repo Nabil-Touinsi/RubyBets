@@ -1,0 +1,18 @@
+﻿{
+    "source":  "rubybets_ml_baseline",
+    "scope":  "experimental",
+    "status":  "available",
+    "model_name":  "LogisticRegression_balanced",
+    "target":  "1X2",
+    "model_artifact":  "models/ml/1x2/best_1x2_model.joblib",
+    "features_expected":  [
+                              "home_form_points_last_5",
+                              "away_form_points_last_5",
+                              "home_goals_scored_avg_last_5",
+                              "away_goals_scored_avg_last_5",
+                              "home_goals_conceded_avg_last_5",
+                              "away_goals_conceded_avg_last_5"
+                          ],
+    "message":  "Experimental ML baseline status. This endpoint does not replace the explainable V1 scoring engine.",
+    "responsible_note":  "Baseline ML experimentale. Ne remplace pas le scoring explicable V1 et ne garantit aucun resultat sportif."
+}

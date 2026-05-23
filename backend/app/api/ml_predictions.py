@@ -1,6 +1,7 @@
 # Role du fichier :
 # Cette route expose la baseline ML 1X2 experimentale sans remplacer le scoring explicable V1.
 
+from pathlib import Path
 from typing import Any
 
 from fastapi import APIRouter, HTTPException
@@ -15,6 +16,18 @@ from app.services.ml_feature_service import (
 
 
 router = APIRouter(prefix="/api/ml", tags=["Experimental ML"])
+
+
+ML_1X2_MODEL_NAME = "LogisticRegression_balanced"
+ML_1X2_MODEL_ARTIFACT = "models/ml/1x2/best_1x2_model.joblib"
+ML_1X2_EXPECTED_FEATURES = [
+    "home_form_points_last_5",
+    "away_form_points_last_5",
+    "home_goals_scored_avg_last_5",
+    "away_goals_scored_avg_last_5",
+    "home_goals_conceded_avg_last_5",
+    "away_goals_conceded_avg_last_5",
+]
 
 
 # Ce modele decrit les 6 features attendues par la baseline ML 1X2.
@@ -35,6 +48,25 @@ class ML1X2BatchCleanMatchRequest(BaseModel):
 # Transforme la requete API en dictionnaire de features utilisable par le service ML.
 def build_features_from_request(request: ML1X2PredictionRequest) -> dict[str, float]:
     return request.model_dump()
+
+
+# Expose le statut technique de la baseline ML 1X2 experimentale.
+@router.get("/1x2/status")
+async def get_ml_1x2_status() -> dict[str, Any]:
+    project_root = Path(__file__).resolve().parents[3]
+    model_path = project_root / ML_1X2_MODEL_ARTIFACT
+
+    return {
+        "source": "rubybets_ml_baseline",
+        "scope": "experimental",
+        "status": "available" if model_path.exists() else "missing_model_artifact",
+        "model_name": ML_1X2_MODEL_NAME,
+        "target": "1X2",
+        "model_artifact": ML_1X2_MODEL_ARTIFACT,
+        "features_expected": ML_1X2_EXPECTED_FEATURES,
+        "message": "Experimental ML baseline status. This endpoint does not replace the explainable V1 scoring engine.",
+        "responsible_note": "Baseline ML experimentale. Ne remplace pas le scoring explicable V1 et ne garantit aucun resultat sportif.",
+    }
 
 
 # Expose une prediction ML 1X2 experimentale a partir de features envoyees manuellement.
@@ -126,6 +158,7 @@ async def predict_1x2_batch_from_clean_matches(
 
 # Schema de communication :
 # ml_predictions.py
+#   -> expose le statut technique du modele ML 1X2 experimental
 #   -> recoit soit 6 features numeriques depuis une requete POST
 #   -> soit recupere une ligne ml.features depuis PostgreSQL par feature_id
 #   -> soit recupere une ligne ml.features depuis PostgreSQL par clean_match_id
