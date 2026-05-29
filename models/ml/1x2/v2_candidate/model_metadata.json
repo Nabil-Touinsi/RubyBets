@@ -1,0 +1,98 @@
+{
+    "source": "rubybets_ml_1x2",
+    "scope": "experimental_v2_candidate",
+    "status": "experimental_candidate",
+    "model_name": "LogisticRegression_balanced",
+    "target": "1X2",
+    "target_column": "target_result",
+    "target_classes": [
+        "HOME_WIN",
+        "DRAW",
+        "AWAY_WIN"
+    ],
+    "feature_set": "last10_plus_team_strength_plus_match_balance",
+    "features_expected": [
+        "home_form_points_last_10",
+        "away_form_points_last_10",
+        "home_goals_scored_avg_last_10",
+        "away_goals_scored_avg_last_10",
+        "home_goals_conceded_avg_last_10",
+        "away_goals_conceded_avg_last_10",
+        "form_points_diff",
+        "goals_scored_diff",
+        "goals_conceded_diff",
+        "abs_form_points_diff",
+        "abs_goals_scored_diff",
+        "abs_goals_conceded_diff",
+        "home_team_strength_before",
+        "away_team_strength_before",
+        "team_strength_diff",
+        "abs_team_strength_diff",
+        "home_team_strength_recent_delta",
+        "away_team_strength_recent_delta",
+        "home_expected_goal_pressure",
+        "away_expected_goal_pressure",
+        "expected_goal_pressure_diff",
+        "abs_expected_goal_pressure_diff",
+        "is_close_form_match",
+        "is_close_scoring_match",
+        "is_close_defense_match",
+        "is_close_goal_pressure_match",
+        "balance_signal_count",
+        "match_balance_score",
+        "draw_profile_score",
+        "is_close_strength_match",
+        "balance_signal_count_with_strength",
+        "match_balance_score_with_strength",
+        "draw_profile_score_with_strength"
+    ],
+    "feature_count": 33,
+    "model_artifact": "models\\ml\\1x2\\v2_candidate\\model.joblib",
+    "model_metadata": "models\\ml\\1x2\\v2_candidate\\model_metadata.json",
+    "does_replace_official_baseline": false,
+    "does_modify_api": false,
+    "does_modify_frontend": false,
+    "does_modify_postgresql": false,
+    "dataset": {
+        "clean_matches_loaded": 44957,
+        "rows_after_cleaning": 44120,
+        "train_rows": 38820,
+        "test_rows": 5300,
+        "test_seasons": [
+            "2022_2023",
+            "2023_2024",
+            "2024_2025"
+        ]
+    },
+    "official_baseline_reference": {
+        "accuracy": 0.4669,
+        "f1_macro": 0.4266
+    },
+    "previous_team_strength_reference": {
+        "accuracy": 0.5104,
+        "f1_macro": 0.4804,
+        "draw_recall": 0.272
+    },
+    "evaluation_results": {
+        "accuracy": 0.5111,
+        "f1_macro": 0.4824,
+        "f1_weighted": 0.5077,
+        "home_win_precision": 0.6227,
+        "home_win_recall": 0.5777,
+        "draw_precision": 0.3255,
+        "draw_recall": 0.2803,
+        "away_win_precision": 0.4985,
+        "away_win_recall": 0.6051
+    },
+    "high_confidence_reference_threshold": {
+        "threshold": 0.61,
+        "selected_rows": 895,
+        "coverage": 0.1689,
+        "accuracy": 0.7061,
+        "predicted_draw_rows": 0
+    },
+    "decision": {
+        "summary": "V2 candidate saved separately for later analysis. It improves F1 macro and DRAW recall compared with the previous team_strength reference, but remains experimental.",
+        "main_limit": "Global accuracy remains low for a general predictor. The explainable V1 scoring remains the product baseline."
+    }
+}

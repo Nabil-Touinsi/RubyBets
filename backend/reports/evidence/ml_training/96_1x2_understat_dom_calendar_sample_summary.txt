@@ -1,0 +1,55 @@
+RubyBets - ML 1X2 V8 Understat DOM calendar sample
+96 - Synthese extraction DOM calendrier Understat
+
+Objectif :
+Verifier si les matchs visibles dans le calendrier Understat peuvent etre extraits depuis le DOM rendu par Playwright.
+
+Garde-fous respectes :
+- Aucune modification de PostgreSQL.
+- Aucune modification de ml.features.
+- Aucune modification de l'API, du frontend, du scoring V1 ou des modeles sauvegardes.
+- Aucune integration produit d'Understat.
+- Preuve experimentale interne uniquement.
+
+Page testee :
+- URL : https://understat.com/league/EPL/2024
+- Playwright disponible : True
+- Erreur installation/import : none
+- Navigateur lance : True
+- Status code : 200
+- Rendered body length : 68749
+
+Extraction DOM :
+- Rows extracted : 13
+- Complete rows : 13
+- Incomplete rows : 0
+- Status : V8_DOM_SAMPLE_AVAILABLE
+
+Erreur eventuelle :
+- Error type : none
+- Error message : none
+
+Echantillon extrait :
+- 2025-05-19 | Brighton 3-2 Liverpool | xG 2.18-3.06 | match_id=26965
+- 2025-05-20 | Crystal Palace 4-2 Wolverhampton Wanderers | xG 1.68-1.43 | match_id=26967
+- 2025-05-20 | Manchester City 3-1 Bournemouth | xG 1.60-0.96 | match_id=26970
+- 2025-05-25 | Nottingham Forest 0-1 Chelsea | xG 1.58-1.31 | match_id=26972
+- 2025-05-25 | Newcastle United 0-1 Everton | xG 1.16-1.07 | match_id=26973
+- 2025-05-25 | Manchester United 2-0 Aston Villa | xG 2.96-0.34 | match_id=26974
+- 2025-05-25 | Liverpool 1-1 Crystal Palace | xG 1.92-1.41 | match_id=26975
+- 2025-05-25 | Tottenham 1-4 Brighton | xG 1.85-3.12 | match_id=26976
+- 2025-05-25 | Southampton 1-2 Arsenal | xG 0.60-2.41 | match_id=26977
+- 2025-05-25 | Wolverhampton Wanderers 1-1 Brentford | xG 1.11-1.97 | match_id=26978
+
+Fichiers generes :
+reports\evidence\ml_training\96_1x2_understat_dom_calendar_sample_summary.txt
+reports\evidence\ml_training\97_1x2_understat_dom_calendar_sample.csv
+reports\evidence\ml_training\98_1x2_understat_dom_calendar_next_action.txt
+
+Decision attendue :
+- Si Rows extracted > 0 : valider manuellement le CSV 97, puis creer un extracteur saison complet.
+- Si Rows extracted = 0 : inspecter les selecteurs DOM, le HTML rendu et les requetes reseau avant de continuer.
+
+Statut de suivi :
+- Tache realisee : test d'extraction DOM Understat si les fichiers 96, 97 et 98 sont generes.
+- Statut source a mettre a jour : a produire -> realise pour reports/evidence/ml_training/96, 97 et 98.

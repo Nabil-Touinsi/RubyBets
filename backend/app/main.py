@@ -11,6 +11,7 @@ from app.api.recommendations import router as recommendations_router
 from app.api.glossary import router as glossary_router
 from app.api.responsible_info import router as responsible_info_router
 from app.api.ml_predictions import router as ml_predictions_router
+from app.api.experimental_ml_v17_8 import router as experimental_ml_v17_8_router
 
 app = FastAPI(
     title=settings.app_name,
@@ -33,3 +34,4 @@ app.include_router(recommendations_router)
 app.include_router(glossary_router)
 app.include_router(responsible_info_router)
 app.include_router(ml_predictions_router)
+app.include_router(experimental_ml_v17_8_router)

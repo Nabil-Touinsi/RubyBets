@@ -1,0 +1,19 @@
+RubyBets - ML 1X2 V8 Understat DOM calendar sample
+98 - Prochaine action recommandee
+
+Resultat :
+L'extraction DOM Playwright a recupere des lignes exploitables depuis le calendrier Understat.
+
+Decision :
+Ne pas entrainer de modele maintenant.
+La prochaine action technique est de valider manuellement le CSV 97, puis de creer un extracteur plus large pour une saison complete EPL 2024.
+
+Prochaine etape proposee :
+1. Controler reports/evidence/ml_training/97_1x2_understat_dom_calendar_sample.csv.
+2. Verifier que les champs date, home_team, away_team, goals, xG et understat_match_id sont coherents.
+3. Creer ensuite un script de recuperation saison complete si l'echantillon est valide.
+4. Apres seulement, travailler sur le matching avec ml.clean_matches.
+5. Ne calculer les rolling xG pre-match qu'apres validation du matching.
+
+Garde-fou :
+Understat reste une source experimentale interne. Aucune integration produit, API ou frontend pour le moment.

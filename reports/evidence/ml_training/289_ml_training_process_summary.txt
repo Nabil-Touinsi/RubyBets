@@ -1,0 +1,771 @@
+RubyBets - Synthese generale du processus ML training
+====================================================
+
+Fichier : 289_ml_training_process_summary.txt
+Scope : Machine Learning experimental
+Archive associee : ml_training.zip
+Dossier source cible : reports/evidence/ml_training/
+Periode couverte : des premieres baselines 1X2 jusqu'a l'integration backend experimentale V17.8
+
+1. Role de ce document
+----------------------
+
+Ce document resume clairement tout le processus ML training RubyBets.
+
+Il sert a eviter que le dossier reports/evidence/ml_training/ devienne illisible avec plusieurs centaines de fichiers de preuves.
+L'objectif est de conserver une lecture simple pour le suivi RNCP, la soutenance et les prochains developpements.
+
+Le principe retenu est le suivant :
+- conserver les preuves detaillees dans une archive ZIP ;
+- garder ce fichier TXT comme resume narratif du processus ;
+- continuer a rappeler que le ML reste experimental ;
+- ne jamais confondre ces experimentations avec le scoring explicable V1 officiel.
+
+2. Etat de l'archive analysee
+-----------------------------
+
+Archive analysee : ml_training.zip
+
+Contenu constate :
+- 279 fichiers reels dans l'archive ;
+- 135 fichiers .txt ;
+- 137 fichiers .csv ;
+- 3 fichiers .json ;
+- 2 fichiers .html ;
+- 2 fichiers .docx.
+
+La numerotation principale va de :
+- 01_dataset_summary.txt
+jusqu'a :
+- 287_v17_8_adapter_demo_api_tests.txt
+
+Important :
+L'archive contient les preuves jusqu'a la validation de la route adapter-demo V17.8.
+Si le fichier 288_v17_8_api_documentation_update.txt est cree ensuite, il devra etre ajoute dans une nouvelle archive ou conserve a cote de ce resume.
+
+3. Positionnement general conserve pendant toute la phase ML
+------------------------------------------------------------
+
+RubyBets reste une application web d'aide a la decision football avant-match.
+
+RubyBets :
+- ne permet pas de parier ;
+- n'est pas un bookmaker ;
+- ne promet aucun resultat sportif ;
+- aide uniquement a structurer une analyse a partir de donnees reelles.
+
+Le scoring explicable V1 reste le socle officiel du produit.
+
+Toutes les experimentations ML documentees ici restent separees :
+- de l'API officielle /api/matches/{match_id}/predictions ;
+- du frontend ;
+- de PostgreSQL ;
+- de ml.features, sauf lecture technique quand elle est explicitement indiquee ;
+- du scoring explicable V1 ;
+- de toute promesse de resultat sportif.
+
+4. Phase 1 - Premiere baseline ML 1X2
+-------------------------------------
+
+Fichiers principaux :
+- 01_dataset_summary.txt
+- 02_training_execution_log.txt
+- 03_model_comparison.csv
+- 04_logistic_regression_report.txt
+- 05_random_forest_report.txt
+- 06_xgboost_report.txt
+- 07_best_model_decision.txt
+
+Objectif :
+Construire une premiere baseline de classification supervisee pour predire le resultat 1X2 :
+- HOME_WIN ;
+- DRAW ;
+- AWAY_WIN.
+
+Dataset utilise :
+- environ 44 957 matchs nettoyes ;
+- ligues principales : D1, E0, F1, I1, SP1 ;
+- saisons historiques de 2000_2001 a 2024_2025 selon les experiences ;
+- split chronologique pour eviter une evaluation artificielle.
+
+Premieres features :
+- forme recente domicile/exterieur ;
+- buts marques recemment ;
+- buts encaisses recemment ;
+- fenetres last_5 au depart.
+
+Resultat de reference :
+- modele sauvegarde initial : LogisticRegression_balanced ;
+- accuracy officielle initiale : 0.4669 ;
+- F1 macro officiel : 0.4266.
+
+Lecture :
+Cette premiere baseline etait utile comme point de depart, mais trop faible pour devenir une fonctionnalite produit.
+Elle a surtout servi a mettre en place une chaine ML propre : chargement, entrainement, evaluation, sauvegarde et preuves.
+
+5. Phase 2 - Exposition backend experimentale de la baseline 1X2
+-----------------------------------------------------------------
+
+Fichiers principaux :
+- 08_model_reload_check.txt
+- 09_backend_ml_service_check.txt
+- 10_backend_ml_service_pytest.txt
+- 11_backend_full_pytest_after_ml_service.txt
+- 12_experimental_ml_1x2_api_check.txt
+- 13_unified_ml_1x2_pytest.txt
+- 14_backend_full_pytest_after_unified_ml_api.txt
+- 15 a 27 : tests depuis database feature, clean_match, batch et status endpoint.
+
+Objectif :
+Verifier que la baseline ML 1X2 peut etre rechargee et appelee via un service backend experimental.
+
+Routes ou comportements testes :
+- prediction depuis features manuelles ;
+- prediction depuis une ligne technique feature_id ;
+- prediction depuis clean_match_id ;
+- prediction batch depuis plusieurs clean_match_id ;
+- endpoint de statut ML 1X2.
+
+Decision :
+Cette exposition backend a ete utile techniquement, mais elle est restee experimentale.
+Elle n'a pas remplace le scoring explicable V1 et n'a pas ete branchee au frontend officiel.
+
+6. Phase 3 - Evaluation du modele sauvegarde et premiers signaux de fiabilite
+----------------------------------------------------------------------------
+
+Fichiers principaux :
+- 28_saved_1x2_model_evaluation.txt
+- 29_backend_full_pytest_after_saved_model_evaluation.txt
+- 30_saved_1x2_predictions_inspection.csv
+- 31_saved_1x2_reliability_summary.txt
+
+Objectif :
+Verifier si le modele sauvegarde etait fiable, rechargeable et coherent.
+
+Lecture :
+Le modele initial etait techniquement exploitable, mais sa performance globale restait limitee.
+La phase suivante a donc consiste a enrichir les features plutot qu'a integrer trop vite le modele dans le produit.
+
+7. Phase 4 - Feature engineering V2 / V3 / V4 / V5
+--------------------------------------------------
+
+Fichiers principaux :
+- 32_1x2_feature_sets_comparison.txt
+- 34_1x2_models_on_best_features_comparison.txt
+- 36_1x2_high_confidence_thresholds.txt
+- 39 a 45 : team_strength_rating
+- 46 a 48 : V2 fast experiment
+- 50 a 64 : V3 feature groups, high confidence, filtre DRAW
+- 65 a 67 : V4 DRAW-aware
+- 68 a 71 : V5 balance features
+
+Objectif :
+Ameliorer les predictions 1X2 grace a de meilleures variables :
+- last_10 ;
+- force d'equipe avant-match ;
+- contexte domicile/exterieur ;
+- equilibre du match ;
+- signaux de risque de match nul ;
+- differents groupes de features V3.
+
+Resultats importants :
+- V2 meilleur compromis :
+  - accuracy : 0.5111 ;
+  - F1 macro : 0.4824 ;
+  - DRAW recall : 0.2803.
+- V3 forte confiance :
+  - selected rows : 1386 ;
+  - accuracy : 0.7006 ;
+  - coverage : 0.2615 ;
+  - limite : aucune prediction DRAW en forte confiance.
+- Filtre risque DRAW V3 :
+  - gate : remove_confidence_between_0_62_and_0_70 ;
+  - kept rows : 782 ;
+  - accuracy : 0.7455 ;
+  - coverage : 0.1475.
+- V4 DRAW-aware :
+  - non retenue comme candidat global.
+- V5 balance features :
+  - accuracy : 0.5115 ;
+  - F1 macro : 0.4828 ;
+  - gain tres faible par rapport a V2.
+
+Decision :
+La phase V2-V5 a montre que le 1X2 global reste difficile.
+Le signal forte confiance est interessant, mais il oblige a s'abstenir sur beaucoup de matchs.
+Le DRAW reste la classe la plus fragile.
+
+8. Phase 5 - Audit des cotes et benchmarks V6 / V7
+--------------------------------------------------
+
+Fichiers principaux :
+- 74_1x2_market_odds_coverage_summary.txt
+- 76_1x2_v6_market_prior_summary.txt
+- 78_1x2_v6_market_prior_decision.txt
+- 79_1x2_v7_team_strength_context_summary.txt
+- 81_1x2_v7_team_strength_context_decision.txt
+- 82_1x2_all_versions_error_patterns_summary.txt
+- 85_1x2_next_strategy_decision.txt
+
+Objectif :
+Verifier si les cotes historiques 1X2 pouvaient aider comme signal experimental interne.
+
+Audit :
+- B365H/B365D/B365A presentes sur environ 92.37 % des matchs bruts ;
+- les autres familles de cotes sont beaucoup moins couvertes.
+
+V6 Market prior :
+- meilleur candidat global :
+  - strategy : v6_market_only_probs ;
+  - accuracy : 0.5205 ;
+  - F1 macro : 0.4878 ;
+  - DRAW precision : 0.3166 ;
+  - DRAW recall : 0.2628.
+- decision : non retenu comme candidat global produit.
+
+V7 Team strength / context :
+- accuracy : 0.5074 ;
+- F1 macro : 0.4786 ;
+- decision : non retenu.
+
+Decision globale a ce stade :
+Le projet atteint un plateau sur le 1X2 strict global.
+Une strategie selective existe, mais le modele ne devient pas encore une fonctionnalite officielle.
+La prochaine piste devait soit enrichir fortement les donnees, soit changer la logique de recommandation.
+
+9. Phase 6 - Enrichissement xG Understat V8 / V8.1
+--------------------------------------------------
+
+Fichiers principaux :
+- 86 a 98 : audit et debug Understat
+- 109 a 128 : extraction DOM, matching clean_matches, rolling xG dry-run
+- 129 a 133 : V8 xG in-memory
+- 134 a 139 : stabilite V8
+- 140 a 144 : V8.1 gating xG
+
+Objectif :
+Verifier si les donnees xG Understat peuvent enrichir les predictions.
+
+Processus :
+- tentative de recuperation HTTP simple ;
+- debug avec Playwright ;
+- extraction DOM multi-ligues/multi-saisons ;
+- rapprochement avec ml.clean_matches ;
+- calcul de features rolling xG pre-match ;
+- test en memoire sans insertion en base.
+
+Resultats V8 :
+- strategy : v8_market_probs_plus_xg ;
+- accuracy : 0.5097 ;
+- F1 macro : 0.4926 ;
+- DRAW precision : 0.3073 ;
+- DRAW recall : 0.3584.
+
+Lecture :
+La V8 ameliore certains signaux sur les matchs nuls, mais n'ameliore pas la performance globale.
+V8.1 teste un gating selectif, mais le compromis reste insuffisant.
+
+Decision :
+Understat/xG reste une piste experimentale interessante, mais non integree au produit.
+Aucune modification de PostgreSQL, ml.features, API, frontend ou scoring V1 n'a ete effectuee.
+
+10. Phase 7 - Calibration selective V9 et meta-abstention V10
+-------------------------------------------------------------
+
+Fichiers principaux :
+- 145 a 156 : V9 selective calibration + abstention
+- 157 a 163 : V10 meta-abstention
+
+Objectif :
+Ne plus forcer une prediction sur tous les matchs.
+L'idee est de recommander uniquement quand le signal est suffisamment fort.
+
+V9 :
+- strategy : v9_sigmoid_p070_m003_drawp033_drawm003 ;
+- selected accuracy : 0.7874 ;
+- coverage : 0.1492 ;
+- abstention rate : 0.8508 ;
+- selected rows : 795 ;
+- predicted DRAW rows : 0.
+
+Decision V9 :
+V9 est un candidat experimental solide en forte confiance, mais trop selectif pour devenir une reponse utilisateur complete.
+
+V10 :
+- strategy : v10_random_forest_balanced_keep075_margin000_exclude_draw ;
+- selected accuracy : 0.7977 ;
+- coverage : 0.0964 ;
+- selected rows : 514 ;
+- net correct delta vs V9 total scope : -216.
+
+Decision V10 :
+V10 est rejetee.
+Elle augmente legerement la precision, mais reduit trop la couverture et n'ameliore pas le bilan global par rapport a V9.
+
+11. Phase 8 - V11 / V12 : consensus marche, Elo et calendrier
+-------------------------------------------------------------
+
+Fichiers principaux :
+- 164 a 178 : V11 market consensus + stabilite
+- 179 a 185 : V12 market + Elo + calendrier
+
+Objectif :
+Chercher une couverture plus large que V9, avec des signaux de consensus marche et des contextes supplementaires.
+
+V11 :
+- strategy : v11_direct_market_consensus_p062_m000_agr000_exclude_draw ;
+- selected accuracy : 0.7363 ;
+- coverage : 0.2326 ;
+- selected rows : 1240 ;
+- net correct delta vs V9 : 287 ;
+- predicted DRAW rows : 0.
+
+Decision V11 :
+Interessante pour augmenter la couverture, mais reste en revue.
+Elle ne doit pas etre integree au produit.
+
+V12 :
+- reprend la logique V11 avec Elo/calendrier ;
+- selected accuracy : 0.7363 ;
+- coverage : 0.2326 ;
+- pas de gain net vs V11.
+
+Decision V12 :
+N'apporte pas d'amelioration decisive.
+Le projet doit changer de strategie plutot que continuer a forcer le 1X2 strict.
+
+12. Phase 9 - Pivot produit : double chance V13 / V13.1
+------------------------------------------------------
+
+Fichiers principaux :
+- 187 a 192 : V13 double chance
+- 193 a 198 : V13.1 mixed selective
+- 199 a 205 : stabilite et comparaison finale V9 / V13
+
+Objectif :
+Traiter les matchs trop risques non pas avec un 1X2 strict, mais avec une recommandation double chance :
+- 1X ;
+- X2 ;
+- 12.
+
+Cette idee correspond mieux a l'usage utilisateur : lorsqu'un match est incertain, on evite de forcer un vainqueur strict.
+
+V13 double chance pure :
+- double chance accuracy : 0.8375 ;
+- coverage : 0.6685 ;
+- selected rows : 3563 ;
+- strict 1X2 rows : 0.
+
+V13.1 mixed selective :
+- mixed accuracy : 0.8572 ;
+- coverage : 0.5413 ;
+- selected rows : 2885 ;
+- strict 1X2 rows : 147 ;
+- strict 1X2 accuracy : 0.8707 ;
+- double chance rows : 2738 ;
+- double chance accuracy : 0.8565.
+
+Decision :
+V13.1 devient une experimentation tres forte.
+Elle montre qu'un selecteur mixte strict 1X2 + double chance est beaucoup plus exploitable qu'un 1X2 global force.
+
+13. Phase 10 - Marches complementaires V14 / V15 / V16
+------------------------------------------------------
+
+Fichiers principaux :
+- 206 a 213 : V14 Over/Under 2.5
+- 214 a 219 : V15 Over/Under 1.5
+- 220 a 225 : V16 BTTS
+- 226 : comparaison V14/V15/V16 avant V17
+
+Objectif :
+Verifier si RubyBets peut enrichir la recommandation avec d'autres marches :
+- O/U 2.5 ;
+- O/U 1.5 ;
+- BTTS.
+
+V14 O/U 2.5 :
+- accuracy : 0.6444 ;
+- coverage : 0.5355 ;
+- selected rows : 2854 ;
+- decision : utile en review, mais pas assez fort.
+
+V15 O/U 1.5 :
+- accuracy : 0.7935 ;
+- coverage : 0.5287 ;
+- selected rows : 2818 ;
+- OVER_1_5 rows : 2753 ;
+- OVER_1_5 accuracy : 0.8049 ;
+- UNDER_1_5 rows : 65 ;
+- UNDER_1_5 accuracy : 0.3077.
+- decision : signal OVER_1_5 exploitable, UNDER_1_5 non exploitable.
+
+V16 BTTS :
+- accuracy : 0.5790 ;
+- coverage : 0.3931 ;
+- selected rows : 2095 ;
+- BTTS_YES accuracy : 0.5849 ;
+- BTTS_NO accuracy : 0.5245.
+- decision : signal trop faible comme marche autonome.
+
+Decision :
+V15 OVER_1_5 est le seul marche complementaire assez propre pour etre teste dans un selecteur multi-marches.
+UNDER_1_5, O/U 2.5 et BTTS restent exclus a ce stade.
+
+14. Phase 11 - Selecteur multi-marches V17.0
+-------------------------------------------
+
+Fichiers principaux :
+- 227 a 232 : V17 multi-market selector
+- 233 : comparaison globale V13 / V17
+
+Objectif :
+Combiner :
+1. V13.1 strict 1X2 ;
+2. V13.1 double chance ;
+3. V15 OVER_1_5.
+
+Logique :
+- si un 1X2 strict est fiable, on le garde ;
+- sinon, si la double chance est fiable, on la garde ;
+- sinon, si OVER_1_5 est fiable, on l'utilise ;
+- sinon, abstention.
+
+V17.0 :
+- strategy : v17_controlled_v13_mixed_plus_over15_only ;
+- accuracy : 0.8382 ;
+- coverage : 0.7651 ;
+- abstention rate : 0.2349 ;
+- selected rows : 4078 ;
+- strict 1X2 rows : 147 ;
+- double chance rows : 2738 ;
+- OVER_1_5 rows : 1193 ;
+- OVER_1_5 accuracy : 0.7921.
+
+Decision :
+V17.0 devient la reference prudente multi-marches.
+Elle offre un tres bon compromis accuracy / coverage / lisibilite.
+
+15. Phase 12 - V17.1 a V17.6 : enrichissement goals / BTTS
+---------------------------------------------------------
+
+Fichiers principaux :
+- 234 a 237 : V17.1 enriched features audit
+- 238 a 243 : V17.2 Over/Under 1.5 enrichi
+- 244 a 249 : V17.3 Over/Under 2.5 enrichi
+- 250 a 255 : V17.4 BTTS enrichi
+- 256 a 261 : V17.5 selector enrichi
+- 262 a 267 : V17.6 BTTS ultra-selectif
+
+V17.1 :
+- 44 089 lignes ;
+- 54 features enrichies ;
+- couverture critique moyenne : 0.9992 ;
+- missing critique : 0.0039.
+Decision : base prete pour retester goals et BTTS.
+
+V17.2 O/U 1.5 enrichi :
+- accuracy : 0.8133 ;
+- coverage : 0.5598 ;
+- OVER_1_5 rows : 2984 ;
+- UNDER_1_5 rows : 0.
+Decision : OVER_1_5 progresse, UNDER_1_5 reste rejete.
+
+V17.3 O/U 2.5 enrichi :
+- accuracy : 0.6489 ;
+- coverage : 0.4655 ;
+- OVER_2_5 accuracy : 0.6551 ;
+- UNDER_2_5 accuracy : 0.6355.
+Decision : signal limite, exclu du selecteur final.
+
+V17.4 BTTS enrichi :
+- accuracy : 0.5728 ;
+- coverage : 0.4782 ;
+- BTTS_YES accuracy : 0.5909 ;
+- BTTS_NO accuracy : 0.5315.
+Decision : rejete comme amelioration exploitable.
+
+V17.5 selecteur enrichi :
+- accuracy : 0.8411 ;
+- coverage : 0.7544 ;
+- selected rows : 4021 ;
+- strict 1X2 accuracy : 0.8707 ;
+- double chance accuracy : 0.8565 ;
+- OVER_1_5 accuracy : 0.8002.
+Decision : stable, mais ne remplace pas V17.0 car il perd en coverage et en volume selectionne.
+
+V17.6 BTTS ultra-selectif :
+- accuracy : 0.6187 ;
+- coverage : 0.0522 ;
+- selected rows : 278 ;
+- BTTS_YES accuracy : 0.6176.
+Decision : signal BTTS faible mais utilisable pour une comparaison experimentale.
+
+16. Phase 13 - V17.7 et V17.8 : integration plus visible de BTTS
+---------------------------------------------------------------
+
+Fichiers principaux :
+- 268 a 273 : V17.7 selector with BTTS
+- 274 a 279 : V17.8 user objective BTTS
+- 279b : audit strategy
+- 280 : model card finale V17.8
+- 281 : plan d'integration technique V17.8
+
+V17.7 :
+- accuracy : 0.8368 ;
+- coverage : 0.7679 ;
+- selected rows : 4093 ;
+- strict 1X2 accuracy : 0.8707 ;
+- double chance accuracy : 0.8565 ;
+- OVER_1_5 accuracy : 0.7921 ;
+- BTTS rows : 15 ;
+- BTTS accuracy : 0.4667.
+Decision : BTTS trop rare et trop faible dans cette version.
+
+V17.8 :
+- strategy : v17_8_user_objective_btts_replace_over15_or_fallback_s520_mh8_eg0900_tot1800_bt550_ov500_fail450_limitall ;
+- mode : replace_over15_or_fallback ;
+- accuracy globale : 0.8000 ;
+- coverage : 0.7946 ;
+- abstention rate : 0.2054 ;
+- selected rows : 4235 ;
+- strict 1X2 rows : 147 ;
+- strict 1X2 accuracy : 0.8707 ;
+- double chance rows : 2738 ;
+- double chance accuracy : 0.8565 ;
+- OVER_1_5 rows : 594 ;
+- OVER_1_5 accuracy : 0.7694 ;
+- BTTS rows : 756 ;
+- BTTS accuracy : 0.6058 ;
+- added BTTS rows : 157 ;
+- replaced OVER_1_5 rows : 599.
+
+Decision V17.8 :
+V17.8 atteint l'objectif utilisateur : proposer un selecteur multi-marches plus complet avec 1X2 strict, double chance, OVER_1_5 et BTTS.
+Elle devient la variante experimentale cible pour l'objectif utilisateur multi-marches avec BTTS.
+
+Reference prudente :
+V17.0 reste la reference prudente en accuracy.
+
+17. Phase 14 - Integration backend experimentale V17.8
+-----------------------------------------------------
+
+Fichiers principaux :
+- 282_v17_8_service_tests.txt
+- 283_v17_8_demo_api_response.json
+- 284_v17_8_demo_api_tests.txt
+- 285_v17_8_feature_adapter_tests.txt
+- 286_v17_8_adapter_demo_api_response.json
+- 287_v17_8_adapter_demo_api_tests.txt
+
+Fichiers backend crees ou modifies :
+- backend/app/services/ml_v17_8_service.py
+- backend/app/services/ml_v17_8_feature_adapter.py
+- backend/app/api/experimental_ml_v17_8.py
+- backend/app/main.py
+- backend/tests/test_ml_v17_8_service.py
+
+Objectif :
+Transformer la decision V17.8 en debut d'integration backend experimentale, sans toucher au produit officiel.
+
+Etapes validees :
+1. Service V17.8 :
+   - recommande BTTS_YES si les signaux sont favorables ;
+   - conserve la recommandation prudente si BTTS est trop faible ;
+   - s'abstient si les features necessaires sont absentes.
+   - preuve : 3 passed.
+
+2. Route demo :
+   - GET /api/experimental/ml/v17-8/demo ;
+   - retourne une recommandation experimentale controlee ;
+   - preuve : 4 passed.
+
+3. Adaptateur de features :
+   - transforme des donnees match preparees en features compatibles V17.8 ;
+   - detecte les features manquantes ;
+   - conserve les metadonnees utiles ;
+   - preuve : 7 passed.
+
+4. Route adapter-demo :
+   - GET /api/experimental/ml/v17-8/adapter-demo ;
+   - flux teste : prepared_match_data -> ml_v17_8_feature_adapter.py -> ml_v17_8_service.py ;
+   - preuve : 8 passed in 1.77s.
+
+Decision :
+L'integration backend experimentale V17.8 est validee en isolation.
+Elle reste separee du scoring explicable V1, de PostgreSQL, de ml.features, du frontend et de la route officielle /predictions.
+
+18. Decision finale actuelle
+----------------------------
+
+La meilleure reference prudente reste :
+- V17.0 multi-market controlled selector ;
+- accuracy : 0.8382 ;
+- coverage : 0.7651.
+
+La variante retenue pour l'objectif utilisateur est :
+- V17.8 user objective BTTS selector ;
+- accuracy : 0.8000 ;
+- coverage : 0.7946 ;
+- selected rows : 4235 ;
+- integration de 1X2 strict, double chance, OVER_1_5 et BTTS.
+
+Pourquoi V17.8 est retenue malgre une accuracy plus basse que V17.0 :
+- elle repond mieux a l'objectif utilisateur multi-marches ;
+- elle augmente la couverture ;
+- elle rend BTTS plus visible ;
+- elle garde un niveau global professionnel ;
+- elle reste clairement experimentale.
+
+Pourquoi V17.8 n'est pas integree officiellement :
+- BTTS reste le marche le plus fragile ;
+- certains segments restent sous les niveaux de prudence souhaites ;
+- le modele n'est pas encore branche sur les vrais matchs RubyBets ;
+- le scoring explicable V1 reste le moteur officiel.
+
+19. Organisation recommandee du dossier ml_training
+---------------------------------------------------
+
+Pour garder le dossier lisible, il est recommande d'organiser les preuves ainsi :
+
+reports/evidence/ml_training/
+|
+|-- 289_ml_training_process_summary.txt
+|-- ml_training_evidence_archive_001_287.zip
+|-- 288_v17_8_api_documentation_update.txt  (si deja cree ou a creer)
+|
+|-- README optionnel futur : expliquer que les preuves detaillees sont dans le ZIP.
+
+A ne pas faire immediatement :
+- ne pas supprimer les fichiers individuels avant d'avoir verifie le contenu du ZIP ;
+- ne pas supprimer les preuves recentes 286/287 si elles ne sont pas encore archivees ;
+- ne pas creer une preuve SQL artificielle ;
+- ne pas presenter V17.8 comme moteur officiel.
+
+20. Fichiers de preuves par grandes phases
+-----------------------------------------
+
+01-07 :
+Baseline ML 1X2 initiale.
+
+08-27 :
+Services backend experimentaux et routes ML 1X2.
+
+28-31 :
+Evaluation et controle du modele sauvegarde.
+
+32-45 :
+Comparaison features, team strength et signaux forte confiance.
+
+46-64 :
+V2/V3, filtre DRAW, decision finale V3.
+
+65-71 :
+V4 DRAW-aware et V5 balance features.
+
+74-85 :
+Audit cotes, V6 market prior, V7 contexte, analyse globale du plateau.
+
+86-144 :
+Piste Understat/xG, extraction, matching, rolling xG, V8/V8.1.
+
+145-163 :
+V9 calibration selective et V10 meta-abstention.
+
+164-185 :
+V11 market consensus et V12 market + Elo + calendrier.
+
+187-205 :
+V13 double chance, V13.1 mixed selective, stabilite et comparaison.
+
+206-226 :
+V14 O/U 2.5, V15 O/U 1.5, V16 BTTS, comparaison goals/BTTS.
+
+227-233 :
+V17.0 selecteur multi-marches controle.
+
+234-267 :
+V17.1 a V17.6 : features enrichies, retests goals/BTTS, V17.5, V17.6.
+
+268-280 :
+V17.7 et V17.8 avec BTTS, audit et model card finale.
+
+281-287 :
+Plan d'integration V17.8, service backend, API demo, adaptateur, adapter-demo et tests.
+
+21. Limites a rappeler en soutenance
+------------------------------------
+
+- Les resultats ML ne garantissent aucun resultat sportif.
+- Le scoring explicable V1 reste le socle officiel de RubyBets.
+- Les versions ML V17.x restent experimentales.
+- V17.8 n'est pas encore branchee aux vrais matchs RubyBets.
+- Le frontend n'utilise pas encore V17.8.
+- PostgreSQL et ml.features ne sont pas modifies par cette integration V17.8.
+- Les marches UNDER_1_5, O/U 2.5 et BTTS_NO restent exclus des decisions produit actuelles.
+- BTTS_YES est interessant dans V17.8, mais reste a surveiller.
+
+22. Prochaine etape technique apres organisation
+------------------------------------------------
+
+Apres creation de ce resume et archivage ZIP, la prochaine etape logique est :
+
+1. verifier que docs/api_documentation.md contient bien les routes experimentales V17.8 ;
+2. creer ou conserver la preuve 288_v17_8_api_documentation_update.txt ;
+3. compiler / tester rapidement le backend ;
+4. verifier que la route adapter-demo fonctionne toujours ;
+5. preparer un commit propre.
+
+Commande de test cible :
+python -m pytest tests/test_ml_v17_8_service.py
+
+Resultat attendu actuel :
+8 passed.
+
+23. Statuts de taches a mettre a jour dans les sources du projet
+----------------------------------------------------------------
+
+Taches realisees :
+- Baseline ML 1X2 : realisee.
+- API experimentale ML 1X2 : realisee.
+- Feature engineering V2/V3/V4/V5 : realise.
+- Audit cotes V6/V7 : realise.
+- Piste Understat/xG V8/V8.1 : realisee, non integree.
+- V9 selective calibration : realisee.
+- V10 meta-abstention : rejetee.
+- V11/V12 : realisees, non retenues comme moteur officiel.
+- V13/V13.1 double chance : realisees, tres fortes experimentalement.
+- V14/V15/V16 goals/BTTS : realisees.
+- V17.0 : reference prudente.
+- V17.8 : variante experimentale cible utilisateur.
+- Service V17.8 : realise.
+- Route demo V17.8 : realisee.
+- Adaptateur V17.8 : realise.
+- Route adapter-demo V17.8 : realisee et testee.
+- Resume global ML training : a considerer realise apres ajout de ce fichier.
+
+Fichiers ou documents sources a mettre a jour plus tard :
+- docs/api_documentation.md ;
+- docs/rncp_evidence_matrix.md ;
+- eventuellement le document Word 22 Matrice competences / preuves ;
+- eventuellement le document Word 23 Strategie de preuves GitHub ;
+- eventuellement le document Word 20_21 Support de soutenance.
+
+24. Conclusion
+--------------
+
+La phase ML training RubyBets a evolue progressivement :
+
+1. d'une baseline 1X2 faible mais propre ;
+2. vers des features plus riches ;
+3. puis vers une logique selective avec abstention ;
+4. puis vers une decision produit plus intelligente : double chance pour les matchs incertains ;
+5. puis vers un selecteur multi-marches ;
+6. enfin vers V17.8, qui integre BTTS de maniere experimentale et plus proche de l'objectif utilisateur.
+
+La conclusion actuelle est claire :
+- V17.0 reste la reference prudente ;
+- V17.8 est la variante experimentale cible pour l'objectif utilisateur ;
+- le scoring explicable V1 reste le moteur officiel ;
+- aucune integration produit finale de V17.8 n'est encore realisee ;
+- toutes les preuves doivent rester archivees et tracables.

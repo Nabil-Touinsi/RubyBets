@@ -105,3 +105,159 @@ Fichiers liés :
 
 Important : cet endpoint reste une route technique de contrôle. Il ne remplace pas le scoring explicable V1 et n’intègre pas encore la baseline ML dans le frontend.
 
+---
+
+## Routes expérimentales ML V17.8
+
+### Positionnement
+
+Les routes V17.8 sont des routes expérimentales destinées à valider progressivement l’intégration technique du sélecteur ML multi-marchés V17.8.
+
+Elles ne remplacent pas le scoring explicable V1 et ne sont pas utilisées par la route officielle :
+
+```text
+GET /api/matches/{match_id}/predictions
+```
+
+Elles ne modifient pas PostgreSQL, `ml.features`, le frontend ou le moteur de scoring V1.
+
+Leur rôle est uniquement de tester, en isolation, le comportement du module expérimental V17.8 avant toute intégration produit future.
+
+---
+
+### `GET /api/experimental/ml/v17-8/demo`
+
+#### Rôle
+
+Retourne une démonstration contrôlée du service expérimental V17.8 à partir d’un jeu de features préparé manuellement.
+
+Cette route permet de vérifier que le service V17.8 peut produire une recommandation expérimentale ou une abstention, sans utiliser les vrais matchs RubyBets.
+
+#### Type de route
+
+```text
+Expérimentale
+Demo only
+Non utilisée par le frontend
+Non reliée à PostgreSQL
+Non reliée à ml.features
+```
+
+#### Flux technique
+
+```text
+features demo contrôlées
+→ ml_v17_8_service.py
+→ recommandation expérimentale V17.8 ou abstention
+```
+
+#### Réponse attendue
+
+La réponse contient notamment :
+
+```text
+source
+scope
+status
+message
+demo_features_profile
+result
+```
+
+#### Preuves associées
+
+```text
+reports/evidence/ml_training/283_v17_8_demo_api_response.json
+reports/evidence/ml_training/284_v17_8_demo_api_tests.txt
+```
+
+---
+
+### `GET /api/experimental/ml/v17-8/adapter-demo`
+
+#### Rôle
+
+Retourne une démonstration contrôlée du flux complet :
+
+```text
+données match préparées
+→ ml_v17_8_feature_adapter.py
+→ ml_v17_8_service.py
+→ recommandation expérimentale V17.8 ou abstention
+```
+
+Cette route rapproche l’expérimentation V17.8 d’une future intégration réelle, tout en restant volontairement déconnectée des vrais matchs RubyBets.
+
+#### Type de route
+
+```text
+Expérimentale
+Adapter demo only
+Non utilisée par le frontend
+Non reliée à PostgreSQL
+Non reliée à ml.features
+Non reliée à la route officielle /predictions
+```
+
+#### Flux technique
+
+```text
+prepared_match_data
+→ ml_v17_8_feature_adapter.py
+→ ml_v17_8_service.py
+```
+
+#### Réponse attendue
+
+La réponse contient notamment :
+
+```text
+source
+scope
+status
+message
+demo_features_profile
+flow
+result
+```
+
+Le champ `result` contient le retour de l’adaptateur, avec :
+
+```text
+adapter_metadata
+result
+```
+
+`adapter_metadata` décrit le contexte adapté : match, compétition, features manquantes ou complètes.
+
+`result` contient la recommandation expérimentale V17.8 produite par le service.
+
+#### Preuves associées
+
+```text
+reports/evidence/ml_training/286_v17_8_adapter_demo_api_response.json
+reports/evidence/ml_training/287_v17_8_adapter_demo_api_tests.txt
+```
+
+---
+
+### Limites assumées
+
+Ces routes restent strictement expérimentales.
+
+Elles ne doivent pas être présentées comme une fonctionnalité utilisateur finale. Elles servent à prouver que le backend peut isoler, tester et documenter une logique ML expérimentale sans fragiliser le MVP officiel.
+
+Le scoring explicable V1 reste le socle officiel de RubyBets pour la version actuelle du produit.
+
+---
+
+### Statut de validation
+
+```text
+Service V17.8 : validé
+Adaptateur V17.8 : validé
+Route demo : validée
+Route adapter-demo : validée
+Tests backend ciblés : 8 passed in 1.77s
+```
+

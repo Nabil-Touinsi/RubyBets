@@ -126,3 +126,10 @@ Il retourne désormais :
 - le rappel du positionnement expérimental.
 
 Cette route reste strictement technique. Elle sert à contrôler la disponibilité de la baseline ML et à documenter son état, sans intégrer le ML au frontend et sans remplacer le scoring explicable V1.
+
+High-confidence ML signal
+- seuil retenu : 0.60
+- accuracy : 70.76%
+- coverage : 9.2%
+- limite : aucun DRAW prédit en forte confiance
+- décision : signal expérimental, non intégré au frontend
