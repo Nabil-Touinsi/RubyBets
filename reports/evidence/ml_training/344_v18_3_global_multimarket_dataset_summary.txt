@@ -1,0 +1,95 @@
+OK - Dataset V18.3 global multi-market genere.
+
+Contexte :
+- Phase : V18.3 national global multi-market.
+- Objectif : construire un CSV global pour entrainer ensuite 1X2, OVER_1_5, OVER_2_5 et BTTS.
+- StatsBomb : non utilise dans ce dataset global, car couverture limitee au sous-ensemble WC.
+- Feature version utilisee : national_v1_elo_form
+- Competitions exportees : WC, WCQ
+
+Volume dataset :
+- Lignes exportees : 9735
+- Colonnes exportees : 36
+- Train rows chronologiques : 7788 (80.0%)
+- Test rows chronologiques : 1947 (20.0%)
+- Test ratio demande : 0.2
+- Lignes avec core features completes : 9549 (98.09%)
+
+Periode couverte :
+- Premiere date : 1930-07-13T00:00:00+01:00
+- Derniere date : 2026-03-31T00:00:00+02:00
+- Nombre de saisons distinctes : 70
+
+Repartition competitions :
+- WC : 964 (9.9%)
+- WCQ : 8771 (90.1%)
+
+Repartition split train/test :
+- train : 7788 (80.0%)
+- test : 1947 (20.0%)
+
+Distribution target 1X2 :
+- TEAM_A_WIN : 4898 (50.31%)
+- DRAW : 2069 (21.25%)
+- TEAM_B_WIN : 2768 (28.43%)
+
+Distribution target OVER_1_5 :
+- YES : 7246 (74.43%)
+- NO : 2489 (25.57%)
+
+Distribution target OVER_2_5 :
+- YES : 5027 (51.64%)
+- NO : 4708 (48.36%)
+
+Distribution target BTTS :
+- YES : 4068 (41.79%)
+- NO : 5667 (58.21%)
+
+Features exportees :
+- home_form_points_last_5
+- away_form_points_last_5
+- home_form_points_last_10
+- away_form_points_last_10
+- home_goals_scored_avg_last_10
+- away_goals_scored_avg_last_10
+- home_goals_conceded_avg_last_10
+- away_goals_conceded_avg_last_10
+- ranking_gap
+- elo_gap
+- is_neutral_venue
+- team_a_is_host
+- team_b_is_host
+- host_side_team_a
+- host_side_team_b
+- is_group_stage
+- is_knockout_stage
+
+Valeurs manquantes par feature :
+- home_form_points_last_5 : 0 (0.0%)
+- away_form_points_last_5 : 0 (0.0%)
+- home_form_points_last_10 : 0 (0.0%)
+- away_form_points_last_10 : 0 (0.0%)
+- home_goals_scored_avg_last_10 : 117 (1.2%)
+- away_goals_scored_avg_last_10 : 100 (1.03%)
+- home_goals_conceded_avg_last_10 : 117 (1.2%)
+- away_goals_conceded_avg_last_10 : 100 (1.03%)
+- ranking_gap : 9735 (100.0%)
+- elo_gap : 0 (0.0%)
+- is_neutral_venue : 0 (0.0%)
+- team_a_is_host : 0 (0.0%)
+- team_b_is_host : 0 (0.0%)
+- host_side_team_a : 0 (0.0%)
+- host_side_team_b : 0 (0.0%)
+- is_group_stage : 0 (0.0%)
+- is_knockout_stage : 0 (0.0%)
+
+Fichiers generes :
+- Synthese : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\344_v18_3_global_multimarket_dataset_summary.txt
+- Dataset CSV : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\345_v18_3_global_multimarket_dataset.csv
+
+Decision technique :
+- Le dataset V18.3 global est pret pour la baseline multi-market globale.
+- DOUBLE_CHANCE ne sera pas entrainee comme target separee : elle sera derivee des probabilites 1X2.
+- ABSTAIN sera produit plus tard par le selecteur selon les seuils de confiance et de fiabilite.
+- Les colonnes home_* et away_* representent Team A / Team B dans ce pipeline national.
+- Le dataset reste experimental et ne promet aucun resultat sportif.

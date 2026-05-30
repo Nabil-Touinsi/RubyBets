@@ -1,0 +1,53 @@
+OK - Audit V18.3 global multi-market targets termine.
+
+Contexte :
+- Phase : V18.3 national global multi-market.
+- Objectif : auditer les targets 1X2, OVER_1_5, OVER_2_5 et BTTS sur ml_national.
+- StatsBomb : non utilise dans cet audit global, car couverture limitee au sous-ensemble WC.
+- Feature version auditee : national_v1_elo_form
+- Competitions auditees : WC, WCQ
+
+Qualite et exploitabilite :
+- Matchs clean charges : 9735
+- Matchs avec scores complets : 9735 (100.0%)
+- Matchs sans scores complets : 0 (0.0%)
+- Matchs avec resultat 1X2 valide : 9735 (100.0%)
+- Matchs avec features national_v1_elo_form : 9735 (100.0%)
+- Matchs sans features national_v1_elo_form : 0 (0.0%)
+- Matchs exploitables V18.3 : 9735 (100.0%)
+- Controle volume attendu ~9 735 matchs : OK
+
+Periode couverte :
+- Premiere date exploitable : 1930-07-13T00:00:00+01:00
+- Derniere date exploitable : 2026-03-31T00:00:00+02:00
+- Nombre de saisons distinctes : 70
+
+Repartition WC / WCQ :
+- WC : 964 (9.9%)
+- WCQ : 8771 (90.1%)
+
+Distribution 1X2 :
+- TEAM_A_WIN : 4898 (50.31%)
+- DRAW : 2069 (21.25%)
+- TEAM_B_WIN : 2768 (28.43%)
+
+Distribution OVER_1_5 :
+- YES : 7246 (74.43%)
+- NO : 2489 (25.57%)
+
+Distribution OVER_2_5 :
+- YES : 5027 (51.64%)
+- NO : 4708 (48.36%)
+
+Distribution BTTS :
+- YES : 4068 (41.79%)
+- NO : 5667 (58.21%)
+
+Fichiers generes :
+- Synthese : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\342_v18_3_global_multimarket_targets_summary.txt
+- Distribution CSV : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\343_v18_3_global_multimarket_targets_distribution.csv
+
+Decision technique :
+- Cet audit valide la disponibilite des targets avant entrainement V18.3.
+- DOUBLE_CHANCE ne doit pas etre entrainee comme target separee : elle sera derivee des probabilites 1X2.
+- ABSTAIN ne vient pas du score reel : il sera produit plus tard par le selecteur selon les seuils de confiance.

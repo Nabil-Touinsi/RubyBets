@@ -1,0 +1,188 @@
+OK - Entrainement V18.3 global multi-market termine.
+
+Contexte :
+- Phase : V18.3 national global multi-market.
+- Objectif : entrainer des baselines separees pour 1X2, OVER_1_5, OVER_2_5 et BTTS.
+- StatsBomb : non utilise dans cet entrainement global.
+- DOUBLE_CHANCE : non entrainee comme target separee, elle sera derivee plus tard des probabilites 1X2.
+- ABSTAIN : non entraine comme target, il sera produit plus tard par le selecteur selon les seuils.
+- Dataset utilise : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\345_v18_3_global_multimarket_dataset.csv
+
+Volume :
+- Lignes totales : 9735
+- Train rows : 7788
+- Test rows : 1947
+- Features utilisees : 16
+
+Features utilisees :
+- home_form_points_last_5 | missing=0 (0.0%)
+- away_form_points_last_5 | missing=0 (0.0%)
+- home_form_points_last_10 | missing=0 (0.0%)
+- away_form_points_last_10 | missing=0 (0.0%)
+- home_goals_scored_avg_last_10 | missing=117 (1.2%)
+- away_goals_scored_avg_last_10 | missing=100 (1.03%)
+- home_goals_conceded_avg_last_10 | missing=117 (1.2%)
+- away_goals_conceded_avg_last_10 | missing=100 (1.03%)
+- elo_gap | missing=0 (0.0%)
+- is_neutral_venue | missing=0 (0.0%)
+- team_a_is_host | missing=0 (0.0%)
+- team_b_is_host | missing=0 (0.0%)
+- host_side_team_a | missing=0 (0.0%)
+- host_side_team_b | missing=0 (0.0%)
+- is_group_stage | missing=0 (0.0%)
+- is_knockout_stage | missing=0 (0.0%)
+
+Features exclues :
+- ranking_gap : exclue car 100% manquante dans le dataset 345
+
+Distribution des targets sur le test :
+
+1X2 (target_1x2) :
+- TEAM_A_WIN : 914 (46.94%)
+- TEAM_B_WIN : 604 (31.02%)
+- DRAW : 429 (22.03%)
+
+OVER_1_5 (target_over_1_5) :
+- YES : 1410 (72.42%)
+- NO : 537 (27.58%)
+
+OVER_2_5 (target_over_2_5) :
+- NO : 981 (50.39%)
+- YES : 966 (49.61%)
+
+BTTS (target_btts) :
+- NO : 1190 (61.12%)
+- YES : 757 (38.88%)
+
+Meilleurs modeles retenus :
+
+1X2 :
+- Best model : logistic_regression_balanced
+- Accuracy : 0.6004
+- Balanced accuracy : 0.5627
+- F1 macro : 0.5597
+- F1 weighted : 0.6035
+- Precision macro : 0.5589
+- Recall macro : 0.5627
+- Model artifact : C:\dev_classe\RNCP\RubyBets\models\ml_national\v18_3_global_multimarket\1x2_best_model.joblib
+
+OVER_1_5 :
+- Best model : random_forest_balanced
+- Accuracy : 0.6014
+- Balanced accuracy : 0.5692
+- F1 macro : 0.5537
+- F1 weighted : 0.6191
+- Precision macro : 0.5577
+- Recall macro : 0.5692
+- Model artifact : C:\dev_classe\RNCP\RubyBets\models\ml_national\v18_3_global_multimarket\over_1_5_best_model.joblib
+
+OVER_2_5 :
+- Best model : random_forest_balanced
+- Accuracy : 0.5937
+- Balanced accuracy : 0.593
+- F1 macro : 0.5901
+- F1 weighted : 0.5904
+- Precision macro : 0.5962
+- Recall macro : 0.593
+- Model artifact : C:\dev_classe\RNCP\RubyBets\models\ml_national\v18_3_global_multimarket\over_2_5_best_model.joblib
+
+BTTS :
+- Best model : random_forest_balanced
+- Accuracy : 0.5413
+- Balanced accuracy : 0.5349
+- F1 macro : 0.5311
+- F1 weighted : 0.5465
+- Precision macro : 0.5334
+- Recall macro : 0.5349
+- Model artifact : C:\dev_classe\RNCP\RubyBets\models\ml_national\v18_3_global_multimarket\btts_best_model.joblib
+
+Rapports detailles des meilleurs modeles :
+
+================================================================================
+Marche : 1X2
+Modele retenu : logistic_regression_balanced
+
+Classification report :
+              precision    recall  f1-score   support
+
+  TEAM_A_WIN       0.74      0.67      0.71       914
+        DRAW       0.32      0.34      0.33       429
+  TEAM_B_WIN       0.61      0.67      0.64       604
+
+    accuracy                           0.60      1947
+   macro avg       0.56      0.56      0.56      1947
+weighted avg       0.61      0.60      0.60      1947
+
+Matrice de confusion :
+Labels : TEAM_A_WIN, DRAW, TEAM_B_WIN
+- TEAM_A_WIN : [616, 174, 124]
+- DRAW : [146, 146, 137]
+- TEAM_B_WIN : [67, 130, 407]
+
+================================================================================
+Marche : OVER_1_5
+Modele retenu : random_forest_balanced
+
+Classification report :
+              precision    recall  f1-score   support
+
+         YES       0.77      0.64      0.70      1410
+          NO       0.35      0.50      0.41       537
+
+    accuracy                           0.60      1947
+   macro avg       0.56      0.57      0.55      1947
+weighted avg       0.65      0.60      0.62      1947
+
+Matrice de confusion :
+Labels : YES, NO
+- YES : [904, 506]
+- NO : [270, 267]
+
+================================================================================
+Marche : OVER_2_5
+Modele retenu : random_forest_balanced
+
+Classification report :
+              precision    recall  f1-score   support
+
+         YES       0.61      0.50      0.55       966
+          NO       0.58      0.68      0.63       981
+
+    accuracy                           0.59      1947
+   macro avg       0.60      0.59      0.59      1947
+weighted avg       0.60      0.59      0.59      1947
+
+Matrice de confusion :
+Labels : YES, NO
+- YES : [486, 480]
+- NO : [311, 670]
+
+================================================================================
+Marche : BTTS
+Modele retenu : random_forest_balanced
+
+Classification report :
+              precision    recall  f1-score   support
+
+         YES       0.42      0.51      0.46       757
+          NO       0.64      0.56      0.60      1190
+
+    accuracy                           0.54      1947
+   macro avg       0.53      0.53      0.53      1947
+weighted avg       0.56      0.54      0.55      1947
+
+Matrice de confusion :
+Labels : YES, NO
+- YES : [383, 374]
+- NO : [519, 671]
+
+Fichiers generes :
+- Synthese : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\346_v18_3_global_multimarket_models_summary.txt
+- Comparaison modeles : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\347_v18_3_global_multimarket_model_comparison.csv
+- Predictions test : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\348_v18_3_global_multimarket_test_predictions.csv
+
+Decision technique :
+- Cette etape produit une baseline globale pour chaque marche.
+- Le futur selecteur V18.3 devra comparer les probabilites et choisir entre STRICT_1X2, DOUBLE_CHANCE, OVER_1_5, OVER_2_5, BTTS ou ABSTAIN.
+- OVER_1_5 doit etre surveille car sa classe YES est tres majoritaire dans le dataset.
+- Les resultats restent experimentaux et ne promettent aucun resultat sportif.

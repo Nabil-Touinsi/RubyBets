@@ -1,0 +1,104 @@
+RubyBets - Decision V18.3 global selector
+Phase : V18.3 national global multi-market
+Fichier : 354_v18_3_global_selector_decision.txt
+
+Contexte
+- V17.8 club reste fige et protege.
+- V17.9.2 nationale globale reste la reference nationale precedente.
+- V18.2 StatsBomb reste une preuve d'enrichissement ciblee Coupe du Monde, limitee au sous-ensemble 2018/2022.
+- V18.3 teste une logique multi-market globale sur toute la base nationale ml_national, sans utiliser StatsBomb comme feature globale.
+
+Donnees utilisees
+- Dataset global : reports/evidence/ml_training/345_v18_3_global_multimarket_dataset.csv
+- Predictions test : reports/evidence/ml_training/348_v18_3_global_multimarket_test_predictions.csv
+- Diagnostic segments : reports/evidence/ml_training/349_v18_3_global_multimarket_segment_diagnostics.csv
+- Evaluation selecteur : reports/evidence/ml_training/351_v18_3_global_selector_summary.txt
+
+Resultats du selecteur V18.3
+- Lignes test analysees : 1 947
+- Lignes selectionnees : 1 119
+- Lignes abstention : 828
+- Coverage : 0.5747
+- Abstention rate : 0.4253
+- Reliability : 0.9071
+- Confidence moyenne selectionnee : 0.8974
+
+Repartition par marche
+- STRICT_1X2 : 199 lignes | accuracy 0.9347
+- DOUBLE_CHANCE : 859 lignes | accuracy 0.9057
+- OVER_1_5 : 27 lignes | accuracy 0.9259
+- OVER_2_5 : 22 lignes | accuracy 0.7727
+- BTTS : 12 lignes | accuracy 0.7500
+- ABSTAIN : 828 lignes
+
+Decision technique
+V18.3 est retenu comme experience globale reussie de selecteur prudent multi-market national.
+Le resultat est techniquement fort car la reliability atteint 0.9071 sur 1 119 recommandations selectionnees, tout en conservant une abstention importante sur les matchs juges trop faibles.
+Le coverage de 0.5747 est acceptable pour une strategie responsable : le selecteur couvre plus de la moitie du test tout en refusant 42.53% des matchs.
+
+Point de vigilance majeur
+La performance est fortement portee par DOUBLE_CHANCE : 859 recommandations sur 1 119.
+V18.3 ne doit donc pas etre presente comme une strategie multi-market parfaitement equilibree.
+Il s'agit plutot d'un selecteur prudent global ou DOUBLE_CHANCE joue un role central de securisation.
+
+Marches retenus ou limites
+- STRICT_1X2 est retenu uniquement avec seuil fort et prediction non DRAW.
+- DOUBLE_CHANCE est retenu comme marche central du selecteur V18.3.
+- OVER_1_5 est retenu uniquement sur YES avec seuil fort ; UNDER_1_5 reste exclu.
+- OVER_2_5 est interessant mais encore peu utilise ; il doit rester sous surveillance.
+- BTTS reste fragile et doit rester strictement filtre ; BTTS YES n'est pas recommande dans cette version.
+- ABSTAIN est conserve comme sortie officielle pour proteger la credibilite du produit.
+
+Decision produit
+V18.3 ne doit pas encore etre integre directement au frontend.
+Avant integration produit, il faut construire une couche backend d'inference propre, testee et documentee.
+Le frontend ne doit afficher ce selecteur qu'apres validation d'un service backend stable, capable de charger les modeles, appliquer les seuils et retourner une recommandation explicable.
+
+Decision RNCP / soutenance
+V18.3 est une preuve forte pour montrer :
+- la construction d'un dataset national global ;
+- l'entrainement de plusieurs modeles par marche ;
+- le diagnostic par segments ;
+- la conception d'un selecteur prudent ;
+- l'utilisation d'ABSTAIN pour eviter les recommandations faibles ;
+- une logique responsable sans promesse de resultat sportif.
+
+Formulation recommandee
+RubyBets V18.3 ne cherche pas a predire tous les matchs. Le selecteur choisit uniquement les cas ou le signal est suffisamment fort, et s'abstient sinon. Cette logique permet d'obtenir une fiabilite elevee tout en assumant une couverture partielle, plus coherente avec une application d'aide a la decision responsable.
+
+Statut final V18.3
+- Audit targets V18.3 : realise.
+- Dataset global V18.3 : realise.
+- Baseline multi-market globale : realisee.
+- Diagnostic par segments : realise.
+- Selecteur global V18.3 : realise.
+- Decision V18.3 : realisee.
+
+Suite recommandee
+Option prioritaire : creer une phase V18.3.1 pour tester un selecteur ajuste afin de reduire la dependance a DOUBLE_CHANCE sans baisser fortement la reliability.
+Option suivante : preparer la couche backend d'inference nationale, mais seulement apres validation de la strategie finale.
+Option a ne pas lancer maintenant : integration frontend directe.
+
+Fichiers concernes
+- backend/scripts/ml_national/audit_v18_3_global_multimarket_targets.py
+- backend/scripts/ml_national/build_v18_3_global_multimarket_dataset.py
+- backend/scripts/ml_national/train_v18_3_global_multimarket_models.py
+- backend/scripts/ml_national/diagnose_v18_3_global_multimarket_models.py
+- backend/scripts/ml_national/evaluate_v18_3_global_selector.py
+- reports/evidence/ml_training/342_v18_3_global_multimarket_targets_summary.txt
+- reports/evidence/ml_training/343_v18_3_global_multimarket_targets_distribution.csv
+- reports/evidence/ml_training/344_v18_3_global_multimarket_dataset_summary.txt
+- reports/evidence/ml_training/345_v18_3_global_multimarket_dataset.csv
+- reports/evidence/ml_training/346_v18_3_global_multimarket_models_summary.txt
+- reports/evidence/ml_training/347_v18_3_global_multimarket_model_comparison.csv
+- reports/evidence/ml_training/348_v18_3_global_multimarket_test_predictions.csv
+- reports/evidence/ml_training/349_v18_3_global_multimarket_segment_diagnostics.csv
+- reports/evidence/ml_training/350_v18_3_global_multimarket_diagnostics_summary.txt
+- reports/evidence/ml_training/351_v18_3_global_selector_summary.txt
+- reports/evidence/ml_training/352_v18_3_global_selector_results.csv
+- reports/evidence/ml_training/353_v18_3_global_selector_market_breakdown.csv
+- reports/evidence/ml_training/354_v18_3_global_selector_decision.txt
+
+Conclusion
+V18.3 valide une strategie globale prudente, fiable et defendable, mais encore experimentale.
+Elle doit etre conservee comme preuve ML/RNCP importante et comme base de travail pour la prochaine iteration.

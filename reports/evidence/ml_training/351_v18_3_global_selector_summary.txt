@@ -1,0 +1,52 @@
+OK - Evaluation selecteur V18.3 global multi-market terminee.
+
+Contexte :
+- Phase : V18.3 national global multi-market.
+- Objectif : choisir un marche final par match entre STRICT_1X2, DOUBLE_CHANCE, OVER_1_5, OVER_2_5, BTTS ou ABSTAIN.
+- StatsBomb : non utilise dans le selecteur global.
+- DOUBLE_CHANCE : derivee des probabilites 1X2, non entrainee comme target separee.
+- ABSTAIN : produit par le selecteur lorsque les seuils de confiance ne sont pas respectes.
+
+Fichier utilise :
+- Predictions test : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\348_v18_3_global_multimarket_test_predictions.csv
+
+Volume :
+- Lignes test analysees : 1947
+- Lignes selectionnees : 1119
+- Lignes abstention : 828
+- Coverage : 0.5747
+- Abstention rate : 0.4253
+- Reliability : 0.9071
+- Confidence moyenne selectionnee : 0.8974
+
+Seuils du selecteur :
+- STRICT_1X2 : prediction non DRAW et confiance >= 0.8
+- OVER_1_5 : YES uniquement et confiance >= 0.8
+- OVER_2_5 : prediction YES/NO avec confiance >= 0.7
+- BTTS : NO uniquement et confiance >= 0.7
+- DOUBLE_CHANCE : probabilite de l'issue exclue <= 0.15
+- Priorite : STRICT_1X2 > OVER_1_5 > OVER_2_5 > BTTS > DOUBLE_CHANCE > ABSTAIN
+
+Repartition par marche :
+- STRICT_1X2 : rows=199, accuracy=0.9347, avg_conf=0.8681, share_total=0.1022
+- DOUBLE_CHANCE : rows=859, accuracy=0.9057, avg_conf=0.9133, share_total=0.4412
+- OVER_1_5 : rows=27, accuracy=0.9259, avg_conf=0.8269, share_total=0.0139
+- OVER_2_5 : rows=22, accuracy=0.7727, avg_conf=0.7279, share_total=0.0113
+- BTTS : rows=12, accuracy=0.7500, avg_conf=0.7185, share_total=0.0062
+- ABSTAIN : rows=828, accuracy=NA, avg_conf=NA, share_total=0.4253
+
+Repartition competitions test :
+- WCQ : 1819
+- WC : 128
+
+Fichiers generes :
+- Synthese : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\351_v18_3_global_selector_summary.txt
+- Resultats selecteur : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\352_v18_3_global_selector_results.csv
+- Repartition marches : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\353_v18_3_global_selector_market_breakdown.csv
+
+Decision technique :
+- Cette evaluation produit le premier selecteur V18.3 global multi-market.
+- Les marches faibles sont filtres avant selection pour eviter une recommandation brute trop risquee.
+- OVER_1_5 NO n'est pas recommande dans cette version, car le diagnostic V18.3 l'a identifie comme faible.
+- BTTS YES n'est pas recommande dans cette version, car le diagnostic V18.3 l'a identifie comme fragile.
+- Les resultats restent experimentaux et ne promettent aucun resultat sportif.

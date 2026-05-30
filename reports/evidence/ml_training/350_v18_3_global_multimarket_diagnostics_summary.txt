@@ -1,0 +1,108 @@
+OK - Diagnostic V18.3 global multi-market termine.
+
+Contexte :
+- Phase : V18.3 national global multi-market.
+- Objectif : diagnostiquer les performances des baselines 1X2, OVER_1_5, OVER_2_5 et BTTS par segments avant le selecteur.
+- StatsBomb : non utilise dans ce diagnostic global.
+- DOUBLE_CHANCE : sera derivee plus tard des probabilites 1X2.
+- ABSTAIN : sera produit plus tard par le selecteur selon les seuils.
+
+Fichiers utilises :
+- Dataset global : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\345_v18_3_global_multimarket_dataset.csv
+- Comparaison modeles : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\347_v18_3_global_multimarket_model_comparison.csv
+- Predictions test : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\348_v18_3_global_multimarket_test_predictions.csv
+
+Volume diagnostique :
+- Lignes test analysees : 1947
+- Competitions : WCQ:1819 | WC:128
+- Periode test : 2017 -> 2026
+
+Modeles retenus depuis 347 :
+- 1X2 : logistic_regression_balanced | accuracy=0.6004 | f1_macro=0.5597 | balanced_accuracy=0.5627
+- OVER_1_5 : random_forest_balanced | accuracy=0.6014 | f1_macro=0.5537 | balanced_accuracy=0.5692
+- OVER_2_5 : random_forest_balanced | accuracy=0.5937 | f1_macro=0.5901 | balanced_accuracy=0.593
+- BTTS : random_forest_balanced | accuracy=0.5413 | f1_macro=0.5311 | balanced_accuracy=0.5349
+
+Performance globale sur le test :
+- 1X2 : rows=1947, accuracy=0.6004, avg_confidence=0.5681, errors=778
+- BTTS : rows=1947, accuracy=0.5413, avg_confidence=0.5656, errors=893
+- OVER_1_5 : rows=1947, accuracy=0.6014, avg_confidence=0.6063, errors=776
+- OVER_2_5 : rows=1947, accuracy=0.5937, avg_confidence=0.5872, errors=791
+
+Points critiques a surveiller :
+- Precision sur les vrais nuls (1X2) : rows=429, accuracy=0.3403, avg_conf=0.5137
+- Controle des matchs under 1.5 (OVER_1_5) : rows=537, accuracy=0.4972, avg_conf=0.5795
+- Controle des matchs over 2.5 (OVER_2_5) : rows=966, accuracy=0.5031, avg_conf=0.5985
+- Controle des matchs BTTS oui (BTTS) : rows=757, accuracy=0.5059, avg_conf=0.5599
+
+================================================================================
+Segments forts pour 1X2 (minimum 30 lignes) :
+- confidence_bucket_1x2 = conf_086_100_tres_forte | rows=113 | accuracy=0.9292 | avg_conf=0.9017
+- confidence_bucket_1x2 = conf_076_085_forte | rows=189 | accuracy=0.8995 | avg_conf=0.7962
+- elo_gap_bucket = abs_elo_301_plus_ecart_tres_fort | rows=311 | accuracy=0.8585 | avg_conf=0.7945
+- confidence_bucket_1x2 = conf_066_075_bonne | rows=268 | accuracy=0.7761 | avg_conf=0.6965
+- 1x2_prediction = TEAM_A_WIN | rows=829 | accuracy=0.7431 | avg_conf=0.6246
+
+Segments faibles pour 1X2 (minimum 30 lignes) :
+- 1x2_prediction = DRAW | rows=450 | accuracy=0.3244 | avg_conf=0.4330
+- target_1x2 = DRAW | rows=429 | accuracy=0.3403 | avg_conf=0.5137
+- elo_gap_bucket = abs_elo_000_025_tres_equilibre | rows=185 | accuracy=0.3622 | avg_conf=0.4326
+- confidence_bucket_1x2 = conf_000_045_tres_faible | rows=559 | accuracy=0.3810 | avg_conf=0.4137
+- elo_gap_bucket = abs_elo_026_075_equilibre | rows=365 | accuracy=0.4110 | avg_conf=0.4543
+
+================================================================================
+Segments forts pour OVER_1_5 (minimum 30 lignes) :
+- confidence_bucket_over_1_5 = conf_086_100_tres_forte | rows=58 | accuracy=0.9655 | avg_conf=0.8965
+- confidence_bucket_over_1_5 = conf_076_085_forte | rows=140 | accuracy=0.8857 | avg_conf=0.7943
+- elo_gap_bucket = abs_elo_301_plus_ecart_tres_fort | rows=311 | accuracy=0.8457 | avg_conf=0.7124
+- confidence_bucket_over_1_5 = conf_066_075_bonne | rows=253 | accuracy=0.7866 | avg_conf=0.6965
+- over_1_5_prediction = YES | rows=1174 | accuracy=0.7700 | avg_conf=0.6362
+
+Segments faibles pour OVER_1_5 (minimum 30 lignes) :
+- over_1_5_prediction = NO | rows=773 | accuracy=0.3454 | avg_conf=0.5610
+- competition_code = WC | rows=128 | accuracy=0.4453 | avg_conf=0.5657
+- stage_type = unknown_or_qualification | rows=128 | accuracy=0.4453 | avg_conf=0.5657
+- season_period = test_period_2017_2018 | rows=116 | accuracy=0.4655 | avg_conf=0.5856
+- elo_gap_bucket = abs_elo_026_075_equilibre | rows=365 | accuracy=0.4767 | avg_conf=0.5810
+
+================================================================================
+Segments forts pour OVER_2_5 (minimum 30 lignes) :
+- confidence_bucket_over_2_5 = conf_076_085_forte | rows=50 | accuracy=0.8600 | avg_conf=0.7928
+- elo_gap_bucket = abs_elo_301_plus_ecart_tres_fort | rows=311 | accuracy=0.7363 | avg_conf=0.6415
+- actual_total_goals_bucket = goals_0_1 | rows=537 | accuracy=0.7039 | avg_conf=0.5739
+- confidence_bucket_over_2_5 = conf_066_075_bonne | rows=166 | accuracy=0.6928 | avg_conf=0.6947
+- target_over_2_5 = NO | rows=981 | accuracy=0.6830 | avg_conf=0.5760
+
+Segments faibles pour OVER_2_5 (minimum 30 lignes) :
+- actual_total_goals_bucket = goals_3 | rows=369 | accuracy=0.4390 | avg_conf=0.5842
+- target_over_2_5 = YES | rows=966 | accuracy=0.5031 | avg_conf=0.5985
+- confidence_bucket_over_2_5 = conf_046_055_faible | rows=643 | accuracy=0.5117 | avg_conf=0.5263
+- actual_total_goals_bucket = goals_4_plus | rows=597 | accuracy=0.5427 | avg_conf=0.6074
+- elo_gap_bucket = abs_elo_076_150_ecart_moyen | rows=448 | accuracy=0.5446 | avg_conf=0.5783
+
+================================================================================
+Segments forts pour BTTS (minimum 30 lignes) :
+- confidence_bucket_btts = conf_066_075_bonne | rows=145 | accuracy=0.6966 | avg_conf=0.6841
+- confidence_bucket_btts = conf_076_085_forte | rows=35 | accuracy=0.6857 | avg_conf=0.7850
+- elo_gap_bucket = abs_elo_301_plus_ecart_tres_fort | rows=311 | accuracy=0.6656 | avg_conf=0.6196
+- btts_prediction = NO | rows=1045 | accuracy=0.6421 | avg_conf=0.5806
+- actual_total_goals_bucket = goals_3 | rows=369 | accuracy=0.5989 | avg_conf=0.5652
+
+Segments faibles pour BTTS (minimum 30 lignes) :
+- btts_prediction = YES | rows=902 | accuracy=0.4246 | avg_conf=0.5483
+- competition_code = WC | rows=128 | accuracy=0.4688 | avg_conf=0.5651
+- stage_type = unknown_or_qualification | rows=128 | accuracy=0.4688 | avg_conf=0.5651
+- actual_total_goals_bucket = goals_0_1 | rows=537 | accuracy=0.4786 | avg_conf=0.5528
+- elo_advantage_side = team_b_elo_advantage | rows=940 | accuracy=0.4809 | avg_conf=0.5539
+
+Fichiers generes :
+- Diagnostics segments : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\349_v18_3_global_multimarket_segment_diagnostics.csv
+- Synthese : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\350_v18_3_global_multimarket_diagnostics_summary.txt
+
+Decision technique :
+- Cette etape valide le diagnostic avant construction du selecteur V18.3.
+- Le futur selecteur devra eviter de choisir un marche uniquement parce que sa classe majoritaire est frequente.
+- OVER_2_5 semble utile a surveiller car il est plus equilibre que OVER_1_5 dans le test.
+- BTTS reste fragile et devra etre filtre strictement si le selecteur l'utilise.
+- Les segments post-match comme actual_total_goals_bucket servent uniquement au diagnostic d'erreurs, pas a la prediction.
+- Les resultats restent experimentaux et ne promettent aucun resultat sportif.

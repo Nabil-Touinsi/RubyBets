@@ -1,0 +1,124 @@
+market,segment_family,segment_value,rows,correct_rows,error_rows,accuracy,avg_confidence,min_confidence,max_confidence,target_distribution,prediction_distribution,main_model,note
+1X2,1x2_prediction,TEAM_A_WIN,829,616,213,0.7431,0.6246,0.3448,0.9755,TEAM_A_WIN:616 | DRAW:146 | TEAM_B_WIN:67,TEAM_A_WIN:829,logistic_regression_balanced,Diagnostic par classe predite.
+1X2,1x2_prediction,TEAM_B_WIN,668,407,261,0.6093,0.5891,0.3584,0.9763,TEAM_B_WIN:407 | DRAW:137 | TEAM_A_WIN:124,TEAM_B_WIN:668,logistic_regression_balanced,Diagnostic par classe predite.
+1X2,1x2_prediction,DRAW,450,146,304,0.3244,0.433,0.3433,0.5409,TEAM_A_WIN:174 | DRAW:146 | TEAM_B_WIN:130,DRAW:450,logistic_regression_balanced,Diagnostic par classe predite.
+1X2,actual_total_goals_bucket,goals_4_plus,597,439,158,0.7353,0.6207,0.3433,0.9755,TEAM_A_WIN:341 | TEAM_B_WIN:177 | DRAW:79,TEAM_A_WIN:310 | TEAM_B_WIN:191 | DRAW:96,logistic_regression_balanced,"Segment post-match utilise pour diagnostiquer les erreurs, pas pour predire."
+1X2,actual_total_goals_bucket,goals_0_1,537,258,279,0.4804,0.5275,0.3494,0.9502,TEAM_A_WIN:214 | TEAM_B_WIN:165 | DRAW:158,TEAM_A_WIN:192 | TEAM_B_WIN:185 | DRAW:160,logistic_regression_balanced,"Segment post-match utilise pour diagnostiquer les erreurs, pas pour predire."
+1X2,actual_total_goals_bucket,goals_2,444,236,208,0.5315,0.55,0.3496,0.9763,DRAW:192 | TEAM_A_WIN:140 | TEAM_B_WIN:112,TEAM_A_WIN:169 | TEAM_B_WIN:160 | DRAW:115,logistic_regression_balanced,"Segment post-match utilise pour diagnostiquer les erreurs, pas pour predire."
+1X2,actual_total_goals_bucket,goals_3,369,236,133,0.6396,0.5639,0.3448,0.9544,TEAM_A_WIN:219 | TEAM_B_WIN:150,TEAM_A_WIN:158 | TEAM_B_WIN:132 | DRAW:79,logistic_regression_balanced,"Segment post-match utilise pour diagnostiquer les erreurs, pas pour predire."
+1X2,competition_code,WCQ,1819,1116,703,0.6135,0.5758,0.3433,0.9763,TEAM_A_WIN:861 | TEAM_B_WIN:557 | DRAW:401,TEAM_A_WIN:801 | TEAM_B_WIN:618 | DRAW:400,logistic_regression_balanced,
+1X2,competition_code,WC,128,53,75,0.4141,0.4588,0.3478,0.822,TEAM_A_WIN:53 | TEAM_B_WIN:47 | DRAW:28,DRAW:50 | TEAM_B_WIN:50 | TEAM_A_WIN:28,logistic_regression_balanced,
+1X2,confidence_bucket_1x2,conf_000_045_tres_faible,559,213,346,0.381,0.4137,0.3433,0.45,TEAM_A_WIN:221 | TEAM_B_WIN:173 | DRAW:165,DRAW:310 | TEAM_A_WIN:126 | TEAM_B_WIN:123,logistic_regression_balanced,Diagnostic par niveau de probabilite maximale du modele.
+1X2,confidence_bucket_1x2,conf_046_055_faible,516,256,260,0.4961,0.4936,0.45,0.5499,TEAM_A_WIN:224 | TEAM_B_WIN:152 | DRAW:140,TEAM_B_WIN:193 | TEAM_A_WIN:183 | DRAW:140,logistic_regression_balanced,Diagnostic par niveau de probabilite maximale du modele.
+1X2,confidence_bucket_1x2,conf_056_065_moyenne,302,217,85,0.7185,0.5999,0.5509,0.6498,TEAM_A_WIN:147 | TEAM_B_WIN:100 | DRAW:55,TEAM_A_WIN:161 | TEAM_B_WIN:141,logistic_regression_balanced,Diagnostic par niveau de probabilite maximale du modele.
+1X2,confidence_bucket_1x2,conf_066_075_bonne,268,208,60,0.7761,0.6965,0.65,0.7498,TEAM_A_WIN:145 | TEAM_B_WIN:75 | DRAW:48,TEAM_A_WIN:168 | TEAM_B_WIN:100,logistic_regression_balanced,Diagnostic par niveau de probabilite maximale du modele.
+1X2,confidence_bucket_1x2,conf_076_085_forte,189,170,19,0.8995,0.7962,0.7501,0.8499,TEAM_A_WIN:110 | TEAM_B_WIN:64 | DRAW:15,TEAM_A_WIN:117 | TEAM_B_WIN:72,logistic_regression_balanced,Diagnostic par niveau de probabilite maximale du modele.
+1X2,confidence_bucket_1x2,conf_086_100_tres_forte,113,105,8,0.9292,0.9017,0.8517,0.9763,TEAM_A_WIN:67 | TEAM_B_WIN:40 | DRAW:6,TEAM_A_WIN:74 | TEAM_B_WIN:39,logistic_regression_balanced,Diagnostic par niveau de probabilite maximale du modele.
+1X2,elo_advantage_side,team_a_elo_advantage,1007,664,343,0.6594,0.5898,0.3433,0.9755,TEAM_A_WIN:708 | DRAW:206 | TEAM_B_WIN:93,TEAM_A_WIN:792 | DRAW:175 | TEAM_B_WIN:40,logistic_regression_balanced,
+1X2,elo_advantage_side,team_b_elo_advantage,940,505,435,0.5372,0.5449,0.3448,0.9763,TEAM_B_WIN:511 | DRAW:223 | TEAM_A_WIN:206,TEAM_B_WIN:628 | DRAW:275 | TEAM_A_WIN:37,logistic_regression_balanced,
+1X2,elo_gap_bucket,abs_elo_151_300_ecart_fort,638,444,194,0.6959,0.6118,0.3874,0.8993,TEAM_A_WIN:311 | TEAM_B_WIN:198 | DRAW:129,TEAM_A_WIN:326 | TEAM_B_WIN:276 | DRAW:36,logistic_regression_balanced,
+1X2,elo_gap_bucket,abs_elo_076_150_ecart_moyen,448,241,207,0.5379,0.4976,0.3448,0.8131,TEAM_A_WIN:218 | TEAM_B_WIN:118 | DRAW:112,TEAM_A_WIN:180 | DRAW:154 | TEAM_B_WIN:114,logistic_regression_balanced,
+1X2,elo_gap_bucket,abs_elo_026_075_equilibre,365,150,215,0.411,0.4543,0.3478,0.7431,TEAM_A_WIN:147 | TEAM_B_WIN:114 | DRAW:104,DRAW:165 | TEAM_A_WIN:110 | TEAM_B_WIN:90,logistic_regression_balanced,
+1X2,elo_gap_bucket,abs_elo_301_plus_ecart_tres_fort,311,267,44,0.8585,0.7945,0.4794,0.9763,TEAM_A_WIN:151 | TEAM_B_WIN:126 | DRAW:34,TEAM_A_WIN:164 | TEAM_B_WIN:147,logistic_regression_balanced,
+1X2,elo_gap_bucket,abs_elo_000_025_tres_equilibre,185,67,118,0.3622,0.4326,0.3433,0.6378,TEAM_A_WIN:87 | DRAW:50 | TEAM_B_WIN:48,DRAW:95 | TEAM_A_WIN:49 | TEAM_B_WIN:41,logistic_regression_balanced,
+1X2,host_context,team_a_host,1512,925,587,0.6118,0.5724,0.3433,0.9755,TEAM_A_WIN:749 | TEAM_B_WIN:429 | DRAW:334,TEAM_A_WIN:711 | TEAM_B_WIN:410 | DRAW:391,logistic_regression_balanced,
+1X2,host_context,neutral_venue,435,244,191,0.5609,0.5532,0.3478,0.9763,TEAM_B_WIN:175 | TEAM_A_WIN:165 | DRAW:95,TEAM_B_WIN:258 | TEAM_A_WIN:118 | DRAW:59,logistic_regression_balanced,
+1X2,overall,all_test_rows,1947,1169,778,0.6004,0.5681,0.3433,0.9763,TEAM_A_WIN:914 | TEAM_B_WIN:604 | DRAW:429,TEAM_A_WIN:829 | TEAM_B_WIN:668 | DRAW:450,logistic_regression_balanced,Performance globale sur le test chronologique.
+1X2,season_period,test_period_2019_2022,930,561,369,0.6032,0.5642,0.3448,0.9763,TEAM_A_WIN:443 | TEAM_B_WIN:288 | DRAW:199,TEAM_A_WIN:392 | TEAM_B_WIN:312 | DRAW:226,logistic_regression_balanced,
+1X2,season_period,test_period_2023_2026,901,547,354,0.6071,0.5805,0.3433,0.9699,TEAM_A_WIN:421 | TEAM_B_WIN:278 | DRAW:202,TEAM_A_WIN:400 | TEAM_B_WIN:320 | DRAW:181,logistic_regression_balanced,
+1X2,season_period,test_period_2017_2018,116,61,55,0.5259,0.5036,0.3478,0.9156,TEAM_A_WIN:50 | TEAM_B_WIN:38 | DRAW:28,DRAW:43 | TEAM_A_WIN:37 | TEAM_B_WIN:36,logistic_regression_balanced,
+1X2,stage_type,world_cup_qualification,1819,1116,703,0.6135,0.5758,0.3433,0.9763,TEAM_A_WIN:861 | TEAM_B_WIN:557 | DRAW:401,TEAM_A_WIN:801 | TEAM_B_WIN:618 | DRAW:400,logistic_regression_balanced,
+1X2,stage_type,unknown_or_qualification,128,53,75,0.4141,0.4588,0.3478,0.822,TEAM_A_WIN:53 | TEAM_B_WIN:47 | DRAW:28,DRAW:50 | TEAM_B_WIN:50 | TEAM_A_WIN:28,logistic_regression_balanced,
+1X2,target_1x2,TEAM_A_WIN,914,616,298,0.674,0.5906,0.3494,0.9755,TEAM_A_WIN:914,TEAM_A_WIN:616 | DRAW:174 | TEAM_B_WIN:124,logistic_regression_balanced,Diagnostic par classe reelle.
+1X2,target_1x2,TEAM_B_WIN,604,407,197,0.6738,0.5729,0.3433,0.9763,TEAM_B_WIN:604,TEAM_B_WIN:407 | DRAW:130 | TEAM_A_WIN:67,logistic_regression_balanced,Diagnostic par classe reelle.
+1X2,target_1x2,DRAW,429,146,283,0.3403,0.5137,0.3496,0.8904,DRAW:429,DRAW:146 | TEAM_A_WIN:146 | TEAM_B_WIN:137,logistic_regression_balanced,Diagnostic par classe reelle.
+BTTS,actual_total_goals_bucket,goals_4_plus,597,351,246,0.5879,0.5823,0.5,0.8826,YES:367 | NO:230,NO:382 | YES:215,random_forest_balanced,"Segment post-match utilise pour diagnostiquer les erreurs, pas pour predire."
+BTTS,actual_total_goals_bucket,goals_0_1,537,257,280,0.4786,0.5528,0.5003,0.7858,NO:537,YES:280 | NO:257,random_forest_balanced,"Segment post-match utilise pour diagnostiquer les erreurs, pas pour predire."
+BTTS,actual_total_goals_bucket,goals_2,444,225,219,0.5068,0.5591,0.5003,0.861,NO:252 | YES:192,YES:231 | NO:213,random_forest_balanced,"Segment post-match utilise pour diagnostiquer les erreurs, pas pour predire."
+BTTS,actual_total_goals_bucket,goals_3,369,221,148,0.5989,0.5652,0.5001,0.8092,YES:198 | NO:171,NO:193 | YES:176,random_forest_balanced,"Segment post-match utilise pour diagnostiquer les erreurs, pas pour predire."
+BTTS,btts_prediction,NO,1045,671,374,0.6421,0.5806,0.5,0.8826,NO:671 | YES:374,NO:1045,random_forest_balanced,Diagnostic par classe predite.
+BTTS,btts_prediction,YES,902,383,519,0.4246,0.5483,0.5002,0.6963,NO:519 | YES:383,YES:902,random_forest_balanced,Diagnostic par classe predite.
+BTTS,competition_code,WCQ,1819,994,825,0.5465,0.5657,0.5,0.8826,NO:1125 | YES:694,NO:1014 | YES:805,random_forest_balanced,
+BTTS,competition_code,WC,128,60,68,0.4688,0.5651,0.5003,0.6759,NO:65 | YES:63,YES:97 | NO:31,random_forest_balanced,
+BTTS,confidence_bucket_btts,conf_046_055_faible,989,513,476,0.5187,0.524,0.5,0.5498,NO:578 | YES:411,YES:537 | NO:452,random_forest_balanced,Diagnostic par niveau de probabilite maximale du modele.
+BTTS,confidence_bucket_btts,conf_056_065_moyenne,775,414,361,0.5342,0.5855,0.55,0.6497,NO:481 | YES:294,NO:424 | YES:351,random_forest_balanced,Diagnostic par niveau de probabilite maximale du modele.
+BTTS,confidence_bucket_btts,conf_066_075_bonne,145,101,44,0.6966,0.6841,0.6503,0.7442,NO:105 | YES:40,NO:131 | YES:14,random_forest_balanced,Diagnostic par niveau de probabilite maximale du modele.
+BTTS,confidence_bucket_btts,conf_076_085_forte,35,24,11,0.6857,0.785,0.7519,0.8497,NO:24 | YES:11,NO:35,random_forest_balanced,Diagnostic par niveau de probabilite maximale du modele.
+BTTS,confidence_bucket_btts,conf_086_100_tres_forte,3,2,1,0.6667,0.8666,0.8563,0.8826,NO:2 | YES:1,NO:3,random_forest_balanced,Diagnostic par niveau de probabilite maximale du modele.
+BTTS,elo_advantage_side,team_a_elo_advantage,1007,602,405,0.5978,0.5766,0.5001,0.8826,NO:615 | YES:392,NO:792 | YES:215,random_forest_balanced,
+BTTS,elo_advantage_side,team_b_elo_advantage,940,452,488,0.4809,0.5539,0.5,0.7895,NO:575 | YES:365,YES:687 | NO:253,random_forest_balanced,
+BTTS,elo_gap_bucket,abs_elo_151_300_ecart_fort,638,333,305,0.5219,0.5704,0.5009,0.8563,NO:412 | YES:226,NO:371 | YES:267,random_forest_balanced,
+BTTS,elo_gap_bucket,abs_elo_076_150_ecart_moyen,448,228,220,0.5089,0.5472,0.5,0.7137,NO:252 | YES:196,YES:226 | NO:222,random_forest_balanced,
+BTTS,elo_gap_bucket,abs_elo_026_075_equilibre,365,189,176,0.5178,0.5446,0.5001,0.6963,NO:198 | YES:167,YES:221 | NO:144,random_forest_balanced,
+BTTS,elo_gap_bucket,abs_elo_301_plus_ecart_tres_fort,311,207,104,0.6656,0.6196,0.5011,0.8826,NO:228 | YES:83,NO:250 | YES:61,random_forest_balanced,
+BTTS,elo_gap_bucket,abs_elo_000_025_tres_equilibre,185,97,88,0.5243,0.5444,0.5002,0.6855,NO:100 | YES:85,YES:127 | NO:58,random_forest_balanced,
+BTTS,host_context,team_a_host,1512,819,693,0.5417,0.5655,0.5,0.8826,NO:940 | YES:572,NO:859 | YES:653,random_forest_balanced,
+BTTS,host_context,neutral_venue,435,235,200,0.5402,0.566,0.5001,0.7986,NO:250 | YES:185,YES:249 | NO:186,random_forest_balanced,
+BTTS,overall,all_test_rows,1947,1054,893,0.5413,0.5656,0.5,0.8826,NO:1190 | YES:757,NO:1045 | YES:902,random_forest_balanced,Performance globale sur le test chronologique.
+BTTS,season_period,test_period_2019_2022,930,507,423,0.5452,0.5645,0.5001,0.861,NO:573 | YES:357,NO:484 | YES:446,random_forest_balanced,
+BTTS,season_period,test_period_2023_2026,901,488,413,0.5416,0.5672,0.5,0.8826,NO:553 | YES:348,NO:516 | YES:385,random_forest_balanced,
+BTTS,season_period,test_period_2017_2018,116,59,57,0.5086,0.5627,0.5012,0.814,NO:64 | YES:52,YES:71 | NO:45,random_forest_balanced,
+BTTS,stage_type,world_cup_qualification,1819,994,825,0.5465,0.5657,0.5,0.8826,NO:1125 | YES:694,NO:1014 | YES:805,random_forest_balanced,
+BTTS,stage_type,unknown_or_qualification,128,60,68,0.4688,0.5651,0.5003,0.6759,NO:65 | YES:63,YES:97 | NO:31,random_forest_balanced,
+BTTS,target_btts,NO,1190,671,519,0.5639,0.5692,0.5001,0.8826,NO:1190,NO:671 | YES:519,random_forest_balanced,Diagnostic par classe reelle.
+BTTS,target_btts,YES,757,383,374,0.5059,0.5599,0.5,0.8563,YES:757,YES:383 | NO:374,random_forest_balanced,Diagnostic par classe reelle.
+OVER_1_5,actual_total_goals_bucket,goals_4_plus,597,432,165,0.7236,0.6402,0.5005,0.9581,YES:597,YES:432 | NO:165,random_forest_balanced,"Segment post-match utilise pour diagnostiquer les erreurs, pas pour predire."
+OVER_1_5,actual_total_goals_bucket,goals_0_1,537,267,270,0.4972,0.5795,0.5001,0.9101,NO:537,YES:270 | NO:267,random_forest_balanced,"Segment post-match utilise pour diagnostiquer les erreurs, pas pour predire."
+OVER_1_5,actual_total_goals_bucket,goals_2,444,246,198,0.5541,0.5918,0.5002,0.9523,YES:444,YES:246 | NO:198,random_forest_balanced,"Segment post-match utilise pour diagnostiquer les erreurs, pas pour predire."
+OVER_1_5,actual_total_goals_bucket,goals_3,369,226,143,0.6125,0.608,0.5011,0.9387,YES:369,YES:226 | NO:143,random_forest_balanced,"Segment post-match utilise pour diagnostiquer les erreurs, pas pour predire."
+OVER_1_5,competition_code,WCQ,1819,1114,705,0.6124,0.6092,0.5001,0.9581,YES:1315 | NO:504,YES:1126 | NO:693,random_forest_balanced,
+OVER_1_5,competition_code,WC,128,57,71,0.4453,0.5657,0.5016,0.722,YES:95 | NO:33,NO:80 | YES:48,random_forest_balanced,
+OVER_1_5,confidence_bucket_over_1_5,conf_056_065_moyenne,868,460,408,0.53,0.5893,0.5501,0.65,YES:605 | NO:263,NO:457 | YES:411,random_forest_balanced,Diagnostic par niveau de probabilite maximale du modele.
+OVER_1_5,confidence_bucket_over_1_5,conf_046_055_faible,628,332,296,0.5287,0.5248,0.5001,0.55,YES:424 | NO:204,NO:314 | YES:314,random_forest_balanced,Diagnostic par niveau de probabilite maximale du modele.
+OVER_1_5,confidence_bucket_over_1_5,conf_066_075_bonne,253,199,54,0.7866,0.6965,0.6501,0.7499,YES:201 | NO:52,YES:251 | NO:2,random_forest_balanced,Diagnostic par niveau de probabilite maximale du modele.
+OVER_1_5,confidence_bucket_over_1_5,conf_076_085_forte,140,124,16,0.8857,0.7943,0.7501,0.8476,YES:124 | NO:16,YES:140,random_forest_balanced,Diagnostic par niveau de probabilite maximale du modele.
+OVER_1_5,confidence_bucket_over_1_5,conf_086_100_tres_forte,58,56,2,0.9655,0.8965,0.8504,0.9581,YES:56 | NO:2,YES:58,random_forest_balanced,Diagnostic par niveau de probabilite maximale du modele.
+OVER_1_5,elo_advantage_side,team_a_elo_advantage,1007,668,339,0.6634,0.625,0.5002,0.9581,YES:754 | NO:253,YES:747 | NO:260,random_forest_balanced,
+OVER_1_5,elo_advantage_side,team_b_elo_advantage,940,503,437,0.5351,0.5864,0.5001,0.9523,YES:656 | NO:284,NO:513 | YES:427,random_forest_balanced,
+OVER_1_5,elo_gap_bucket,abs_elo_151_300_ecart_fort,638,399,239,0.6254,0.5912,0.5001,0.9505,YES:456 | NO:182,YES:417 | NO:221,random_forest_balanced,
+OVER_1_5,elo_gap_bucket,abs_elo_076_150_ecart_moyen,448,246,202,0.5491,0.5852,0.5006,0.8289,YES:312 | NO:136,YES:228 | NO:220,random_forest_balanced,
+OVER_1_5,elo_gap_bucket,abs_elo_026_075_equilibre,365,174,191,0.4767,0.581,0.5005,0.839,YES:247 | NO:118,NO:207 | YES:158,random_forest_balanced,
+OVER_1_5,elo_gap_bucket,abs_elo_301_plus_ecart_tres_fort,311,263,48,0.8457,0.7124,0.5009,0.9581,YES:269 | NO:42,YES:295 | NO:16,random_forest_balanced,
+OVER_1_5,elo_gap_bucket,abs_elo_000_025_tres_equilibre,185,89,96,0.4811,0.5814,0.5004,0.783,YES:126 | NO:59,NO:109 | YES:76,random_forest_balanced,
+OVER_1_5,host_context,team_a_host,1512,901,611,0.5959,0.6087,0.5001,0.9581,YES:1091 | NO:421,YES:882 | NO:630,random_forest_balanced,
+OVER_1_5,host_context,neutral_venue,435,270,165,0.6207,0.5981,0.5002,0.9523,YES:319 | NO:116,YES:292 | NO:143,random_forest_balanced,
+OVER_1_5,over_1_5_prediction,YES,1174,904,270,0.77,0.6362,0.5002,0.9581,YES:904 | NO:270,YES:1174,random_forest_balanced,Diagnostic par classe predite.
+OVER_1_5,over_1_5_prediction,NO,773,267,506,0.3454,0.561,0.5001,0.6652,YES:506 | NO:267,NO:773,random_forest_balanced,Diagnostic par classe predite.
+OVER_1_5,overall,all_test_rows,1947,1171,776,0.6014,0.6063,0.5001,0.9581,YES:1410 | NO:537,YES:1174 | NO:773,random_forest_balanced,Performance globale sur le test chronologique.
+OVER_1_5,season_period,test_period_2019_2022,930,561,369,0.6032,0.6072,0.5002,0.9523,YES:676 | NO:254,YES:555 | NO:375,random_forest_balanced,
+OVER_1_5,season_period,test_period_2023_2026,901,556,345,0.6171,0.6081,0.5001,0.9505,YES:651 | NO:250,YES:570 | NO:331,random_forest_balanced,
+OVER_1_5,season_period,test_period_2017_2018,116,54,62,0.4655,0.5856,0.5018,0.9581,YES:83 | NO:33,NO:67 | YES:49,random_forest_balanced,
+OVER_1_5,stage_type,world_cup_qualification,1819,1114,705,0.6124,0.6092,0.5001,0.9581,YES:1315 | NO:504,YES:1126 | NO:693,random_forest_balanced,
+OVER_1_5,stage_type,unknown_or_qualification,128,57,71,0.4453,0.5657,0.5016,0.722,YES:95 | NO:33,NO:80 | YES:48,random_forest_balanced,
+OVER_1_5,target_over_1_5,YES,1410,904,506,0.6411,0.6165,0.5002,0.9581,YES:1410,YES:904 | NO:506,random_forest_balanced,Diagnostic par classe reelle.
+OVER_1_5,target_over_1_5,NO,537,267,270,0.4972,0.5795,0.5001,0.9101,NO:537,YES:270 | NO:267,random_forest_balanced,Diagnostic par classe reelle.
+OVER_2_5,actual_total_goals_bucket,goals_4_plus,597,324,273,0.5427,0.6074,0.5,0.9284,YES:597,YES:324 | NO:273,random_forest_balanced,"Segment post-match utilise pour diagnostiquer les erreurs, pas pour predire."
+OVER_2_5,actual_total_goals_bucket,goals_0_1,537,378,159,0.7039,0.5739,0.5005,0.9052,NO:537,NO:378 | YES:159,random_forest_balanced,"Segment post-match utilise pour diagnostiquer les erreurs, pas pour predire."
+OVER_2_5,actual_total_goals_bucket,goals_2,444,292,152,0.6577,0.5785,0.5001,0.8701,NO:444,NO:292 | YES:152,random_forest_balanced,"Segment post-match utilise pour diagnostiquer les erreurs, pas pour predire."
+OVER_2_5,actual_total_goals_bucket,goals_3,369,162,207,0.439,0.5842,0.5002,0.9183,YES:369,NO:207 | YES:162,random_forest_balanced,"Segment post-match utilise pour diagnostiquer les erreurs, pas pour predire."
+OVER_2_5,competition_code,WCQ,1819,1084,735,0.5959,0.5892,0.5,0.9284,NO:914 | YES:905,NO:1049 | YES:770,random_forest_balanced,
+OVER_2_5,competition_code,WC,128,72,56,0.5625,0.5594,0.501,0.694,NO:67 | YES:61,NO:101 | YES:27,random_forest_balanced,
+OVER_2_5,confidence_bucket_over_2_5,conf_056_065_moyenne,1064,647,417,0.6081,0.5906,0.55,0.6499,NO:604 | YES:460,NO:771 | YES:293,random_forest_balanced,Diagnostic par niveau de probabilite maximale du modele.
+OVER_2_5,confidence_bucket_over_2_5,conf_046_055_faible,643,329,314,0.5117,0.5263,0.5,0.5499,YES:324 | NO:319,NO:375 | YES:268,random_forest_balanced,Diagnostic par niveau de probabilite maximale du modele.
+OVER_2_5,confidence_bucket_over_2_5,conf_066_075_bonne,166,115,51,0.6928,0.6947,0.6502,0.7492,YES:117 | NO:49,YES:162 | NO:4,random_forest_balanced,Diagnostic par niveau de probabilite maximale du modele.
+OVER_2_5,confidence_bucket_over_2_5,conf_076_085_forte,50,43,7,0.86,0.7928,0.7533,0.8435,YES:43 | NO:7,YES:50,random_forest_balanced,Diagnostic par niveau de probabilite maximale du modele.
+OVER_2_5,confidence_bucket_over_2_5,conf_086_100_tres_forte,24,22,2,0.9167,0.8959,0.854,0.9284,YES:22 | NO:2,YES:24,random_forest_balanced,Diagnostic par niveau de probabilite maximale du modele.
+OVER_2_5,elo_advantage_side,team_a_elo_advantage,1007,594,413,0.5899,0.5959,0.5001,0.9284,YES:544 | NO:463,YES:521 | NO:486,random_forest_balanced,
+OVER_2_5,elo_advantage_side,team_b_elo_advantage,940,562,378,0.5979,0.5778,0.5,0.8389,NO:518 | YES:422,NO:664 | YES:276,random_forest_balanced,
+OVER_2_5,elo_gap_bucket,abs_elo_151_300_ecart_fort,638,371,267,0.5815,0.5775,0.5,0.9263,NO:340 | YES:298,NO:399 | YES:239,random_forest_balanced,
+OVER_2_5,elo_gap_bucket,abs_elo_076_150_ecart_moyen,448,244,204,0.5446,0.5783,0.5005,0.8335,NO:230 | YES:218,NO:306 | YES:142,random_forest_balanced,
+OVER_2_5,elo_gap_bucket,abs_elo_026_075_equilibre,365,208,157,0.5699,0.5743,0.5002,0.8701,NO:200 | YES:165,NO:253 | YES:112,random_forest_balanced,
+OVER_2_5,elo_gap_bucket,abs_elo_301_plus_ecart_tres_fort,311,229,82,0.7363,0.6415,0.5004,0.9284,YES:208 | NO:103,YES:240 | NO:71,random_forest_balanced,
+OVER_2_5,elo_gap_bucket,abs_elo_000_025_tres_equilibre,185,104,81,0.5622,0.5765,0.501,0.746,NO:108 | YES:77,NO:121 | YES:64,random_forest_balanced,
+OVER_2_5,host_context,team_a_host,1512,917,595,0.6065,0.589,0.5001,0.9284,NO:770 | YES:742,NO:977 | YES:535,random_forest_balanced,
+OVER_2_5,host_context,neutral_venue,435,239,196,0.5494,0.581,0.5,0.864,YES:224 | NO:211,YES:262 | NO:173,random_forest_balanced,
+OVER_2_5,over_2_5_prediction,NO,1150,670,480,0.5826,0.5698,0.5002,0.694,NO:670 | YES:480,NO:1150,random_forest_balanced,Diagnostic par classe predite.
+OVER_2_5,over_2_5_prediction,YES,797,486,311,0.6098,0.6124,0.5,0.9284,YES:486 | NO:311,YES:797,random_forest_balanced,Diagnostic par classe predite.
+OVER_2_5,overall,all_test_rows,1947,1156,791,0.5937,0.5872,0.5,0.9284,NO:981 | YES:966,NO:1150 | YES:797,random_forest_balanced,Performance globale sur le test chronologique.
+OVER_2_5,season_period,test_period_2019_2022,930,546,384,0.5871,0.5883,0.5,0.9284,NO:477 | YES:453,NO:551 | YES:379,random_forest_balanced,
+OVER_2_5,season_period,test_period_2023_2026,901,544,357,0.6038,0.5881,0.5002,0.9263,YES:458 | NO:443,NO:514 | YES:387,random_forest_balanced,
+OVER_2_5,season_period,test_period_2017_2018,116,66,50,0.569,0.5719,0.501,0.9134,NO:61 | YES:55,NO:85 | YES:31,random_forest_balanced,
+OVER_2_5,stage_type,world_cup_qualification,1819,1084,735,0.5959,0.5892,0.5,0.9284,NO:914 | YES:905,NO:1049 | YES:770,random_forest_balanced,
+OVER_2_5,stage_type,unknown_or_qualification,128,72,56,0.5625,0.5594,0.501,0.694,NO:67 | YES:61,NO:101 | YES:27,random_forest_balanced,
+OVER_2_5,target_over_2_5,NO,981,670,311,0.683,0.576,0.5001,0.9052,NO:981,NO:670 | YES:311,random_forest_balanced,Diagnostic par classe reelle.
+OVER_2_5,target_over_2_5,YES,966,486,480,0.5031,0.5985,0.5,0.9284,YES:966,YES:486 | NO:480,random_forest_balanced,Diagnostic par classe reelle.
