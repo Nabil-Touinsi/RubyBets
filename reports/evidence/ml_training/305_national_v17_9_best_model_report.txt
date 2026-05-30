@@ -1,0 +1,35 @@
+Rapport détaillé - meilleur modèle national V17.9 baseline
+
+Meilleur modèle : logistic_regression_balanced
+Accuracy test : 0.602
+F1 macro test : 0.5599
+F1 weighted test : 0.6044
+
+Classification report :
+- TEAM_A_WIN
+  precision : 0.7446
+  recall    : 0.6761
+  f1-score  : 0.7087
+  support   : 914
+- DRAW
+  precision : 0.3235
+  recall    : 0.3333
+  f1-score  : 0.3284
+  support   : 429
+- TEAM_B_WIN
+  precision : 0.6089
+  recall    : 0.6805
+  f1-score  : 0.6427
+  support   : 604
+
+Confusion matrix :
+Labels : TEAM_A_WIN, DRAW, TEAM_B_WIN
+[618, 173, 123]
+[145, 143, 141]
+[67, 126, 411]
+
+Note méthodologique :
+- Le split est chronologique pour simuler un usage réel avant-match.
+- Le modèle V17.9 national ne remplace pas V17.8 club.
+- Les colonnes home_* / away_* représentent Team A / Team B dans ce pipeline national.
+- Les scores ne constituent pas une promesse de résultat sportif.

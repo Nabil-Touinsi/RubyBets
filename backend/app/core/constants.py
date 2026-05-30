@@ -7,6 +7,7 @@ MVP_COMPETITION_CODES = {
     "SA",    # Serie A
     "PD",    # La Liga
     "CL",    # Champions League
+    "WC",    # World Cup
 }
 
 FOOTBALL_DATA_PROVIDER = "football-data.org"

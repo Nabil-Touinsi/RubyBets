@@ -1,0 +1,47 @@
+OK - Évaluation stratégie sélective V17.9.1 terminée.
+Feature version : national_v1_elo_form
+Fichier prédictions : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\306_national_v17_9_predictions.csv
+Couverture minimale de sélection : 0.2
+
+Référence sans abstention :
+- strategy_name : all_predictions
+- accuracy : 0.602
+- f1_macro : 0.5599
+- coverage : 1.0
+
+Meilleure stratégie retenue :
+- strategy_name : abs_elo_gap_200_plus_no_predicted_draw
+- selected_rows : 686
+- coverage : 0.3523
+- abstention_rate : 0.6477
+- accuracy : 0.7886
+- f1_macro : 0.5681
+- f1_weighted : 0.7235
+- draw_rows : 107
+- draw_accuracy : 0.0
+- wc_rows : 14
+- wc_accuracy : 0.5
+- wcq_rows : 672
+- wcq_accuracy : 0.7946
+
+Top stratégies par accuracy :
+- abs_elo_gap_400_plus | accuracy=0.9291 | coverage=0.0652 | abstention=0.9348 | f1_macro=0.6346
+- abs_elo_gap_300_plus | accuracy=0.8585 | coverage=0.1597 | abstention=0.8403 | f1_macro=0.6048
+- abs_elo_gap_200_plus_no_predicted_draw | accuracy=0.7886 | coverage=0.3523 | abstention=0.6477 | f1_macro=0.5681
+- abs_elo_gap_200_plus | accuracy=0.7873 | coverage=0.3549 | abstention=0.6451 | f1_macro=0.5845
+- abs_elo_gap_150_plus_no_predicted_draw | accuracy=0.7616 | coverage=0.4741 | abstention=0.5259 | f1_macro=0.551
+- abs_elo_gap_150_plus | accuracy=0.7524 | coverage=0.4874 | abstention=0.5126 | f1_macro=0.5849
+- abs_elo_gap_100_plus_no_predicted_draw | accuracy=0.7419 | coverage=0.5732 | abstention=0.4268 | f1_macro=0.5376
+- neutral_abs_elo_gap_100_plus | accuracy=0.7257 | coverage=0.1161 | abstention=0.8839 | f1_macro=0.5932
+- wcq_abs_elo_gap_100_plus | accuracy=0.7186 | coverage=0.5968 | abstention=0.4032 | f1_macro=0.5973
+- abs_elo_gap_100_plus | accuracy=0.7108 | coverage=0.6251 | abstention=0.3749 | f1_macro=0.5964
+
+CSV comparaison stratégies : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\312_national_v17_9_selective_strategy_results.csv
+CSV meilleure sélection : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\313_national_v17_9_best_selective_predictions.csv
+
+Décision technique :
+- Une stratégie sélective est nécessaire avant toute intégration frontend.
+- Les matchs avec faible elo_gap doivent être considérés comme plus risqués.
+- La prédiction des DRAW reste fragile et doit être affichée avec prudence.
+- StatsBomb ne doit être envisagé qu'après validation de cette stratégie sélective.
+- Le modèle national V17.9 ne remplace pas le modèle club V17.8.

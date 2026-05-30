@@ -1,0 +1,17 @@
+segment_name,segment_value,rows,accuracy,f1_macro,team_a_win_rows,draw_rows,team_b_win_rows
+competition_code,WC,128,0.4375,0.429,53,28,47
+competition_code,WCQ,1819,0.6135,0.5678,861,401,557
+is_neutral_venue,False,1512,0.6098,0.5668,749,334,429
+is_neutral_venue,True,435,0.5747,0.5029,165,95,175
+host_advantage_side,NONE,435,0.5747,0.5029,165,95,175
+host_advantage_side,TEAM_A,1512,0.6098,0.5668,749,334,429
+is_group_stage,False,1947,0.602,0.5599,914,429,604
+is_knockout_stage,False,1947,0.602,0.5599,914,429,604
+elo_gap_bucket,0-50,365,0.3616,0.3586,157,102,106
+elo_gap_bucket,50-100,365,0.4795,0.4689,164,100,101
+elo_gap_bucket,100-200,526,0.6103,0.5573,252,117,157
+elo_gap_bucket,200-400,564,0.7553,0.5678,283,104,177
+elo_gap_bucket,400+,127,0.9291,0.6346,58,6,63
+target_result,DRAW,429,0.3333,0.1667,0,429,0
+target_result,TEAM_A_WIN,914,0.6761,0.2689,914,0,0
+target_result,TEAM_B_WIN,604,0.6805,0.27,0,0,604

@@ -1,0 +1,133 @@
+﻿RubyBets - Phase nationale Kaggle - Import et nettoyage
+
+Date : 29/05/2026
+Objectif : préparer une base historique nationale propre pour le futur modèle V17.9, sans modifier V17.8.
+
+1. Source utilisée
+Dataset Kaggle international football results.
+Fichiers placés dans :
+data/external/national_results/
+
+Fichiers disponibles :
+- results.csv
+- goalscorers.csv
+- shootouts.csv
+- former_names.csv
+
+2. Script d'import Kaggle
+Fichier :
+backend/scripts/ml_national/import_kaggle_national_matches.py
+
+Rôle :
+Importer les matchs historiques FIFA World Cup et FIFA World Cup qualification depuis results.csv vers ml_national.raw_matches.
+
+Correction effectuée :
+La fonction has_score() a été corrigée pour ne pas considérer les valeurs vides, na, nan, none ou null comme des scores valides.
+
+Résultat final après réimport propre :
+- Total importé : 9735 matchs terminés avec scores
+- FIFA World Cup : 964 matchs
+- FIFA World Cup qualification : 8771 matchs
+
+Contrôle SQL validé :
+WC  | FINISHED | 964  | 964  | 964
+WCQ | FINISHED | 8771 | 8771 | 8771
+
+3. Script de nettoyage national
+Fichier :
+backend/scripts/ml_national/clean_national_matches.py
+
+Rôle :
+Nettoyer ml_national.raw_matches vers ml_national.clean_matches.
+
+Règle métier validée :
+Dans le pipeline national, home_team_name et away_team_name sont interprétés comme Team A et Team B.
+Ils ne doivent pas être considérés comme domicile / extérieur classique.
+
+Résultat calculé :
+- TEAM_A_WIN si score Team A > score Team B
+- DRAW si scores égaux
+- TEAM_B_WIN si score Team A < score Team B
+
+Résultat du nettoyage :
+- Matchs bruts sélectionnés : 9735
+- Anciennes lignes clean supprimées : 0
+- Nouvelles lignes clean insérées : 9735
+- Table cible : ml_national.clean_matches
+
+Répartition par compétition :
+- WC : 964
+- WCQ : 8771
+
+Répartition par résultat Team A / Team B :
+- TEAM_A_WIN : 4898
+- DRAW : 2069
+- TEAM_B_WIN : 2768
+
+4. Correction du faux signal domicile
+Problème identifié :
+Dans une Coupe du Monde finale, Team A / Team B ne correspond pas forcément à domicile / extérieur.
+
+Décision :
+Ne pas utiliser de home_advantage classique pour le pipeline national.
+Créer une logique séparée de contexte hôte :
+- team_a_is_host
+- team_b_is_host
+- host_advantage_side
+
+Colonnes ajoutées dans :
+- ml_national.clean_matches
+- ml_national.features
+
+Contrôle SQL validé :
+clean_matches | host_advantage_side
+clean_matches | team_a_is_host
+clean_matches | team_b_is_host
+features      | host_advantage_side
+features      | team_a_is_host
+features      | team_b_is_host
+
+5. Contrôle du contexte hôte
+Répartition observée :
+WC  | NONE   | 843
+WC  | TEAM_A | 121
+WCQ | NONE   | 839
+WCQ | TEAM_A | 7932
+
+Interprétation :
+- WC correspond au tournoi final : majorité de matchs neutres.
+- WCQ correspond aux qualifications continentales : Team A joue très souvent dans son pays.
+
+6. Couverture historique Coupe du Monde
+La table clean_matches couvre 22 éditions FIFA World Cup de 1930 à 2022.
+
+Détail :
+1930 : 18
+1934 : 17
+1938 : 18
+1950 : 22
+1954 : 26
+1958 : 35
+1962 : 32
+1966 : 32
+1970 : 32
+1974 : 38
+1978 : 38
+1982 : 52
+1986 : 52
+1990 : 52
+1994 : 52
+1998 : 64
+2002 : 64
+2006 : 64
+2010 : 64
+2014 : 64
+2018 : 64
+2022 : 64
+
+7. Prochaine étape
+Créer :
+backend/scripts/ml_national/build_national_elo_ratings.py
+
+Objectif :
+Calculer un Elo interne RubyBets à partir de ml_national.clean_matches pour enrichir les futures features nationales.

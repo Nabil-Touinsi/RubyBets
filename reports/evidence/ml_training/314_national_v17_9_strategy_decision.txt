@@ -1,0 +1,69 @@
+﻿Décision technique - Stratégie V17.9.1 nationale sélective RubyBets
+
+Contexte :
+La baseline nationale V17.9 a été entraînée à partir des données Kaggle internationales enrichies avec l’Elo interne RubyBets.
+Le modèle retenu est logistic_regression_balanced.
+
+Résultat baseline brute :
+- Accuracy globale : 0.602
+- F1 macro : 0.5599
+- Coverage : 1.0
+- Point faible principal : prédiction des matchs nuls (DRAW)
+
+Diagnostic :
+Le modèle est plus fiable lorsque l’écart Elo entre les deux équipes est important.
+Les segments montrent que :
+- abs_elo_gap_0_50 : accuracy 0.3616
+- abs_elo_gap_50_100 : accuracy 0.4795
+- abs_elo_gap_100_plus : accuracy 0.7108
+- abs_elo_gap_150_plus : accuracy 0.7524
+- abs_elo_gap_200_plus : accuracy 0.7873
+- abs_elo_gap_400_plus : accuracy 0.9291
+
+Comparaison des stratégies :
+La stratégie abs_elo_gap_400_plus atteint une très forte accuracy, mais ne couvre que 6.52 % des matchs.
+Elle est donc trop restrictive pour devenir la stratégie principale.
+
+La stratégie abs_elo_gap_200_plus atteint une accuracy de 0.7873 avec une coverage de 0.3549.
+Elle est intéressante comme stratégie prudente, mais reste limitée en couverture.
+
+La stratégie abs_elo_gap_150_plus atteint :
+- Accuracy : 0.7524
+- Coverage : 0.4874
+- Abstention rate : 0.5126
+- F1 macro : 0.5849
+
+Décision retenue :
+La stratégie principale retenue pour V17.9.1 est :
+
+abs_elo_gap_150_plus
+
+Justification :
+Cette stratégie offre le meilleur compromis entre fiabilité et utilité produit.
+Elle améliore fortement la précision par rapport à la baseline brute, tout en conservant une couverture proche de 50 % des matchs.
+Elle est donc plus exploitable pour RubyBets qu’une stratégie très restrictive.
+
+Règle produit proposée :
+- Si abs_elo_gap < 150 : abstention ou risque élevé
+- Si abs_elo_gap >= 150 : prédiction nationale exploitable
+- Si abs_elo_gap >= 200 : prédiction prudente renforcée
+- Si abs_elo_gap >= 400 : prédiction très forte
+
+Décision d’intégration :
+Le modèle V17.9.1 ne doit pas encore être intégré directement dans le frontend.
+Il doit d’abord être utilisé comme candidat national expérimental, avec une logique d’abstention claire.
+
+Positionnement responsable :
+RubyBets ne force pas une prédiction sur tous les matchs.
+Lorsque les signaux sont trop faibles ou que les équipes sont trop proches, l’application doit afficher une prudence renforcée ou une indisponibilité de recommandation.
+
+Décision sur StatsBomb :
+StatsBomb Open Data n’est pas lancé immédiatement.
+L’enrichissement StatsBomb reste une option post-baseline, à envisager seulement après validation de la stratégie sélective et identification précise des segments à améliorer.
+
+Statut :
+- Baseline V17.9 nationale : réalisée
+- Diagnostic V17.9 : réalisé
+- Stratégie sélective V17.9.1 : réalisée
+- Stratégie principale retenue : abs_elo_gap_150_plus
+- StatsBomb : reporté après validation stratégique

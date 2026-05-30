@@ -1,0 +1,54 @@
+OK - Évaluation stratégie hybride V17.9.2 terminée.
+Feature version : national_v1_elo_form
+Fichier prédictions : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\306_national_v17_9_predictions.csv
+Couverture minimale recherchée : 0.65
+
+Référence V17.9 stricte brute :
+- strategy_name : strict_all_predictions
+- reliability / accuracy stricte : 0.602
+- coverage : 1.0
+
+Référence V17.9.1 stricte sélective :
+- strategy_name : v17_9_1_abs_150_plus
+- reliability : 0.7524
+- coverage : 0.4874
+- abstention_rate : 0.5126
+
+Meilleure stratégie hybride retenue automatiquement :
+- strategy_name : v17_9_2_hybrid_balanced
+- selected_rows : 1424
+- coverage : 0.7314
+- abstention_rate : 0.2686
+- reliability : 0.8139
+- strict_rows : 686
+- strict_reliability : 0.7886
+- double_chance_rows : 738
+- double_chance_reliability : 0.8374
+- draw_rows : 277
+- draw_reliability : 0.6137
+- wc_rows : 70
+- wc_reliability : 0.7571
+- wcq_rows : 1354
+- wcq_reliability : 0.8168
+
+Comparaison des stratégies :
+- v17_9_2_hybrid_balanced | reliability=0.8139 | coverage=0.7314 | abstention=0.2686 | strict_rows=686 | double_chance_rows=738
+- v17_9_2_hybrid_safe | reliability=0.8085 | coverage=0.6251 | abstention=0.3749 | strict_rows=686 | double_chance_rows=531
+- v17_9_2_hybrid_max_coverage | reliability=0.7915 | coverage=1.0 | abstention=0.0 | strict_rows=686 | double_chance_rows=1261
+- v17_9_2_hybrid_coverage | reliability=0.78 | coverage=0.8125 | abstention=0.1875 | strict_rows=923 | double_chance_rows=659
+- v17_9_1_abs_150_plus | reliability=0.7524 | coverage=0.4874 | abstention=0.5126 | strict_rows=949 | double_chance_rows=0
+- strict_all_predictions | reliability=0.602 | coverage=1.0 | abstention=0.0 | strict_rows=1947 | double_chance_rows=0
+
+CSV comparaison stratégies : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\316_national_v17_9_2_hybrid_strategy_results.csv
+CSV meilleure sélection : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\317_national_v17_9_2_best_hybrid_predictions.csv
+
+Lecture importante :
+- La reliability hybride n'est pas directement comparable à l'accuracy 1X2 stricte.
+- La double chance est un marché plus large, donc mécaniquement moins risqué.
+- Cette stratégie sert à augmenter la couverture tout en restant responsable.
+
+Décision technique :
+- V17.9.2 teste une logique produit plus réaliste : strict 1X2 quand le signal est fort, double chance quand le match est plus incertain, abstention quand le signal est trop faible.
+- Cette étape ne modifie pas le modèle ML entraîné.
+- Cette étape ne remplace pas V17.8 club.
+- StatsBomb reste reporté tant que la stratégie hybride n'a pas été analysée.

@@ -1,0 +1,7 @@
+strategy_name,total_rows,selected_rows,coverage,abstention_rate,reliability,strict_rows,strict_reliability,double_chance_rows,double_chance_reliability,draw_rows,draw_reliability,wc_rows,wc_reliability,wcq_rows,wcq_reliability
+strict_all_predictions,1947,1947,1.0,0.0,0.602,1947,0.602,0,,429,0.3333,128,0.4375,1819,0.6135
+v17_9_1_abs_150_plus,1947,949,0.4874,0.5126,0.7524,949,0.7524,0,,163,0.0675,32,0.5938,917,0.7579
+v17_9_2_hybrid_safe,1947,1217,0.6251,0.3749,0.8085,686,0.7886,531,0.8343,227,0.5286,55,0.7091,1162,0.8133
+v17_9_2_hybrid_balanced,1947,1424,0.7314,0.2686,0.8139,686,0.7886,738,0.8374,277,0.6137,70,0.7571,1354,0.8168
+v17_9_2_hybrid_coverage,1947,1582,0.8125,0.1875,0.78,923,0.7616,659,0.8058,327,0.5352,86,0.7674,1496,0.7807
+v17_9_2_hybrid_max_coverage,1947,1947,1.0,0.0,0.7915,686,0.7886,1261,0.793,429,0.7506,128,0.7344,1819,0.7955

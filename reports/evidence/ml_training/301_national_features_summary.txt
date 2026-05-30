@@ -1,0 +1,41 @@
+OK - Features nationales RubyBets construites.
+Feature version : national_v1_elo_form
+Matchs transformés en features : 9735
+Lignes anciennes supprimées : 0
+Lignes insérées/mises à jour : 9735
+Première date : 1930-07-13
+Dernière date : 2026-03-31
+Lignes avec core features complètes : 9549
+Table cible : ml_national.features
+CSV aperçu features : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\302_national_features_preview.csv
+
+Répartition par compétition :
+- WC: 964
+- WCQ: 8771
+
+Répartition target_result :
+- TEAM_B_WIN: 2768
+- TEAM_A_WIN: 4898
+- DRAW: 2069
+
+Répartition contexte hôte :
+- NONE: 1682
+- TEAM_A: 8053
+
+Valeurs manquantes par feature :
+- home_form_points_last_5: 0
+- away_form_points_last_5: 0
+- home_form_points_last_10: 0
+- away_form_points_last_10: 0
+- home_goals_scored_avg_last_10: 117
+- away_goals_scored_avg_last_10: 100
+- home_goals_conceded_avg_last_10: 117
+- away_goals_conceded_avg_last_10: 100
+- elo_gap: 0
+
+Décision technique :
+- Les colonnes home_* et away_* sont utilisées comme Team A / Team B dans le pipeline national.
+- Les features sont calculées chronologiquement pour éviter toute fuite de données futures.
+- ranking_gap reste vide car aucun classement FIFA externe n'est encore intégré.
+- elo_gap vient de ml_national.team_rankings et devient la feature de niveau relatif principale.
+- Le pipeline club V17.8 et la table ml.features ne sont pas modifiés.

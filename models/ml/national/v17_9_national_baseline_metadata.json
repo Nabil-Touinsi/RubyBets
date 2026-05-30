@@ -1,0 +1,46 @@
+{
+    "source": "rubybets_ml_national",
+    "scope": "experimental",
+    "status": "baseline_review",
+    "model_version": "v17_9_national_baseline",
+    "model_name": "logistic_regression_balanced",
+    "feature_version": "national_v1_elo_form",
+    "target": "target_result",
+    "target_classes": [
+        "TEAM_A_WIN",
+        "DRAW",
+        "TEAM_B_WIN"
+    ],
+    "features_used": [
+        "home_form_points_last_10",
+        "away_form_points_last_10",
+        "home_goals_scored_avg_last_10",
+        "away_goals_scored_avg_last_10",
+        "home_goals_conceded_avg_last_10",
+        "away_goals_conceded_avg_last_10",
+        "elo_gap",
+        "is_neutral_venue",
+        "team_a_is_host",
+        "team_b_is_host",
+        "is_group_stage",
+        "is_knockout_stage",
+        "host_side_team_a",
+        "host_side_team_b"
+    ],
+    "split_strategy": "chronological",
+    "test_ratio": 0.2,
+    "train_rows": 7788,
+    "test_rows": 1947,
+    "train_start_date": "1930-07-12T23:00:00+00:00",
+    "train_end_date": "2017-10-07T22:00:00+00:00",
+    "test_start_date": "2017-10-07T22:00:00+00:00",
+    "test_end_date": "2026-03-30T22:00:00+00:00",
+    "evaluation_results": {
+        "accuracy": 0.602,
+        "f1_macro": 0.5599,
+        "f1_weighted": 0.6044
+    },
+    "model_artifact": "models\\ml\\national\\v17_9_national_baseline.joblib",
+    "created_at": "2026-05-30T12:39:12",
+    "important_note": "Baseline nationale expérimentale. Ne remplace pas le modèle club V17.8 et ne garantit aucun résultat sportif."
+}

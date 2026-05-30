@@ -1,0 +1,459 @@
+RubyBets - Décision stratégie hybride nationale V17.9.2
+
+Fichier de preuve :
+reports/evidence/ml_training/318_national_v17_9_2_hybrid_strategy_decision.txt
+
+Projet :
+RubyBets - RNCP Data & IA
+
+Périmètre :
+Phase nationale expérimentale dédiée aux matchs d'équipes nationales et à la future inférence Coupe du Monde 2026.
+
+Date de formalisation :
+30/05/2026
+
+Statut :
+DECISION_VALIDEE_PROVISOIREMENT_AVANT_INTEGRATION_BACKEND
+
+Version protégée :
+Le modèle club V17.8 reste figé comme référence stable.
+Tag existant :
+rubybets-v0.9-ml-v17.8
+
+La stratégie nationale V17.9.2 ne remplace pas V17.8.
+Elle constitue un candidat expérimental séparé, construit dans le schéma ml_national, pour préparer l'inférence future sur les matchs de Coupe du Monde / équipes nationales.
+
+
+1. Rappel de l'objectif
+
+L'objectif de cette phase était de construire un pipeline national séparé du pipeline club afin de préparer RubyBets à analyser plus tard des matchs de Coupe du Monde 2026.
+
+Le besoin principal était le suivant :
+
+- ne pas toucher au modèle club V17.8 ;
+- ne pas utiliser les matchs Coupe du Monde 2026 programmés pour l'entraînement, car les scores ne sont pas encore connus ;
+- utiliser un historique national exploitable ;
+- construire un modèle national expérimental ;
+- évaluer sa fiabilité ;
+- décider si une stratégie produit responsable peut être retenue avant une future intégration backend.
+
+Le pipeline national repose actuellement sur :
+
+- Kaggle results.csv comme source historique principale ;
+- un schéma PostgreSQL séparé : ml_national ;
+- un Elo interne RubyBets ;
+- des features nationales ;
+- une baseline V17.9 ;
+- un diagnostic V17.9 ;
+- une stratégie sélective V17.9.1 ;
+- une stratégie hybride V17.9.2.
+
+
+2. Résumé des résultats V17.9 brute
+
+La baseline nationale V17.9 utilise le modèle :
+
+logistic_regression_balanced
+
+Résultat sur le jeu de test :
+
+- lignes testées : 1 947
+- accuracy / reliability : 0.602
+- coverage : 1.0
+- F1 macro : 0.5599
+- F1 weighted : 0.6044
+
+Lecture produit :
+
+La V17.9 brute répond sur tous les matchs, mais sa fiabilité globale reste trop faible pour être exposée directement dans RubyBets comme recommandation produit.
+
+Elle est utile comme baseline technique, mais elle ne doit pas être intégrée directement au frontend sans filtre, sans stratégie de prudence et sans couche backend d'inférence propre.
+
+
+3. Diagnostic des faiblesses V17.9
+
+Le diagnostic V17.9 a montré plusieurs zones de fragilité :
+
+- les matchs nuls sont difficiles à prédire ;
+- les matchs avec faible écart Elo sont beaucoup plus incertains ;
+- les matchs de Coupe du Monde finale sont moins fiables que les qualifications ;
+- les matchs neutres sont plus difficiles que les matchs où le contexte est plus lisible.
+
+Résultats importants du diagnostic :
+
+- accuracy globale : 0.602
+- accuracy sur les DRAW réels : 0.3333
+- accuracy elo_gap 0-50 : 0.3616
+- accuracy elo_gap 50-100 : 0.4795
+- accuracy elo_gap 100-200 : 0.6103
+- accuracy elo_gap 200-400 : 0.7553
+- accuracy elo_gap 400+ : 0.9291
+- accuracy WC : 0.4375
+- accuracy WCQ : 0.6135
+
+Décision issue du diagnostic :
+
+Le modèle national ne doit pas être utilisé comme prédicteur brut sur tous les matchs.
+Il doit être encadré par une stratégie de sélection, de prudence ou d'abstention.
+
+
+4. Résumé de la stratégie V17.9.1
+
+La stratégie V17.9.1 a testé une logique sélective stricte.
+
+Stratégie produit retenue à cette étape :
+
+abs_elo_gap_150_plus
+
+Résultat :
+
+- accuracy / reliability : 0.7524
+- coverage : 0.4874
+- abstention rate : 0.5126
+- F1 macro : 0.5849
+
+Lecture produit :
+
+La V17.9.1 améliore nettement la fiabilité par rapport à la V17.9 brute.
+Cependant, elle couvre moins de la moitié des matchs testés.
+
+Elle est donc solide techniquement, mais encore limitée pour une expérience utilisateur complète, car trop de matchs seraient affichés comme non exploitables.
+
+
+5. Objectif de la stratégie V17.9.2
+
+La V17.9.2 a été créée pour trouver un meilleur compromis entre fiabilité et couverture.
+
+Le principe retenu est hybride :
+
+- utiliser une prédiction stricte 1X2 quand le signal est fort ;
+- utiliser une recommandation double chance quand le signal est moyen ;
+- s'abstenir quand le signal est trop faible ou trop risqué.
+
+Cette logique correspond mieux au positionnement de RubyBets :
+
+RubyBets n'est pas un bookmaker.
+RubyBets ne promet aucun résultat sportif.
+RubyBets est une application d'aide à la décision avant-match.
+RubyBets doit donc pouvoir dire qu'un match est trop incertain au lieu de forcer une prédiction.
+
+
+6. Résultat de la stratégie V17.9.2 retenue
+
+Stratégie retenue :
+
+v17_9_2_hybrid_balanced
+
+Résultat global :
+
+- reliability : 0.8139
+- coverage : 0.7314
+- abstention rate : 0.2686
+- selected rows : 1 424
+- strict rows : 686
+- double chance rows : 738
+
+Détail sur 1 947 matchs testés :
+
+- 686 matchs utilisent une recommandation stricte 1X2 ;
+- 738 matchs utilisent une recommandation double chance ;
+- 523 matchs sont en abstention.
+
+Fiabilité détaillée :
+
+- strict reliability : 0.7886
+- double chance reliability : 0.8374
+- draw reliability : 0.6137
+- WC reliability : 0.7571
+- WCQ reliability : 0.8168
+
+
+7. Pourquoi V17.9.2 est meilleure que V17.9 brute
+
+La V17.9 brute donne une prédiction sur tous les matchs, avec une reliability de 0.602.
+
+La V17.9.2 réduit volontairement le périmètre d'exposition produit :
+
+- elle ne force pas les matchs trop incertains ;
+- elle distingue les signaux forts des signaux moyens ;
+- elle transforme certains matchs risqués en double chance plutôt qu'en prédiction stricte ;
+- elle conserve une abstention sur les matchs les plus fragiles.
+
+Comparaison principale :
+
+V17.9 brute :
+- reliability : 0.602
+- coverage : 1.0
+- logique : prédiction forcée sur tous les matchs
+
+V17.9.2 hybride :
+- reliability : 0.8139
+- coverage : 0.7314
+- logique : 1X2 strict, double chance ou abstention selon le niveau de signal
+
+Décision :
+
+La V17.9.2 est meilleure que V17.9 brute pour un usage produit, car elle améliore fortement la fiabilité tout en gardant une couverture exploitable.
+
+
+8. Pourquoi V17.9.2 est meilleure que V17.9.1 pour le coverage
+
+La V17.9.1 stricte sélective améliore la fiabilité, mais elle reste très restrictive.
+
+Comparaison :
+
+V17.9.1 :
+- reliability : 0.7524
+- coverage : 0.4874
+- abstention rate : 0.5126
+
+V17.9.2 :
+- reliability : 0.8139
+- coverage : 0.7314
+- abstention rate : 0.2686
+
+Lecture produit :
+
+La V17.9.2 augmente la couverture de manière importante tout en améliorant aussi la reliability.
+
+Elle permet d'exploiter 1 424 matchs sur 1 947, contre une couverture beaucoup plus limitée avec V17.9.1.
+
+Décision :
+
+La V17.9.1 reste intéressante comme référence stricte, mais V17.9.2 est plus adaptée à une future intégration produit, car elle offre un meilleur équilibre entre prudence, fiabilité et expérience utilisateur.
+
+
+9. Pourquoi retenir v17_9_2_hybrid_balanced
+
+La stratégie v17_9_2_hybrid_balanced est retenue car elle correspond au comportement attendu d'une application responsable :
+
+- prédire strictement quand le signal est fort ;
+- élargir en double chance quand le signal est moyen ;
+- refuser de prédire quand le risque est trop élevé.
+
+Ce comportement est plus professionnel qu'une prédiction unique forcée.
+
+La stratégie retenue améliore la lisibilité produit :
+
+- STRICT_1X2 : signal fort, recommandation plus directe ;
+- DOUBLE_CHANCE : signal moyen, recommandation prudente ;
+- ABSTAIN : signal faible, données insuffisantes ou risque trop élevé.
+
+Décision :
+
+v17_9_2_hybrid_balanced devient la stratégie nationale expérimentale à préparer pour l'intégration backend, mais elle ne doit pas encore être exposée directement au frontend sans service d'inférence propre.
+
+
+10. Pourquoi la double chance est utilisée comme stratégie produit responsable
+
+La double chance n'est pas utilisée pour donner une impression artificielle de performance.
+
+Elle est utilisée comme mécanisme de prudence produit.
+
+Dans les matchs où le modèle identifie une tendance mais où le signal n'est pas assez solide pour une prédiction stricte, la double chance permet de formuler une recommandation moins agressive.
+
+Exemple de logique :
+
+- signal très fort : recommander Team A win, Draw ou Team B win ;
+- signal moyen : recommander Team A ou Draw, Draw ou Team B, ou Team A ou Team B selon le contexte ;
+- signal faible : s'abstenir.
+
+Point important :
+
+La reliability d'une double chance ne doit pas être interprétée exactement comme l'accuracy d'un 1X2 strict.
+La double chance couvre deux issues possibles au lieu d'une seule.
+Elle doit donc être présentée comme une recommandation prudente, pas comme une prédiction équivalente au 1X2.
+
+Décision :
+
+La double chance est cohérente avec RubyBets parce qu'elle renforce la prudence, réduit le risque de suraffirmation et évite de présenter une prédiction trop précise sur des matchs incertains.
+
+
+11. Pourquoi StatsBomb reste reporté
+
+StatsBomb Open Data n'est pas lancé immédiatement.
+
+Raison principale :
+
+La stratégie V17.9.2 donne déjà un résultat suffisamment solide pour justifier une phase de formalisation, de versioning et de préparation backend.
+
+Résultat actuel :
+
+- reliability : 0.8139
+- coverage : 0.7314
+
+StatsBomb pourrait être utile plus tard pour enrichir certains segments, par exemple :
+
+- matchs de Coupe du Monde finale ;
+- matchs neutres ;
+- matchs avec faible elo_gap ;
+- profils tactiques plus détaillés ;
+- contextes où les données Kaggle + Elo restent insuffisantes.
+
+Mais l'ajouter maintenant complexifierait la phase actuelle sans être indispensable.
+
+Décision :
+
+StatsBomb reste une option post-baseline.
+Il ne doit pas être lancé avant la documentation et le versioning de V17.9.2.
+Il pourra être réévalué plus tard si une faiblesse précise justifie un enrichissement avancé.
+
+
+12. Pourquoi V17.9.2 ne doit pas encore être intégrée directement au frontend
+
+La V17.9.2 ne doit pas être branchée directement dans l'interface React.
+
+Raisons :
+
+- le frontend ne doit pas charger directement un modèle ML ;
+- la logique d'inférence doit rester côté backend ;
+- la stratégie hybride doit être appliquée dans un service métier contrôlé ;
+- les cas d'abstention doivent être gérés proprement ;
+- les matchs WC 2026 programmés n'ont pas encore de scores ;
+- certaines équipes peuvent être inconnues ou non encore qualifiées ;
+- il faut construire des features d'inférence sans fuite de données futures.
+
+Avant une intégration frontend, il faut créer une couche backend propre.
+
+Cette couche devra :
+
+- charger le modèle national V17.9 ;
+- charger les métadonnées ;
+- construire les features disponibles avant match ;
+- appliquer la stratégie V17.9.2 ;
+- retourner un contrat JSON stable ;
+- distinguer STRICT_1X2, DOUBLE_CHANCE et ABSTAIN ;
+- inclure un message responsable ;
+- gérer les cas de données manquantes.
+
+Décision :
+
+Aucune intégration frontend directe ne doit être faite maintenant.
+La prochaine grande phase doit être l'intégration backend expérimentale de l'inférence nationale.
+
+
+13. Contrat de sortie recommandé pour la future intégration backend
+
+Le futur service backend national devra retourner une structure claire, par exemple :
+
+{
+  "source": "rubybets_ml_national",
+  "scope": "experimental",
+  "model_version": "v17_9_national_baseline",
+  "strategy_version": "v17_9_2_hybrid_balanced",
+  "match_id": "...",
+  "market_type": "STRICT_1X2 | DOUBLE_CHANCE | ABSTAIN",
+  "recommendation": "...",
+  "reliability_reference": 0.8139,
+  "risk_level": "low | medium | high",
+  "confidence_level": "low | medium | high",
+  "abstention_reason": null,
+  "responsible_note": "Recommandation analytique sans garantie de résultat."
+}
+
+Cette structure permettra de préparer le frontend sans mélanger logique métier et affichage.
+
+
+14. Décision finale
+
+La stratégie nationale retenue à ce stade est :
+
+v17_9_2_hybrid_balanced
+
+Statut :
+
+CANDIDAT_NATIONAL_EXPERIMENTAL_RETENU_POUR_PREPARATION_BACKEND
+
+Motifs :
+
+- meilleure reliability que V17.9 brute ;
+- meilleure couverture que V17.9.1 stricte ;
+- bonne lisibilité produit ;
+- logique compatible avec une aide à la décision responsable ;
+- distinction claire entre 1X2 strict, double chance et abstention ;
+- respect du périmètre national séparé ;
+- pas d'impact sur le modèle club V17.8.
+
+La V17.9.2 devient donc la référence expérimentale nationale à versionner avant de préparer l'inférence Coupe du Monde 2026 côté backend.
+
+
+15. Prochaines actions recommandées
+
+Actions immédiates :
+
+1. Sauvegarder ce fichier comme preuve :
+   reports/evidence/ml_training/318_national_v17_9_2_hybrid_strategy_decision.txt
+
+2. Vérifier l'état Git :
+   git status --short --untracked-files=all
+
+3. Identifier tous les fichiers créés ou modifiés :
+   - scripts ml_national ;
+   - rapports 298 à 318 ;
+   - modèle national ;
+   - métadonnées modèle ;
+   - documents de planification si ajoutés.
+
+4. Préparer un commit clair pour versionner la phase nationale.
+
+Message de commit possible :
+
+feat(ml): add national v17.9.2 hybrid strategy
+
+5. Pousser sur GitHub.
+
+6. Créer éventuellement un tag de phase nationale :
+
+rubybets-v0.10-ml-national-v17.9.2
+
+
+16. Statuts de suivi
+
+Elo interne RubyBets :
+Réalisé
+
+Features nationales :
+Réalisé
+
+Baseline V17.9 nationale :
+Réalisée
+
+Diagnostic V17.9 :
+Réalisé
+
+Stratégie sélective V17.9.1 :
+Réalisée
+
+Décision V17.9.1 :
+Documentée
+
+Stratégie hybride V17.9.2 :
+Réalisée
+
+Décision V17.9.2 :
+Formalisée dans ce fichier
+
+StatsBomb Open Data :
+Reporté / post-baseline
+
+Intégration backend WC 2026 :
+À produire après versioning
+
+Intégration frontend WC 2026 :
+À produire après la couche backend d'inférence
+
+
+17. Rappel de positionnement responsable
+
+RubyBets est une application d'aide à la décision football avant-match.
+
+RubyBets :
+
+- ne permet pas de parier ;
+- n'est pas un bookmaker ;
+- ne promet aucun résultat sportif ;
+- ne garantit pas la réussite d'une recommandation ;
+- affiche des recommandations analytiques issues de données disponibles ;
+- doit conserver une logique de prudence, d'explication et d'abstention lorsque le risque est trop élevé.
+
+Cette décision V17.9.2 doit donc être présentée comme une étape expérimentale maîtrisée, et non comme une promesse de performance sportive.

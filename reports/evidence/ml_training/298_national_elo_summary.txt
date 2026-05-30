@@ -1,0 +1,41 @@
+OK - Elo national RubyBets calculé.
+Matchs traités : 9735
+Équipes détectées : 217
+Première date : 1930-07-13
+Dernière date : 2026-03-31
+Elo initial : 1500.0
+K factor WC : 60.0
+K factor WCQ : 40.0
+Bonus contexte hôte : 50.0
+Anciennes lignes Elo supprimées : 0
+Lignes Elo match insérées/mises à jour : 38940
+Lignes Elo latest insérées/mises à jour : 217
+Table cible : ml_national.team_rankings
+CSV classement final : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\299_national_elo_final_rankings.csv
+CSV évolutions match : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\300_national_elo_match_updates.csv
+
+Répartition par compétition :
+- WC: 964
+- WCQ: 8771
+
+Répartition contexte hôte utilisé :
+- NONE: 1682
+- TEAM_A: 8053
+
+Top 10 Elo final :
+1. France: 1949.95
+2. Germany: 1895.7
+3. Netherlands: 1891.469
+4. Spain: 1873.565
+5. Japan: 1864.104
+6. Argentina: 1857.149
+7. England: 1851.477
+8. Belgium: 1835.195
+9. Croatia: 1833.646
+10. Morocco: 1802.631
+
+Décision technique :
+- Le calcul reste séparé du pipeline club V17.8.
+- Le script utilise Team A / Team B et non un domicile/extérieur club classique.
+- Le contexte hôte est pris en compte uniquement via host_advantage_side.
+- Les valeurs produites préparent la future feature elo_gap dans ml_national.features.
