@@ -1,0 +1,68 @@
+﻿RubyBets - Decision V18.3.3 global selector strict reliability
+
+Fichier :
+reports/evidence/ml_training/367_v18_3_3_global_selector_strict_reliability_decision.txt
+
+Version :
+V18.3.3 - strict reliability selector profile
+
+Origine :
+V18.3.3 n'est pas une nouvelle phase d'entrainement.
+Elle est extraite des resultats de recherche V18.3.2 afin d'identifier le meilleur profil respectant une reliability stricte superieure ou egale a 0.90.
+
+Fichiers sources :
+- reports/evidence/ml_training/361_v18_3_2_global_selector_threshold_search_results.csv
+- reports/evidence/ml_training/365_v18_3_3_global_selector_strict_reliability_summary.txt
+- reports/evidence/ml_training/366_v18_3_3_global_selector_strict_reliability_best_config.csv
+
+Objectif :
+Trouver une configuration plus prudente que V18.3.2, avec :
+- reliability >= 0.90
+- DOUBLE_CHANCE share selected <= 0.72
+- coverage maximale possible
+
+Meilleure variante retenue :
+v18_3_2_s760_o15780_o25700_b750_dc150_capnone_reference_order_btts1
+
+Resultats :
+- Reliability : 0.900893
+- Coverage : 0.575244
+- Selected rows : 1120
+- DOUBLE_CHANCE share selected : 0.716071
+- Direct market share selected : 0.283929
+
+Repartition :
+- STRICT_1X2 rows : 276
+- DOUBLE_CHANCE rows : 802
+- OVER_1_5 rows : 23
+- OVER_2_5 rows : 18
+- BTTS rows : 1
+
+Analyse :
+V18.3.3 repasse au-dessus du seuil strict de 0.90 de reliability tout en conservant une coverage tres proche de V18.3.2.
+Elle reste cependant fortement dependante de DOUBLE_CHANCE, avec plus de 800 selections sur ce marche.
+Les marches directs existent, mais restent minoritaires :
+- STRICT_1X2 est exploitable avec 276 selections.
+- OVER_1_5 est present mais limite.
+- OVER_2_5 reste faible et doit etre surveille.
+- BTTS est quasiment inexploite dans cette configuration.
+
+Decision :
+V18.3.3 est retenue comme profil strict reliability.
+Elle devient la meilleure candidate actuelle pour une future formalisation backend du selecteur global, car elle combine :
+- une reliability superieure a 0.90 ;
+- une coverage elevee ;
+- une dependance a DOUBLE_CHANCE controlee sous 0.72.
+
+Positionnement final des variantes :
+- V18.3 : reference globale fiable initiale
+- V18.3.1 : variante equilibree prudente
+- V18.3.2 : variante coverage boost experimentale
+- V18.3.3 : variante strict reliability recommandee pour la suite backend
+
+Decision produit :
+Ne pas integrer V18.3.3 au frontend maintenant.
+La prochaine etape doit etre la formalisation backend propre du selecteur d'inference, avec une logique claire, testable et documentee.
+
+Conclusion :
+V18.3.3 est le meilleur compromis actuel pour continuer vers une couche backend d'inference fiable. Elle ne resout pas encore le manque d'equilibre entre les marches, mais elle fournit un profil solide, prudent et defendable pour la suite technique.

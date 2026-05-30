@@ -1,0 +1,58 @@
+﻿RubyBets - V18.3.3 strict reliability selector profile
+
+Fichier :
+reports/evidence/ml_training/365_v18_3_3_global_selector_strict_reliability_summary.txt
+
+Origine :
+V18.3.3 n'est pas une nouvelle phase d'entrainement.
+Il s'agit d'un profil strict extrait des resultats de recherche V18.3.2.
+
+Fichier source :
+reports/evidence/ml_training/361_v18_3_2_global_selector_threshold_search_results.csv
+
+Objectif V18.3.3 :
+Identifier une configuration respectant une reliability stricte superieure ou egale a 0.90, tout en conservant une coverage maximale et une dependance a DOUBLE_CHANCE inferieure ou egale a 0.72.
+
+Contraintes appliquees :
+- Reliability >= 0.90
+- DOUBLE_CHANCE share selected <= 0.72
+- Tri final par coverage maximale puis reliability maximale
+
+Nombre de configurations candidates :
+1966
+
+Meilleure variante retenue :
+v18_3_2_s760_o15780_o25700_b750_dc150_capnone_reference_order_btts1
+
+Resultats :
+- Reliability : 0.900893
+- Coverage : 0.575244
+- Selected rows : 1120
+- DOUBLE_CHANCE share selected : 0.716071
+- Direct market share selected : 0.283929
+
+Repartition :
+- STRICT_1X2 rows : 276
+- DOUBLE_CHANCE rows : 802
+- OVER_1_5 rows : 23
+- OVER_2_5 rows : 18
+- BTTS rows : 1
+
+Analyse :
+V18.3.3 atteint l'objectif strict de reliability >= 0.90 tout en conservant une coverage proche de V18.3.2.
+La coverage reste legerement inferieure a V18.3.2, mais la fiabilite repasse au-dessus du seuil psychologique de 0.90.
+La dependance a DOUBLE_CHANCE reste controlee sous 0.72, meme si elle demeure importante.
+
+Decision :
+V18.3.3 est retenue comme profil strict reliability.
+Elle constitue le meilleur compromis actuel entre prudence, couverture et dependance controlee a DOUBLE_CHANCE.
+
+Positionnement des variantes :
+- V18.3 : reference globale fiable initiale
+- V18.3.1 : variante equilibree prudente
+- V18.3.2 : variante coverage boost experimentale
+- V18.3.3 : variante strict reliability recommandee pour la suite backend
+
+Decision produit :
+Ne pas integrer directement au frontend maintenant.
+La prochaine etape doit etre la formalisation backend propre du selecteur d'inference avant toute exposition utilisateur.
