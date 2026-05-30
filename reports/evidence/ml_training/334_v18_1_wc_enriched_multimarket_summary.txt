@@ -1,0 +1,50 @@
+RubyBets - Experience V18.1 WC enriched multi-market
+
+Source input : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\333_v18_1_wc_enriched_dataset.csv
+Comparaison modeles : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\335_v18_1_wc_enriched_model_comparison.csv
+Predictions test : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\336_v18_1_wc_enriched_predictions.csv
+
+Objectif :
+Comparer Kaggle + Elo seul contre Kaggle + Elo + StatsBomb rolling features.
+Les marches testes sont : 1X2, OVER_1_5, OVER_2_5 et BTTS.
+
+Perimetre :
+- Train : Coupe du Monde 2018
+- Test : Coupe du Monde 2022
+- Dataset : 128 matchs Coupe du Monde enrichis
+
+Important :
+Cette experience reste limitee au perimetre WC 2018/2022.
+Elle ne remplace pas encore V17.9.2 nationale globale.
+Aucun modele n'est integre au backend ou au frontend a cette etape.
+
+Dataset :
+- Lignes totales : 128
+- Train rows : 64
+- Test rows : 64
+- Features Kaggle/Elo : 9
+- Features Kaggle/Elo + StatsBomb : 31
+
+Meilleurs resultats par target et feature set :
+- target_1x2 | kaggle_elo_only | random_forest_balanced | accuracy=0.375 | f1=0.3589 | precision=0.3741 | recall=0.3746 | features=9
+- target_1x2 | kaggle_elo_statsbomb | random_forest_balanced | accuracy=0.5312 | f1=0.52 | precision=0.5552 | recall=0.5103 | features=31
+- target_over_1_5 | kaggle_elo_only | dummy_most_frequent | accuracy=0.7344 | f1=0.8468 | precision=0.7344 | recall=1.0 | features=9
+- target_over_1_5 | kaggle_elo_statsbomb | dummy_most_frequent | accuracy=0.7344 | f1=0.8468 | precision=0.7344 | recall=1.0 | features=31
+- target_over_2_5 | kaggle_elo_only | logistic_regression_balanced | accuracy=0.5156 | f1=0.4151 | precision=0.4783 | recall=0.3667 | features=9
+- target_over_2_5 | kaggle_elo_statsbomb | random_forest_balanced | accuracy=0.5781 | f1=0.5091 | precision=0.56 | recall=0.4667 | features=31
+- target_btts | kaggle_elo_only | logistic_regression_balanced | accuracy=0.5625 | f1=0.6111 | precision=0.5366 | recall=0.7097 | features=9
+- target_btts | kaggle_elo_statsbomb | logistic_regression_balanced | accuracy=0.4844 | f1=0.5823 | precision=0.4792 | recall=0.7419 | features=31
+
+Comparaison base vs enrichi :
+- target_1x2 | base=random_forest_balanced f1=0.3589 acc=0.375 | enriched=random_forest_balanced f1=0.52 acc=0.5312 | delta_f1=0.1611 | delta_accuracy=0.1562
+- target_over_1_5 | base=dummy_most_frequent f1=0.8468 acc=0.7344 | enriched=dummy_most_frequent f1=0.8468 acc=0.7344 | delta_f1=0.0 | delta_accuracy=0.0
+- target_over_2_5 | base=logistic_regression_balanced f1=0.4151 acc=0.5156 | enriched=random_forest_balanced f1=0.5091 acc=0.5781 | delta_f1=0.094 | delta_accuracy=0.0625
+- target_btts | base=logistic_regression_balanced f1=0.6111 acc=0.5625 | enriched=logistic_regression_balanced f1=0.5823 acc=0.4844 | delta_f1=-0.0288 | delta_accuracy=-0.0781
+
+Experiences ignorees :
+- Aucune.
+
+Decision attendue apres lecture :
+- Si l'enrichissement StatsBomb ameliore clairement OVER_1_5 ou BTTS, il pourra etre conserve pour V18.2.
+- Si le gain est faible, StatsBomb restera une preuve d'enrichissement data, sans complexifier le modele produit.
+- La double chance devra etre derivee plus tard des probabilites 1X2, pas entrainee comme target separee.

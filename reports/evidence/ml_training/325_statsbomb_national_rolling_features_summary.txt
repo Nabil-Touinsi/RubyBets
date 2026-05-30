@@ -1,0 +1,44 @@
+RubyBets - Features rolling StatsBomb nationales anti-fuite
+
+Source input : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\324_statsbomb_national_match_event_features.csv
+Fichier genere : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\326_statsbomb_national_rolling_features.csv
+
+Objectif :
+Transformer les statistiques event-level StatsBomb en variables historiques avant-match.
+Chaque ligne utilise uniquement les matchs precedents de chaque equipe.
+
+Regle anti-fuite :
+Les statistiques du match courant sont ajoutees a l'historique uniquement apres calcul des features.
+Le match a predire n'est donc jamais utilise pour construire ses propres variables.
+
+Resultats generaux :
+- Lignes input : 262
+- Lignes rolling generees : 262
+- Fenetre rolling : last_5
+- Matchs avec historique StatsBomb pour les deux equipes : 224 / 262 (0.855)
+- Matchs avec 5 matchs precedents pour les deux equipes : 89 / 262 (0.3397)
+
+Distribution des targets conservees :
+- OVER_1_5 : 193 / 262 (0.7366)
+- OVER_2_5 : 124 / 262 (0.4733)
+- BTTS : 130 / 262 (0.4962)
+
+Repartition par competition :
+- Copa America 2024: 32
+- FIFA World Cup 2018: 64
+- FIFA World Cup 2022: 64
+- UEFA Euro 2020: 51
+- UEFA Euro 2024: 51
+
+Features creees :
+- xG for/against last_5
+- shots for/against last_5
+- shots on target for/against last_5
+- goals for/against last_5
+- differentiels xG, tirs, tirs cadres et buts
+- compte d'historique disponible par equipe
+
+Decision :
+- Les features rolling sont pretes pour un premier test V18.0 StatsBomb.
+- Ces features doivent etre utilisees comme enrichissement qualitatif sur sous-ensemble.
+- Le socle principal reste Kaggle + Elo car StatsBomb ne couvre que 262 matchs cibles.

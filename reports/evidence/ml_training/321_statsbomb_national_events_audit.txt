@@ -1,0 +1,60 @@
+RubyBets - Audit events StatsBomb nationaux
+
+Source locale analysee : C:\dev_classe\RNCP\RubyBets\data\external\statsbomb_open_data
+Dossier events : C:\dev_classe\RNCP\RubyBets\data\external\statsbomb_open_data\data\events
+
+Objectif :
+Verifier si les events StatsBomb telecharges permettent de creer des features utiles
+pour enrichir les futurs modeles nationaux OVER_1_5, OVER_2_5 et BTTS.
+
+Competitions ciblees :
+- Copa America | 2024 | competition_id=223 | season_id=282
+- FIFA World Cup | 2022 | competition_id=43 | season_id=106
+- FIFA World Cup | 2018 | competition_id=43 | season_id=3
+- UEFA Euro | 2024 | competition_id=55 | season_id=282
+- UEFA Euro | 2020 | competition_id=55 | season_id=43
+
+Resultats globaux :
+- Matchs cibles attendus : 262
+- Matchs avec events disponibles : 262
+- Matchs sans fichier events : 0
+- Lignes de preview generees : 262
+- Total events lus : 943374
+- Total tirs detectes : 6619
+- Tirs avec xG StatsBomb : 6619
+- Couverture xG sur les tirs : 1.0
+
+Distribution des targets sur les matchs audites :
+- OVER_1_5 : 193 / 262
+- OVER_2_5 : 124 / 262
+- BTTS : 130 / 262
+
+Top types d'events detectes :
+- Pass: 267948
+- Ball Receipt*: 252086
+- Carry: 213890
+- Pressure: 79658
+- Ball Recovery: 23069
+- Duel: 16152
+- Clearance: 10057
+- Block: 9568
+- Goal Keeper: 7884
+- Dribble: 7612
+- Foul Committed: 7338
+- Foul Won: 7014
+- Shot: 6619
+- Miscontrol: 6508
+- Dispossessed: 5467
+- Interception: 5464
+- Dribbled Past: 4591
+- Substitution: 2196
+- Camera On: 1740
+- Injury Stoppage: 1505
+
+Decision attendue apres lecture :
+- Si xG, tirs et tirs cadres sont bien disponibles, on pourra creer une table de features StatsBomb.
+- Les features ne devront jamais utiliser les events du match a predire.
+- Les variables event-level devront etre transformeées en moyennes historiques avant-match.
+- StatsBomb restera un enrichissement qualitatif sur un sous-ensemble, pas le socle principal.
+
+CSV preview genere : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\322_statsbomb_national_events_features_preview.csv

@@ -18,3 +18,6 @@ dist/
 Thumbs.db
 # RubyBets local API cache
 backend/app/data/cache/*.json
+
+# StatsBomb Open Data - source externe locale non versionnée
+data/external/statsbomb_open_data/

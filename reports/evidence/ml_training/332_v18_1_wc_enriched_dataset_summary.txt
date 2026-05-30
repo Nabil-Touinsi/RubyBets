@@ -1,0 +1,39 @@
+RubyBets - Dataset V18.1 WC enriched
+
+Source alignement : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\331_v18_1_kaggle_statsbomb_alignment_matches.csv
+Source StatsBomb rolling : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\326_statsbomb_national_rolling_features.csv
+Fichier genere : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\333_v18_1_wc_enriched_dataset.csv
+
+Objectif :
+Construire un dataset enrichi Kaggle + Elo + StatsBomb rolling features
+pour tester ensuite 1X2, double chance, OVER_1_5, OVER_2_5 et BTTS.
+
+Perimetre retenu :
+Coupe du Monde 2018 + Coupe du Monde 2022 uniquement.
+Les matchs Euro et Copa America ne sont pas fusionnes car non alignes dans le socle Kaggle/Elo actuel.
+
+Regle de qualite :
+Seuls les matchs alignes proprement sont conserves.
+Les matchs ambigus ou non alignes sont exclus.
+Les features StatsBomb sont des rolling features anti-fuite.
+
+Resultats :
+- Lignes alignement disponibles : 262
+- Lignes enrichies generees : 128
+- Alignements directs : 125
+- Alignements inverses : 3
+
+Distribution targets enrichies :
+- OVER_1_5 : 95 / 128 (0.7422)
+- OVER_2_5 : 61 / 128 (0.4766)
+- BTTS : 63 / 128 (0.4922)
+
+Repartition par competition :
+- FIFA World Cup 2018: 64
+- FIFA World Cup 2022: 64
+
+Decision :
+- Dataset V18.1 WC enriched pret pour entrainement experimental.
+- Ce dataset reste limite a 128 matchs Coupe du Monde.
+- Il doit servir a comparer Kaggle + Elo seul contre Kaggle + Elo + StatsBomb.
+- Aucun resultat ne doit etre integre au produit avant evaluation.

@@ -1,0 +1,332 @@
+RubyBets - Décision V18.1 WC enriched multimarket
+
+Fichier de preuve :
+reports/evidence/ml_training/337_v18_1_wc_enriched_decision.txt
+
+Projet :
+RubyBets - RNCP Data & IA
+
+Phase :
+V18.1 national enriched multimarket
+
+Statut :
+DECISION_EXPERIMENTALE_VALIDEE_SUR_PERIMETRE_WC_ENRICHED
+
+Objectif :
+Formaliser la décision après l'expérience V18.1 qui compare Kaggle + Elo seul contre Kaggle + Elo + StatsBomb rolling features sur les marchés suivants :
+
+* 1X2
+* OVER_1_5
+* OVER_2_5
+* BTTS
+
+Cette décision prépare la phase suivante V18.2 : un sélecteur expérimental multi-market responsable, capable de choisir entre 1X2 strict, double chance, OVER_1_5, OVER_2_5, BTTS ou abstention.
+
+1. Rappel du contexte
+
+La phase V17.9.2 avait permis de construire une stratégie nationale hybride basée sur Kaggle + Elo :
+
+* 1X2 strict quand le signal est fort ;
+* double chance quand le signal est moyen ;
+* abstention quand le signal est faible.
+
+Cette stratégie V17.9.2 a été figée et versionnée avec le tag :
+
+rubybets-v0.10-ml-national-v17.9.2
+
+Après cette validation, l'objectif était d'améliorer la phase nationale en enrichissant les données, notamment pour mieux travailler les marchés :
+
+* OVER_1_5
+* OVER_2_5
+* BTTS
+
+StatsBomb Open Data a donc été testé comme source d'enrichissement event-level.
+
+2. Rappel des étapes StatsBomb réalisées
+
+Les étapes suivantes ont été réalisées avant la décision V18.1 :
+
+1. Téléchargement local ciblé de StatsBomb Open Data.
+2. Exclusion du dossier StatsBomb du versioning GitHub.
+3. Audit de couverture nationale StatsBomb.
+4. Téléchargement ciblé des events pour les compétitions utiles.
+5. Audit des events StatsBomb.
+6. Construction du dataset match-level StatsBomb.
+7. Construction des features rolling anti-fuite.
+8. Audit d'alignement Kaggle/Elo + StatsBomb.
+9. Construction du dataset enrichi V18.1 WC enriched.
+10. Entraînement expérimental V18.1 multi-market.
+
+Les preuves associées sont :
+
+* 319_statsbomb_national_coverage_audit.txt
+* 320_statsbomb_national_coverage_by_competition.csv
+* 321_statsbomb_national_events_audit.txt
+* 322_statsbomb_national_events_features_preview.csv
+* 323_statsbomb_national_match_event_features_summary.txt
+* 324_statsbomb_national_match_event_features.csv
+* 325_statsbomb_national_rolling_features_summary.txt
+* 326_statsbomb_national_rolling_features.csv
+* 330_v18_1_kaggle_statsbomb_alignment_summary.txt
+* 331_v18_1_kaggle_statsbomb_alignment_matches.csv
+* 332_v18_1_wc_enriched_dataset_summary.txt
+* 333_v18_1_wc_enriched_dataset.csv
+* 334_v18_1_wc_enriched_multimarket_summary.txt
+* 335_v18_1_wc_enriched_model_comparison.csv
+* 336_v18_1_wc_enriched_predictions.csv
+
+3. Périmètre du dataset V18.1
+
+Le dataset V18.1 WC enriched contient uniquement les matchs correctement alignés entre :
+
+* Kaggle / Elo national ;
+* StatsBomb rolling features anti-fuite.
+
+Périmètre retenu :
+
+* FIFA World Cup 2018
+* FIFA World Cup 2022
+
+Volume :
+
+* 128 matchs enrichis ;
+* 64 matchs Coupe du Monde 2018 ;
+* 64 matchs Coupe du Monde 2022.
+
+Les compétitions Euro 2020, Euro 2024 et Copa America 2024 ne sont pas intégrées dans V18.1, car elles ne sont pas alignées dans le socle Kaggle/Elo actuel.
+
+Décision de qualité :
+
+Seuls les matchs alignés proprement sont conservés.
+Les matchs ambigus ou non alignés sont exclus.
+Les features StatsBomb utilisées sont des rolling features anti-fuite.
+
+4. Règle anti-fuite
+
+La règle anti-fuite reste centrale.
+
+Les statistiques event-level du match courant ne doivent jamais être utilisées pour prédire ce même match.
+
+Les données StatsBomb ont donc été transformées en variables historiques avant-match :
+
+* xG for / against last_5 ;
+* tirs for / against last_5 ;
+* tirs cadrés for / against last_5 ;
+* buts for / against last_5 ;
+* différentiels xG, tirs, tirs cadrés et buts ;
+* historique disponible par équipe.
+
+Cela permet de respecter la logique pré-match de RubyBets.
+
+5. Résultats V18.1
+
+L'expérience V18.1 compare deux jeux de features :
+
+1. Kaggle + Elo seul ;
+2. Kaggle + Elo + StatsBomb rolling features.
+
+Split utilisé :
+
+* Train : Coupe du Monde 2018 ;
+* Test : Coupe du Monde 2022.
+
+Marchés testés :
+
+* 1X2 ;
+* OVER_1_5 ;
+* OVER_2_5 ;
+* BTTS.
+
+Résultats principaux :
+
+1X2 :
+
+* Kaggle + Elo seul : F1 = 0.3589 ; accuracy = 0.375
+* Kaggle + Elo + StatsBomb : F1 = 0.52 ; accuracy = 0.5312
+* Delta F1 = +0.1611
+* Delta accuracy = +0.1562
+
+OVER_1_5 :
+
+* Kaggle + Elo seul : F1 = 0.8468 ; accuracy = 0.7344
+* Kaggle + Elo + StatsBomb : F1 = 0.8468 ; accuracy = 0.7344
+* Delta F1 = 0.0
+* Delta accuracy = 0.0
+
+OVER_2_5 :
+
+* Kaggle + Elo seul : F1 = 0.4151 ; accuracy = 0.5156
+* Kaggle + Elo + StatsBomb : F1 = 0.5091 ; accuracy = 0.5781
+* Delta F1 = +0.094
+* Delta accuracy = +0.0625
+
+BTTS :
+
+* Kaggle + Elo seul : F1 = 0.6111 ; accuracy = 0.5625
+* Kaggle + Elo + StatsBomb : F1 = 0.5823 ; accuracy = 0.4844
+* Delta F1 = -0.0288
+* Delta accuracy = -0.0781
+
+6. Lecture des résultats
+
+Les résultats montrent que StatsBomb n'améliore pas tous les marchés.
+
+StatsBomb apporte un gain clair sur :
+
+* 1X2 ;
+* OVER_2_5.
+
+StatsBomb n'apporte pas de gain sur :
+
+* OVER_1_5 ;
+* BTTS.
+
+Pour OVER_1_5, le meilleur résultat reste équivalent à une baseline naïve, car le marché est très fréquent dans ce sous-ensemble. Il ne faut donc pas présenter OVER_1_5 comme une réussite ML avancée à ce stade.
+
+Pour BTTS, l'enrichissement StatsBomb dégrade légèrement la performance sur ce split. Il faut donc rester prudent et ne pas forcer StatsBomb sur ce marché.
+
+7. Décision V18.1
+
+Décision retenue :
+
+StatsBomb est validé comme enrichissement ciblé, mais pas comme remplacement du socle Kaggle + Elo.
+
+La phase V18.1 confirme que :
+
+* Kaggle + Elo reste le socle principal national ;
+* StatsBomb est utile comme enrichissement qualitatif sur les matchs Coupe du Monde alignés ;
+* l'apport StatsBomb est particulièrement intéressant pour le 1X2 ;
+* OVER_2_5 peut être conservé comme marché optionnel enrichi ;
+* OVER_1_5 reste utile produit, mais doit être exposé avec prudence ;
+* BTTS doit rester testé avec prudence, plutôt avec Kaggle + Elo seul pour l'instant.
+
+La V18.1 ne remplace donc pas V17.9.2.
+Elle prépare une phase V18.2 expérimentale multi-market.
+
+8. Statut des marchés après V18.1
+
+1X2 :
+Statut : renforcé par StatsBomb.
+Décision : conserver Kaggle + Elo + StatsBomb comme piste enrichie sur le périmètre Coupe du Monde.
+
+Double chance :
+Statut : à dériver des probabilités 1X2.
+Décision : ne pas entraîner comme target séparée. La double chance doit être construite à partir du niveau de signal 1X2.
+
+OVER_1_5 :
+Statut : conservé dans l'objectif produit.
+Décision : garder dans le futur sélecteur V18.2, mais avec un seuil très prudent, car le modèle ne dépasse pas clairement une baseline naïve.
+
+OVER_2_5 :
+Statut : optionnel mais intéressant.
+Décision : conserver comme marché optionnel enrichi StatsBomb, car l'expérience V18.1 montre une amélioration.
+
+BTTS :
+Statut : à conserver avec prudence.
+Décision : ne pas forcer StatsBomb sur BTTS pour l'instant. Tester plutôt une logique Kaggle + Elo seul ou un seuil de sélection strict.
+
+ABSTAIN :
+Statut : obligatoire.
+Décision : conserver l'abstention lorsque les signaux sont trop faibles ou contradictoires.
+
+9. Préparation du sélecteur V18.2
+
+La prochaine phase doit créer un sélecteur expérimental V18.2.
+
+Objectif :
+
+Choisir automatiquement le marché le plus pertinent selon le niveau de signal, sans forcer une recommandation sur tous les matchs.
+
+Logique cible corrigée :
+
+* si 1X2 enrichi très fort : STRICT_1X2 ;
+* si 1X2 moyen : DOUBLE_CHANCE ;
+* si signal OVER_1_5 très fiable : OVER_1_5 ;
+* si signal OVER_2_5 fort : OVER_2_5 ;
+* si signal BTTS fort avec Kaggle + Elo : BTTS ;
+* sinon : ABSTAIN.
+
+Cette logique doit respecter le positionnement responsable de RubyBets :
+
+* ne pas promettre de résultat ;
+* ne pas forcer une prédiction ;
+* privilégier les marchés les plus fiables ;
+* s'abstenir lorsque le signal est insuffisant.
+
+10. Pourquoi OVER_1_5 reste dans V18.2
+
+OVER_1_5 reste important pour l'expérience produit, même si V18.1 ne montre pas encore de gain ML net sur ce marché.
+
+Raison :
+
+* c'est un marché simple ;
+* il est lisible pour l'utilisateur ;
+* il complète bien les recommandations 1X2 ;
+* il peut être pertinent sur certains matchs à forte tendance offensive ;
+* il doit cependant être filtré par un seuil strict.
+
+Décision :
+
+OVER_1_5 reste dans le futur sélecteur V18.2, mais il ne doit pas être prioritaire par défaut.
+Il sera sélectionné uniquement lorsque le signal est très fiable.
+
+11. Pourquoi StatsBomb ne doit pas encore être intégré au produit
+
+StatsBomb ne doit pas encore être branché directement dans le backend produit ni dans le frontend.
+
+Raisons :
+
+* V18.1 est limitée à 128 matchs Coupe du Monde ;
+* le split 2018 -> 2022 reste petit ;
+* StatsBomb ne couvre pas tout le socle Kaggle ;
+* certains marchés ne sont pas améliorés ;
+* le sélecteur V18.2 n'est pas encore évalué ;
+* aucune couche backend d'inférence propre n'existe encore pour cette version.
+
+Décision :
+
+Aucune intégration produit immédiate.
+La prochaine étape est une expérimentation V18.2 selector sur les prédictions générées.
+
+12. Décision finale
+
+Statut final V18.1 :
+
+V18_1_WC_ENRICHED_EXPERIMENT_VALIDATED_FOR_SELECTOR_REVIEW
+
+Décision :
+
+* StatsBomb est validé comme source d'enrichissement data ;
+* StatsBomb améliore clairement le 1X2 sur le périmètre testé ;
+* StatsBomb améliore modérément OVER_2_5 ;
+* StatsBomb n'améliore pas OVER_1_5 sur cette expérience ;
+* StatsBomb n'améliore pas BTTS sur cette expérience ;
+* OVER_1_5 reste malgré tout dans l'objectif produit, avec seuil prudent ;
+* la double chance doit être dérivée des probabilités 1X2 ;
+* V18.2 doit tester un sélecteur multi-market responsable ;
+* V17.9.2 reste la référence nationale globale actuellement figée.
+
+13. Prochaine étape
+
+Créer le sélecteur expérimental :
+
+backend/scripts/ml_national/evaluate_v18_2_wc_enriched_selector.py
+
+Sorties attendues :
+
+reports/evidence/ml_training/338_v18_2_wc_enriched_selector_summary.txt
+reports/evidence/ml_training/339_v18_2_wc_enriched_selector_results.csv
+reports/evidence/ml_training/340_v18_2_wc_enriched_best_predictions.csv
+
+Objectif V18.2 :
+
+Évaluer une stratégie produit qui choisit entre :
+
+* STRICT_1X2 ;
+* DOUBLE_CHANCE ;
+* OVER_1_5 ;
+* OVER_2_5 ;
+* BTTS ;
+* ABSTAIN.
+
+La stratégie doit maximiser la reliability tout en gardant une couverture exploitable et une logique responsable.

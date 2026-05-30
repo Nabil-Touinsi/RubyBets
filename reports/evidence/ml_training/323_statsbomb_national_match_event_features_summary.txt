@@ -1,0 +1,44 @@
+RubyBets - Construction dataset match-level StatsBomb national
+
+Source locale : C:\dev_classe\RNCP\RubyBets\data\external\statsbomb_open_data
+Fichier genere : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\324_statsbomb_national_match_event_features.csv
+
+Objectif :
+Construire un dataset match-level propre a partir des events StatsBomb
+pour preparer l'enrichissement des futurs modeles nationaux OVER_1_5, OVER_2_5 et BTTS.
+
+Important :
+Ce fichier contient les statistiques du match lui-meme.
+Il ne doit pas etre utilise directement pour predire ce meme match.
+La prochaine etape devra transformer ces valeurs en moyennes historiques avant-match.
+
+Competitions ciblees :
+- Copa America | 2024 | competition_id=223 | season_id=282
+- FIFA World Cup | 2022 | competition_id=43 | season_id=106
+- FIFA World Cup | 2018 | competition_id=43 | season_id=3
+- UEFA Euro | 2024 | competition_id=55 | season_id=282
+- UEFA Euro | 2020 | competition_id=55 | season_id=43
+
+Resultats generaux :
+- Lignes match-level generees : 262
+- Matchs sans events ignores : 0
+- Total tirs : 6619
+- Total xG : 798.4869
+
+Distribution des targets :
+- OVER_1_5 : 193 / 262 (0.7366)
+- OVER_2_5 : 124 / 262 (0.4733)
+- BTTS : 130 / 262 (0.4962)
+
+Repartition par competition :
+- Copa America 2024: 32
+- FIFA World Cup 2018: 64
+- FIFA World Cup 2022: 64
+- UEFA Euro 2020: 51
+- UEFA Euro 2024: 51
+
+Decision :
+- Dataset match-level StatsBomb pret pour la phase suivante.
+- Prochaine etape : creer des features rolling anti-fuite.
+- Exemple : team_a_xg_for_last_5 doit utiliser uniquement les matchs precedents de Team A.
+- StatsBomb reste un enrichissement qualitatif sur sous-ensemble, pas le socle principal Kaggle.

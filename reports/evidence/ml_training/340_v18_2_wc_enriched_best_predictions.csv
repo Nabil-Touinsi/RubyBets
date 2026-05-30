@@ -1,0 +1,65 @@
+strategy_name,match_key,clean_match_id,statsbomb_match_id,match_date,season,team_a_name,team_b_name,team_a_score,team_b_score,market_type,recommendation,actual,predicted,confidence,positive_probability,is_correct,source_target,source_feature_set,source_model_name
+v18_2_1x2_first_selector,8771,8771,3857286,2022-11-20,2022,Qatar,Ecuador,0,2,DOUBLE_CHANCE,TEAM_A_OR_DRAW,TEAM_B_WIN,TEAM_A_WIN,0.5058,,False,target_1x2,kaggle_elo_statsbomb,random_forest_balanced
+v18_2_1x2_first_selector,8773,8773,3857271,2022-11-21,2022,England,Iran,6,2,OVER_1_5,OVER_1_5,1,1,0.9631,0.9631,True,target_over_1_5,kaggle_elo_statsbomb,logistic_regression_balanced
+v18_2_1x2_first_selector,8774,8774,3857282,2022-11-21,2022,United States,Wales,1,1,DOUBLE_CHANCE,TEAM_A_OR_DRAW,DRAW,TEAM_A_WIN,0.4426,,True,target_1x2,kaggle_elo_statsbomb,random_forest_balanced
+v18_2_1x2_first_selector,8772,8772,3857285,2022-11-21,2022,Senegal,Netherlands,0,2,DOUBLE_CHANCE,DRAW_OR_TEAM_B,TEAM_B_WIN,TEAM_B_WIN,0.5522,,True,target_1x2,kaggle_elo_statsbomb,random_forest_balanced
+v18_2_1x2_first_selector,8777,8777,3857254,2022-11-22,2022,Denmark,Tunisia,0,0,DOUBLE_CHANCE,TEAM_A_OR_DRAW,DRAW,TEAM_A_WIN,0.5519,,True,target_1x2,kaggle_elo_statsbomb,random_forest_balanced
+v18_2_1x2_first_selector,8776,8776,3857265,2022-11-22,2022,Mexico,Poland,0,0,OVER_1_5,OVER_1_5,0,1,0.8709,0.8709,False,target_over_1_5,kaggle_elo_statsbomb,logistic_regression_balanced
+v18_2_1x2_first_selector,8778,8778,3857279,2022-11-22,2022,France,Australia,4,1,DOUBLE_CHANCE,TEAM_A_OR_DRAW,TEAM_A_WIN,TEAM_A_WIN,0.444,,True,target_1x2,kaggle_elo_statsbomb,random_forest_balanced
+v18_2_1x2_first_selector,8775,8775,3857300,2022-11-22,2022,Argentina,Saudi Arabia,1,2,ABSTAIN,ABSTAIN,,,,,,,,
+v18_2_1x2_first_selector,8782,8782,3857268,2022-11-23,2022,Belgium,Canada,1,0,ABSTAIN,ABSTAIN,,,,,,,,
+v18_2_1x2_first_selector,8781,8781,3857277,2022-11-23,2022,Morocco,Croatia,0,0,OVER_1_5,OVER_1_5,0,1,0.9199,0.9199,False,target_over_1_5,kaggle_elo_statsbomb,logistic_regression_balanced
+v18_2_1x2_first_selector,8779,8779,3857284,2022-11-23,2022,Germany,Japan,1,2,DOUBLE_CHANCE,TEAM_A_OR_DRAW,TEAM_B_WIN,TEAM_A_WIN,0.5633,,False,target_1x2,kaggle_elo_statsbomb,random_forest_balanced
+v18_2_1x2_first_selector,8780,8780,3857291,2022-11-23,2022,Spain,Costa Rica,7,0,STRICT_1X2,TEAM_A_WIN,TEAM_A_WIN,TEAM_A_WIN,0.6311,,True,target_1x2,kaggle_elo_statsbomb,random_forest_balanced
+v18_2_1x2_first_selector,8784,8784,3857258,2022-11-24,2022,Brazil,Serbia,2,0,STRICT_1X2,TEAM_A_WIN,TEAM_A_WIN,TEAM_A_WIN,0.6881,,True,target_1x2,kaggle_elo_statsbomb,random_forest_balanced
+v18_2_1x2_first_selector,8785,8785,3857287,2022-11-24,2022,Uruguay,South Korea,0,0,DOUBLE_CHANCE,TEAM_A_OR_DRAW,DRAW,TEAM_A_WIN,0.4607,,True,target_1x2,kaggle_elo_statsbomb,random_forest_balanced
+v18_2_1x2_first_selector,8783,8783,3857290,2022-11-24,2022,Switzerland,Cameroon,1,0,OVER_1_5,OVER_1_5,0,1,0.7842,0.7842,False,target_over_1_5,kaggle_elo_statsbomb,logistic_regression_balanced
+v18_2_1x2_first_selector,8786,8786,3857298,2022-11-24,2022,Portugal,Ghana,3,2,OVER_1_5,OVER_1_5,1,1,0.9352,0.9352,True,target_over_1_5,kaggle_elo_statsbomb,logistic_regression_balanced
+v18_2_1x2_first_selector,8790,8790,3857272,2022-11-25,2022,England,United States,0,0,DOUBLE_CHANCE,TEAM_A_OR_DRAW,DRAW,TEAM_A_WIN,0.5177,,True,target_1x2,kaggle_elo_statsbomb,random_forest_balanced
+v18_2_1x2_first_selector,8789,8789,3857273,2022-11-25,2022,Wales,Iran,0,2,ABSTAIN,ABSTAIN,,,,,,,,
+v18_2_1x2_first_selector,8788,8788,3857274,2022-11-25,2022,Netherlands,Ecuador,1,1,DOUBLE_CHANCE,TEAM_A_OR_DRAW,DRAW,TEAM_A_WIN,0.4607,,True,target_1x2,kaggle_elo_statsbomb,random_forest_balanced
+v18_2_1x2_first_selector,8787,8787,3857301,2022-11-25,2022,Qatar,Senegal,1,3,OVER_1_5,OVER_1_5,1,1,0.9642,0.9642,True,target_over_1_5,kaggle_elo_statsbomb,logistic_regression_balanced
+v18_2_1x2_first_selector,8794,8794,3857266,2022-11-26,2022,France,Denmark,2,1,DOUBLE_CHANCE,TEAM_A_OR_DRAW,TEAM_A_WIN,TEAM_A_WIN,0.5619,,True,target_1x2,kaggle_elo_statsbomb,random_forest_balanced
+v18_2_1x2_first_selector,8793,8793,3857288,2022-11-26,2022,Tunisia,Australia,0,1,ABSTAIN,ABSTAIN,,,,,,,,
+v18_2_1x2_first_selector,8792,8792,3857289,2022-11-26,2022,Argentina,Mexico,2,0,DOUBLE_CHANCE,TEAM_A_OR_DRAW,TEAM_A_WIN,TEAM_A_WIN,0.5438,,True,target_1x2,kaggle_elo_statsbomb,random_forest_balanced
+v18_2_1x2_first_selector,8791,8791,3857297,2022-11-26,2022,Poland,Saudi Arabia,2,0,DOUBLE_CHANCE,DRAW_OR_TEAM_B,TEAM_A_WIN,TEAM_B_WIN,0.4463,,False,target_1x2,kaggle_elo_statsbomb,random_forest_balanced
+v18_2_1x2_first_selector,8796,8796,3857263,2022-11-27,2022,Spain,Germany,1,1,DOUBLE_CHANCE,TEAM_A_OR_DRAW,DRAW,TEAM_A_WIN,0.5526,,True,target_1x2,kaggle_elo_statsbomb,random_forest_balanced
+v18_2_1x2_first_selector,8798,8798,3857281,2022-11-27,2022,Croatia,Canada,4,1,ABSTAIN,ABSTAIN,,,,,,,,
+v18_2_1x2_first_selector,8797,8797,3857283,2022-11-27,2022,Belgium,Morocco,0,2,OVER_1_5,OVER_1_5,1,1,0.8855,0.8855,True,target_over_1_5,kaggle_elo_statsbomb,logistic_regression_balanced
+v18_2_1x2_first_selector,8795,8795,3857295,2022-11-27,2022,Japan,Costa Rica,0,1,ABSTAIN,ABSTAIN,,,,,,,,
+v18_2_1x2_first_selector,8799,8799,3857259,2022-11-28,2022,Cameroon,Serbia,3,3,DOUBLE_CHANCE,DRAW_OR_TEAM_B,DRAW,TEAM_B_WIN,0.4853,,True,target_1x2,kaggle_elo_statsbomb,random_forest_balanced
+v18_2_1x2_first_selector,8800,8800,3857269,2022-11-28,2022,Brazil,Switzerland,1,0,STRICT_1X2,TEAM_A_WIN,TEAM_A_WIN,TEAM_A_WIN,0.645,,True,target_1x2,kaggle_elo_statsbomb,random_forest_balanced
+v18_2_1x2_first_selector,8802,8802,3857270,2022-11-28,2022,Portugal,Uruguay,2,0,OVER_1_5,OVER_1_5,1,1,0.828,0.828,True,target_over_1_5,kaggle_elo_statsbomb,logistic_regression_balanced
+v18_2_1x2_first_selector,8801,8801,3857299,2022-11-28,2022,South Korea,Ghana,2,3,ABSTAIN,ABSTAIN,,,,,,,,
+v18_2_1x2_first_selector,8805,8805,3857261,2022-11-29,2022,Wales,England,0,3,OVER_1_5,OVER_1_5,1,1,0.9775,0.9775,True,target_over_1_5,kaggle_elo_statsbomb,logistic_regression_balanced
+v18_2_1x2_first_selector,8803,8803,3857267,2022-11-29,2022,Ecuador,Senegal,1,2,DOUBLE_CHANCE,DRAW_OR_TEAM_B,TEAM_B_WIN,TEAM_B_WIN,0.461,,True,target_1x2,kaggle_elo_statsbomb,random_forest_balanced
+v18_2_1x2_first_selector,8806,8806,3857278,2022-11-29,2022,Iran,United States,0,1,DOUBLE_CHANCE,DRAW_OR_TEAM_B,TEAM_B_WIN,TEAM_B_WIN,0.4532,,True,target_1x2,kaggle_elo_statsbomb,random_forest_balanced
+v18_2_1x2_first_selector,8804,8804,3857294,2022-11-29,2022,Qatar,Netherlands,0,2,OVER_1_5,OVER_1_5,1,1,0.9975,0.9975,True,target_over_1_5,kaggle_elo_statsbomb,logistic_regression_balanced
+v18_2_1x2_first_selector,8809,8809,3857257,2022-11-30,2022,Australia,Denmark,1,0,OVER_1_5,OVER_1_5,0,1,0.9492,0.9492,False,target_over_1_5,kaggle_elo_statsbomb,logistic_regression_balanced
+v18_2_1x2_first_selector,8808,8808,3857260,2022-11-30,2022,Saudi Arabia,Mexico,1,2,OVER_1_5,OVER_1_5,1,1,0.9588,0.9588,True,target_over_1_5,kaggle_elo_statsbomb,logistic_regression_balanced
+v18_2_1x2_first_selector,8807,8807,3857264,2022-11-30,2022,Poland,Argentina,0,2,OVER_1_5,OVER_1_5,1,1,0.8237,0.8237,True,target_over_1_5,kaggle_elo_statsbomb,logistic_regression_balanced
+v18_2_1x2_first_selector,8810,8810,3857275,2022-11-30,2022,Tunisia,France,1,0,OVER_1_5,OVER_1_5,0,1,0.9149,0.9149,False,target_over_1_5,kaggle_elo_statsbomb,logistic_regression_balanced
+v18_2_1x2_first_selector,8811,8811,3857255,2022-12-01,2022,Japan,Spain,2,1,OVER_1_5,OVER_1_5,1,1,0.9204,0.9204,True,target_over_1_5,kaggle_elo_statsbomb,logistic_regression_balanced
+v18_2_1x2_first_selector,8814,8814,3857276,2022-12-01,2022,Canada,Morocco,1,2,OVER_1_5,OVER_1_5,1,1,0.9897,0.9897,True,target_over_1_5,kaggle_elo_statsbomb,logistic_regression_balanced
+v18_2_1x2_first_selector,8812,8812,3857292,2022-12-01,2022,Costa Rica,Germany,2,4,ABSTAIN,ABSTAIN,,,,,,,,
+v18_2_1x2_first_selector,8813,8813,3857296,2022-12-01,2022,Croatia,Belgium,0,0,OVER_1_5,OVER_1_5,0,1,0.8515,0.8515,False,target_over_1_5,kaggle_elo_statsbomb,logistic_regression_balanced
+v18_2_1x2_first_selector,8815,8815,3857256,2022-12-02,2022,Serbia,Switzerland,2,3,OVER_1_5,OVER_1_5,1,1,0.9984,0.9984,True,target_over_1_5,kaggle_elo_statsbomb,logistic_regression_balanced
+v18_2_1x2_first_selector,8818,8818,3857262,2022-12-02,2022,South Korea,Portugal,2,1,OVER_1_5,OVER_1_5,1,1,0.8806,0.8806,True,target_over_1_5,kaggle_elo_statsbomb,logistic_regression_balanced
+v18_2_1x2_first_selector,8816,8816,3857280,2022-12-02,2022,Cameroon,Brazil,1,0,DOUBLE_CHANCE,DRAW_OR_TEAM_B,TEAM_A_WIN,TEAM_B_WIN,0.4963,,False,target_1x2,kaggle_elo_statsbomb,random_forest_balanced
+v18_2_1x2_first_selector,8817,8817,3857293,2022-12-02,2022,Ghana,Uruguay,0,2,ABSTAIN,ABSTAIN,,,,,,,,
+v18_2_1x2_first_selector,8819,8819,3869117,2022-12-03,2022,Netherlands,United States,3,1,ABSTAIN,ABSTAIN,,,,,,,,
+v18_2_1x2_first_selector,8820,8820,3869151,2022-12-03,2022,Argentina,Australia,2,1,STRICT_1X2,TEAM_A_WIN,TEAM_A_WIN,TEAM_A_WIN,0.6747,,True,target_1x2,kaggle_elo_statsbomb,random_forest_balanced
+v18_2_1x2_first_selector,8822,8822,3869118,2022-12-04,2022,England,Senegal,3,0,DOUBLE_CHANCE,TEAM_A_OR_DRAW,TEAM_A_WIN,TEAM_A_WIN,0.4964,,True,target_1x2,kaggle_elo_statsbomb,random_forest_balanced
+v18_2_1x2_first_selector,8821,8821,3869152,2022-12-04,2022,France,Poland,3,1,STRICT_1X2,TEAM_A_WIN,TEAM_A_WIN,TEAM_A_WIN,0.7161,,True,target_1x2,kaggle_elo_statsbomb,random_forest_balanced
+v18_2_1x2_first_selector,8823,8823,3869219,2022-12-05,2022,Japan,Croatia,1,1,OVER_1_5,OVER_1_5,1,1,0.9683,0.9683,True,target_over_1_5,kaggle_elo_statsbomb,logistic_regression_balanced
+v18_2_1x2_first_selector,8824,8824,3869253,2022-12-05,2022,Brazil,South Korea,4,1,STRICT_1X2,TEAM_A_WIN,TEAM_A_WIN,TEAM_A_WIN,0.7382,,True,target_1x2,kaggle_elo_statsbomb,random_forest_balanced
+v18_2_1x2_first_selector,8825,8825,3869220,2022-12-06,2022,Morocco,Spain,0,0,OVER_1_5,OVER_1_5,0,1,0.9233,0.9233,False,target_over_1_5,kaggle_elo_statsbomb,logistic_regression_balanced
+v18_2_1x2_first_selector,8826,8826,3869254,2022-12-06,2022,Portugal,Switzerland,6,1,DOUBLE_CHANCE,TEAM_A_OR_DRAW,TEAM_A_WIN,TEAM_A_WIN,0.5511,,True,target_1x2,kaggle_elo_statsbomb,random_forest_balanced
+v18_2_1x2_first_selector,8828,8828,3869321,2022-12-09,2022,Netherlands,Argentina,2,2,ABSTAIN,ABSTAIN,,,,,,,,
+v18_2_1x2_first_selector,8827,8827,3869420,2022-12-09,2022,Croatia,Brazil,1,1,OVER_1_5,OVER_1_5,1,1,0.8338,0.8338,True,target_over_1_5,kaggle_elo_statsbomb,logistic_regression_balanced
+v18_2_1x2_first_selector,8830,8830,3869354,2022-12-10,2022,England,France,1,2,OVER_1_5,OVER_1_5,1,1,0.8078,0.8078,True,target_over_1_5,kaggle_elo_statsbomb,logistic_regression_balanced
+v18_2_1x2_first_selector,8829,8829,3869486,2022-12-10,2022,Morocco,Portugal,1,0,ABSTAIN,ABSTAIN,,,,,,,,
+v18_2_1x2_first_selector,8831,8831,3869519,2022-12-13,2022,Argentina,Croatia,3,0,STRICT_1X2,TEAM_A_WIN,TEAM_A_WIN,TEAM_A_WIN,0.6887,,True,target_1x2,kaggle_elo_statsbomb,random_forest_balanced
+v18_2_1x2_first_selector,8832,8832,3869552,2022-12-14,2022,France,Morocco,2,0,DOUBLE_CHANCE,TEAM_A_OR_DRAW,TEAM_A_WIN,TEAM_A_WIN,0.5139,,True,target_1x2,kaggle_elo_statsbomb,random_forest_balanced
+v18_2_1x2_first_selector,8833,8833,3869684,2022-12-17,2022,Croatia,Morocco,2,1,OVER_1_5,OVER_1_5,1,1,0.997,0.997,True,target_over_1_5,kaggle_elo_statsbomb,logistic_regression_balanced
+v18_2_1x2_first_selector,8834,8834,3869685,2022-12-18,2022,Argentina,France,3,3,DOUBLE_CHANCE,TEAM_A_OR_DRAW,DRAW,TEAM_A_WIN,0.4505,,True,target_1x2,kaggle_elo_statsbomb,random_forest_balanced

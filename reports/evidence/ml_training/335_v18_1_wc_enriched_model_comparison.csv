@@ -1,0 +1,25 @@
+target,feature_set,model_name,train_rows,test_rows,feature_count,train_distribution,test_distribution,accuracy,f1,precision,recall
+target_1x2,kaggle_elo_only,dummy_most_frequent,64,64,9,"{'DRAW': np.int64(13), 'TEAM_A_WIN': np.int64(25), 'TEAM_B_WIN': np.int64(26)}","{'DRAW': np.int64(15), 'TEAM_A_WIN': np.int64(28), 'TEAM_B_WIN': np.int64(21)}",0.3281,0.1647,0.1094,0.3333
+target_1x2,kaggle_elo_only,logistic_regression_balanced,64,64,9,"{'DRAW': np.int64(13), 'TEAM_A_WIN': np.int64(25), 'TEAM_B_WIN': np.int64(26)}","{'DRAW': np.int64(15), 'TEAM_A_WIN': np.int64(28), 'TEAM_B_WIN': np.int64(21)}",0.3125,0.3146,0.3357,0.3357
+target_1x2,kaggle_elo_only,random_forest_balanced,64,64,9,"{'DRAW': np.int64(13), 'TEAM_A_WIN': np.int64(25), 'TEAM_B_WIN': np.int64(26)}","{'DRAW': np.int64(15), 'TEAM_A_WIN': np.int64(28), 'TEAM_B_WIN': np.int64(21)}",0.375,0.3589,0.3741,0.3746
+target_1x2,kaggle_elo_statsbomb,dummy_most_frequent,64,64,31,"{'DRAW': np.int64(13), 'TEAM_A_WIN': np.int64(25), 'TEAM_B_WIN': np.int64(26)}","{'DRAW': np.int64(15), 'TEAM_A_WIN': np.int64(28), 'TEAM_B_WIN': np.int64(21)}",0.3281,0.1647,0.1094,0.3333
+target_1x2,kaggle_elo_statsbomb,logistic_regression_balanced,64,64,31,"{'DRAW': np.int64(13), 'TEAM_A_WIN': np.int64(25), 'TEAM_B_WIN': np.int64(26)}","{'DRAW': np.int64(15), 'TEAM_A_WIN': np.int64(28), 'TEAM_B_WIN': np.int64(21)}",0.4219,0.3087,0.2591,0.3833
+target_1x2,kaggle_elo_statsbomb,random_forest_balanced,64,64,31,"{'DRAW': np.int64(13), 'TEAM_A_WIN': np.int64(25), 'TEAM_B_WIN': np.int64(26)}","{'DRAW': np.int64(15), 'TEAM_A_WIN': np.int64(28), 'TEAM_B_WIN': np.int64(21)}",0.5312,0.52,0.5552,0.5103
+target_over_1_5,kaggle_elo_only,dummy_most_frequent,64,64,9,"{0: np.int64(16), 1: np.int64(48)}","{0: np.int64(17), 1: np.int64(47)}",0.7344,0.8468,0.7344,1.0
+target_over_1_5,kaggle_elo_only,logistic_regression_balanced,64,64,9,"{0: np.int64(16), 1: np.int64(48)}","{0: np.int64(17), 1: np.int64(47)}",0.5938,0.675,0.8182,0.5745
+target_over_1_5,kaggle_elo_only,random_forest_balanced,64,64,9,"{0: np.int64(16), 1: np.int64(48)}","{0: np.int64(17), 1: np.int64(47)}",0.6406,0.781,0.7069,0.8723
+target_over_1_5,kaggle_elo_statsbomb,dummy_most_frequent,64,64,31,"{0: np.int64(16), 1: np.int64(48)}","{0: np.int64(17), 1: np.int64(47)}",0.7344,0.8468,0.7344,1.0
+target_over_1_5,kaggle_elo_statsbomb,logistic_regression_balanced,64,64,31,"{0: np.int64(16), 1: np.int64(48)}","{0: np.int64(17), 1: np.int64(47)}",0.6719,0.8037,0.7167,0.9149
+target_over_1_5,kaggle_elo_statsbomb,random_forest_balanced,64,64,31,"{0: np.int64(16), 1: np.int64(48)}","{0: np.int64(17), 1: np.int64(47)}",0.7188,0.8364,0.7302,0.9787
+target_over_2_5,kaggle_elo_only,dummy_most_frequent,64,64,9,"{0: np.int64(33), 1: np.int64(31)}","{0: np.int64(34), 1: np.int64(30)}",0.5312,0.0,0.0,0.0
+target_over_2_5,kaggle_elo_only,logistic_regression_balanced,64,64,9,"{0: np.int64(33), 1: np.int64(31)}","{0: np.int64(34), 1: np.int64(30)}",0.5156,0.4151,0.4783,0.3667
+target_over_2_5,kaggle_elo_only,random_forest_balanced,64,64,9,"{0: np.int64(33), 1: np.int64(31)}","{0: np.int64(34), 1: np.int64(30)}",0.5,0.4074,0.4583,0.3667
+target_over_2_5,kaggle_elo_statsbomb,dummy_most_frequent,64,64,31,"{0: np.int64(33), 1: np.int64(31)}","{0: np.int64(34), 1: np.int64(30)}",0.5312,0.0,0.0,0.0
+target_over_2_5,kaggle_elo_statsbomb,logistic_regression_balanced,64,64,31,"{0: np.int64(33), 1: np.int64(31)}","{0: np.int64(34), 1: np.int64(30)}",0.5,0.36,0.45,0.3
+target_over_2_5,kaggle_elo_statsbomb,random_forest_balanced,64,64,31,"{0: np.int64(33), 1: np.int64(31)}","{0: np.int64(34), 1: np.int64(30)}",0.5781,0.5091,0.56,0.4667
+target_btts,kaggle_elo_only,dummy_most_frequent,64,64,9,"{0: np.int64(32), 1: np.int64(32)}","{0: np.int64(33), 1: np.int64(31)}",0.5156,0.0,0.0,0.0
+target_btts,kaggle_elo_only,logistic_regression_balanced,64,64,9,"{0: np.int64(32), 1: np.int64(32)}","{0: np.int64(33), 1: np.int64(31)}",0.5625,0.6111,0.5366,0.7097
+target_btts,kaggle_elo_only,random_forest_balanced,64,64,9,"{0: np.int64(32), 1: np.int64(32)}","{0: np.int64(33), 1: np.int64(31)}",0.5,0.5789,0.4889,0.7097
+target_btts,kaggle_elo_statsbomb,dummy_most_frequent,64,64,31,"{0: np.int64(32), 1: np.int64(32)}","{0: np.int64(33), 1: np.int64(31)}",0.5156,0.0,0.0,0.0
+target_btts,kaggle_elo_statsbomb,logistic_regression_balanced,64,64,31,"{0: np.int64(32), 1: np.int64(32)}","{0: np.int64(33), 1: np.int64(31)}",0.4844,0.5823,0.4792,0.7419
+target_btts,kaggle_elo_statsbomb,random_forest_balanced,64,64,31,"{0: np.int64(32), 1: np.int64(32)}","{0: np.int64(33), 1: np.int64(31)}",0.4844,0.5714,0.4783,0.7097

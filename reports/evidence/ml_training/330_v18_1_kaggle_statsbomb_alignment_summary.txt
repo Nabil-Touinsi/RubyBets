@@ -1,0 +1,30 @@
+RubyBets - Audit alignement V18.1 Kaggle + Elo + StatsBomb
+
+Source StatsBomb rolling : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\326_statsbomb_national_rolling_features.csv
+Fichier d'alignement genere : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\331_v18_1_kaggle_statsbomb_alignment_matches.csv
+
+Objectif :
+Verifier combien de matchs StatsBomb rolling peuvent etre relies proprement
+aux features nationales Kaggle + Elo deja presentes dans PostgreSQL.
+
+Resultats globaux :
+- Lignes StatsBomb rolling : 262
+- Lignes Kaggle/Elo chargees depuis ml_national.features : 9735
+- Matchs alignes directs : 125
+- Matchs alignes inverses : 3
+- Matchs alignes total : 128 / 262 (0.4885)
+- Matchs ambigus : 0
+- Matchs non alignes : 134
+
+Alignement par competition StatsBomb :
+- Copa America 2024: 0 / 32 (0.0)
+- FIFA World Cup 2018: 64 / 64 (1.0)
+- FIFA World Cup 2022: 64 / 64 (1.0)
+- UEFA Euro 2020: 0 / 51 (0.0)
+- UEFA Euro 2024: 0 / 51 (0.0)
+
+Decision attendue apres lecture :
+- Si le volume aligne est suffisant, construire un dataset V18.1 enriched.
+- Si seuls les matchs Coupe du Monde s'alignent, limiter V18.1 au perimetre WC enrichi.
+- Ne pas fusionner les matchs non alignes pour eviter une erreur de donnees.
+- StatsBomb reste un enrichissement rolling anti-fuite, pas le socle principal.

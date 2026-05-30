@@ -1,0 +1,335 @@
+RubyBets - Décision V18.2 WC enriched selector
+
+Fichier de preuve :
+reports/evidence/ml_training/341_v18_2_wc_enriched_selector_decision.txt
+
+Projet :
+RubyBets - RNCP Data & IA
+
+Phase :
+V18.2 WC enriched selector
+
+Statut :
+V18_2_WC_ENRICHED_SELECTOR_VALIDATED_FOR_EXPERIMENTAL_REVIEW
+
+Objectif :
+Formaliser la décision après l'évaluation du sélecteur expérimental V18.2, capable de choisir entre plusieurs marchés sans forcer une recommandation sur tous les matchs.
+
+Marchés considérés :
+
+* STRICT_1X2
+* DOUBLE_CHANCE
+* OVER_1_5
+* OVER_2_5
+* BTTS
+* ABSTAIN
+
+1. Rappel du contexte
+
+La phase V18.1 a permis de construire un dataset enrichi Kaggle + Elo + StatsBomb rolling features sur un périmètre Coupe du Monde 2018 / 2022.
+
+L'objectif était de tester si les features StatsBomb pouvaient enrichir les prédictions nationales sur plusieurs marchés :
+
+* 1X2 ;
+* OVER_1_5 ;
+* OVER_2_5 ;
+* BTTS.
+
+La V18.1 a montré que StatsBomb améliore surtout le 1X2 et, dans une moindre mesure, OVER_2_5. En revanche, l'amélioration n'est pas confirmée pour OVER_1_5 ni pour BTTS.
+
+La phase V18.2 a donc été créée pour tester une logique produit plus intelligente :
+
+* ne pas exposer tous les marchés systématiquement ;
+* choisir le marché le plus fiable selon le niveau de signal ;
+* conserver l'abstention quand le signal est insuffisant.
+
+2. Périmètre évalué
+
+Le sélecteur V18.2 est évalué sur le périmètre suivant :
+
+* Train : Coupe du Monde 2018 ;
+* Test : Coupe du Monde 2022 ;
+* Matchs évalués : 64 ;
+* Dataset source : 333_v18_1_wc_enriched_dataset.csv ;
+* Prédictions source : 336_v18_1_wc_enriched_predictions.csv.
+
+Ce périmètre reste expérimental et limité aux matchs Coupe du Monde 2022 en test.
+
+Il ne remplace pas la référence nationale globale V17.9.2.
+
+3. Stratégies testées
+
+Quatre stratégies ont été testées :
+
+1. v18_2_balanced_market_selector
+2. v18_2_safe_market_selector
+3. v18_2_coverage_market_selector
+4. v18_2_1x2_first_selector
+
+Chaque stratégie applique des seuils différents sur :
+
+* le 1X2 strict ;
+* la double chance ;
+* OVER_1_5 ;
+* OVER_2_5 ;
+* BTTS.
+
+Chaque stratégie peut aussi s'abstenir si aucun signal n'est jugé assez fiable.
+
+4. Meilleure stratégie retenue
+
+La meilleure stratégie retenue automatiquement est :
+
+v18_2_1x2_first_selector
+
+Résultats :
+
+* reliability : 0.7885
+* coverage : 0.8125
+* selected_rows : 52 / 64
+* abstain_rows : 12 / 64
+
+Répartition des marchés sélectionnés :
+
+* STRICT_1X2 : 7 matchs
+* DOUBLE_CHANCE : 21 matchs
+* OVER_1_5 : 24 matchs
+* OVER_2_5 : 0 match
+* BTTS : 0 match
+
+Fiabilité par marché :
+
+* STRICT_1X2 : 1.0
+* DOUBLE_CHANCE : 0.8095
+* OVER_1_5 : 0.7083
+
+5. Lecture des résultats
+
+La stratégie V18.2 confirme qu'une logique multi-market peut être plus intéressante qu'une prédiction unique forcée.
+
+Le sélecteur retient principalement trois types de sorties :
+
+* le 1X2 strict lorsque le signal est très fort ;
+* la double chance lorsque le signal 1X2 est moyen ;
+* OVER_1_5 lorsque le signal buts est jugé exploitable.
+
+Le sélecteur s'abstient sur 12 matchs, ce qui respecte le positionnement responsable de RubyBets.
+
+La couverture reste élevée : 52 matchs sélectionnés sur 64.
+
+La reliability globale atteint 0.7885, ce qui est solide pour une stratégie expérimentale multi-market sur Coupe du Monde 2022.
+
+6. Décision sur STRICT_1X2
+
+Le marché STRICT_1X2 est conservé dans V18.2.
+
+Résultat observé :
+
+* 7 matchs sélectionnés ;
+* reliability : 1.0.
+
+Lecture :
+
+Le 1X2 strict est très fiable dans cette stratégie, mais il reste peu fréquent. Cela confirme qu'il doit être réservé aux signaux très forts.
+
+Décision :
+
+STRICT_1X2 reste prioritaire quand le modèle enrichi identifie un signal très solide.
+
+7. Décision sur DOUBLE_CHANCE
+
+La double chance est conservée dans V18.2.
+
+Résultat observé :
+
+* 21 matchs sélectionnés ;
+* reliability : 0.8095.
+
+Lecture :
+
+La double chance joue bien son rôle de marché prudent. Elle permet d'augmenter la couverture sans forcer une prédiction 1X2 trop stricte.
+
+Décision :
+
+DOUBLE_CHANCE reste un élément central de la stratégie RubyBets nationale, car elle correspond à une logique responsable d'aide à la décision.
+
+8. Décision sur OVER_1_5
+
+OVER_1_5 est bien conservé dans V18.2.
+
+Résultat observé :
+
+* 24 matchs sélectionnés ;
+* reliability : 0.7083.
+
+Lecture :
+
+OVER_1_5 apporte une couverture utile, mais sa fiabilité est inférieure à celle du 1X2 strict et de la double chance.
+
+Il ne doit donc pas être présenté comme le marché le plus fiable, mais comme un marché complémentaire utile lorsque le signal offensif est suffisant.
+
+Décision :
+
+OVER_1_5 reste dans le sélecteur V18.2, mais avec prudence.
+Il ne doit pas être prioritaire par défaut.
+Il doit être sélectionné uniquement lorsque le seuil de confiance est suffisamment élevé.
+
+9. Décision sur OVER_2_5
+
+OVER_2_5 n'est pas sélectionné dans la meilleure stratégie V18.2.
+
+Résultat observé :
+
+* 0 match sélectionné dans v18_2_1x2_first_selector.
+
+Lecture :
+
+Même si V18.1 montrait un gain intéressant sur OVER_2_5 avec StatsBomb, le sélecteur V18.2 ne le retient pas automatiquement dans la meilleure stratégie.
+
+Cela ne signifie pas que OVER_2_5 est inutile, mais qu'il doit rester optionnel et être retravaillé avec des seuils spécifiques.
+
+Décision :
+
+OVER_2_5 reste un marché optionnel à surveiller, mais il n'est pas retenu comme sortie active dans la meilleure stratégie V18.2.
+
+10. Décision sur BTTS
+
+BTTS n'est pas sélectionné dans la meilleure stratégie V18.2.
+
+Résultat observé :
+
+* 0 match sélectionné.
+
+Lecture :
+
+La phase V18.1 avait déjà montré que l'enrichissement StatsBomb ne renforçait pas clairement BTTS sur ce périmètre.
+
+Le sélecteur V18.2 confirme qu'il ne faut pas forcer BTTS dans la stratégie actuelle.
+
+Décision :
+
+BTTS reste dans l'objectif produit à long terme, mais il n'est pas retenu dans la meilleure stratégie V18.2 actuelle.
+Il devra être retravaillé avec une approche spécifique ou un seuil très strict.
+
+11. Décision sur ABSTAIN
+
+L'abstention est conservée.
+
+Résultat observé :
+
+* 12 abstentions sur 64 matchs.
+
+Lecture :
+
+L'abstention permet d'éviter de forcer une recommandation quand les signaux sont insuffisants ou contradictoires.
+
+Cela protège la crédibilité de RubyBets.
+
+Décision :
+
+ABSTAIN reste obligatoire dans les futures stratégies produit.
+
+12. Décision finale V18.2
+
+La stratégie retenue est :
+
+v18_2_1x2_first_selector
+
+Statut :
+
+V18_2_WC_ENRICHED_SELECTOR_VALIDATED_FOR_EXPERIMENTAL_REVIEW
+
+Décision :
+
+V18.2 est validée comme sélecteur expérimental multi-market sur le périmètre Coupe du Monde 2022.
+
+La stratégie montre une bonne combinaison entre :
+
+* reliability ;
+* coverage ;
+* prudence ;
+* diversité des marchés ;
+* abstention responsable.
+
+Elle utilise principalement :
+
+* STRICT_1X2 ;
+* DOUBLE_CHANCE ;
+* OVER_1_5.
+
+Elle ne retient pas automatiquement :
+
+* OVER_2_5 ;
+* BTTS.
+
+V18.2 ne remplace pas V17.9.2 nationale globale.
+V18.2 reste une expérimentation enrichie sur un périmètre Coupe du Monde.
+
+13. Pourquoi V18.2 ne doit pas encore être intégrée au backend/frontend
+
+V18.2 ne doit pas encore être intégrée directement au produit.
+
+Raisons :
+
+* le périmètre est limité à 64 matchs test Coupe du Monde 2022 ;
+* le dataset enrichi ne contient que 128 matchs ;
+* les compétitions Euro et Copa America ne sont pas encore alignées ;
+* BTTS et OVER_2_5 ne sont pas encore suffisamment stabilisés ;
+* aucune couche backend d'inférence propre n'existe encore pour V18.2 ;
+* V17.9.2 reste la référence nationale globale versionnée.
+
+Décision :
+
+Aucune intégration backend ou frontend immédiate.
+La prochaine étape doit être une formalisation propre, puis un versioning GitHub de la phase StatsBomb / V18.1 / V18.2.
+
+14. Prochaine étape recommandée
+
+Avant de poursuivre le développement, il faut :
+
+1. Sauvegarder ce fichier de décision.
+2. Vérifier la compilation des scripts ml_national.
+3. Vérifier git status.
+4. Versionner les scripts et preuves V18.0 / V18.1 / V18.2.
+5. Préparer un nouveau chat pour éviter la perte de contexte.
+
+Fichiers de preuve récents à inclure dans le suivi :
+
+* 319_statsbomb_national_coverage_audit.txt
+* 320_statsbomb_national_coverage_by_competition.csv
+* 321_statsbomb_national_events_audit.txt
+* 322_statsbomb_national_events_features_preview.csv
+* 323_statsbomb_national_match_event_features_summary.txt
+* 324_statsbomb_national_match_event_features.csv
+* 325_statsbomb_national_rolling_features_summary.txt
+* 326_statsbomb_national_rolling_features.csv
+* 327_statsbomb_v18_0_multimarket_baseline_summary.txt
+* 328_statsbomb_v18_0_multimarket_model_comparison.csv
+* 329_statsbomb_v18_0_multimarket_predictions.csv
+* 330_v18_1_kaggle_statsbomb_alignment_summary.txt
+* 331_v18_1_kaggle_statsbomb_alignment_matches.csv
+* 332_v18_1_wc_enriched_dataset_summary.txt
+* 333_v18_1_wc_enriched_dataset.csv
+* 334_v18_1_wc_enriched_multimarket_summary.txt
+* 335_v18_1_wc_enriched_model_comparison.csv
+* 336_v18_1_wc_enriched_predictions.csv
+* 337_v18_1_wc_enriched_decision.txt
+* 338_v18_2_wc_enriched_selector_summary.txt
+* 339_v18_2_wc_enriched_selector_results.csv
+* 340_v18_2_wc_enriched_best_predictions.csv
+* 341_v18_2_wc_enriched_selector_decision.txt
+
+15. Rappel responsable
+
+RubyBets est une application d'aide à la décision football avant-match.
+
+RubyBets :
+
+* ne permet pas de parier ;
+* n'est pas un bookmaker ;
+* ne promet aucun résultat sportif ;
+* ne garantit pas la réussite d'une recommandation ;
+* doit afficher des recommandations analytiques prudentes ;
+* doit conserver l'abstention quand le signal est trop faible.
+
+V18.2 respecte cette logique, car elle ne force pas tous les matchs et conserve une abstention explicite.

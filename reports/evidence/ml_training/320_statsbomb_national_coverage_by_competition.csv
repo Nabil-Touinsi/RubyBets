@@ -1,0 +1,81 @@
+competition_id,season_id,competition_name,season_name,country_name,match_file_exists,match_count,first_match_date,last_match_date,is_national_candidate,national_reason
+9,281,1. Bundesliga,2023/2024,Germany,True,34,2023-08-19,2024-05-18,False,not_detected_as_national
+9,27,1. Bundesliga,2015/2016,Germany,True,34,2015-08-15,2016-05-14,False,not_detected_as_national
+1267,107,African Cup of Nations,2023,Africa,True,52,2024-01-13,2024-02-11,False,not_detected_as_national
+16,4,Champions League,2018/2019,Europe,True,1,2019-06-01,2019-06-01,False,not_detected_as_national
+16,1,Champions League,2017/2018,Europe,True,1,2018-05-26,2018-05-26,False,not_detected_as_national
+16,2,Champions League,2016/2017,Europe,True,1,2017-06-03,2017-06-03,False,not_detected_as_national
+16,27,Champions League,2015/2016,Europe,True,1,2016-05-28,2016-05-28,False,not_detected_as_national
+16,26,Champions League,2014/2015,Europe,True,1,2015-06-06,2015-06-06,False,not_detected_as_national
+16,25,Champions League,2013/2014,Europe,True,1,2014-05-24,2014-05-24,False,not_detected_as_national
+16,24,Champions League,2012/2013,Europe,True,1,2013-05-25,2013-05-25,False,not_detected_as_national
+16,23,Champions League,2011/2012,Europe,True,1,2012-05-19,2012-05-19,False,not_detected_as_national
+16,22,Champions League,2010/2011,Europe,True,1,2011-05-28,2011-05-28,False,not_detected_as_national
+16,21,Champions League,2009/2010,Europe,True,1,2010-05-22,2010-05-22,False,not_detected_as_national
+16,41,Champions League,2008/2009,Europe,True,1,2009-05-27,2009-05-27,False,not_detected_as_national
+16,39,Champions League,2006/2007,Europe,True,1,2007-05-23,2007-05-23,False,not_detected_as_national
+16,37,Champions League,2004/2005,Europe,True,1,2005-05-25,2005-05-25,False,not_detected_as_national
+16,44,Champions League,2003/2004,Europe,True,1,2004-05-26,2004-05-26,False,not_detected_as_national
+16,76,Champions League,1999/2000,Europe,True,1,1999-11-23,1999-11-23,False,not_detected_as_national
+16,277,Champions League,1972/1973,Europe,True,1,1973-05-30,1973-05-30,False,not_detected_as_national
+16,71,Champions League,1971/1972,Europe,True,1,1972-05-31,1972-05-31,False,not_detected_as_national
+16,276,Champions League,1970/1971,Europe,True,1,1971-06-02,1971-06-02,False,not_detected_as_national
+223,282,Copa America,2024,South America,True,32,2024-06-21,2024-07-15,True,competition_keyword=copa america
+87,84,Copa del Rey,1983/1984,Spain,True,1,1984-05-05,1984-05-05,False,not_detected_as_national
+87,268,Copa del Rey,1982/1983,Spain,True,1,1983-06-04,1983-06-04,False,not_detected_as_national
+87,279,Copa del Rey,1977/1978,Spain,True,1,1978-04-19,1978-04-19,False,not_detected_as_national
+37,281,FA Women's Super League,2023/2024,England,True,132,2023-10-01,2024-05-18,False,not_detected_as_national
+37,90,FA Women's Super League,2020/2021,England,True,131,2020-09-05,2021-05-09,False,not_detected_as_national
+37,42,FA Women's Super League,2019/2020,England,True,87,2019-09-07,2020-02-23,False,not_detected_as_national
+37,4,FA Women's Super League,2018/2019,England,True,107,2018-09-09,2019-05-11,False,not_detected_as_national
+1470,274,FIFA U20 World Cup,1979,International,True,1,1979-09-07,1979-09-07,True,country_name=International
+43,106,FIFA World Cup,2022,International,True,64,2022-11-20,2022-12-18,True,country_name=International
+43,3,FIFA World Cup,2018,International,True,64,2018-06-14,2018-07-15,True,country_name=International
+43,55,FIFA World Cup,1990,International,True,1,1990-06-24,1990-06-24,True,country_name=International
+43,54,FIFA World Cup,1986,International,True,3,1986-06-22,1986-06-29,True,country_name=International
+43,51,FIFA World Cup,1974,International,True,6,1974-06-19,1974-07-07,True,country_name=International
+43,272,FIFA World Cup,1970,International,True,6,1970-06-03,1970-06-21,True,country_name=International
+43,270,FIFA World Cup,1962,International,True,1,1962-05-30,1962-05-30,True,country_name=International
+43,269,FIFA World Cup,1958,International,True,2,1958-06-24,1958-06-29,True,country_name=International
+135,281,Frauen Bundesliga,2023/2024,Germany,True,132,2023-09-15,2024-05-20,False,not_detected_as_national
+1238,108,Indian Super league,2021/2022,India,True,115,2021-11-19,2022-03-20,False,not_detected_as_national
+11,90,La Liga,2020/2021,Spain,True,35,2020-09-27,2021-05-16,False,not_detected_as_national
+11,42,La Liga,2019/2020,Spain,True,33,2019-09-21,2020-07-19,False,not_detected_as_national
+11,4,La Liga,2018/2019,Spain,True,34,2018-08-18,2019-05-19,False,not_detected_as_national
+11,1,La Liga,2017/2018,Spain,True,36,2017-08-20,2018-05-20,False,not_detected_as_national
+11,2,La Liga,2016/2017,Spain,True,34,2016-08-20,2017-05-21,False,not_detected_as_national
+11,27,La Liga,2015/2016,Spain,True,380,2015-08-21,2016-05-15,False,not_detected_as_national
+11,26,La Liga,2014/2015,Spain,True,38,2014-08-24,2015-05-23,False,not_detected_as_national
+11,25,La Liga,2013/2014,Spain,True,31,2013-08-18,2014-05-17,False,not_detected_as_national
+11,24,La Liga,2012/2013,Spain,True,32,2012-08-19,2013-05-12,False,not_detected_as_national
+11,23,La Liga,2011/2012,Spain,True,37,2011-08-29,2012-05-12,False,not_detected_as_national
+11,22,La Liga,2010/2011,Spain,True,33,2010-08-29,2011-05-11,False,not_detected_as_national
+11,21,La Liga,2009/2010,Spain,True,35,2009-09-12,2010-05-16,False,not_detected_as_national
+11,41,La Liga,2008/2009,Spain,True,31,2008-08-31,2009-05-10,False,not_detected_as_national
+11,40,La Liga,2007/2008,Spain,True,27,2007-08-26,2008-05-17,False,not_detected_as_national
+11,39,La Liga,2006/2007,Spain,True,26,2006-08-28,2007-06-17,False,not_detected_as_national
+11,38,La Liga,2005/2006,Spain,True,17,2005-10-01,2006-02-25,False,not_detected_as_national
+11,37,La Liga,2004/2005,Spain,True,7,2004-10-16,2005-05-01,False,not_detected_as_national
+11,278,La Liga,1973/1974,Spain,True,1,1974-02-17,1974-02-17,False,not_detected_as_national
+182,281,Liga F,2023/2024,Spain,True,240,2023-09-15,2024-06-16,False,not_detected_as_national
+81,48,Liga Profesional,1997/1998,Argentina,True,1,1997-10-25,1997-10-25,False,not_detected_as_national
+81,275,Liga Profesional,1981,Argentina,True,1,1981-04-10,1981-04-10,False,not_detected_as_national
+7,235,Ligue 1,2022/2023,France,True,32,2022-08-06,2023-06-03,False,not_detected_as_national
+7,108,Ligue 1,2021/2022,France,True,26,2021-08-29,2022-05-21,False,not_detected_as_national
+7,27,Ligue 1,2015/2016,France,True,377,2015-08-07,2016-05-14,False,not_detected_as_national
+44,107,Major League Soccer,2023,United States of America,True,6,2023-08-27,2023-10-22,False,not_detected_as_national
+116,68,North American League,1977,North and Central America,True,1,1977-08-28,1977-08-28,False,not_detected_as_national
+49,107,NWSL,2023,United States of America,True,137,2023-03-25,2023-11-12,False,not_detected_as_national
+49,3,NWSL,2018,United States of America,True,36,2018-04-15,2018-08-12,False,not_detected_as_national
+2,27,Premier League,2015/2016,England,True,380,2015-08-08,2016-05-17,False,not_detected_as_national
+2,44,Premier League,2003/2004,England,True,38,2003-08-16,2004-05-15,False,not_detected_as_national
+12,27,Serie A,2015/2016,Italy,True,380,2015-08-22,2016-05-15,False,not_detected_as_national
+12,86,Serie A,1986/1987,Italy,True,1,1986-11-09,1986-11-09,False,not_detected_as_national
+131,281,Serie A Women,2023/2024,Italy,True,130,2023-09-16,2024-05-19,False,not_detected_as_national
+55,282,UEFA Euro,2024,Europe,True,51,2024-06-14,2024-07-14,True,competition_keyword=euro
+55,43,UEFA Euro,2020,Europe,True,51,2021-06-11,2021-07-11,True,competition_keyword=euro
+35,75,UEFA Europa League,1988/1989,Europe,True,3,1989-03-15,1989-05-03,True,competition_keyword=euro
+53,315,UEFA Women's Euro,2025,Europe,True,31,2025-07-02,2025-07-27,True,competition_keyword=euro
+53,106,UEFA Women's Euro,2022,Europe,True,31,2022-07-06,2022-07-31,True,competition_keyword=euro
+72,107,Women's World Cup,2023,International,True,64,2023-07-20,2023-08-20,True,country_name=International
+72,30,Women's World Cup,2019,International,True,52,2019-06-07,2019-07-07,True,country_name=International

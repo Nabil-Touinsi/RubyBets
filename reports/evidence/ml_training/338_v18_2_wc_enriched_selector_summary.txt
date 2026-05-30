@@ -1,0 +1,40 @@
+RubyBets - Evaluation selecteur V18.2 WC enriched
+
+Source predictions : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\336_v18_1_wc_enriched_predictions.csv
+Resultats strategies : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\339_v18_2_wc_enriched_selector_results.csv
+Predictions meilleure strategie : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\340_v18_2_wc_enriched_best_predictions.csv
+
+Objectif :
+Evaluer un selecteur experimental qui choisit entre STRICT_1X2, DOUBLE_CHANCE,
+OVER_1_5, OVER_2_5, BTTS ou ABSTAIN sur le perimetre Coupe du Monde 2022.
+
+Important :
+Le selecteur ne force pas tous les matchs.
+OVER_1_5 est conserve, mais avec seuil prudent.
+DOUBLE_CHANCE est derivee de la prediction 1X2.
+Aucun resultat n'est encore integre au backend ou au frontend.
+
+Strategies testees :
+- v18_2_balanced_market_selector | reliability=0.76 | coverage=0.7812 | selected=50 | abstain=14 | 1X2=7 | DC=6 | O1.5=36 | O2.5=1 | BTTS=0
+- v18_2_safe_market_selector | reliability=0.7619 | coverage=0.6562 | selected=42 | abstain=22 | 1X2=4 | DC=3 | O1.5=35 | O2.5=0 | BTTS=0
+- v18_2_coverage_market_selector | reliability=0.75 | coverage=0.875 | selected=56 | abstain=8 | 1X2=9 | DC=5 | O1.5=38 | O2.5=3 | BTTS=1
+- v18_2_1x2_first_selector | reliability=0.7885 | coverage=0.8125 | selected=52 | abstain=12 | 1X2=7 | DC=21 | O1.5=24 | O2.5=0 | BTTS=0
+
+Meilleure strategie retenue automatiquement :
+- strategy_name : v18_2_1x2_first_selector
+- reliability : 0.7885
+- coverage : 0.8125
+- selected_rows : 52
+- abstain_rows : 12
+- strict_1x2_rows : 7
+- double_chance_rows : 21
+- over_1_5_rows : 24
+- over_2_5_rows : 0
+- btts_rows : 0
+- market_reliability : {'DOUBLE_CHANCE': 0.8095, 'OVER_1_5': 0.7083, 'STRICT_1X2': 1.0}
+
+Decision attendue apres lecture :
+- Si le selecteur ameliore la reliability sans couverture trop faible, formaliser V18.2.
+- Si OVER_1_5 est trop dominant ou trop faible, ajuster son seuil.
+- Si BTTS degrade la reliability, le garder seulement avec seuil tres strict.
+- V18.2 reste experimental sur WC 2022 et ne remplace pas V17.9.2 globale.

@@ -1,0 +1,50 @@
+RubyBets - Audit couverture StatsBomb Open Data nationale
+
+Source locale analysee : C:\dev_classe\RNCP\RubyBets\data\external\statsbomb_open_data
+Fichier competitions : C:\dev_classe\RNCP\RubyBets\data\external\statsbomb_open_data\data\competitions.json
+Dossier matches : C:\dev_classe\RNCP\RubyBets\data\external\statsbomb_open_data\data\matches
+
+Objectif :
+Verifier si StatsBomb Open Data contient assez de matchs d'equipes nationales
+pour enrichir plus tard les modeles nationaux OVER_1_5 et BTTS.
+
+Important :
+Cet audit ne telecharge pas encore les events StatsBomb.
+Il controle uniquement la couverture competitions + matches.
+Les events seront analyses seulement si la couverture nationale est exploitable.
+
+Resultats globaux :
+- Competition/seasons referencees : 80
+- Competition/seasons avec fichier matches : 80
+- Total matchs StatsBomb disponibles dans le sparse checkout : 3961
+
+Resultats candidats nationaux :
+- Competition/seasons detectees comme nationales : 17
+- Competition/seasons nationales avec matchs : 17
+- Matchs nationaux candidats : 463
+
+Top competitions nationales candidates :
+- FIFA World Cup | 2022 | International | matchs=64 | 2022-11-20 -> 2022-12-18 | raison=country_name=International
+- FIFA World Cup | 2018 | International | matchs=64 | 2018-06-14 -> 2018-07-15 | raison=country_name=International
+- Women's World Cup | 2023 | International | matchs=64 | 2023-07-20 -> 2023-08-20 | raison=country_name=International
+- Women's World Cup | 2019 | International | matchs=52 | 2019-06-07 -> 2019-07-07 | raison=country_name=International
+- UEFA Euro | 2024 | Europe | matchs=51 | 2024-06-14 -> 2024-07-14 | raison=competition_keyword=euro
+- UEFA Euro | 2020 | Europe | matchs=51 | 2021-06-11 -> 2021-07-11 | raison=competition_keyword=euro
+- Copa America | 2024 | South America | matchs=32 | 2024-06-21 -> 2024-07-15 | raison=competition_keyword=copa america
+- UEFA Women's Euro | 2025 | Europe | matchs=31 | 2025-07-02 -> 2025-07-27 | raison=competition_keyword=euro
+- UEFA Women's Euro | 2022 | Europe | matchs=31 | 2022-07-06 -> 2022-07-31 | raison=competition_keyword=euro
+- FIFA World Cup | 1974 | International | matchs=6 | 1974-06-19 -> 1974-07-07 | raison=country_name=International
+- FIFA World Cup | 1970 | International | matchs=6 | 1970-06-03 -> 1970-06-21 | raison=country_name=International
+- FIFA World Cup | 1986 | International | matchs=3 | 1986-06-22 -> 1986-06-29 | raison=country_name=International
+- UEFA Europa League | 1988/1989 | Europe | matchs=3 | 1989-03-15 -> 1989-05-03 | raison=competition_keyword=euro
+- FIFA World Cup | 1958 | International | matchs=2 | 1958-06-24 -> 1958-06-29 | raison=country_name=International
+- FIFA U20 World Cup | 1979 | International | matchs=1 | 1979-09-07 -> 1979-09-07 | raison=country_name=International
+- FIFA World Cup | 1990 | International | matchs=1 | 1990-06-24 -> 1990-06-24 | raison=country_name=International
+- FIFA World Cup | 1962 | International | matchs=1 | 1962-05-30 -> 1962-05-30 | raison=country_name=International
+
+Decision attendue apres lecture :
+- Si le volume national est suffisant, passer a l'audit des events StatsBomb.
+- Si le volume est faible, garder StatsBomb comme enrichissement cible mais ne pas en faire le socle principal.
+- Ne pas integrer StatsBomb dans les modeles avant d'avoir verifie l'absence de fuite de donnees.
+
+CSV detaille genere : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\320_statsbomb_national_coverage_by_competition.csv

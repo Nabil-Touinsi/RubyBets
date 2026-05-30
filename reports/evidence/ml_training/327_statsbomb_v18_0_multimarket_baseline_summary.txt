@@ -1,0 +1,38 @@
+RubyBets - Baseline experimentale V18.0 StatsBomb multi-market
+
+Source input : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\326_statsbomb_national_rolling_features.csv
+Comparaison modeles : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\328_statsbomb_v18_0_multimarket_model_comparison.csv
+Predictions test : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\329_statsbomb_v18_0_multimarket_predictions.csv
+
+Objectif :
+Tester si les features rolling StatsBomb peuvent ameliorer les marches OVER_1_5, OVER_2_5 et BTTS.
+
+Important :
+Cette experience est limitee au sous-ensemble StatsBomb.
+Elle ne remplace pas Kaggle + Elo, qui reste le socle principal national.
+Aucun modele n'est encore integre au backend ou au frontend.
+
+Dataset :
+- Lignes totales : 262
+- Features utilisees : 24
+- Targets testees : target_over_1_5, target_over_2_5, target_btts
+
+Scopes testes :
+- history_any : les deux equipes ont au moins un match StatsBomb precedent.
+- full_last_5 : les deux equipes ont cinq matchs StatsBomb precedents.
+
+Meilleurs resultats par target/scope :
+- target_over_1_5 | history_any | dummy_most_frequent | accuracy=0.6912 | f1=0.8174 | precision=0.6912 | recall=1.0 | test_rows=68
+- target_over_2_5 | history_any | dummy_most_frequent | accuracy=0.3971 | f1=0.5684 | precision=0.3971 | recall=1.0 | test_rows=68
+- target_btts | history_any | dummy_most_frequent | accuracy=0.4853 | f1=0.6535 | precision=0.4853 | recall=1.0 | test_rows=68
+- target_over_1_5 | full_last_5 | dummy_most_frequent | accuracy=0.7037 | f1=0.8261 | precision=0.7037 | recall=1.0 | test_rows=27
+- target_over_2_5 | full_last_5 | dummy_most_frequent | accuracy=0.4074 | f1=0.5789 | precision=0.4074 | recall=1.0 | test_rows=27
+- target_btts | full_last_5 | dummy_most_frequent | accuracy=0.4815 | f1=0.65 | precision=0.4815 | recall=1.0 | test_rows=27
+
+Experiences ignorees :
+- Aucune.
+
+Decision attendue apres lecture :
+- Si OVER_1_5 ou BTTS depasse clairement DummyClassifier, garder StatsBomb pour V18.0.
+- Si les gains sont faibles, conserver StatsBomb comme preuve d'enrichissement data mais ne pas complexifier le modele.
+- Ne pas integrer ces resultats directement dans le produit avant comparaison avec Kaggle + Elo.

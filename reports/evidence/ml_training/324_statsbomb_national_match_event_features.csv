@@ -1,0 +1,263 @@
+statsbomb_match_id,competition_id,season_id,competition_name,season_name,country_name,match_date,stadium_name,stadium_country,team_a_name,team_b_name,team_a_score,team_b_score,total_goals,target_over_1_5,target_over_2_5,target_btts,team_a_shots,team_b_shots,team_a_shots_on_target,team_b_shots_on_target,team_a_goals_from_shots,team_b_goals_from_shots,team_a_xg,team_b_xg,team_a_shot_accuracy,team_b_shot_accuracy,team_a_xg_per_shot,team_b_xg_per_shot,match_shots_total,match_xg_total,event_count
+7525,43,3,FIFA World Cup,2018,International,2018-06-14,Stadion Luzhniki,Russia,Russia,Saudi Arabia,5,0,5,True,True,False,14,6,7,0,5,0,1.2816,0.2488,0.5,0.0,0.0915,0.0415,20,1.5304,3318
+7576,43,3,FIFA World Cup,2018,International,2018-06-15,Olimpiyskiy Stadion Fisht,Russia,Portugal,Spain,3,3,6,True,True,True,10,12,3,5,3,3,1.4346,1.6609,0.3,0.4167,0.1435,0.1384,22,3.0955,4153
+7577,43,3,FIFA World Cup,2018,International,2018-06-15,Saint-Petersburg Stadium ( Gazprom Arena ),Russia,Morocco,Iran,0,1,1,False,False,False,14,8,3,2,0,0,1.0592,0.6976,0.2143,0.25,0.0757,0.0872,22,1.7568,2875
+7578,43,3,FIFA World Cup,2018,International,2018-06-15,Ekaterinburg Arena,Russia,Egypt,Uruguay,0,1,1,False,False,False,8,16,3,4,0,1,0.3645,1.9408,0.375,0.25,0.0456,0.1213,24,2.3053,3758
+7529,43,3,FIFA World Cup,2018,International,2018-06-16,Rostec Arena,Russia,Croatia,Nigeria,2,0,2,True,False,False,11,13,2,2,1,0,1.6945,0.7623,0.1818,0.1538,0.154,0.0586,24,2.4568,3320
+7530,43,3,FIFA World Cup,2018,International,2018-06-16,Ak Bars Arena,Russia,France,Australia,2,1,3,True,True,True,12,5,4,2,1,1,1.5616,0.98,0.3333,0.4,0.1301,0.196,17,2.5416,3472
+7531,43,3,FIFA World Cup,2018,International,2018-06-16,Otkritie Bank Arena,Russia,Argentina,Iceland,1,1,2,True,False,True,28,9,7,2,1,1,2.0805,1.0321,0.25,0.2222,0.0743,0.1147,37,3.1126,3599
+7532,43,3,FIFA World Cup,2018,International,2018-06-16,Mordovia Arena,Russia,Peru,Denmark,0,1,1,False,False,False,17,11,6,3,0,1,1.9264,1.1216,0.3529,0.2727,0.1133,0.102,28,3.048,3097
+7533,43,3,FIFA World Cup,2018,International,2018-06-17,Rostov Arena,Russia,Brazil,Switzerland,1,1,2,True,False,True,21,7,4,2,1,1,1.8666,0.4721,0.1905,0.2857,0.0889,0.0674,28,2.3387,4010
+7534,43,3,FIFA World Cup,2018,International,2018-06-17,Stadion Luzhniki,Russia,Germany,Mexico,0,1,1,False,False,False,26,12,9,4,0,1,2.2993,0.9933,0.3462,0.3333,0.0884,0.0828,38,3.2926,3704
+7535,43,3,FIFA World Cup,2018,International,2018-06-17,Solidarnost Arena,Russia,Costa Rica,Serbia,0,1,1,False,False,False,10,12,3,2,0,1,0.596,1.9926,0.3,0.1667,0.0596,0.166,22,2.5886,3183
+7536,43,3,FIFA World Cup,2018,International,2018-06-18,Olimpiyskiy Stadion Fisht,Russia,Belgium,Panama,3,0,3,True,True,False,15,7,6,2,3,0,1.2121,0.6254,0.4,0.2857,0.0808,0.0893,22,1.8375,3662
+7537,43,3,FIFA World Cup,2018,International,2018-06-18,Volgograd Arena,Russia,Tunisia,England,1,2,3,True,True,True,6,18,1,7,1,2,0.9457,2.6264,0.1667,0.3889,0.1576,0.1459,24,3.5721,3548
+7538,43,3,FIFA World Cup,2018,International,2018-06-18,Stadion Nizhny Novgorod (Nizhniy Novgorod),Russia,Sweden,South Korea,1,0,1,False,False,False,16,5,4,0,1,0,2.0151,0.4144,0.25,0.0,0.1259,0.0829,21,2.4295,3117
+7539,43,3,FIFA World Cup,2018,International,2018-06-19,Otkritie Bank Arena,Russia,Poland,Senegal,1,2,3,True,True,True,10,7,3,1,1,1,1.0423,1.4278,0.3,0.1429,0.1042,0.204,17,2.4701,3457
+7540,43,3,FIFA World Cup,2018,International,2018-06-19,Saint-Petersburg Stadium ( Gazprom Arena ),Russia,Russia,Egypt,3,1,4,True,True,True,12,15,4,2,2,1,0.9812,1.6975,0.3333,0.1333,0.0818,0.1132,27,2.6787,3348
+7541,43,3,FIFA World Cup,2018,International,2018-06-19,Mordovia Arena,Russia,Colombia,Japan,1,2,3,True,True,True,10,14,3,6,1,2,0.8063,2.3207,0.3,0.4286,0.0806,0.1658,24,3.127,3869
+7542,43,3,FIFA World Cup,2018,International,2018-06-20,Stadion Luzhniki,Russia,Portugal,Morocco,1,0,1,False,False,False,12,17,2,4,1,0,0.885,1.4551,0.1667,0.2353,0.0737,0.0856,29,2.3401,3243
+7543,43,3,FIFA World Cup,2018,International,2018-06-20,Ak Bars Arena,Russia,Iran,Spain,0,1,1,False,False,False,6,18,0,3,0,1,0.4265,2.197,0.0,0.1667,0.0711,0.1221,24,2.6235,3822
+7544,43,3,FIFA World Cup,2018,International,2018-06-20,Rostov Arena,Russia,Uruguay,Saudi Arabia,1,0,1,False,False,False,14,8,3,2,1,0,1.8074,0.2735,0.2143,0.25,0.1291,0.0342,22,2.0809,3952
+7545,43,3,FIFA World Cup,2018,International,2018-06-21,Stadion Nizhny Novgorod (Nizhniy Novgorod),Russia,Argentina,Croatia,0,3,3,True,True,False,10,14,3,5,0,3,1.2181,1.8317,0.3,0.3571,0.1218,0.1308,24,3.0498,3463
+7546,43,3,FIFA World Cup,2018,International,2018-06-21,Ekaterinburg Arena,Russia,France,Peru,1,0,1,False,False,False,12,12,4,2,1,0,1.8624,0.6252,0.3333,0.1667,0.1552,0.0521,24,2.4876,3742
+7547,43,3,FIFA World Cup,2018,International,2018-06-21,Solidarnost Arena,Russia,Denmark,Australia,1,1,2,True,False,True,10,13,5,5,1,1,1.0144,1.4122,0.5,0.3846,0.1014,0.1086,23,2.4266,3576
+7548,43,3,FIFA World Cup,2018,International,2018-06-22,Saint-Petersburg Stadium ( Gazprom Arena ),Russia,Brazil,Costa Rica,2,0,2,True,False,False,23,4,9,0,2,0,3.0964,0.1587,0.3913,0.0,0.1346,0.0397,27,3.2551,3721
+7549,43,3,FIFA World Cup,2018,International,2018-06-22,Volgograd Arena,Russia,Nigeria,Iceland,2,0,2,True,False,False,17,10,4,3,2,0,1.3122,1.5522,0.2353,0.3,0.0772,0.1552,27,2.8644,3219
+7550,43,3,FIFA World Cup,2018,International,2018-06-22,Rostec Arena,Russia,Serbia,Switzerland,1,2,3,True,True,True,12,19,3,5,1,2,1.1535,1.5573,0.25,0.2632,0.0961,0.082,31,2.7108,3475
+7551,43,3,FIFA World Cup,2018,International,2018-06-23,Olimpiyskiy Stadion Fisht,Russia,Germany,Sweden,2,1,3,True,True,True,18,7,5,6,2,1,1.3181,0.8152,0.2778,0.8571,0.0732,0.1165,25,2.1333,3460
+7552,43,3,FIFA World Cup,2018,International,2018-06-23,Otkritie Bank Arena,Russia,Belgium,Tunisia,5,2,7,True,True,True,23,17,11,5,5,2,5.3364,1.1882,0.4783,0.2941,0.232,0.0699,40,6.5246,3483
+7553,43,3,FIFA World Cup,2018,International,2018-06-23,Rostov Arena,Russia,South Korea,Mexico,1,2,3,True,True,True,17,14,6,5,1,2,0.8218,1.8776,0.3529,0.3571,0.0483,0.1341,31,2.6994,3287
+7554,43,3,FIFA World Cup,2018,International,2018-06-24,Stadion Nizhny Novgorod (Nizhniy Novgorod),Russia,England,Panama,6,1,7,True,True,True,11,8,7,2,6,1,3.1683,1.08,0.6364,0.25,0.288,0.135,19,4.2483,3573
+7555,43,3,FIFA World Cup,2018,International,2018-06-24,Ak Bars Arena,Russia,Poland,Colombia,0,3,3,True,True,False,11,13,2,3,0,3,1.1142,1.3869,0.1818,0.2308,0.1013,0.1067,24,2.5011,3749
+7556,43,3,FIFA World Cup,2018,International,2018-06-24,Ekaterinburg Arena,Russia,Japan,Senegal,2,2,4,True,True,True,7,15,3,7,2,2,0.9822,1.8783,0.4286,0.4667,0.1403,0.1252,22,2.8605,3039
+7557,43,3,FIFA World Cup,2018,International,2018-06-25,Mordovia Arena,Russia,Iran,Portugal,1,1,2,True,False,True,9,15,2,4,1,1,1.577,1.5224,0.2222,0.2667,0.1752,0.1015,24,3.0994,3188
+7558,43,3,FIFA World Cup,2018,International,2018-06-25,Solidarnost Arena,Russia,Uruguay,Russia,3,0,3,True,True,False,16,3,6,1,2,0,2.4826,0.1802,0.375,0.3333,0.1552,0.0601,19,2.6628,3268
+7559,43,3,FIFA World Cup,2018,International,2018-06-25,Volgograd Arena,Russia,Saudi Arabia,Egypt,2,1,3,True,True,True,21,8,7,1,2,1,2.5458,0.9237,0.3333,0.125,0.1212,0.1155,29,3.4695,3831
+7560,43,3,FIFA World Cup,2018,International,2018-06-25,Rostec Arena,Russia,Spain,Morocco,2,2,4,True,True,True,18,8,3,3,2,2,2.6045,1.0718,0.1667,0.375,0.1447,0.134,26,3.6763,3599
+7561,43,3,FIFA World Cup,2018,International,2018-06-26,Rostov Arena,Russia,Iceland,Croatia,1,2,3,True,True,True,17,13,6,2,1,2,2.1327,0.6739,0.3529,0.1538,0.1255,0.0518,30,2.8066,3325
+7562,43,3,FIFA World Cup,2018,International,2018-06-26,Olimpiyskiy Stadion Fisht,Russia,Australia,Peru,0,2,2,True,False,False,16,4,2,3,0,2,1.6293,0.3364,0.125,0.75,0.1018,0.0841,20,1.9657,3630
+7563,43,3,FIFA World Cup,2018,International,2018-06-26,Stadion Luzhniki,Russia,Denmark,France,0,0,0,False,False,False,5,11,1,4,0,0,0.139,0.4181,0.2,0.3636,0.0278,0.038,16,0.5571,3605
+7564,43,3,FIFA World Cup,2018,International,2018-06-26,Saint-Petersburg Stadium ( Gazprom Arena ),Russia,Nigeria,Argentina,1,2,3,True,True,True,9,8,3,3,1,2,1.3053,0.8506,0.3333,0.375,0.145,0.1063,17,2.1559,3503
+7565,43,3,FIFA World Cup,2018,International,2018-06-27,Otkritie Bank Arena,Russia,Serbia,Brazil,0,2,2,True,False,False,11,15,1,7,0,2,0.9483,1.4198,0.0909,0.4667,0.0862,0.0947,26,2.3681,4083
+7566,43,3,FIFA World Cup,2018,International,2018-06-27,Ekaterinburg Arena,Russia,Mexico,Sweden,0,3,3,True,True,False,22,15,3,5,0,2,1.6107,2.7905,0.1364,0.3333,0.0732,0.186,37,4.4012,2831
+7567,43,3,FIFA World Cup,2018,International,2018-06-27,Ak Bars Arena,Russia,South Korea,Germany,2,0,2,True,False,False,12,29,5,6,2,0,1.7746,2.7064,0.4167,0.2069,0.1479,0.0933,41,4.481,3708
+7568,43,3,FIFA World Cup,2018,International,2018-06-27,Stadion Nizhny Novgorod (Nizhniy Novgorod),Russia,Switzerland,Costa Rica,2,2,4,True,True,True,13,14,3,6,2,1,1.2197,1.5762,0.2308,0.4286,0.0938,0.1126,27,2.7959,3347
+7569,43,3,FIFA World Cup,2018,International,2018-06-28,Mordovia Arena,Russia,Panama,Tunisia,1,2,3,True,True,True,9,15,4,6,0,2,0.6908,2.8525,0.4444,0.4,0.0768,0.1902,24,3.5433,3410
+7570,43,3,FIFA World Cup,2018,International,2018-06-28,Rostec Arena,Russia,England,Belgium,0,1,1,False,False,False,12,14,1,3,0,1,1.2007,0.9653,0.0833,0.2143,0.1001,0.069,26,2.166,3986
+7571,43,3,FIFA World Cup,2018,International,2018-06-28,Solidarnost Arena,Russia,Senegal,Colombia,0,1,1,False,False,False,7,4,3,2,0,1,0.3609,0.2849,0.4286,0.5,0.0516,0.0712,11,0.6458,2816
+7572,43,3,FIFA World Cup,2018,International,2018-06-28,Volgograd Arena,Russia,Japan,Poland,0,1,1,False,False,False,11,11,3,2,0,1,0.8906,1.0407,0.2727,0.1818,0.081,0.0946,22,1.9313,3671
+7579,43,3,FIFA World Cup,2018,International,2018-06-30,Olimpiyskiy Stadion Fisht,Russia,Uruguay,Portugal,2,1,3,True,True,True,7,21,3,4,2,1,0.476,0.9956,0.4286,0.1905,0.068,0.0474,28,1.4716,3196
+7580,43,3,FIFA World Cup,2018,International,2018-06-30,Ak Bars Arena,Russia,France,Argentina,4,3,7,True,True,True,9,12,4,4,4,3,1.638,1.4466,0.4444,0.3333,0.182,0.1205,21,3.0846,3549
+7581,43,3,FIFA World Cup,2018,International,2018-07-01,Stadion Nizhny Novgorod (Nizhniy Novgorod),Russia,Croatia,Denmark,1,1,2,True,False,True,26,19,11,8,4,3,6.0877,4.614,0.4231,0.4211,0.2341,0.2428,45,10.7017,4285
+7582,43,3,FIFA World Cup,2018,International,2018-07-01,Stadion Luzhniki,Russia,Spain,Russia,1,1,2,True,False,True,29,12,14,5,3,5,5.3586,4.5404,0.4828,0.4167,0.1848,0.3784,41,9.899,5024
+7583,43,3,FIFA World Cup,2018,International,2018-07-02,Solidarnost Arena,Russia,Brazil,Mexico,2,0,2,True,False,False,19,14,10,1,2,0,3.3204,0.5828,0.5263,0.0714,0.1748,0.0416,33,3.9032,3393
+7584,43,3,FIFA World Cup,2018,International,2018-07-02,Rostov Arena,Russia,Belgium,Japan,3,2,5,True,True,True,28,12,7,4,3,2,2.9178,0.6938,0.25,0.3333,0.1042,0.0578,40,3.6116,3715
+7585,43,3,FIFA World Cup,2018,International,2018-07-03,Otkritie Bank Arena,Russia,Colombia,England,1,1,2,True,False,True,19,22,8,7,4,5,4.7487,6.1618,0.4211,0.3182,0.2499,0.2801,41,10.9105,4019
+7586,43,3,FIFA World Cup,2018,International,2018-07-03,Saint-Petersburg Stadium ( Gazprom Arena ),Russia,Sweden,Switzerland,1,0,1,False,False,False,12,16,3,3,1,0,0.9105,0.533,0.25,0.1875,0.0759,0.0333,28,1.4435,3318
+8649,43,3,FIFA World Cup,2018,International,2018-07-06,Stadion Nizhny Novgorod (Nizhniy Novgorod),Russia,Uruguay,France,0,2,2,True,False,False,10,11,4,2,0,2,0.6932,0.5388,0.4,0.1818,0.0693,0.049,21,1.232,3375
+8650,43,3,FIFA World Cup,2018,International,2018-07-06,Ak Bars Arena,Russia,Brazil,Belgium,1,2,3,True,True,True,25,8,9,3,1,1,2.6092,0.4053,0.36,0.375,0.1044,0.0507,33,3.0145,3589
+8651,43,3,FIFA World Cup,2018,International,2018-07-07,Solidarnost Arena,Russia,Sweden,England,0,2,2,True,False,False,8,12,3,2,0,2,0.8342,0.7582,0.375,0.1667,0.1043,0.0632,20,1.5924,3303
+8652,43,3,FIFA World Cup,2018,International,2018-07-07,Olimpiyskiy Stadion Fisht,Russia,Russia,Croatia,2,2,4,True,True,True,18,23,10,9,5,6,4.9884,5.568,0.5556,0.3913,0.2771,0.2421,41,10.5564,4041
+8655,43,3,FIFA World Cup,2018,International,2018-07-10,Saint-Petersburg Stadium ( Gazprom Arena ),Russia,France,Belgium,1,0,1,False,False,False,19,9,5,2,1,0,1.6817,0.5669,0.2632,0.2222,0.0885,0.063,28,2.2486,3354
+8656,43,3,FIFA World Cup,2018,International,2018-07-11,Stadion Luzhniki,Russia,Croatia,England,2,1,3,True,True,True,22,11,7,1,2,1,2.1413,0.5467,0.3182,0.0909,0.0973,0.0497,33,2.688,4165
+8657,43,3,FIFA World Cup,2018,International,2018-07-14,Saint-Petersburg Stadium ( Gazprom Arena ),Russia,Belgium,England,2,0,2,True,False,False,11,15,4,5,2,0,1.3207,1.3354,0.3636,0.3333,0.1201,0.089,26,2.6561,4426
+8658,43,3,FIFA World Cup,2018,International,2018-07-15,Stadion Luzhniki,Russia,France,Croatia,4,2,6,True,True,True,8,15,6,3,3,2,1.098,1.4803,0.75,0.2,0.1372,0.0987,23,2.5783,2978
+3788741,55,43,UEFA Euro,2020,Europe,2021-06-11,Estadio Olímpico,Italy,Turkey,Italy,0,3,3,True,True,False,3,24,0,8,0,2,0.151,1.5909,0.0,0.3333,0.0503,0.0663,27,1.7419,3803
+3788742,55,43,UEFA Euro,2020,Europe,2021-06-12,Parken,Denmark,Denmark,Finland,0,1,1,False,False,False,22,1,6,1,0,1,1.9526,0.2885,0.2727,1.0,0.0888,0.2885,23,2.2411,3488
+3788743,55,43,UEFA Euro,2020,Europe,2021-06-12,Saint-Petersburg Stadium ( Gazprom Arena ),Russia,Belgium,Russia,3,0,3,True,True,False,9,5,4,1,3,0,1.3934,0.2573,0.4444,0.2,0.1548,0.0515,14,1.6507,3856
+3788744,55,43,UEFA Euro,2020,Europe,2021-06-12,Bakı Olimpiya Stadionu,Azerbaijan,Wales,Switzerland,1,1,2,True,False,True,9,18,2,4,1,1,0.5759,1.5599,0.2222,0.2222,0.064,0.0867,27,2.1358,2996
+3788745,55,43,UEFA Euro,2020,Europe,2021-06-13,Wembley Stadium,England,England,Croatia,1,0,1,False,False,False,8,8,2,1,1,0,0.7069,0.3401,0.25,0.125,0.0884,0.0425,16,1.047,3366
+3788746,55,43,UEFA Euro,2020,Europe,2021-06-13,Johan Cruijff Arena (Amsterdam),Netherlands,Netherlands,Ukraine,3,2,5,True,True,True,15,7,7,5,3,2,1.4298,0.5937,0.4667,0.7143,0.0953,0.0848,22,2.0235,3969
+3788747,55,43,UEFA Euro,2020,Europe,2021-06-13,Arena Naţională,Romania,Austria,North Macedonia,3,1,4,True,True,True,10,7,6,2,3,1,1.4414,0.8399,0.6,0.2857,0.1441,0.12,17,2.2813,3464
+3788748,55,43,UEFA Euro,2020,Europe,2021-06-14,Hampden Park,Scotland,Scotland,Czech Republic,0,2,2,True,False,False,19,10,4,7,0,2,1.7327,0.8108,0.2105,0.7,0.0912,0.0811,29,2.5435,3440
+3788749,55,43,UEFA Euro,2020,Europe,2021-06-14,Saint-Petersburg Stadium ( Gazprom Arena ),Russia,Poland,Slovakia,1,2,3,True,True,True,18,11,4,2,1,1,1.3888,0.3538,0.2222,0.1818,0.0772,0.0322,29,1.7426,3628
+3788750,55,43,UEFA Euro,2020,Europe,2021-06-14,Estadio de La Cartuja,Spain,Spain,Sweden,0,0,0,False,False,False,17,4,5,0,0,0,1.9276,0.8158,0.2941,0.0,0.1134,0.204,21,2.7434,3677
+3788751,55,43,UEFA Euro,2020,Europe,2021-06-15,Allianz Arena,Germany,France,Germany,1,0,1,False,False,False,4,10,1,1,0,0,0.446,0.8254,0.25,0.1,0.1115,0.0825,14,1.2714,4031
+3788752,55,43,UEFA Euro,2020,Europe,2021-06-15,Puskás Aréna,Hungary,Hungary,Portugal,0,3,3,True,True,False,5,11,3,7,0,3,0.1976,2.681,0.6,0.6364,0.0395,0.2437,16,2.8786,3709
+3788753,55,43,UEFA Euro,2020,Europe,2021-06-16,Saint-Petersburg Stadium ( Gazprom Arena ),Russia,Finland,Russia,0,1,1,False,False,False,11,14,1,3,0,1,0.9651,1.259,0.0909,0.2143,0.0877,0.0899,25,2.2241,3805
+3788754,55,43,UEFA Euro,2020,Europe,2021-06-16,Estadio Olímpico,Italy,Italy,Switzerland,3,0,3,True,True,False,13,6,3,1,3,0,1.7058,0.3338,0.2308,0.1667,0.1312,0.0556,19,2.0396,3830
+3788755,55,43,UEFA Euro,2020,Europe,2021-06-16,Bakı Olimpiya Stadionu,Azerbaijan,Turkey,Wales,0,2,2,True,False,False,18,16,5,7,0,2,1.3103,2.874,0.2778,0.4375,0.0728,0.1796,34,4.1843,3262
+3788756,55,43,UEFA Euro,2020,Europe,2021-06-17,Johan Cruijff Arena (Amsterdam),Netherlands,Netherlands,Austria,2,0,2,True,False,False,14,9,3,1,2,0,3.3375,0.3981,0.2143,0.1111,0.2384,0.0442,23,3.7356,3748
+3788757,55,43,UEFA Euro,2020,Europe,2021-06-17,Parken,Denmark,Denmark,Belgium,1,2,3,True,True,True,21,6,5,4,1,2,1.623,1.0519,0.2381,0.6667,0.0773,0.1753,27,2.6749,3978
+3788758,55,43,UEFA Euro,2020,Europe,2021-06-17,Arena Naţională,Romania,Ukraine,North Macedonia,2,1,3,True,True,True,17,13,9,5,2,1,3.2405,1.9847,0.5294,0.3846,0.1906,0.1527,30,5.2252,3337
+3788759,55,43,UEFA Euro,2020,Europe,2021-06-18,Wembley Stadium,England,England,Scotland,0,0,0,False,False,False,9,11,1,1,0,0,0.8539,0.7354,0.1111,0.0909,0.0949,0.0669,20,1.5893,3366
+3788760,55,43,UEFA Euro,2020,Europe,2021-06-18,Hampden Park,Scotland,Croatia,Czech Republic,1,1,2,True,False,True,11,11,3,1,1,1,0.9902,1.9126,0.2727,0.0909,0.09,0.1739,22,2.9028,3401
+3788761,55,43,UEFA Euro,2020,Europe,2021-06-18,Saint-Petersburg Stadium ( Gazprom Arena ),Russia,Sweden,Slovakia,1,0,1,False,False,False,13,10,4,0,1,0,1.584,0.5532,0.3077,0.0,0.1218,0.0553,23,2.1372,3925
+3788762,55,43,UEFA Euro,2020,Europe,2021-06-19,Estadio de La Cartuja,Spain,Spain,Poland,1,1,2,True,False,True,12,5,5,2,1,1,2.6149,0.5523,0.4167,0.4,0.2179,0.1105,17,3.1672,3653
+3788763,55,43,UEFA Euro,2020,Europe,2021-06-19,Puskás Aréna,Hungary,Hungary,France,1,1,2,True,False,True,5,17,3,4,1,1,0.4735,1.69,0.6,0.2353,0.0947,0.0994,22,2.1635,3610
+3788764,55,43,UEFA Euro,2020,Europe,2021-06-19,Allianz Arena,Germany,Portugal,Germany,2,4,6,True,True,True,7,13,2,7,2,2,1.9357,2.1305,0.2857,0.5385,0.2765,0.1639,20,4.0662,3582
+3788765,55,43,UEFA Euro,2020,Europe,2021-06-20,Bakı Olimpiya Stadionu,Azerbaijan,Switzerland,Turkey,3,1,4,True,True,True,23,20,10,6,3,1,1.984,1.2448,0.4348,0.3,0.0863,0.0622,43,3.2288,3780
+3788766,55,43,UEFA Euro,2020,Europe,2021-06-20,Estadio Olímpico,Italy,Italy,Wales,1,0,1,False,False,False,23,3,7,1,1,0,1.6691,0.2407,0.3043,0.3333,0.0726,0.0802,26,1.9098,3136
+3788767,55,43,UEFA Euro,2020,Europe,2021-06-21,Arena Naţională,Romania,Ukraine,Austria,0,1,1,False,False,False,5,18,1,4,0,1,0.4103,1.4935,0.2,0.2222,0.0821,0.083,23,1.9038,3587
+3788768,55,43,UEFA Euro,2020,Europe,2021-06-21,Saint-Petersburg Stadium ( Gazprom Arena ),Russia,Finland,Belgium,0,2,2,True,False,False,7,17,1,7,0,1,0.2402,1.1404,0.1429,0.4118,0.0343,0.0671,24,1.3806,4085
+3788769,55,43,UEFA Euro,2020,Europe,2021-06-21,Parken,Denmark,Russia,Denmark,1,4,5,True,True,True,6,16,2,9,1,4,1.091,2.3304,0.3333,0.5625,0.1818,0.1456,22,3.4214,3029
+3788770,55,43,UEFA Euro,2020,Europe,2021-06-21,Johan Cruijff Arena (Amsterdam),Netherlands,North Macedonia,Netherlands,0,3,3,True,True,False,13,17,1,7,0,3,0.7442,3.2199,0.0769,0.4118,0.0572,0.1894,30,3.9641,3830
+3788771,55,43,UEFA Euro,2020,Europe,2021-06-22,Hampden Park,Scotland,Croatia,Scotland,3,1,4,True,True,True,11,11,7,3,3,1,0.7815,1.1114,0.6364,0.2727,0.071,0.101,22,1.8929,3692
+3788772,55,43,UEFA Euro,2020,Europe,2021-06-22,Wembley Stadium,England,Czech Republic,England,0,1,1,False,False,False,7,6,1,3,0,1,0.393,0.6423,0.1429,0.5,0.0561,0.1071,13,1.0353,3443
+3788773,55,43,UEFA Euro,2020,Europe,2021-06-23,Puskás Aréna,Hungary,Portugal,France,2,2,4,True,True,True,10,11,5,6,2,2,2.0424,1.5066,0.5,0.5455,0.2042,0.137,21,3.549,3889
+3788774,55,43,UEFA Euro,2020,Europe,2021-06-23,Allianz Arena,Germany,Germany,Hungary,2,2,4,True,True,True,18,9,6,3,2,2,2.0977,0.7371,0.3333,0.3333,0.1165,0.0819,27,2.8348,3675
+3788775,55,43,UEFA Euro,2020,Europe,2021-06-23,Estadio de La Cartuja,Spain,Slovakia,Spain,0,5,5,True,True,False,3,19,1,9,0,3,0.093,3.2231,0.3333,0.4737,0.031,0.1696,22,3.3161,3627
+3788776,55,43,UEFA Euro,2020,Europe,2021-06-23,Saint-Petersburg Stadium ( Gazprom Arena ),Russia,Sweden,Poland,3,2,5,True,True,True,11,18,4,6,3,2,1.0418,1.6608,0.3636,0.3333,0.0947,0.0923,29,2.7026,2879
+3794685,55,43,UEFA Euro,2020,Europe,2021-06-26,Wembley Stadium,England,Italy,Austria,2,1,3,True,True,True,26,16,7,3,2,1,1.5171,1.0385,0.2692,0.1875,0.0583,0.0649,42,2.5556,4882
+3794689,55,43,UEFA Euro,2020,Europe,2021-06-26,Johan Cruijff Arena (Amsterdam),Netherlands,Wales,Denmark,0,4,4,True,True,False,11,16,1,8,0,4,0.5984,2.1553,0.0909,0.5,0.0544,0.1347,27,2.7537,3117
+3794687,55,43,UEFA Euro,2020,Europe,2021-06-27,Estadio de La Cartuja,Spain,Belgium,Portugal,1,0,1,False,False,False,6,23,1,4,1,0,0.2243,1.2148,0.1667,0.1739,0.0374,0.0528,29,1.4391,3793
+3794690,55,43,UEFA Euro,2020,Europe,2021-06-27,Puskás Aréna,Hungary,Netherlands,Czech Republic,0,2,2,True,False,False,6,12,0,5,0,2,0.838,1.2731,0.0,0.4167,0.1397,0.1061,18,2.1111,3099
+3794686,55,43,UEFA Euro,2020,Europe,2021-06-28,Parken,Denmark,Croatia,Spain,3,5,8,True,True,True,11,24,6,10,2,5,2.7882,2.78,0.5455,0.4167,0.2535,0.1158,35,5.5682,4858
+3794691,55,43,UEFA Euro,2020,Europe,2021-06-28,Arena Naţională,Romania,France,Switzerland,3,3,6,True,True,True,31,18,13,10,7,8,6.5634,5.7715,0.4194,0.5556,0.2117,0.3206,49,12.3349,4569
+3794688,55,43,UEFA Euro,2020,Europe,2021-06-29,Wembley Stadium,England,England,Germany,2,0,2,True,False,False,5,9,4,3,2,0,1.1635,1.0585,0.8,0.3333,0.2327,0.1176,14,2.222,3454
+3794692,55,43,UEFA Euro,2020,Europe,2021-06-29,Hampden Park,Scotland,Sweden,Ukraine,1,2,3,True,True,True,13,15,3,4,1,2,0.9119,1.3443,0.2308,0.2667,0.0701,0.0896,28,2.2562,4919
+3795107,55,43,UEFA Euro,2020,Europe,2021-07-02,Allianz Arena,Germany,Belgium,Italy,1,2,3,True,True,True,10,14,3,4,1,2,1.8028,1.1426,0.3,0.2857,0.1803,0.0816,24,2.9454,3616
+3795108,55,43,UEFA Euro,2020,Europe,2021-07-02,Saint-Petersburg Stadium ( Gazprom Arena ),Russia,Switzerland,Spain,1,1,2,True,False,True,12,34,5,15,2,3,3.9578,6.9281,0.4167,0.4412,0.3298,0.2038,46,10.8859,4989
+3795109,55,43,UEFA Euro,2020,Europe,2021-07-03,Bakı Olimpiya Stadionu,Azerbaijan,Czech Republic,Denmark,1,2,3,True,True,True,16,11,5,7,1,2,1.1617,1.212,0.3125,0.6364,0.0726,0.1102,27,2.3737,3217
+3795187,55,43,UEFA Euro,2020,Europe,2021-07-03,Estadio Olímpico,Italy,Ukraine,England,0,4,4,True,True,False,7,10,2,6,0,4,0.3376,1.2155,0.2857,0.6,0.0482,0.1216,17,1.5531,4264
+3795220,55,43,UEFA Euro,2020,Europe,2021-07-06,Wembley Stadium,England,Italy,Spain,1,1,2,True,False,True,12,20,9,7,5,3,4.3157,4.5361,0.75,0.35,0.3596,0.2268,32,8.8518,4824
+3795221,55,43,UEFA Euro,2020,Europe,2021-07-07,Wembley Stadium,England,England,Denmark,2,1,3,True,True,True,21,6,10,4,1,1,3.0502,0.3755,0.4762,0.6667,0.1452,0.0626,27,3.4257,4691
+3795506,55,43,UEFA Euro,2020,Europe,2021-07-11,Wembley Stadium,England,Italy,England,1,1,2,True,False,True,24,11,11,6,4,3,5.9994,4.3437,0.4583,0.5455,0.25,0.3949,35,10.3431,4796
+3857286,43,106,FIFA World Cup,2022,International,2022-11-20,Al Bayt Stadium,Qatar,Qatar,Ecuador,0,2,2,True,False,False,5,6,0,3,0,2,0.3042,1.154,0.0,0.5,0.0608,0.1923,11,1.4582,3299
+3857271,43,106,FIFA World Cup,2022,International,2022-11-21,Sheikh Khalifa International Stadium,Qatar,England,Iran,6,2,8,True,True,True,13,8,7,3,6,2,1.9872,1.4557,0.5385,0.375,0.1529,0.182,21,3.4429,3649
+3857282,43,106,FIFA World Cup,2022,International,2022-11-21,Ahmad bin Ali Stadium,Qatar,United States,Wales,1,1,2,True,False,True,6,7,1,3,1,1,0.6025,1.3953,0.1667,0.4286,0.1004,0.1993,13,1.9978,3687
+3857285,43,106,FIFA World Cup,2022,International,2022-11-21,Al Thumama Stadium,Qatar,Senegal,Netherlands,0,2,2,True,False,False,15,10,4,3,0,2,0.6915,1.1239,0.2667,0.3,0.0461,0.1124,25,1.8154,3133
+3857254,43,106,FIFA World Cup,2022,International,2022-11-22,Education City Stadium ,Qatar,Denmark,Tunisia,0,0,0,False,False,False,11,13,5,1,0,0,1.5666,1.0599,0.4545,0.0769,0.1424,0.0815,24,2.6265,3680
+3857265,43,106,FIFA World Cup,2022,International,2022-11-22,Stadium 974,Qatar,Mexico,Poland,0,0,0,False,False,False,11,6,4,2,0,0,0.5291,1.1379,0.3636,0.3333,0.0481,0.1897,17,1.667,3184
+3857279,43,106,FIFA World Cup,2022,International,2022-11-22,Al Janoub Stadium   ,Qatar,France,Australia,4,1,5,True,True,True,23,4,6,1,4,1,3.1705,0.3233,0.2609,0.25,0.1378,0.0808,27,3.4938,3963
+3857300,43,106,FIFA World Cup,2022,International,2022-11-22,Lusail Stadium,Qatar,Argentina,Saudi Arabia,1,2,3,True,True,True,15,3,6,2,1,2,2.4916,0.1535,0.4,0.6667,0.1661,0.0512,18,2.6451,3329
+3857268,43,106,FIFA World Cup,2022,International,2022-11-23,Ahmad bin Ali Stadium,Qatar,Belgium,Canada,1,0,1,False,False,False,9,22,3,3,1,0,0.67,2.5462,0.3333,0.1364,0.0744,0.1157,31,3.2162,3499
+3857277,43,106,FIFA World Cup,2022,International,2022-11-23,Al Bayt Stadium,Qatar,Morocco,Croatia,0,0,0,False,False,False,8,5,2,1,0,0,0.3626,0.8499,0.25,0.2,0.0453,0.17,13,1.2125,3719
+3857284,43,106,FIFA World Cup,2022,International,2022-11-23,Sheikh Khalifa International Stadium,Qatar,Germany,Japan,1,2,3,True,True,True,26,12,9,4,1,2,2.768,1.2493,0.3462,0.3333,0.1065,0.1041,38,4.0173,3717
+3857291,43,106,FIFA World Cup,2022,International,2022-11-23,Al Thumama Stadium,Qatar,Spain,Costa Rica,7,0,7,True,True,False,17,0,8,0,7,0,2.7619,0.0,0.4706,0.0,0.1625,0.0,17,2.7619,4351
+3857258,43,106,FIFA World Cup,2022,International,2022-11-24,Lusail Stadium,Qatar,Brazil,Serbia,2,0,2,True,False,False,23,5,9,0,2,0,2.1239,0.1633,0.3913,0.0,0.0923,0.0327,28,2.2872,3656
+3857287,43,106,FIFA World Cup,2022,International,2022-11-24,Education City Stadium ,Qatar,Uruguay,South Korea,0,0,0,False,False,False,10,7,1,0,0,0,0.4173,0.493,0.1,0.0,0.0417,0.0704,17,0.9103,3462
+3857290,43,106,FIFA World Cup,2022,International,2022-11-24,Al Janoub Stadium   ,Qatar,Switzerland,Cameroon,1,0,1,False,False,False,7,8,3,5,1,0,1.4265,0.6131,0.4286,0.625,0.2038,0.0766,15,2.0396,3601
+3857298,43,106,FIFA World Cup,2022,International,2022-11-24,Stadium 974,Qatar,Portugal,Ghana,3,2,5,True,True,True,11,9,5,3,3,2,2.0969,0.78,0.4545,0.3333,0.1906,0.0867,20,2.8769,3738
+3857272,43,106,FIFA World Cup,2022,International,2022-11-25,Al Bayt Stadium,Qatar,England,United States,0,0,0,False,False,False,8,10,3,1,0,0,0.4606,0.5143,0.375,0.1,0.0576,0.0514,18,0.9749,3519
+3857273,43,106,FIFA World Cup,2022,International,2022-11-25,Ahmad bin Ali Stadium,Qatar,Wales,Iran,0,2,2,True,False,False,10,21,4,6,0,2,0.6156,1.454,0.4,0.2857,0.0616,0.0692,31,2.0696,3133
+3857274,43,106,FIFA World Cup,2022,International,2022-11-25,Sheikh Khalifa International Stadium,Qatar,Netherlands,Ecuador,1,1,2,True,False,True,2,15,1,4,1,1,0.1045,1.6511,0.5,0.2667,0.0522,0.1101,17,1.7556,3563
+3857301,43,106,FIFA World Cup,2022,International,2022-11-25,Al Thumama Stadium,Qatar,Qatar,Senegal,1,3,4,True,True,True,10,12,3,4,1,3,0.9601,0.903,0.3,0.3333,0.096,0.0752,22,1.8631,3546
+3857266,43,106,FIFA World Cup,2022,International,2022-11-26,Stadium 974,Qatar,France,Denmark,2,1,3,True,True,True,21,10,6,2,2,1,1.9336,0.8885,0.2857,0.2,0.0921,0.0889,31,2.8221,3853
+3857288,43,106,FIFA World Cup,2022,International,2022-11-26,Al Janoub Stadium   ,Qatar,Tunisia,Australia,0,1,1,False,False,False,14,9,4,2,0,1,1.0522,0.359,0.2857,0.2222,0.0752,0.0399,23,1.4112,3359
+3857289,43,106,FIFA World Cup,2022,International,2022-11-26,Lusail Stadium,Qatar,Argentina,Mexico,2,0,2,True,False,False,5,4,2,1,2,0,0.3252,0.2064,0.4,0.25,0.065,0.0516,9,0.5316,3375
+3857297,43,106,FIFA World Cup,2022,International,2022-11-26,Education City Stadium ,Qatar,Poland,Saudi Arabia,2,0,2,True,False,False,9,17,3,5,2,0,1.7342,1.972,0.3333,0.2941,0.1927,0.116,26,3.7062,3202
+3857263,43,106,FIFA World Cup,2022,International,2022-11-27,Al Bayt Stadium,Qatar,Spain,Germany,1,1,2,True,False,True,7,11,3,4,1,1,0.6395,1.147,0.4286,0.3636,0.0914,0.1043,18,1.7865,3603
+3857281,43,106,FIFA World Cup,2022,International,2022-11-27,Sheikh Khalifa International Stadium,Qatar,Croatia,Canada,4,1,5,True,True,True,13,8,10,2,4,1,2.6102,0.2868,0.7692,0.25,0.2008,0.0358,21,2.897,3724
+3857283,43,106,FIFA World Cup,2022,International,2022-11-27,Al Thumama Stadium,Qatar,Belgium,Morocco,0,2,2,True,False,False,10,10,4,4,0,2,0.6426,0.9911,0.4,0.4,0.0643,0.0991,20,1.6337,3620
+3857295,43,106,FIFA World Cup,2022,International,2022-11-27,Ahmad bin Ali Stadium,Qatar,Japan,Costa Rica,0,1,1,False,False,False,13,4,3,1,0,1,0.7735,0.1994,0.2308,0.25,0.0595,0.0498,17,0.9729,3825
+3857259,43,106,FIFA World Cup,2022,International,2022-11-28,Al Janoub Stadium   ,Qatar,Cameroon,Serbia,3,3,6,True,True,True,13,15,8,5,3,3,2.0703,1.7381,0.6154,0.3333,0.1593,0.1159,28,3.8084,3270
+3857269,43,106,FIFA World Cup,2022,International,2022-11-28,Stadium 974,Qatar,Brazil,Switzerland,1,0,1,False,False,False,13,6,5,0,1,0,0.9227,0.2886,0.3846,0.0,0.071,0.0481,19,1.2113,3786
+3857270,43,106,FIFA World Cup,2022,International,2022-11-28,Lusail Stadium,Qatar,Portugal,Uruguay,2,0,2,True,False,False,15,11,3,3,2,0,1.2137,1.2167,0.2,0.2727,0.0809,0.1106,26,2.4304,3441
+3857299,43,106,FIFA World Cup,2022,International,2022-11-28,Education City Stadium ,Qatar,South Korea,Ghana,2,3,5,True,True,True,21,7,6,3,2,3,1.3678,1.1805,0.2857,0.4286,0.0651,0.1686,28,2.5483,3346
+3857261,43,106,FIFA World Cup,2022,International,2022-11-29,Ahmad bin Ali Stadium,Qatar,Wales,England,0,3,3,True,True,False,7,18,1,7,0,3,0.208,2.9155,0.1429,0.3889,0.0297,0.162,25,3.1235,3315
+3857267,43,106,FIFA World Cup,2022,International,2022-11-29,Sheikh Khalifa International Stadium,Qatar,Ecuador,Senegal,1,2,3,True,True,True,9,13,4,3,1,2,1.0017,1.7075,0.4444,0.2308,0.1113,0.1313,22,2.7092,2827
+3857278,43,106,FIFA World Cup,2022,International,2022-11-29,Al Thumama Stadium,Qatar,Iran,United States,0,1,1,False,False,False,4,12,1,5,0,1,0.9208,1.1697,0.25,0.4167,0.2302,0.0975,16,2.0905,3596
+3857294,43,106,FIFA World Cup,2022,International,2022-11-29,Al Bayt Stadium,Qatar,Netherlands,Qatar,2,0,2,True,False,False,13,5,4,3,2,0,1.714,0.1437,0.3077,0.6,0.1318,0.0287,18,1.8577,4311
+3857257,43,106,FIFA World Cup,2022,International,2022-11-30,Al Janoub Stadium   ,Qatar,Australia,Denmark,1,0,1,False,False,False,8,14,4,4,1,0,0.4697,0.7372,0.5,0.2857,0.0587,0.0527,22,1.2069,3594
+3857260,43,106,FIFA World Cup,2022,International,2022-11-30,Lusail Stadium,Qatar,Saudi Arabia,Mexico,1,2,3,True,True,True,10,26,2,10,1,2,1.0761,2.3221,0.2,0.3846,0.1076,0.0893,36,3.3982,2912
+3857264,43,106,FIFA World Cup,2022,International,2022-11-30,Stadium 974,Qatar,Poland,Argentina,0,2,2,True,False,False,4,24,0,13,0,2,0.1976,3.0767,0.0,0.5417,0.0494,0.1282,28,3.2743,4052
+3857275,43,106,FIFA World Cup,2022,International,2022-11-30,Education City Stadium ,Qatar,Tunisia,France,1,0,1,False,False,False,5,10,3,3,1,0,0.2983,0.477,0.6,0.3,0.0597,0.0477,15,0.7753,3564
+3857255,43,106,FIFA World Cup,2022,International,2022-12-01,Sheikh Khalifa International Stadium,Qatar,Japan,Spain,2,1,3,True,True,True,6,12,3,5,2,1,1.1578,0.8577,0.5,0.4167,0.193,0.0715,18,2.0155,4450
+3857276,43,106,FIFA World Cup,2022,International,2022-12-01,Al Thumama Stadium,Qatar,Canada,Morocco,1,2,3,True,True,True,5,7,0,2,0,2,1.0956,0.4264,0.0,0.2857,0.2191,0.0609,12,1.522,3388
+3857292,43,106,FIFA World Cup,2022,International,2022-12-01,Al Bayt Stadium,Qatar,Costa Rica,Germany,2,4,6,True,True,True,7,31,5,11,1,4,1.0347,4.3161,0.7143,0.3548,0.1478,0.1392,38,5.3508,3869
+3857296,43,106,FIFA World Cup,2022,International,2022-12-01,Ahmad bin Ali Stadium,Qatar,Croatia,Belgium,0,0,0,False,False,False,11,16,4,3,0,0,0.695,2.3818,0.3636,0.1875,0.0632,0.1489,27,3.0768,4116
+3857256,43,106,FIFA World Cup,2022,International,2022-12-02,Stadium 974,Qatar,Serbia,Switzerland,2,3,5,True,True,True,12,14,4,7,2,3,1.189,3.1035,0.3333,0.5,0.0991,0.2217,26,4.2925,3210
+3857262,43,106,FIFA World Cup,2022,International,2022-12-02,Education City Stadium ,Qatar,South Korea,Portugal,2,1,3,True,True,True,12,13,6,6,2,1,1.399,0.9737,0.5,0.4615,0.1166,0.0749,25,2.3727,3378
+3857280,43,106,FIFA World Cup,2022,International,2022-12-02,Lusail Stadium,Qatar,Cameroon,Brazil,1,0,1,False,False,False,7,21,3,8,1,0,0.3834,2.3782,0.4286,0.381,0.0548,0.1132,28,2.7616,3299
+3857293,43,106,FIFA World Cup,2022,International,2022-12-02,Al Janoub Stadium   ,Qatar,Ghana,Uruguay,0,2,2,True,False,False,9,12,4,6,0,2,1.3927,1.6366,0.4444,0.5,0.1547,0.1364,21,3.0293,3495
+3869117,43,106,FIFA World Cup,2022,International,2022-12-03,Sheikh Khalifa International Stadium,Qatar,Netherlands,United States,3,1,4,True,True,True,11,18,6,6,3,1,1.4819,1.6521,0.5455,0.3333,0.1347,0.0918,29,3.134,3582
+3869151,43,106,FIFA World Cup,2022,International,2022-12-03,Ahmad bin Ali Stadium,Qatar,Argentina,Australia,2,1,3,True,True,True,14,5,5,1,2,0,1.4816,0.4261,0.3571,0.2,0.1058,0.0852,19,1.9077,4150
+3869118,43,106,FIFA World Cup,2022,International,2022-12-04,Al Bayt Stadium,Qatar,England,Senegal,3,0,3,True,True,False,8,10,4,1,3,0,1.02,0.9728,0.5,0.1,0.1275,0.0973,18,1.9928,3505
+3869152,43,106,FIFA World Cup,2022,International,2022-12-04,Al Thumama Stadium,Qatar,France,Poland,3,1,4,True,True,True,16,12,8,2,3,1,1.1264,1.5935,0.5,0.1667,0.0704,0.1328,28,2.7199,3618
+3869219,43,106,FIFA World Cup,2022,International,2022-12-05,Al Janoub Stadium   ,Qatar,Japan,Croatia,1,1,2,True,False,True,17,21,8,7,2,4,4.203,3.9884,0.4706,0.3333,0.2472,0.1899,38,8.1914,4559
+3869253,43,106,FIFA World Cup,2022,International,2022-12-05,Stadium 974,Qatar,Brazil,South Korea,4,1,5,True,True,True,18,8,10,6,4,1,3.2614,0.3448,0.5556,0.75,0.1812,0.0431,26,3.6062,4046
+3869220,43,106,FIFA World Cup,2022,International,2022-12-06,Education City Stadium ,Qatar,Morocco,Spain,0,0,0,False,False,False,10,15,7,3,3,0,3.7044,2.8455,0.7,0.2,0.3704,0.1897,25,6.5499,4750
+3869254,43,106,FIFA World Cup,2022,International,2022-12-06,Lusail Stadium,Qatar,Portugal,Switzerland,6,1,7,True,True,True,15,10,9,3,6,1,2.2843,1.2718,0.6,0.3,0.1523,0.1272,25,3.5561,3422
+3869321,43,106,FIFA World Cup,2022,International,2022-12-09,Lusail Stadium,Qatar,Netherlands,Argentina,2,2,4,True,True,True,12,19,7,9,5,6,4.487,5.8567,0.5833,0.4737,0.3739,0.3082,31,10.3437,4708
+3869420,43,106,FIFA World Cup,2022,International,2022-12-09,Education City Stadium ,Qatar,Croatia,Brazil,1,1,2,True,False,True,13,24,5,14,5,3,3.7669,4.9503,0.3846,0.5833,0.2898,0.2063,37,8.7172,5145
+3869354,43,106,FIFA World Cup,2022,International,2022-12-10,Al Bayt Stadium,Qatar,England,France,1,2,3,True,True,True,16,8,7,5,1,2,2.3526,0.8394,0.4375,0.625,0.147,0.1049,24,3.192,3239
+3869486,43,106,FIFA World Cup,2022,International,2022-12-10,Al Thumama Stadium,Qatar,Morocco,Portugal,1,0,1,False,False,False,9,12,3,3,1,0,0.972,0.7441,0.3333,0.25,0.108,0.062,21,1.7161,3381
+3869519,43,106,FIFA World Cup,2022,International,2022-12-13,Lusail Stadium,Qatar,Argentina,Croatia,3,0,3,True,True,False,9,12,7,2,3,0,1.8644,0.4101,0.7778,0.1667,0.2072,0.0342,21,2.2745,3806
+3869552,43,106,FIFA World Cup,2022,International,2022-12-14,Al Bayt Stadium,Qatar,France,Morocco,2,0,2,True,False,False,14,13,2,2,2,0,2.0024,1.2304,0.1429,0.1538,0.143,0.0946,27,3.2328,3551
+3869684,43,106,FIFA World Cup,2022,International,2022-12-17,Sheikh Khalifa International Stadium,Qatar,Croatia,Morocco,2,1,3,True,True,True,12,9,4,2,2,1,0.8493,0.9915,0.3333,0.2222,0.0708,0.1102,21,1.8408,3560
+3869685,43,106,FIFA World Cup,2022,International,2022-12-18,Lusail Stadium,Qatar,Argentina,France,3,3,6,True,True,True,24,14,14,8,7,5,5.8923,5.4066,0.5833,0.5714,0.2455,0.3862,38,11.2989,4407
+3930158,55,282,UEFA Euro,2024,Europe,2024-06-14,Allianz Arena,Germany,Germany,Scotland,5,1,6,True,True,True,20,1,10,0,5,0,1.8446,0.0605,0.5,0.0,0.0922,0.0605,21,1.9051,3372
+3930159,55,282,UEFA Euro,2024,Europe,2024-06-15,RheinEnergieStadion,Germany,Hungary,Switzerland,1,3,4,True,True,True,6,15,2,7,1,3,1.1028,2.0958,0.3333,0.4667,0.1838,0.1397,21,3.1986,3370
+3930160,55,282,UEFA Euro,2024,Europe,2024-06-15,Olympiastadion Berlin,Germany,Spain,Croatia,3,0,3,True,True,False,11,16,6,5,3,0,1.5672,2.4821,0.5455,0.3125,0.1425,0.1551,27,4.0493,3793
+3930161,55,282,UEFA Euro,2024,Europe,2024-06-15,Signal-Iduna-Park,Germany,Italy,Albania,2,1,3,True,True,True,17,8,5,2,2,1,1.4498,0.3546,0.2941,0.25,0.0853,0.0443,25,1.8044,4066
+3930162,55,282,UEFA Euro,2024,Europe,2024-06-16,MHPArena,Germany,Slovenia,Denmark,1,1,2,True,False,True,11,16,2,4,1,1,0.9664,1.5112,0.1818,0.25,0.0879,0.0945,27,2.4776,3509
+3930163,55,282,UEFA Euro,2024,Europe,2024-06-16,VELTINS-Arena,Germany,Serbia,England,0,1,1,False,False,False,6,5,1,3,0,1,0.2494,0.5588,0.1667,0.6,0.0416,0.1118,11,0.8082,3920
+3938637,55,282,UEFA Euro,2024,Europe,2024-06-16,Volksparkstadion,Germany,Poland,Netherlands,1,2,3,True,True,True,12,21,7,4,1,2,0.9092,1.3128,0.5833,0.1905,0.0758,0.0625,33,2.222,3409
+3930164,55,282,UEFA Euro,2024,Europe,2024-06-17,Deutsche Bank Park,Germany,Belgium,Slovakia,0,1,1,False,False,False,16,10,5,4,0,1,1.7503,0.7111,0.3125,0.4,0.1094,0.0711,26,2.4614,3543
+3930165,55,282,UEFA Euro,2024,Europe,2024-06-17,Merkur Spiel-Arena,Germany,Austria,France,0,1,1,False,False,False,5,14,3,3,0,0,0.7483,1.9045,0.6,0.2143,0.1497,0.136,19,2.6528,3718
+3938638,55,282,UEFA Euro,2024,Europe,2024-06-17,Allianz Arena,Germany,Romania,Ukraine,3,0,3,True,True,False,10,13,5,2,3,0,1.1211,0.5435,0.5,0.1538,0.1121,0.0418,23,1.6646,3169
+3930166,55,282,UEFA Euro,2024,Europe,2024-06-18,Red Bull Arena,Germany,Portugal,Czech Republic,2,1,3,True,True,True,19,5,8,1,1,1,1.8375,0.3148,0.4211,0.2,0.0967,0.063,24,2.1523,3610
+3938639,55,282,UEFA Euro,2024,Europe,2024-06-18,Signal-Iduna-Park,Germany,Turkey,Georgia,3,1,4,True,True,True,22,14,7,4,3,1,2.4034,1.5786,0.3182,0.2857,0.1092,0.1128,36,3.982,3837
+3930167,55,282,UEFA Euro,2024,Europe,2024-06-19,Volksparkstadion,Germany,Croatia,Albania,2,2,4,True,True,True,21,14,8,7,1,2,1.8586,1.3259,0.381,0.5,0.0885,0.0947,35,3.1845,3719
+3930168,55,282,UEFA Euro,2024,Europe,2024-06-19,MHPArena,Germany,Germany,Hungary,2,0,2,True,False,False,19,11,7,2,2,0,1.4837,1.228,0.3684,0.1818,0.0781,0.1116,30,2.7117,3880
+3930169,55,282,UEFA Euro,2024,Europe,2024-06-19,RheinEnergieStadion,Germany,Scotland,Switzerland,1,1,2,True,False,True,12,11,3,5,1,1,0.7719,0.9902,0.25,0.4545,0.0643,0.09,23,1.7621,3130
+3930170,55,282,UEFA Euro,2024,Europe,2024-06-20,Allianz Arena,Germany,Slovenia,Serbia,1,1,2,True,False,True,12,15,4,4,1,1,1.5522,1.4613,0.3333,0.2667,0.1293,0.0974,27,3.0135,3552
+3930171,55,282,UEFA Euro,2024,Europe,2024-06-20,Deutsche Bank Park,Germany,Denmark,England,1,1,2,True,False,True,16,12,7,4,1,1,0.7333,1.1727,0.4375,0.3333,0.0458,0.0977,28,1.906,3881
+3930172,55,282,UEFA Euro,2024,Europe,2024-06-20,VELTINS-Arena,Germany,Spain,Italy,1,0,1,False,False,False,20,4,9,1,0,0,1.5339,0.1434,0.45,0.25,0.0767,0.0358,24,1.6773,3982
+3939969,223,282,Copa America,2024,South America,2024-06-21,Mercedes-Benz Stadium,United States of America,Argentina,Canada,2,0,2,True,False,False,19,10,8,2,2,0,3.5383,0.9773,0.4211,0.2,0.1862,0.0977,29,4.5156,3619
+3930173,55,282,UEFA Euro,2024,Europe,2024-06-21,Trainingszentrum RB Leipzig Platz 1,Germany,Netherlands,France,0,0,0,False,False,False,9,15,4,3,0,0,0.7382,1.2184,0.4444,0.2,0.082,0.0812,24,1.9566,3681
+3938640,55,282,UEFA Euro,2024,Europe,2024-06-21,Merkur Spiel-Arena,Germany,Slovakia,Ukraine,1,2,3,True,True,True,14,13,5,5,1,2,0.7461,1.7317,0.3571,0.3846,0.0533,0.1332,27,2.4778,3512
+3938641,55,282,UEFA Euro,2024,Europe,2024-06-21,Olympiastadion Berlin,Germany,Poland,Austria,1,3,4,True,True,True,15,15,3,9,1,3,1.4381,1.8217,0.2,0.6,0.0959,0.1214,30,3.2598,3400
+3939970,223,282,Copa America,2024,South America,2024-06-22,AT&T Stadium,United States of America,Peru,Chile,0,0,0,False,False,False,7,11,4,1,0,0,0.6773,1.0248,0.5714,0.0909,0.0968,0.0932,18,1.7021,3212
+3939972,223,282,Copa America,2024,South America,2024-06-22,Levi''s Stadium,United States of America,Ecuador,Venezuela,1,2,3,True,True,True,9,14,4,5,1,2,0.7356,1.585,0.4444,0.3571,0.0817,0.1132,23,2.3206,3038
+3930174,55,282,UEFA Euro,2024,Europe,2024-06-22,Signal-Iduna-Park,Germany,Turkey,Portugal,0,3,3,True,True,False,11,12,3,3,0,2,0.779,1.9012,0.2727,0.25,0.0708,0.1584,23,2.6802,3781
+3930175,55,282,UEFA Euro,2024,Europe,2024-06-22,RheinEnergieStadion,Germany,Belgium,Romania,2,0,2,True,False,False,20,14,9,4,2,0,1.6458,1.246,0.45,0.2857,0.0823,0.089,34,2.8918,3203
+3938642,55,282,UEFA Euro,2024,Europe,2024-06-22,Volksparkstadion,Germany,Georgia,Czech Republic,1,1,2,True,False,True,5,27,1,11,1,1,1.1799,2.8655,0.2,0.4074,0.236,0.1061,32,4.0454,3332
+3939971,223,282,Copa America,2024,South America,2024-06-23,NRG Stadium,United States of America,Mexico,Jamaica,1,0,1,False,False,False,20,13,9,4,1,0,1.1361,0.5062,0.45,0.3077,0.0568,0.0389,33,1.6423,3308
+3939974,223,282,Copa America,2024,South America,2024-06-23,AT&T Stadium,United States of America,United States,Bolivia,2,0,2,True,False,False,20,6,8,3,2,0,2.4047,0.1497,0.4,0.5,0.1202,0.0249,26,2.5544,3398
+3930176,55,282,UEFA Euro,2024,Europe,2024-06-23,Deutsche Bank Park,Germany,Switzerland,Germany,1,1,2,True,False,True,4,18,3,3,1,1,0.2801,1.5417,0.75,0.1667,0.07,0.0856,22,1.8218,3727
+3930177,55,282,UEFA Euro,2024,Europe,2024-06-23,MHPArena,Germany,Scotland,Hungary,0,1,1,False,False,False,4,14,0,5,0,1,0.1835,1.001,0.0,0.3571,0.0459,0.0715,18,1.1845,3386
+3939973,223,282,Copa America,2024,South America,2024-06-24,Hard Rock Stadium,United States of America,Uruguay,Panama,3,1,4,True,True,True,20,10,7,3,3,1,1.3614,0.5409,0.35,0.3,0.0681,0.0541,30,1.9023,2995
+3939975,223,282,Copa America,2024,South America,2024-06-24,NRG Stadium,United States of America,Colombia,Paraguay,2,1,3,True,True,True,11,11,3,3,2,1,0.6219,0.8276,0.2727,0.2727,0.0565,0.0752,22,1.4495,2994
+3930178,55,282,UEFA Euro,2024,Europe,2024-06-24,Red Bull Arena,Germany,Croatia,Italy,1,1,2,True,False,True,6,13,4,3,1,1,1.4832,0.9854,0.6667,0.2308,0.2472,0.0758,19,2.4686,4008
+3930179,55,282,UEFA Euro,2024,Europe,2024-06-24,Merkur Spiel-Arena,Germany,Albania,Spain,0,1,1,False,False,False,10,16,4,3,0,1,0.5032,0.9517,0.4,0.1875,0.0503,0.0595,26,1.4549,3776
+3939976,223,282,Copa America,2024,South America,2024-06-25,SoFi Stadium,United States of America,Brazil,Costa Rica,0,0,0,False,False,False,20,2,3,0,0,0,1.6212,0.0367,0.15,0.0,0.0811,0.0184,22,1.6579,3697
+3939978,223,282,Copa America,2024,South America,2024-06-25,Children''s Mercy Park,United States of America,Peru,Canada,0,1,1,False,False,False,9,5,4,2,0,1,0.5764,0.909,0.4444,0.4,0.064,0.1818,14,1.4854,2944
+3930180,55,282,UEFA Euro,2024,Europe,2024-06-25,Olympiastadion Berlin,Germany,Netherlands,Austria,2,3,5,True,True,True,11,9,2,5,2,2,1.5102,1.0579,0.1818,0.5556,0.1373,0.1175,20,2.5681,3206
+3930181,55,282,UEFA Euro,2024,Europe,2024-06-25,RheinEnergieStadion,Germany,England,Slovenia,0,0,0,False,False,False,12,4,3,2,0,0,0.7562,0.1649,0.25,0.5,0.063,0.0412,16,0.9211,3688
+3930182,55,282,UEFA Euro,2024,Europe,2024-06-25,Allianz Arena,Germany,Denmark,Serbia,0,0,0,False,False,False,10,5,3,1,0,0,0.5515,0.3244,0.3,0.2,0.0552,0.0649,15,0.8759,3787
+3938643,55,282,UEFA Euro,2024,Europe,2024-06-25,Signal-Iduna-Park,Germany,France,Poland,1,1,2,True,False,True,19,10,8,3,1,1,1.8915,1.1791,0.4211,0.3,0.0996,0.1179,29,3.0706,3767
+3939977,223,282,Copa America,2024,South America,2024-06-26,MetLife Stadium,United States of America,Chile,Argentina,0,1,1,False,False,False,3,22,3,9,0,1,0.131,2.7841,1.0,0.4091,0.0437,0.1265,25,2.9151,3653
+3939980,223,282,Copa America,2024,South America,2024-06-26,Allegiant Stadium,United States of America,Ecuador,Jamaica,3,1,4,True,True,True,23,7,3,4,2,1,2.3658,0.9347,0.1304,0.5714,0.1029,0.1335,30,3.3005,2534
+3930183,55,282,UEFA Euro,2024,Europe,2024-06-26,Deutsche Bank Park,Germany,Slovakia,Romania,1,1,2,True,False,True,13,9,4,5,1,1,0.8447,1.1219,0.3077,0.5556,0.065,0.1247,22,1.9666,2880
+3930184,55,282,UEFA Euro,2024,Europe,2024-06-26,Volksparkstadion,Germany,Czech Republic,Turkey,1,2,3,True,True,True,12,18,6,5,1,2,1.4103,1.2175,0.5,0.2778,0.1175,0.0676,30,2.6278,2953
+3938644,55,282,UEFA Euro,2024,Europe,2024-06-26,VELTINS-Arena,Germany,Georgia,Portugal,2,0,2,True,False,False,7,22,3,5,2,0,1.3455,2.3561,0.4286,0.2273,0.1922,0.1071,29,3.7016,3659
+3938645,55,282,UEFA Euro,2024,Europe,2024-06-26,MHPArena,Germany,Ukraine,Belgium,0,0,0,False,False,False,14,12,5,4,0,0,0.7092,0.634,0.3571,0.3333,0.0507,0.0528,26,1.3432,3526
+3939979,223,282,Copa America,2024,South America,2024-06-27,SoFi Stadium,United States of America,Venezuela,Mexico,1,0,1,False,False,False,10,18,2,5,1,0,1.1386,2.3843,0.2,0.2778,0.1139,0.1325,28,3.5229,3264
+3939981,223,282,Copa America,2024,South America,2024-06-27,Mercedes-Benz Stadium,United States of America,Panama,United States,2,1,3,True,True,True,13,6,4,3,2,1,0.7308,0.9143,0.3077,0.5,0.0562,0.1524,19,1.6451,2779
+3939982,223,282,Copa America,2024,South America,2024-06-28,MetLife Stadium,United States of America,Uruguay,Bolivia,5,0,5,True,True,False,18,4,9,1,5,0,2.321,0.0508,0.5,0.25,0.1289,0.0127,22,2.3718,3293
+3939984,223,282,Copa America,2024,South America,2024-06-28,State Farm Stadium,United States of America,Colombia,Costa Rica,3,0,3,True,True,False,18,5,5,0,3,0,2.9023,0.1653,0.2778,0.0,0.1612,0.0331,23,3.0676,3229
+3939983,223,282,Copa America,2024,South America,2024-06-29,Allegiant Stadium,United States of America,Paraguay,Brazil,1,4,5,True,True,True,15,17,6,6,1,4,0.6917,3.7477,0.4,0.3529,0.0461,0.2205,32,4.4394,3436
+3940878,55,282,UEFA Euro,2024,Europe,2024-06-29,Olympiastadion Berlin,Germany,Switzerland,Italy,2,0,2,True,False,False,16,11,4,1,2,0,0.7824,0.7257,0.25,0.0909,0.0489,0.066,27,1.5081,3852
+3940983,55,282,UEFA Euro,2024,Europe,2024-06-29,Signal-Iduna-Park,Germany,Germany,Denmark,2,0,2,True,False,False,15,10,9,2,2,0,2.2266,1.0735,0.6,0.2,0.1484,0.1073,25,3.3001,3640
+3939985,223,282,Copa America,2024,South America,2024-06-30,Inter&Co Stadium,United States of America,Canada,Chile,0,0,0,False,False,False,9,8,3,4,0,0,0.6995,0.454,0.3333,0.5,0.0777,0.0568,17,1.1535,2903
+3939986,223,282,Copa America,2024,South America,2024-06-30,Hard Rock Stadium,United States of America,Argentina,Peru,2,0,2,True,False,False,12,7,6,1,2,0,2.1058,0.1666,0.5,0.1429,0.1755,0.0238,19,2.2724,3175
+3941017,55,282,UEFA Euro,2024,Europe,2024-06-30,VELTINS-Arena,Germany,England,Slovakia,2,1,3,True,True,True,16,13,2,3,2,1,1.5867,1.5478,0.125,0.2308,0.0992,0.1191,29,3.1345,4764
+3941018,55,282,UEFA Euro,2024,Europe,2024-06-30,RheinEnergieStadion,Germany,Spain,Georgia,4,1,5,True,True,True,35,4,13,0,4,0,2.7647,0.1131,0.3714,0.0,0.079,0.0283,39,2.8778,3948
+3939987,223,282,Copa America,2024,South America,2024-07-01,Q2 Stadium,United States of America,Jamaica,Venezuela,0,3,3,True,True,False,8,17,1,3,0,3,0.6676,1.7144,0.125,0.1765,0.0834,0.1008,25,2.382,2866
+3939988,223,282,Copa America,2024,South America,2024-07-01,State Farm Stadium,United States of America,Mexico,Ecuador,0,0,0,False,False,False,20,9,4,3,0,0,0.9376,0.3058,0.2,0.3333,0.0469,0.034,29,1.2434,2938
+3941019,55,282,UEFA Euro,2024,Europe,2024-07-01,Merkur Spiel-Arena,Germany,France,Belgium,1,0,1,False,False,False,19,5,2,2,0,0,1.262,0.3632,0.1053,0.4,0.0664,0.0726,24,1.6252,3943
+3941020,55,282,UEFA Euro,2024,Europe,2024-07-01,Deutsche Bank Park,Germany,Portugal,Slovenia,0,0,0,False,False,False,23,13,9,6,3,0,4.0717,3.066,0.3913,0.4615,0.177,0.2358,36,7.1377,4225
+3939989,223,282,Copa America,2024,South America,2024-07-02,Inter&Co Stadium,United States of America,Bolivia,Panama,1,3,4,True,True,True,7,13,3,6,1,3,0.7934,1.3406,0.4286,0.4615,0.1133,0.1031,20,2.134,3237
+3939990,223,282,Copa America,2024,South America,2024-07-02,Arrowhead Stadium,United States of America,United States,Uruguay,0,1,1,False,False,False,8,12,2,5,0,1,0.471,1.2715,0.25,0.4167,0.0589,0.106,20,1.7425,2583
+3941021,55,282,UEFA Euro,2024,Europe,2024-07-02,Allianz Arena,Germany,Romania,Netherlands,0,3,3,True,True,False,5,24,1,6,0,3,0.2677,2.6262,0.2,0.25,0.0535,0.1094,29,2.8939,2998
+3941022,55,282,UEFA Euro,2024,Europe,2024-07-02,Red Bull Arena,Germany,Austria,Turkey,1,2,3,True,True,True,21,6,5,3,1,2,2.487,0.8825,0.2381,0.5,0.1184,0.1471,27,3.3695,3720
+3939991,223,282,Copa America,2024,South America,2024-07-03,Levi''s Stadium,United States of America,Brazil,Colombia,1,1,2,True,False,True,7,13,3,6,1,1,0.3058,1.503,0.4286,0.4615,0.0437,0.1156,20,1.8088,3213
+3939992,223,282,Copa America,2024,South America,2024-07-03,Q2 Stadium,United States of America,Costa Rica,Paraguay,2,1,3,True,True,True,2,17,2,6,2,1,0.2721,1.4401,1.0,0.3529,0.136,0.0847,19,1.7122,3067
+3942228,223,282,Copa America,2024,South America,2024-07-05,NRG Stadium,United States of America,Argentina,Ecuador,1,1,2,True,False,True,13,13,6,6,5,3,4.7761,4.5225,0.4615,0.4615,0.3674,0.3479,26,9.2986,2861
+3942226,55,282,UEFA Euro,2024,Europe,2024-07-05,MHPArena,Germany,Spain,Germany,2,1,3,True,True,True,19,23,6,5,2,1,1.5341,1.6291,0.3158,0.2174,0.0807,0.0708,42,3.1632,4463
+3942349,55,282,UEFA Euro,2024,Europe,2024-07-05,Volksparkstadion,Germany,Portugal,France,0,0,0,False,False,False,19,25,7,10,3,5,4.5428,4.9849,0.3684,0.4,0.2391,0.1994,44,9.5277,5195
+3942229,223,282,Copa America,2024,South America,2024-07-06,AT&T Stadium,United States of America,Venezuela,Canada,1,1,2,True,False,True,21,22,8,10,4,5,5.6231,6.0521,0.381,0.4545,0.2678,0.2751,43,11.6752,3130
+3942416,223,282,Copa America,2024,South America,2024-07-06,State Farm Stadium,United States of America,Colombia,Panama,5,0,5,True,True,False,7,14,5,2,5,0,2.1804,0.61,0.7143,0.1429,0.3115,0.0436,21,2.7904,2905
+3942227,55,282,UEFA Euro,2024,Europe,2024-07-06,Merkur Spiel-Arena,Germany,England,Switzerland,1,1,2,True,False,True,18,16,8,7,6,4,4.4545,4.3354,0.4444,0.4375,0.2475,0.271,34,8.7899,4890
+3942382,55,282,UEFA Euro,2024,Europe,2024-07-06,Olympiastadion Berlin,Germany,Netherlands,Turkey,2,1,3,True,True,True,11,15,4,4,1,1,0.7189,1.1824,0.3636,0.2667,0.0654,0.0788,26,1.9013,3417
+3942415,223,282,Copa America,2024,South America,2024-07-07,Allegiant Stadium,United States of America,Uruguay,Brazil,0,0,0,False,False,False,17,11,6,6,4,2,4.5473,3.8099,0.3529,0.5455,0.2675,0.3464,28,8.3572,2791
+3942752,55,282,UEFA Euro,2024,Europe,2024-07-09,Allianz Arena,Germany,Spain,France,2,1,3,True,True,True,6,9,2,3,2,1,0.4215,0.8508,0.3333,0.3333,0.0703,0.0945,15,1.2723,3330
+3942785,223,282,Copa America,2024,South America,2024-07-10,MetLife Stadium,United States of America,Argentina,Canada,2,0,2,True,False,False,11,9,3,2,2,0,1.7542,0.7176,0.2727,0.2222,0.1595,0.0797,20,2.4718,3460
+3942819,55,282,UEFA Euro,2024,Europe,2024-07-10,Signal-Iduna-Park,Germany,Netherlands,England,1,2,3,True,True,True,7,9,3,5,1,2,0.4122,1.2366,0.4286,0.5556,0.0589,0.1374,16,1.6488,3503
+3942852,223,282,Copa America,2024,South America,2024-07-11,Bank of America Stadium,United States of America,Uruguay,Colombia,0,1,1,False,False,False,11,11,2,4,0,1,0.7546,1.172,0.1818,0.3636,0.0686,0.1065,22,1.9266,2794
+3943076,223,282,Copa America,2024,South America,2024-07-14,Bank of America Stadium,United States of America,Canada,Uruguay,2,2,4,True,True,True,19,16,9,9,5,6,6.2053,4.6504,0.4737,0.5625,0.3266,0.2907,35,10.8557,2862
+3943043,55,282,UEFA Euro,2024,Europe,2024-07-14,Olympiastadion Berlin,Germany,Spain,England,2,1,3,True,True,True,16,9,6,3,2,1,1.7917,0.7264,0.375,0.3333,0.112,0.0807,25,2.5181,3304
+3943077,223,282,Copa America,2024,South America,2024-07-15,Hard Rock Stadium,United States of America,Argentina,Colombia,1,0,1,False,False,False,11,19,5,4,1,0,1.0827,0.9723,0.4545,0.2105,0.0984,0.0512,30,2.055,4146

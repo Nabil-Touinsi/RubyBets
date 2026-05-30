@@ -1,0 +1,295 @@
+RubyBets - Décision V18.0 StatsBomb multi-market
+
+Fichier de preuve :
+reports/evidence/ml_training/330_statsbomb_v18_0_multimarket_decision.txt
+
+Projet :
+RubyBets - RNCP Data & IA
+
+Phase :
+V18.0 StatsBomb multi-market - enrichissement event-level national
+
+Statut :
+DECISION_FORMALISEE_AVANT_V18_1_ENRICHED_MULTIMARKET
+
+Date de formalisation :
+30/05/2026
+
+1. Objectif de la phase V18.0
+
+L'objectif de cette phase était de vérifier si StatsBomb Open Data pouvait enrichir la phase nationale RubyBets pour améliorer les marchés suivants :
+
+* OVER_1_5 ;
+* OVER_2_5 ;
+* BTTS.
+
+Cette phase intervient après la stabilisation de la stratégie nationale V17.9.2 hybrid balanced, versionnée avec le tag :
+
+rubybets-v0.10-ml-national-v17.9.2
+
+La V18.0 ne remplace pas V17.9.2.
+Elle sert à tester si une source event-level plus riche peut améliorer certains marchés liés aux buts.
+
+2. Rappel du rôle attendu de StatsBomb
+
+StatsBomb n'a pas été introduit pour remplacer Kaggle + Elo.
+
+Le rôle attendu est le suivant :
+
+Kaggle + Elo :
+socle historique principal, large, utilisé pour construire la baseline nationale et les stratégies 1X2 / double chance.
+
+StatsBomb :
+source d'enrichissement qualitatif sur un sous-ensemble de matchs, avec des données event-level comme les tirs, les tirs cadrés et le xG.
+
+Cette séparation est importante car StatsBomb Open Data ne couvre pas tout l'historique national utilisé dans RubyBets.
+
+3. Données StatsBomb auditées
+
+Les compétitions masculines ciblées pour cette phase sont :
+
+* FIFA World Cup 2018 ;
+* FIFA World Cup 2022 ;
+* UEFA Euro 2020 ;
+* UEFA Euro 2024 ;
+* Copa America 2024.
+
+Les audits précédents ont confirmé :
+
+* 262 matchs ciblés ;
+* 262 matchs avec events disponibles ;
+* 0 fichier event manquant ;
+* 943 374 events lus ;
+* 6 619 tirs détectés ;
+* 6 619 tirs avec xG StatsBomb ;
+* couverture xG sur les tirs : 1.0.
+
+Ces résultats valident StatsBomb comme source techniquement exploitable pour un enrichissement data.
+
+4. Dataset match-level StatsBomb
+
+Un dataset match-level a été construit à partir des events StatsBomb.
+
+Fichier produit :
+reports/evidence/ml_training/324_statsbomb_national_match_event_features.csv
+
+Résumé produit :
+reports/evidence/ml_training/323_statsbomb_national_match_event_features_summary.txt
+
+Résultats :
+
+* 262 lignes match-level générées ;
+* 0 match ignoré ;
+* 6 619 tirs ;
+* 798.4869 xG total.
+
+Distribution des targets :
+
+* OVER_1_5 : 193 / 262 ;
+* OVER_2_5 : 124 / 262 ;
+* BTTS : 130 / 262.
+
+Point de vigilance :
+ce fichier contient les statistiques du match lui-même.
+Il ne doit donc jamais être utilisé directement pour prédire ce même match.
+
+5. Features rolling anti-fuite
+
+Une deuxième étape a transformé les statistiques match-level en features historiques avant-match.
+
+Fichier produit :
+reports/evidence/ml_training/326_statsbomb_national_rolling_features.csv
+
+Résumé produit :
+reports/evidence/ml_training/325_statsbomb_national_rolling_features_summary.txt
+
+Règle anti-fuite appliquée :
+les statistiques du match courant sont ajoutées à l'historique uniquement après le calcul des features du match.
+
+Le match à prédire n'est donc jamais utilisé pour construire ses propres variables.
+
+Résultats :
+
+* 262 lignes rolling générées ;
+* fenêtre rolling : last_5 ;
+* 224 / 262 matchs avec historique StatsBomb pour les deux équipes ;
+* 89 / 262 matchs avec 5 matchs précédents complets pour les deux équipes.
+
+Features créées :
+
+* xG for / against last_5 ;
+* shots for / against last_5 ;
+* shots on target for / against last_5 ;
+* goals for / against last_5 ;
+* différentiels xG, tirs, tirs cadrés et buts ;
+* compte d'historique disponible par équipe.
+
+Décision intermédiaire :
+les features rolling StatsBomb sont techniquement propres et exploitables pour un premier test V18.0.
+
+6. Baseline V18.0 StatsBomb multi-market
+
+Un entraînement expérimental a été lancé sur le sous-ensemble StatsBomb.
+
+Script :
+backend/scripts/ml_national/train_statsbomb_v18_0_multimarket_baseline.py
+
+Fichiers produits :
+
+* reports/evidence/ml_training/327_statsbomb_v18_0_multimarket_baseline_summary.txt ;
+* reports/evidence/ml_training/328_statsbomb_v18_0_multimarket_model_comparison.csv ;
+* reports/evidence/ml_training/329_statsbomb_v18_0_multimarket_predictions.csv.
+
+Targets testées :
+
+* target_over_1_5 ;
+* target_over_2_5 ;
+* target_btts.
+
+Scopes testés :
+
+* history_any : les deux équipes ont au moins un match StatsBomb précédent ;
+* full_last_5 : les deux équipes ont cinq matchs StatsBomb précédents.
+
+Modèles comparés :
+
+* DummyClassifier ;
+* Logistic Regression balanced ;
+* Random Forest balanced.
+
+7. Résultat principal de V18.0
+
+Le résultat le plus important est que le DummyClassifier reste souvent le meilleur modèle selon les meilleurs résultats par target/scope.
+
+Exemples issus de la synthèse V18.0 :
+
+* target_over_1_5 | history_any | dummy_most_frequent ;
+* target_over_2_5 | history_any | dummy_most_frequent ;
+* target_btts | history_any | dummy_most_frequent ;
+* target_over_1_5 | full_last_5 | dummy_most_frequent ;
+* target_over_2_5 | full_last_5 | dummy_most_frequent ;
+* target_btts | full_last_5 | dummy_most_frequent.
+
+Lecture :
+sur ce sous-ensemble StatsBomb seul, les modèles entraînés ne dépassent pas encore clairement la baseline naïve.
+
+Cela signifie que StatsBomb seul ne doit pas être retenu comme modèle principal.
+
+8. Interprétation produit
+
+Le résultat V18.0 ne signifie pas que StatsBomb est inutile.
+
+Il signifie que StatsBomb, utilisé seul sur 262 matchs, n'est pas suffisant pour construire un modèle produit robuste.
+
+Les raisons possibles sont :
+
+* volume de données trop faible ;
+* sous-ensemble limité à quelques compétitions ;
+* fenêtre historique parfois incomplète ;
+* targets comme OVER_1_5 déséquilibrées ;
+* logique event-level utile mais insuffisante sans contexte Elo et historique large.
+
+StatsBomb reste donc utile comme enrichissement, mais pas comme socle indépendant.
+
+9. Décision V18.0
+
+Décision retenue :
+
+StatsBomb est validé comme source d'enrichissement data event-level.
+StatsBomb seul n'est pas retenu comme modèle principal.
+Aucun modèle V18.0 StatsBomb seul ne doit être intégré au backend ou au frontend.
+
+Statut :
+
+STATSBOMB_VALIDATED_AS_ENRICHMENT_ONLY
+
+Conséquence :
+
+La prochaine phase ne doit pas continuer à améliorer StatsBomb isolément.
+Elle doit fusionner StatsBomb avec le socle national existant :
+
+Kaggle + Elo + StatsBomb rolling features
+
+10. Nouvelle cible V18.1
+
+La prochaine phase devient :
+
+V18.1 national enriched multimarket
+
+Objectif :
+
+Construire un dataset enrichi combinant :
+
+* historique national Kaggle ;
+* Elo national RubyBets ;
+* features nationales existantes ;
+* features rolling StatsBomb anti-fuite sur les matchs communs.
+
+Marchés cibles :
+
+* 1X2 ;
+* DOUBLE_CHANCE ;
+* OVER_1_5 ;
+* BTTS ;
+* OVER_2_5 optionnel ;
+* ABSTAIN.
+
+Lecture produit cible :
+
+* signal 1X2 très fort : recommandation stricte 1X2 ;
+* signal vainqueur moyen : double chance ;
+* signal buts fort : OVER_1_5 ;
+* signal BTTS fort : BTTS ;
+* signal trop faible : abstention.
+
+11. Prochaine étape technique
+
+La prochaine étape doit être un audit d'alignement entre Kaggle / ml_national.features et StatsBomb.
+
+Objectif :
+vérifier combien de matchs StatsBomb peuvent être reliés proprement au pipeline national RubyBets.
+
+Critères d'alignement :
+
+* date du match ;
+* nom des équipes ;
+* score ;
+* compétition ;
+* cohérence Team A / Team B.
+
+Fichiers prévus :
+
+reports/evidence/ml_training/331_v18_1_kaggle_statsbomb_alignment_summary.txt
+reports/evidence/ml_training/332_v18_1_kaggle_statsbomb_alignment_matches.csv
+
+Script prévu :
+
+backend/scripts/ml_national/audit_v18_1_kaggle_statsbomb_match_alignment.py
+
+12. Décision finale
+
+La V18.0 StatsBomb multi-market est considérée comme une phase d'enrichissement data réussie, mais pas comme une phase modèle concluante.
+
+Elle prouve que :
+
+* StatsBomb est téléchargeable proprement ;
+* les events sont exploitables ;
+* le xG est disponible ;
+* les features rolling anti-fuite peuvent être produites ;
+* les marchés OVER et BTTS peuvent être audités proprement.
+
+Mais elle montre aussi que :
+
+* StatsBomb seul ne dépasse pas clairement une baseline naïve ;
+* le volume de 262 matchs est insuffisant pour en faire un socle produit ;
+* l'intégration produit serait prématurée.
+
+Décision :
+
+Ne pas intégrer V18.0 StatsBomb seul.
+Passer à V18.1 Kaggle + Elo + StatsBomb rolling features.
+
+Positionnement responsable :
+RubyBets reste une application d'aide à la décision football avant-match.
+Aucun résultat sportif n'est garanti.
+Aucune recommandation issue de V18.0 n'est exposée au frontend.

@@ -1,0 +1,856 @@
+target,scope,model_name,statsbomb_match_id,competition_name,season_name,match_date,team_a_name,team_b_name,team_a_score,team_b_score,actual,predicted,positive_probability,is_correct
+target_over_1_5,history_any,dummy_most_frequent,3930165,UEFA Euro,2024,2024-06-17,Austria,France,0,1,0,1,1.0,False
+target_over_1_5,history_any,dummy_most_frequent,3930166,UEFA Euro,2024,2024-06-18,Portugal,Czech Republic,2,1,1,1,1.0,True
+target_over_1_5,history_any,dummy_most_frequent,3930167,UEFA Euro,2024,2024-06-19,Croatia,Albania,2,2,1,1,1.0,True
+target_over_1_5,history_any,dummy_most_frequent,3930168,UEFA Euro,2024,2024-06-19,Germany,Hungary,2,0,1,1,1.0,True
+target_over_1_5,history_any,dummy_most_frequent,3930169,UEFA Euro,2024,2024-06-19,Scotland,Switzerland,1,1,1,1,1.0,True
+target_over_1_5,history_any,dummy_most_frequent,3930170,UEFA Euro,2024,2024-06-20,Slovenia,Serbia,1,1,1,1,1.0,True
+target_over_1_5,history_any,dummy_most_frequent,3930171,UEFA Euro,2024,2024-06-20,Denmark,England,1,1,1,1,1.0,True
+target_over_1_5,history_any,dummy_most_frequent,3930172,UEFA Euro,2024,2024-06-20,Spain,Italy,1,0,0,1,1.0,False
+target_over_1_5,history_any,dummy_most_frequent,3939969,Copa America,2024,2024-06-21,Argentina,Canada,2,0,1,1,1.0,True
+target_over_1_5,history_any,dummy_most_frequent,3930173,UEFA Euro,2024,2024-06-21,Netherlands,France,0,0,0,1,1.0,False
+target_over_1_5,history_any,dummy_most_frequent,3938640,UEFA Euro,2024,2024-06-21,Slovakia,Ukraine,1,2,1,1,1.0,True
+target_over_1_5,history_any,dummy_most_frequent,3938641,UEFA Euro,2024,2024-06-21,Poland,Austria,1,3,1,1,1.0,True
+target_over_1_5,history_any,dummy_most_frequent,3930174,UEFA Euro,2024,2024-06-22,Turkey,Portugal,0,3,1,1,1.0,True
+target_over_1_5,history_any,dummy_most_frequent,3930175,UEFA Euro,2024,2024-06-22,Belgium,Romania,2,0,1,1,1.0,True
+target_over_1_5,history_any,dummy_most_frequent,3938642,UEFA Euro,2024,2024-06-22,Georgia,Czech Republic,1,1,1,1,1.0,True
+target_over_1_5,history_any,dummy_most_frequent,3930176,UEFA Euro,2024,2024-06-23,Switzerland,Germany,1,1,1,1,1.0,True
+target_over_1_5,history_any,dummy_most_frequent,3930177,UEFA Euro,2024,2024-06-23,Scotland,Hungary,0,1,0,1,1.0,False
+target_over_1_5,history_any,dummy_most_frequent,3939973,Copa America,2024,2024-06-24,Uruguay,Panama,3,1,1,1,1.0,True
+target_over_1_5,history_any,dummy_most_frequent,3930178,UEFA Euro,2024,2024-06-24,Croatia,Italy,1,1,1,1,1.0,True
+target_over_1_5,history_any,dummy_most_frequent,3930179,UEFA Euro,2024,2024-06-24,Albania,Spain,0,1,0,1,1.0,False
+target_over_1_5,history_any,dummy_most_frequent,3939976,Copa America,2024,2024-06-25,Brazil,Costa Rica,0,0,0,1,1.0,False
+target_over_1_5,history_any,dummy_most_frequent,3939978,Copa America,2024,2024-06-25,Peru,Canada,0,1,0,1,1.0,False
+target_over_1_5,history_any,dummy_most_frequent,3930180,UEFA Euro,2024,2024-06-25,Netherlands,Austria,2,3,1,1,1.0,True
+target_over_1_5,history_any,dummy_most_frequent,3930181,UEFA Euro,2024,2024-06-25,England,Slovenia,0,0,0,1,1.0,False
+target_over_1_5,history_any,dummy_most_frequent,3930182,UEFA Euro,2024,2024-06-25,Denmark,Serbia,0,0,0,1,1.0,False
+target_over_1_5,history_any,dummy_most_frequent,3938643,UEFA Euro,2024,2024-06-25,France,Poland,1,1,1,1,1.0,True
+target_over_1_5,history_any,dummy_most_frequent,3939977,Copa America,2024,2024-06-26,Chile,Argentina,0,1,0,1,1.0,False
+target_over_1_5,history_any,dummy_most_frequent,3939980,Copa America,2024,2024-06-26,Ecuador,Jamaica,3,1,1,1,1.0,True
+target_over_1_5,history_any,dummy_most_frequent,3930183,UEFA Euro,2024,2024-06-26,Slovakia,Romania,1,1,1,1,1.0,True
+target_over_1_5,history_any,dummy_most_frequent,3930184,UEFA Euro,2024,2024-06-26,Czech Republic,Turkey,1,2,1,1,1.0,True
+target_over_1_5,history_any,dummy_most_frequent,3938644,UEFA Euro,2024,2024-06-26,Georgia,Portugal,2,0,1,1,1.0,True
+target_over_1_5,history_any,dummy_most_frequent,3938645,UEFA Euro,2024,2024-06-26,Ukraine,Belgium,0,0,0,1,1.0,False
+target_over_1_5,history_any,dummy_most_frequent,3939979,Copa America,2024,2024-06-27,Venezuela,Mexico,1,0,0,1,1.0,False
+target_over_1_5,history_any,dummy_most_frequent,3939981,Copa America,2024,2024-06-27,Panama,United States,2,1,1,1,1.0,True
+target_over_1_5,history_any,dummy_most_frequent,3939982,Copa America,2024,2024-06-28,Uruguay,Bolivia,5,0,1,1,1.0,True
+target_over_1_5,history_any,dummy_most_frequent,3939984,Copa America,2024,2024-06-28,Colombia,Costa Rica,3,0,1,1,1.0,True
+target_over_1_5,history_any,dummy_most_frequent,3939983,Copa America,2024,2024-06-29,Paraguay,Brazil,1,4,1,1,1.0,True
+target_over_1_5,history_any,dummy_most_frequent,3940878,UEFA Euro,2024,2024-06-29,Switzerland,Italy,2,0,1,1,1.0,True
+target_over_1_5,history_any,dummy_most_frequent,3940983,UEFA Euro,2024,2024-06-29,Germany,Denmark,2,0,1,1,1.0,True
+target_over_1_5,history_any,dummy_most_frequent,3939985,Copa America,2024,2024-06-30,Canada,Chile,0,0,0,1,1.0,False
+target_over_1_5,history_any,dummy_most_frequent,3939986,Copa America,2024,2024-06-30,Argentina,Peru,2,0,1,1,1.0,True
+target_over_1_5,history_any,dummy_most_frequent,3941017,UEFA Euro,2024,2024-06-30,England,Slovakia,2,1,1,1,1.0,True
+target_over_1_5,history_any,dummy_most_frequent,3941018,UEFA Euro,2024,2024-06-30,Spain,Georgia,4,1,1,1,1.0,True
+target_over_1_5,history_any,dummy_most_frequent,3939987,Copa America,2024,2024-07-01,Jamaica,Venezuela,0,3,1,1,1.0,True
+target_over_1_5,history_any,dummy_most_frequent,3939988,Copa America,2024,2024-07-01,Mexico,Ecuador,0,0,0,1,1.0,False
+target_over_1_5,history_any,dummy_most_frequent,3941019,UEFA Euro,2024,2024-07-01,France,Belgium,1,0,0,1,1.0,False
+target_over_1_5,history_any,dummy_most_frequent,3941020,UEFA Euro,2024,2024-07-01,Portugal,Slovenia,0,0,0,1,1.0,False
+target_over_1_5,history_any,dummy_most_frequent,3939989,Copa America,2024,2024-07-02,Bolivia,Panama,1,3,1,1,1.0,True
+target_over_1_5,history_any,dummy_most_frequent,3939990,Copa America,2024,2024-07-02,United States,Uruguay,0,1,0,1,1.0,False
+target_over_1_5,history_any,dummy_most_frequent,3941021,UEFA Euro,2024,2024-07-02,Romania,Netherlands,0,3,1,1,1.0,True
+target_over_1_5,history_any,dummy_most_frequent,3941022,UEFA Euro,2024,2024-07-02,Austria,Turkey,1,2,1,1,1.0,True
+target_over_1_5,history_any,dummy_most_frequent,3939991,Copa America,2024,2024-07-03,Brazil,Colombia,1,1,1,1,1.0,True
+target_over_1_5,history_any,dummy_most_frequent,3939992,Copa America,2024,2024-07-03,Costa Rica,Paraguay,2,1,1,1,1.0,True
+target_over_1_5,history_any,dummy_most_frequent,3942228,Copa America,2024,2024-07-05,Argentina,Ecuador,1,1,1,1,1.0,True
+target_over_1_5,history_any,dummy_most_frequent,3942226,UEFA Euro,2024,2024-07-05,Spain,Germany,2,1,1,1,1.0,True
+target_over_1_5,history_any,dummy_most_frequent,3942349,UEFA Euro,2024,2024-07-05,Portugal,France,0,0,0,1,1.0,False
+target_over_1_5,history_any,dummy_most_frequent,3942229,Copa America,2024,2024-07-06,Venezuela,Canada,1,1,1,1,1.0,True
+target_over_1_5,history_any,dummy_most_frequent,3942416,Copa America,2024,2024-07-06,Colombia,Panama,5,0,1,1,1.0,True
+target_over_1_5,history_any,dummy_most_frequent,3942227,UEFA Euro,2024,2024-07-06,England,Switzerland,1,1,1,1,1.0,True
+target_over_1_5,history_any,dummy_most_frequent,3942382,UEFA Euro,2024,2024-07-06,Netherlands,Turkey,2,1,1,1,1.0,True
+target_over_1_5,history_any,dummy_most_frequent,3942415,Copa America,2024,2024-07-07,Uruguay,Brazil,0,0,0,1,1.0,False
+target_over_1_5,history_any,dummy_most_frequent,3942752,UEFA Euro,2024,2024-07-09,Spain,France,2,1,1,1,1.0,True
+target_over_1_5,history_any,dummy_most_frequent,3942785,Copa America,2024,2024-07-10,Argentina,Canada,2,0,1,1,1.0,True
+target_over_1_5,history_any,dummy_most_frequent,3942819,UEFA Euro,2024,2024-07-10,Netherlands,England,1,2,1,1,1.0,True
+target_over_1_5,history_any,dummy_most_frequent,3942852,Copa America,2024,2024-07-11,Uruguay,Colombia,0,1,0,1,1.0,False
+target_over_1_5,history_any,dummy_most_frequent,3943076,Copa America,2024,2024-07-14,Canada,Uruguay,2,2,1,1,1.0,True
+target_over_1_5,history_any,dummy_most_frequent,3943043,UEFA Euro,2024,2024-07-14,Spain,England,2,1,1,1,1.0,True
+target_over_1_5,history_any,dummy_most_frequent,3943077,Copa America,2024,2024-07-15,Argentina,Colombia,1,0,0,1,1.0,False
+target_over_1_5,history_any,logistic_regression_balanced,3930165,UEFA Euro,2024,2024-06-17,Austria,France,0,1,0,1,0.6591,False
+target_over_1_5,history_any,logistic_regression_balanced,3930166,UEFA Euro,2024,2024-06-18,Portugal,Czech Republic,2,1,1,1,0.5826,True
+target_over_1_5,history_any,logistic_regression_balanced,3930167,UEFA Euro,2024,2024-06-19,Croatia,Albania,2,2,1,0,0.4143,False
+target_over_1_5,history_any,logistic_regression_balanced,3930168,UEFA Euro,2024,2024-06-19,Germany,Hungary,2,0,1,1,0.6794,True
+target_over_1_5,history_any,logistic_regression_balanced,3930169,UEFA Euro,2024,2024-06-19,Scotland,Switzerland,1,1,1,1,0.7369,True
+target_over_1_5,history_any,logistic_regression_balanced,3930170,UEFA Euro,2024,2024-06-20,Slovenia,Serbia,1,1,1,0,0.4874,False
+target_over_1_5,history_any,logistic_regression_balanced,3930171,UEFA Euro,2024,2024-06-20,Denmark,England,1,1,1,1,0.796,True
+target_over_1_5,history_any,logistic_regression_balanced,3930172,UEFA Euro,2024,2024-06-20,Spain,Italy,1,0,0,0,0.319,True
+target_over_1_5,history_any,logistic_regression_balanced,3939969,Copa America,2024,2024-06-21,Argentina,Canada,2,0,1,0,0.3748,False
+target_over_1_5,history_any,logistic_regression_balanced,3930173,UEFA Euro,2024,2024-06-21,Netherlands,France,0,0,0,0,0.4279,True
+target_over_1_5,history_any,logistic_regression_balanced,3938640,UEFA Euro,2024,2024-06-21,Slovakia,Ukraine,1,2,1,0,0.3851,False
+target_over_1_5,history_any,logistic_regression_balanced,3938641,UEFA Euro,2024,2024-06-21,Poland,Austria,1,3,1,0,0.4494,False
+target_over_1_5,history_any,logistic_regression_balanced,3930174,UEFA Euro,2024,2024-06-22,Turkey,Portugal,0,3,1,1,0.638,True
+target_over_1_5,history_any,logistic_regression_balanced,3930175,UEFA Euro,2024,2024-06-22,Belgium,Romania,2,0,1,1,0.7848,True
+target_over_1_5,history_any,logistic_regression_balanced,3938642,UEFA Euro,2024,2024-06-22,Georgia,Czech Republic,1,1,1,1,0.6882,True
+target_over_1_5,history_any,logistic_regression_balanced,3930176,UEFA Euro,2024,2024-06-23,Switzerland,Germany,1,1,1,0,0.3964,False
+target_over_1_5,history_any,logistic_regression_balanced,3930177,UEFA Euro,2024,2024-06-23,Scotland,Hungary,0,1,0,1,0.6739,False
+target_over_1_5,history_any,logistic_regression_balanced,3939973,Copa America,2024,2024-06-24,Uruguay,Panama,3,1,1,0,0.3353,False
+target_over_1_5,history_any,logistic_regression_balanced,3930178,UEFA Euro,2024,2024-06-24,Croatia,Italy,1,1,1,1,0.7379,True
+target_over_1_5,history_any,logistic_regression_balanced,3930179,UEFA Euro,2024,2024-06-24,Albania,Spain,0,1,0,1,0.6734,False
+target_over_1_5,history_any,logistic_regression_balanced,3939976,Copa America,2024,2024-06-25,Brazil,Costa Rica,0,0,0,0,0.4263,True
+target_over_1_5,history_any,logistic_regression_balanced,3939978,Copa America,2024,2024-06-25,Peru,Canada,0,1,0,1,0.5386,False
+target_over_1_5,history_any,logistic_regression_balanced,3930180,UEFA Euro,2024,2024-06-25,Netherlands,Austria,2,3,1,0,0.3103,False
+target_over_1_5,history_any,logistic_regression_balanced,3930181,UEFA Euro,2024,2024-06-25,England,Slovenia,0,0,0,0,0.4943,True
+target_over_1_5,history_any,logistic_regression_balanced,3930182,UEFA Euro,2024,2024-06-25,Denmark,Serbia,0,0,0,1,0.6691,False
+target_over_1_5,history_any,logistic_regression_balanced,3938643,UEFA Euro,2024,2024-06-25,France,Poland,1,1,1,0,0.2869,False
+target_over_1_5,history_any,logistic_regression_balanced,3939977,Copa America,2024,2024-06-26,Chile,Argentina,0,1,0,1,0.8205,False
+target_over_1_5,history_any,logistic_regression_balanced,3939980,Copa America,2024,2024-06-26,Ecuador,Jamaica,3,1,1,1,0.5627,True
+target_over_1_5,history_any,logistic_regression_balanced,3930183,UEFA Euro,2024,2024-06-26,Slovakia,Romania,1,1,1,0,0.4795,False
+target_over_1_5,history_any,logistic_regression_balanced,3930184,UEFA Euro,2024,2024-06-26,Czech Republic,Turkey,1,2,1,0,0.3309,False
+target_over_1_5,history_any,logistic_regression_balanced,3938644,UEFA Euro,2024,2024-06-26,Georgia,Portugal,2,0,1,0,0.3566,False
+target_over_1_5,history_any,logistic_regression_balanced,3938645,UEFA Euro,2024,2024-06-26,Ukraine,Belgium,0,0,0,1,0.7237,False
+target_over_1_5,history_any,logistic_regression_balanced,3939979,Copa America,2024,2024-06-27,Venezuela,Mexico,1,0,0,1,0.6103,False
+target_over_1_5,history_any,logistic_regression_balanced,3939981,Copa America,2024,2024-06-27,Panama,United States,2,1,1,1,0.7709,True
+target_over_1_5,history_any,logistic_regression_balanced,3939982,Copa America,2024,2024-06-28,Uruguay,Bolivia,5,0,1,1,0.6471,True
+target_over_1_5,history_any,logistic_regression_balanced,3939984,Copa America,2024,2024-06-28,Colombia,Costa Rica,3,0,1,0,0.1959,False
+target_over_1_5,history_any,logistic_regression_balanced,3939983,Copa America,2024,2024-06-29,Paraguay,Brazil,1,4,1,1,0.7948,True
+target_over_1_5,history_any,logistic_regression_balanced,3940878,UEFA Euro,2024,2024-06-29,Switzerland,Italy,2,0,1,1,0.6451,True
+target_over_1_5,history_any,logistic_regression_balanced,3940983,UEFA Euro,2024,2024-06-29,Germany,Denmark,2,0,1,1,0.675,True
+target_over_1_5,history_any,logistic_regression_balanced,3939985,Copa America,2024,2024-06-30,Canada,Chile,0,0,0,1,0.9011,False
+target_over_1_5,history_any,logistic_regression_balanced,3939986,Copa America,2024,2024-06-30,Argentina,Peru,2,0,1,1,0.6502,True
+target_over_1_5,history_any,logistic_regression_balanced,3941017,UEFA Euro,2024,2024-06-30,England,Slovakia,2,1,1,1,0.5804,True
+target_over_1_5,history_any,logistic_regression_balanced,3941018,UEFA Euro,2024,2024-06-30,Spain,Georgia,4,1,1,0,0.4977,False
+target_over_1_5,history_any,logistic_regression_balanced,3939987,Copa America,2024,2024-07-01,Jamaica,Venezuela,0,3,1,1,0.6809,True
+target_over_1_5,history_any,logistic_regression_balanced,3939988,Copa America,2024,2024-07-01,Mexico,Ecuador,0,0,0,1,0.8301,False
+target_over_1_5,history_any,logistic_regression_balanced,3941019,UEFA Euro,2024,2024-07-01,France,Belgium,1,0,0,1,0.6426,False
+target_over_1_5,history_any,logistic_regression_balanced,3941020,UEFA Euro,2024,2024-07-01,Portugal,Slovenia,0,0,0,1,0.6997,False
+target_over_1_5,history_any,logistic_regression_balanced,3939989,Copa America,2024,2024-07-02,Bolivia,Panama,1,3,1,0,0.3221,False
+target_over_1_5,history_any,logistic_regression_balanced,3939990,Copa America,2024,2024-07-02,United States,Uruguay,0,1,0,1,0.7674,False
+target_over_1_5,history_any,logistic_regression_balanced,3941021,UEFA Euro,2024,2024-07-02,Romania,Netherlands,0,3,1,0,0.4941,False
+target_over_1_5,history_any,logistic_regression_balanced,3941022,UEFA Euro,2024,2024-07-02,Austria,Turkey,1,2,1,0,0.2255,False
+target_over_1_5,history_any,logistic_regression_balanced,3939991,Copa America,2024,2024-07-03,Brazil,Colombia,1,1,1,1,0.8211,True
+target_over_1_5,history_any,logistic_regression_balanced,3939992,Copa America,2024,2024-07-03,Costa Rica,Paraguay,2,1,1,0,0.1071,False
+target_over_1_5,history_any,logistic_regression_balanced,3942228,Copa America,2024,2024-07-05,Argentina,Ecuador,1,1,1,0,0.4765,False
+target_over_1_5,history_any,logistic_regression_balanced,3942226,UEFA Euro,2024,2024-07-05,Spain,Germany,2,1,1,1,0.582,True
+target_over_1_5,history_any,logistic_regression_balanced,3942349,UEFA Euro,2024,2024-07-05,Portugal,France,0,0,0,1,0.8554,False
+target_over_1_5,history_any,logistic_regression_balanced,3942229,Copa America,2024,2024-07-06,Venezuela,Canada,1,1,1,1,0.6473,True
+target_over_1_5,history_any,logistic_regression_balanced,3942416,Copa America,2024,2024-07-06,Colombia,Panama,5,0,1,0,0.3288,False
+target_over_1_5,history_any,logistic_regression_balanced,3942227,UEFA Euro,2024,2024-07-06,England,Switzerland,1,1,1,1,0.5518,True
+target_over_1_5,history_any,logistic_regression_balanced,3942382,UEFA Euro,2024,2024-07-06,Netherlands,Turkey,2,1,1,0,0.2742,False
+target_over_1_5,history_any,logistic_regression_balanced,3942415,Copa America,2024,2024-07-07,Uruguay,Brazil,0,0,0,1,0.5968,False
+target_over_1_5,history_any,logistic_regression_balanced,3942752,UEFA Euro,2024,2024-07-09,Spain,France,2,1,1,1,0.778,True
+target_over_1_5,history_any,logistic_regression_balanced,3942785,Copa America,2024,2024-07-10,Argentina,Canada,2,0,1,1,0.7353,True
+target_over_1_5,history_any,logistic_regression_balanced,3942819,UEFA Euro,2024,2024-07-10,Netherlands,England,1,2,1,1,0.781,True
+target_over_1_5,history_any,logistic_regression_balanced,3942852,Copa America,2024,2024-07-11,Uruguay,Colombia,0,1,0,1,0.5716,False
+target_over_1_5,history_any,logistic_regression_balanced,3943076,Copa America,2024,2024-07-14,Canada,Uruguay,2,2,1,1,0.7253,True
+target_over_1_5,history_any,logistic_regression_balanced,3943043,UEFA Euro,2024,2024-07-14,Spain,England,2,1,1,1,0.7874,True
+target_over_1_5,history_any,logistic_regression_balanced,3943077,Copa America,2024,2024-07-15,Argentina,Colombia,1,0,0,1,0.6913,False
+target_over_1_5,history_any,random_forest_balanced,3930165,UEFA Euro,2024,2024-06-17,Austria,France,0,1,0,1,0.5851,False
+target_over_1_5,history_any,random_forest_balanced,3930166,UEFA Euro,2024,2024-06-18,Portugal,Czech Republic,2,1,1,1,0.8429,True
+target_over_1_5,history_any,random_forest_balanced,3930167,UEFA Euro,2024,2024-06-19,Croatia,Albania,2,2,1,1,0.6147,True
+target_over_1_5,history_any,random_forest_balanced,3930168,UEFA Euro,2024,2024-06-19,Germany,Hungary,2,0,1,1,0.8248,True
+target_over_1_5,history_any,random_forest_balanced,3930169,UEFA Euro,2024,2024-06-19,Scotland,Switzerland,1,1,1,1,0.6762,True
+target_over_1_5,history_any,random_forest_balanced,3930170,UEFA Euro,2024,2024-06-20,Slovenia,Serbia,1,1,1,1,0.6615,True
+target_over_1_5,history_any,random_forest_balanced,3930171,UEFA Euro,2024,2024-06-20,Denmark,England,1,1,1,1,0.6447,True
+target_over_1_5,history_any,random_forest_balanced,3930172,UEFA Euro,2024,2024-06-20,Spain,Italy,1,0,0,1,0.6456,False
+target_over_1_5,history_any,random_forest_balanced,3939969,Copa America,2024,2024-06-21,Argentina,Canada,2,0,1,1,0.7916,True
+target_over_1_5,history_any,random_forest_balanced,3930173,UEFA Euro,2024,2024-06-21,Netherlands,France,0,0,0,1,0.5779,False
+target_over_1_5,history_any,random_forest_balanced,3938640,UEFA Euro,2024,2024-06-21,Slovakia,Ukraine,1,2,1,1,0.7814,True
+target_over_1_5,history_any,random_forest_balanced,3938641,UEFA Euro,2024,2024-06-21,Poland,Austria,1,3,1,1,0.7697,True
+target_over_1_5,history_any,random_forest_balanced,3930174,UEFA Euro,2024,2024-06-22,Turkey,Portugal,0,3,1,1,0.5973,True
+target_over_1_5,history_any,random_forest_balanced,3930175,UEFA Euro,2024,2024-06-22,Belgium,Romania,2,0,1,1,0.7384,True
+target_over_1_5,history_any,random_forest_balanced,3938642,UEFA Euro,2024,2024-06-22,Georgia,Czech Republic,1,1,1,1,0.7141,True
+target_over_1_5,history_any,random_forest_balanced,3930176,UEFA Euro,2024,2024-06-23,Switzerland,Germany,1,1,1,1,0.715,True
+target_over_1_5,history_any,random_forest_balanced,3930177,UEFA Euro,2024,2024-06-23,Scotland,Hungary,0,1,0,1,0.7543,False
+target_over_1_5,history_any,random_forest_balanced,3939973,Copa America,2024,2024-06-24,Uruguay,Panama,3,1,1,1,0.5711,True
+target_over_1_5,history_any,random_forest_balanced,3930178,UEFA Euro,2024,2024-06-24,Croatia,Italy,1,1,1,1,0.6286,True
+target_over_1_5,history_any,random_forest_balanced,3930179,UEFA Euro,2024,2024-06-24,Albania,Spain,0,1,0,1,0.7188,False
+target_over_1_5,history_any,random_forest_balanced,3939976,Copa America,2024,2024-06-25,Brazil,Costa Rica,0,0,0,1,0.6966,False
+target_over_1_5,history_any,random_forest_balanced,3939978,Copa America,2024,2024-06-25,Peru,Canada,0,1,0,1,0.578,False
+target_over_1_5,history_any,random_forest_balanced,3930180,UEFA Euro,2024,2024-06-25,Netherlands,Austria,2,3,1,0,0.4991,False
+target_over_1_5,history_any,random_forest_balanced,3930181,UEFA Euro,2024,2024-06-25,England,Slovenia,0,0,0,1,0.5191,False
+target_over_1_5,history_any,random_forest_balanced,3930182,UEFA Euro,2024,2024-06-25,Denmark,Serbia,0,0,0,1,0.5929,False
+target_over_1_5,history_any,random_forest_balanced,3938643,UEFA Euro,2024,2024-06-25,France,Poland,1,1,1,0,0.4986,False
+target_over_1_5,history_any,random_forest_balanced,3939977,Copa America,2024,2024-06-26,Chile,Argentina,0,1,0,1,0.7509,False
+target_over_1_5,history_any,random_forest_balanced,3939980,Copa America,2024,2024-06-26,Ecuador,Jamaica,3,1,1,1,0.54,True
+target_over_1_5,history_any,random_forest_balanced,3930183,UEFA Euro,2024,2024-06-26,Slovakia,Romania,1,1,1,1,0.7347,True
+target_over_1_5,history_any,random_forest_balanced,3930184,UEFA Euro,2024,2024-06-26,Czech Republic,Turkey,1,2,1,1,0.6839,True
+target_over_1_5,history_any,random_forest_balanced,3938644,UEFA Euro,2024,2024-06-26,Georgia,Portugal,2,0,1,1,0.6362,True
+target_over_1_5,history_any,random_forest_balanced,3938645,UEFA Euro,2024,2024-06-26,Ukraine,Belgium,0,0,0,1,0.6262,False
+target_over_1_5,history_any,random_forest_balanced,3939979,Copa America,2024,2024-06-27,Venezuela,Mexico,1,0,0,1,0.8692,False
+target_over_1_5,history_any,random_forest_balanced,3939981,Copa America,2024,2024-06-27,Panama,United States,2,1,1,1,0.7885,True
+target_over_1_5,history_any,random_forest_balanced,3939982,Copa America,2024,2024-06-28,Uruguay,Bolivia,5,0,1,1,0.5767,True
+target_over_1_5,history_any,random_forest_balanced,3939984,Copa America,2024,2024-06-28,Colombia,Costa Rica,3,0,1,0,0.3767,False
+target_over_1_5,history_any,random_forest_balanced,3939983,Copa America,2024,2024-06-29,Paraguay,Brazil,1,4,1,1,0.7717,True
+target_over_1_5,history_any,random_forest_balanced,3940878,UEFA Euro,2024,2024-06-29,Switzerland,Italy,2,0,1,0,0.4876,False
+target_over_1_5,history_any,random_forest_balanced,3940983,UEFA Euro,2024,2024-06-29,Germany,Denmark,2,0,1,1,0.9215,True
+target_over_1_5,history_any,random_forest_balanced,3939985,Copa America,2024,2024-06-30,Canada,Chile,0,0,0,1,0.6801,False
+target_over_1_5,history_any,random_forest_balanced,3939986,Copa America,2024,2024-06-30,Argentina,Peru,2,0,1,1,0.8437,True
+target_over_1_5,history_any,random_forest_balanced,3941017,UEFA Euro,2024,2024-06-30,England,Slovakia,2,1,1,1,0.6088,True
+target_over_1_5,history_any,random_forest_balanced,3941018,UEFA Euro,2024,2024-06-30,Spain,Georgia,4,1,1,1,0.7497,True
+target_over_1_5,history_any,random_forest_balanced,3939987,Copa America,2024,2024-07-01,Jamaica,Venezuela,0,3,1,1,0.8177,True
+target_over_1_5,history_any,random_forest_balanced,3939988,Copa America,2024,2024-07-01,Mexico,Ecuador,0,0,0,1,0.8906,False
+target_over_1_5,history_any,random_forest_balanced,3941019,UEFA Euro,2024,2024-07-01,France,Belgium,1,0,0,1,0.8404,False
+target_over_1_5,history_any,random_forest_balanced,3941020,UEFA Euro,2024,2024-07-01,Portugal,Slovenia,0,0,0,1,0.8451,False
+target_over_1_5,history_any,random_forest_balanced,3939989,Copa America,2024,2024-07-02,Bolivia,Panama,1,3,1,1,0.793,True
+target_over_1_5,history_any,random_forest_balanced,3939990,Copa America,2024,2024-07-02,United States,Uruguay,0,1,0,1,0.8971,False
+target_over_1_5,history_any,random_forest_balanced,3941021,UEFA Euro,2024,2024-07-02,Romania,Netherlands,0,3,1,1,0.6114,True
+target_over_1_5,history_any,random_forest_balanced,3941022,UEFA Euro,2024,2024-07-02,Austria,Turkey,1,2,1,0,0.3756,False
+target_over_1_5,history_any,random_forest_balanced,3939991,Copa America,2024,2024-07-03,Brazil,Colombia,1,1,1,1,0.7844,True
+target_over_1_5,history_any,random_forest_balanced,3939992,Copa America,2024,2024-07-03,Costa Rica,Paraguay,2,1,1,1,0.7755,True
+target_over_1_5,history_any,random_forest_balanced,3942228,Copa America,2024,2024-07-05,Argentina,Ecuador,1,1,1,1,0.8484,True
+target_over_1_5,history_any,random_forest_balanced,3942226,UEFA Euro,2024,2024-07-05,Spain,Germany,2,1,1,1,0.7932,True
+target_over_1_5,history_any,random_forest_balanced,3942349,UEFA Euro,2024,2024-07-05,Portugal,France,0,0,0,1,0.8144,False
+target_over_1_5,history_any,random_forest_balanced,3942229,Copa America,2024,2024-07-06,Venezuela,Canada,1,1,1,1,0.6325,True
+target_over_1_5,history_any,random_forest_balanced,3942416,Copa America,2024,2024-07-06,Colombia,Panama,5,0,1,1,0.65,True
+target_over_1_5,history_any,random_forest_balanced,3942227,UEFA Euro,2024,2024-07-06,England,Switzerland,1,1,1,1,0.8157,True
+target_over_1_5,history_any,random_forest_balanced,3942382,UEFA Euro,2024,2024-07-06,Netherlands,Turkey,2,1,1,1,0.7732,True
+target_over_1_5,history_any,random_forest_balanced,3942415,Copa America,2024,2024-07-07,Uruguay,Brazil,0,0,0,1,0.6905,False
+target_over_1_5,history_any,random_forest_balanced,3942752,UEFA Euro,2024,2024-07-09,Spain,France,2,1,1,1,0.7847,True
+target_over_1_5,history_any,random_forest_balanced,3942785,Copa America,2024,2024-07-10,Argentina,Canada,2,0,1,1,0.7867,True
+target_over_1_5,history_any,random_forest_balanced,3942819,UEFA Euro,2024,2024-07-10,Netherlands,England,1,2,1,1,0.8321,True
+target_over_1_5,history_any,random_forest_balanced,3942852,Copa America,2024,2024-07-11,Uruguay,Colombia,0,1,0,1,0.8181,False
+target_over_1_5,history_any,random_forest_balanced,3943076,Copa America,2024,2024-07-14,Canada,Uruguay,2,2,1,1,0.6145,True
+target_over_1_5,history_any,random_forest_balanced,3943043,UEFA Euro,2024,2024-07-14,Spain,England,2,1,1,1,0.7372,True
+target_over_1_5,history_any,random_forest_balanced,3943077,Copa America,2024,2024-07-15,Argentina,Colombia,1,0,0,1,0.7748,False
+target_over_2_5,history_any,dummy_most_frequent,3930165,UEFA Euro,2024,2024-06-17,Austria,France,0,1,0,1,1.0,False
+target_over_2_5,history_any,dummy_most_frequent,3930166,UEFA Euro,2024,2024-06-18,Portugal,Czech Republic,2,1,1,1,1.0,True
+target_over_2_5,history_any,dummy_most_frequent,3930167,UEFA Euro,2024,2024-06-19,Croatia,Albania,2,2,1,1,1.0,True
+target_over_2_5,history_any,dummy_most_frequent,3930168,UEFA Euro,2024,2024-06-19,Germany,Hungary,2,0,0,1,1.0,False
+target_over_2_5,history_any,dummy_most_frequent,3930169,UEFA Euro,2024,2024-06-19,Scotland,Switzerland,1,1,0,1,1.0,False
+target_over_2_5,history_any,dummy_most_frequent,3930170,UEFA Euro,2024,2024-06-20,Slovenia,Serbia,1,1,0,1,1.0,False
+target_over_2_5,history_any,dummy_most_frequent,3930171,UEFA Euro,2024,2024-06-20,Denmark,England,1,1,0,1,1.0,False
+target_over_2_5,history_any,dummy_most_frequent,3930172,UEFA Euro,2024,2024-06-20,Spain,Italy,1,0,0,1,1.0,False
+target_over_2_5,history_any,dummy_most_frequent,3939969,Copa America,2024,2024-06-21,Argentina,Canada,2,0,0,1,1.0,False
+target_over_2_5,history_any,dummy_most_frequent,3930173,UEFA Euro,2024,2024-06-21,Netherlands,France,0,0,0,1,1.0,False
+target_over_2_5,history_any,dummy_most_frequent,3938640,UEFA Euro,2024,2024-06-21,Slovakia,Ukraine,1,2,1,1,1.0,True
+target_over_2_5,history_any,dummy_most_frequent,3938641,UEFA Euro,2024,2024-06-21,Poland,Austria,1,3,1,1,1.0,True
+target_over_2_5,history_any,dummy_most_frequent,3930174,UEFA Euro,2024,2024-06-22,Turkey,Portugal,0,3,1,1,1.0,True
+target_over_2_5,history_any,dummy_most_frequent,3930175,UEFA Euro,2024,2024-06-22,Belgium,Romania,2,0,0,1,1.0,False
+target_over_2_5,history_any,dummy_most_frequent,3938642,UEFA Euro,2024,2024-06-22,Georgia,Czech Republic,1,1,0,1,1.0,False
+target_over_2_5,history_any,dummy_most_frequent,3930176,UEFA Euro,2024,2024-06-23,Switzerland,Germany,1,1,0,1,1.0,False
+target_over_2_5,history_any,dummy_most_frequent,3930177,UEFA Euro,2024,2024-06-23,Scotland,Hungary,0,1,0,1,1.0,False
+target_over_2_5,history_any,dummy_most_frequent,3939973,Copa America,2024,2024-06-24,Uruguay,Panama,3,1,1,1,1.0,True
+target_over_2_5,history_any,dummy_most_frequent,3930178,UEFA Euro,2024,2024-06-24,Croatia,Italy,1,1,0,1,1.0,False
+target_over_2_5,history_any,dummy_most_frequent,3930179,UEFA Euro,2024,2024-06-24,Albania,Spain,0,1,0,1,1.0,False
+target_over_2_5,history_any,dummy_most_frequent,3939976,Copa America,2024,2024-06-25,Brazil,Costa Rica,0,0,0,1,1.0,False
+target_over_2_5,history_any,dummy_most_frequent,3939978,Copa America,2024,2024-06-25,Peru,Canada,0,1,0,1,1.0,False
+target_over_2_5,history_any,dummy_most_frequent,3930180,UEFA Euro,2024,2024-06-25,Netherlands,Austria,2,3,1,1,1.0,True
+target_over_2_5,history_any,dummy_most_frequent,3930181,UEFA Euro,2024,2024-06-25,England,Slovenia,0,0,0,1,1.0,False
+target_over_2_5,history_any,dummy_most_frequent,3930182,UEFA Euro,2024,2024-06-25,Denmark,Serbia,0,0,0,1,1.0,False
+target_over_2_5,history_any,dummy_most_frequent,3938643,UEFA Euro,2024,2024-06-25,France,Poland,1,1,0,1,1.0,False
+target_over_2_5,history_any,dummy_most_frequent,3939977,Copa America,2024,2024-06-26,Chile,Argentina,0,1,0,1,1.0,False
+target_over_2_5,history_any,dummy_most_frequent,3939980,Copa America,2024,2024-06-26,Ecuador,Jamaica,3,1,1,1,1.0,True
+target_over_2_5,history_any,dummy_most_frequent,3930183,UEFA Euro,2024,2024-06-26,Slovakia,Romania,1,1,0,1,1.0,False
+target_over_2_5,history_any,dummy_most_frequent,3930184,UEFA Euro,2024,2024-06-26,Czech Republic,Turkey,1,2,1,1,1.0,True
+target_over_2_5,history_any,dummy_most_frequent,3938644,UEFA Euro,2024,2024-06-26,Georgia,Portugal,2,0,0,1,1.0,False
+target_over_2_5,history_any,dummy_most_frequent,3938645,UEFA Euro,2024,2024-06-26,Ukraine,Belgium,0,0,0,1,1.0,False
+target_over_2_5,history_any,dummy_most_frequent,3939979,Copa America,2024,2024-06-27,Venezuela,Mexico,1,0,0,1,1.0,False
+target_over_2_5,history_any,dummy_most_frequent,3939981,Copa America,2024,2024-06-27,Panama,United States,2,1,1,1,1.0,True
+target_over_2_5,history_any,dummy_most_frequent,3939982,Copa America,2024,2024-06-28,Uruguay,Bolivia,5,0,1,1,1.0,True
+target_over_2_5,history_any,dummy_most_frequent,3939984,Copa America,2024,2024-06-28,Colombia,Costa Rica,3,0,1,1,1.0,True
+target_over_2_5,history_any,dummy_most_frequent,3939983,Copa America,2024,2024-06-29,Paraguay,Brazil,1,4,1,1,1.0,True
+target_over_2_5,history_any,dummy_most_frequent,3940878,UEFA Euro,2024,2024-06-29,Switzerland,Italy,2,0,0,1,1.0,False
+target_over_2_5,history_any,dummy_most_frequent,3940983,UEFA Euro,2024,2024-06-29,Germany,Denmark,2,0,0,1,1.0,False
+target_over_2_5,history_any,dummy_most_frequent,3939985,Copa America,2024,2024-06-30,Canada,Chile,0,0,0,1,1.0,False
+target_over_2_5,history_any,dummy_most_frequent,3939986,Copa America,2024,2024-06-30,Argentina,Peru,2,0,0,1,1.0,False
+target_over_2_5,history_any,dummy_most_frequent,3941017,UEFA Euro,2024,2024-06-30,England,Slovakia,2,1,1,1,1.0,True
+target_over_2_5,history_any,dummy_most_frequent,3941018,UEFA Euro,2024,2024-06-30,Spain,Georgia,4,1,1,1,1.0,True
+target_over_2_5,history_any,dummy_most_frequent,3939987,Copa America,2024,2024-07-01,Jamaica,Venezuela,0,3,1,1,1.0,True
+target_over_2_5,history_any,dummy_most_frequent,3939988,Copa America,2024,2024-07-01,Mexico,Ecuador,0,0,0,1,1.0,False
+target_over_2_5,history_any,dummy_most_frequent,3941019,UEFA Euro,2024,2024-07-01,France,Belgium,1,0,0,1,1.0,False
+target_over_2_5,history_any,dummy_most_frequent,3941020,UEFA Euro,2024,2024-07-01,Portugal,Slovenia,0,0,0,1,1.0,False
+target_over_2_5,history_any,dummy_most_frequent,3939989,Copa America,2024,2024-07-02,Bolivia,Panama,1,3,1,1,1.0,True
+target_over_2_5,history_any,dummy_most_frequent,3939990,Copa America,2024,2024-07-02,United States,Uruguay,0,1,0,1,1.0,False
+target_over_2_5,history_any,dummy_most_frequent,3941021,UEFA Euro,2024,2024-07-02,Romania,Netherlands,0,3,1,1,1.0,True
+target_over_2_5,history_any,dummy_most_frequent,3941022,UEFA Euro,2024,2024-07-02,Austria,Turkey,1,2,1,1,1.0,True
+target_over_2_5,history_any,dummy_most_frequent,3939991,Copa America,2024,2024-07-03,Brazil,Colombia,1,1,0,1,1.0,False
+target_over_2_5,history_any,dummy_most_frequent,3939992,Copa America,2024,2024-07-03,Costa Rica,Paraguay,2,1,1,1,1.0,True
+target_over_2_5,history_any,dummy_most_frequent,3942228,Copa America,2024,2024-07-05,Argentina,Ecuador,1,1,0,1,1.0,False
+target_over_2_5,history_any,dummy_most_frequent,3942226,UEFA Euro,2024,2024-07-05,Spain,Germany,2,1,1,1,1.0,True
+target_over_2_5,history_any,dummy_most_frequent,3942349,UEFA Euro,2024,2024-07-05,Portugal,France,0,0,0,1,1.0,False
+target_over_2_5,history_any,dummy_most_frequent,3942229,Copa America,2024,2024-07-06,Venezuela,Canada,1,1,0,1,1.0,False
+target_over_2_5,history_any,dummy_most_frequent,3942416,Copa America,2024,2024-07-06,Colombia,Panama,5,0,1,1,1.0,True
+target_over_2_5,history_any,dummy_most_frequent,3942227,UEFA Euro,2024,2024-07-06,England,Switzerland,1,1,0,1,1.0,False
+target_over_2_5,history_any,dummy_most_frequent,3942382,UEFA Euro,2024,2024-07-06,Netherlands,Turkey,2,1,1,1,1.0,True
+target_over_2_5,history_any,dummy_most_frequent,3942415,Copa America,2024,2024-07-07,Uruguay,Brazil,0,0,0,1,1.0,False
+target_over_2_5,history_any,dummy_most_frequent,3942752,UEFA Euro,2024,2024-07-09,Spain,France,2,1,1,1,1.0,True
+target_over_2_5,history_any,dummy_most_frequent,3942785,Copa America,2024,2024-07-10,Argentina,Canada,2,0,0,1,1.0,False
+target_over_2_5,history_any,dummy_most_frequent,3942819,UEFA Euro,2024,2024-07-10,Netherlands,England,1,2,1,1,1.0,True
+target_over_2_5,history_any,dummy_most_frequent,3942852,Copa America,2024,2024-07-11,Uruguay,Colombia,0,1,0,1,1.0,False
+target_over_2_5,history_any,dummy_most_frequent,3943076,Copa America,2024,2024-07-14,Canada,Uruguay,2,2,1,1,1.0,True
+target_over_2_5,history_any,dummy_most_frequent,3943043,UEFA Euro,2024,2024-07-14,Spain,England,2,1,1,1,1.0,True
+target_over_2_5,history_any,dummy_most_frequent,3943077,Copa America,2024,2024-07-15,Argentina,Colombia,1,0,0,1,1.0,False
+target_over_2_5,history_any,logistic_regression_balanced,3930165,UEFA Euro,2024,2024-06-17,Austria,France,0,1,0,1,0.6049,False
+target_over_2_5,history_any,logistic_regression_balanced,3930166,UEFA Euro,2024,2024-06-18,Portugal,Czech Republic,2,1,1,1,0.5103,True
+target_over_2_5,history_any,logistic_regression_balanced,3930167,UEFA Euro,2024,2024-06-19,Croatia,Albania,2,2,1,0,0.4681,False
+target_over_2_5,history_any,logistic_regression_balanced,3930168,UEFA Euro,2024,2024-06-19,Germany,Hungary,2,0,0,1,0.6625,False
+target_over_2_5,history_any,logistic_regression_balanced,3930169,UEFA Euro,2024,2024-06-19,Scotland,Switzerland,1,1,0,1,0.5081,False
+target_over_2_5,history_any,logistic_regression_balanced,3930170,UEFA Euro,2024,2024-06-20,Slovenia,Serbia,1,1,0,1,0.536,False
+target_over_2_5,history_any,logistic_regression_balanced,3930171,UEFA Euro,2024,2024-06-20,Denmark,England,1,1,0,0,0.4416,True
+target_over_2_5,history_any,logistic_regression_balanced,3930172,UEFA Euro,2024,2024-06-20,Spain,Italy,1,0,0,1,0.6255,False
+target_over_2_5,history_any,logistic_regression_balanced,3939969,Copa America,2024,2024-06-21,Argentina,Canada,2,0,0,1,0.6734,False
+target_over_2_5,history_any,logistic_regression_balanced,3930173,UEFA Euro,2024,2024-06-21,Netherlands,France,0,0,0,1,0.6252,False
+target_over_2_5,history_any,logistic_regression_balanced,3938640,UEFA Euro,2024,2024-06-21,Slovakia,Ukraine,1,2,1,0,0.3631,False
+target_over_2_5,history_any,logistic_regression_balanced,3938641,UEFA Euro,2024,2024-06-21,Poland,Austria,1,3,1,0,0.4289,False
+target_over_2_5,history_any,logistic_regression_balanced,3930174,UEFA Euro,2024,2024-06-22,Turkey,Portugal,0,3,1,0,0.3997,False
+target_over_2_5,history_any,logistic_regression_balanced,3930175,UEFA Euro,2024,2024-06-22,Belgium,Romania,2,0,0,0,0.3334,True
+target_over_2_5,history_any,logistic_regression_balanced,3938642,UEFA Euro,2024,2024-06-22,Georgia,Czech Republic,1,1,0,0,0.391,True
+target_over_2_5,history_any,logistic_regression_balanced,3930176,UEFA Euro,2024,2024-06-23,Switzerland,Germany,1,1,0,0,0.3827,True
+target_over_2_5,history_any,logistic_regression_balanced,3930177,UEFA Euro,2024,2024-06-23,Scotland,Hungary,0,1,0,1,0.5811,False
+target_over_2_5,history_any,logistic_regression_balanced,3939973,Copa America,2024,2024-06-24,Uruguay,Panama,3,1,1,0,0.4944,False
+target_over_2_5,history_any,logistic_regression_balanced,3930178,UEFA Euro,2024,2024-06-24,Croatia,Italy,1,1,0,1,0.7495,False
+target_over_2_5,history_any,logistic_regression_balanced,3930179,UEFA Euro,2024,2024-06-24,Albania,Spain,0,1,0,1,0.5938,False
+target_over_2_5,history_any,logistic_regression_balanced,3939976,Copa America,2024,2024-06-25,Brazil,Costa Rica,0,0,0,1,0.6043,False
+target_over_2_5,history_any,logistic_regression_balanced,3939978,Copa America,2024,2024-06-25,Peru,Canada,0,1,0,1,0.7215,False
+target_over_2_5,history_any,logistic_regression_balanced,3930180,UEFA Euro,2024,2024-06-25,Netherlands,Austria,2,3,1,0,0.4359,False
+target_over_2_5,history_any,logistic_regression_balanced,3930181,UEFA Euro,2024,2024-06-25,England,Slovenia,0,0,0,1,0.5125,False
+target_over_2_5,history_any,logistic_regression_balanced,3930182,UEFA Euro,2024,2024-06-25,Denmark,Serbia,0,0,0,1,0.7026,False
+target_over_2_5,history_any,logistic_regression_balanced,3938643,UEFA Euro,2024,2024-06-25,France,Poland,1,1,0,1,0.5313,False
+target_over_2_5,history_any,logistic_regression_balanced,3939977,Copa America,2024,2024-06-26,Chile,Argentina,0,1,0,1,0.7187,False
+target_over_2_5,history_any,logistic_regression_balanced,3939980,Copa America,2024,2024-06-26,Ecuador,Jamaica,3,1,1,1,0.6673,True
+target_over_2_5,history_any,logistic_regression_balanced,3930183,UEFA Euro,2024,2024-06-26,Slovakia,Romania,1,1,0,0,0.3738,True
+target_over_2_5,history_any,logistic_regression_balanced,3930184,UEFA Euro,2024,2024-06-26,Czech Republic,Turkey,1,2,1,1,0.5851,True
+target_over_2_5,history_any,logistic_regression_balanced,3938644,UEFA Euro,2024,2024-06-26,Georgia,Portugal,2,0,0,0,0.2301,True
+target_over_2_5,history_any,logistic_regression_balanced,3938645,UEFA Euro,2024,2024-06-26,Ukraine,Belgium,0,0,0,1,0.5162,False
+target_over_2_5,history_any,logistic_regression_balanced,3939979,Copa America,2024,2024-06-27,Venezuela,Mexico,1,0,0,1,0.6431,False
+target_over_2_5,history_any,logistic_regression_balanced,3939981,Copa America,2024,2024-06-27,Panama,United States,2,1,1,1,0.5994,True
+target_over_2_5,history_any,logistic_regression_balanced,3939982,Copa America,2024,2024-06-28,Uruguay,Bolivia,5,0,1,1,0.6559,True
+target_over_2_5,history_any,logistic_regression_balanced,3939984,Copa America,2024,2024-06-28,Colombia,Costa Rica,3,0,1,0,0.3039,False
+target_over_2_5,history_any,logistic_regression_balanced,3939983,Copa America,2024,2024-06-29,Paraguay,Brazil,1,4,1,0,0.4999,False
+target_over_2_5,history_any,logistic_regression_balanced,3940878,UEFA Euro,2024,2024-06-29,Switzerland,Italy,2,0,0,1,0.6672,False
+target_over_2_5,history_any,logistic_regression_balanced,3940983,UEFA Euro,2024,2024-06-29,Germany,Denmark,2,0,0,1,0.5821,False
+target_over_2_5,history_any,logistic_regression_balanced,3939985,Copa America,2024,2024-06-30,Canada,Chile,0,0,0,1,0.828,False
+target_over_2_5,history_any,logistic_regression_balanced,3939986,Copa America,2024,2024-06-30,Argentina,Peru,2,0,0,1,0.6218,False
+target_over_2_5,history_any,logistic_regression_balanced,3941017,UEFA Euro,2024,2024-06-30,England,Slovakia,2,1,1,1,0.7182,True
+target_over_2_5,history_any,logistic_regression_balanced,3941018,UEFA Euro,2024,2024-06-30,Spain,Georgia,4,1,1,1,0.6936,True
+target_over_2_5,history_any,logistic_regression_balanced,3939987,Copa America,2024,2024-07-01,Jamaica,Venezuela,0,3,1,1,0.5294,True
+target_over_2_5,history_any,logistic_regression_balanced,3939988,Copa America,2024,2024-07-01,Mexico,Ecuador,0,0,0,1,0.6921,False
+target_over_2_5,history_any,logistic_regression_balanced,3941019,UEFA Euro,2024,2024-07-01,France,Belgium,1,0,0,1,0.5697,False
+target_over_2_5,history_any,logistic_regression_balanced,3941020,UEFA Euro,2024,2024-07-01,Portugal,Slovenia,0,0,0,1,0.5249,False
+target_over_2_5,history_any,logistic_regression_balanced,3939989,Copa America,2024,2024-07-02,Bolivia,Panama,1,3,1,0,0.4628,False
+target_over_2_5,history_any,logistic_regression_balanced,3939990,Copa America,2024,2024-07-02,United States,Uruguay,0,1,0,1,0.59,False
+target_over_2_5,history_any,logistic_regression_balanced,3941021,UEFA Euro,2024,2024-07-02,Romania,Netherlands,0,3,1,1,0.5915,True
+target_over_2_5,history_any,logistic_regression_balanced,3941022,UEFA Euro,2024,2024-07-02,Austria,Turkey,1,2,1,0,0.4723,False
+target_over_2_5,history_any,logistic_regression_balanced,3939991,Copa America,2024,2024-07-03,Brazil,Colombia,1,1,0,1,0.7432,False
+target_over_2_5,history_any,logistic_regression_balanced,3939992,Copa America,2024,2024-07-03,Costa Rica,Paraguay,2,1,1,0,0.2434,False
+target_over_2_5,history_any,logistic_regression_balanced,3942228,Copa America,2024,2024-07-05,Argentina,Ecuador,1,1,0,1,0.5755,False
+target_over_2_5,history_any,logistic_regression_balanced,3942226,UEFA Euro,2024,2024-07-05,Spain,Germany,2,1,1,1,0.5743,True
+target_over_2_5,history_any,logistic_regression_balanced,3942349,UEFA Euro,2024,2024-07-05,Portugal,France,0,0,0,1,0.8437,False
+target_over_2_5,history_any,logistic_regression_balanced,3942229,Copa America,2024,2024-07-06,Venezuela,Canada,1,1,0,1,0.6147,False
+target_over_2_5,history_any,logistic_regression_balanced,3942416,Copa America,2024,2024-07-06,Colombia,Panama,5,0,1,1,0.5252,True
+target_over_2_5,history_any,logistic_regression_balanced,3942227,UEFA Euro,2024,2024-07-06,England,Switzerland,1,1,0,0,0.4553,True
+target_over_2_5,history_any,logistic_regression_balanced,3942382,UEFA Euro,2024,2024-07-06,Netherlands,Turkey,2,1,1,0,0.4683,False
+target_over_2_5,history_any,logistic_regression_balanced,3942415,Copa America,2024,2024-07-07,Uruguay,Brazil,0,0,0,1,0.5569,False
+target_over_2_5,history_any,logistic_regression_balanced,3942752,UEFA Euro,2024,2024-07-09,Spain,France,2,1,1,1,0.7668,True
+target_over_2_5,history_any,logistic_regression_balanced,3942785,Copa America,2024,2024-07-10,Argentina,Canada,2,0,0,1,0.8084,False
+target_over_2_5,history_any,logistic_regression_balanced,3942819,UEFA Euro,2024,2024-07-10,Netherlands,England,1,2,1,1,0.6236,True
+target_over_2_5,history_any,logistic_regression_balanced,3942852,Copa America,2024,2024-07-11,Uruguay,Colombia,0,1,0,1,0.5732,False
+target_over_2_5,history_any,logistic_regression_balanced,3943076,Copa America,2024,2024-07-14,Canada,Uruguay,2,2,1,1,0.6877,True
+target_over_2_5,history_any,logistic_regression_balanced,3943043,UEFA Euro,2024,2024-07-14,Spain,England,2,1,1,1,0.6719,True
+target_over_2_5,history_any,logistic_regression_balanced,3943077,Copa America,2024,2024-07-15,Argentina,Colombia,1,0,0,0,0.4796,True
+target_over_2_5,history_any,random_forest_balanced,3930165,UEFA Euro,2024,2024-06-17,Austria,France,0,1,0,1,0.6067,False
+target_over_2_5,history_any,random_forest_balanced,3930166,UEFA Euro,2024,2024-06-18,Portugal,Czech Republic,2,1,1,1,0.5609,True
+target_over_2_5,history_any,random_forest_balanced,3930167,UEFA Euro,2024,2024-06-19,Croatia,Albania,2,2,1,0,0.4962,False
+target_over_2_5,history_any,random_forest_balanced,3930168,UEFA Euro,2024,2024-06-19,Germany,Hungary,2,0,0,1,0.7455,False
+target_over_2_5,history_any,random_forest_balanced,3930169,UEFA Euro,2024,2024-06-19,Scotland,Switzerland,1,1,0,0,0.4911,True
+target_over_2_5,history_any,random_forest_balanced,3930170,UEFA Euro,2024,2024-06-20,Slovenia,Serbia,1,1,0,0,0.4761,True
+target_over_2_5,history_any,random_forest_balanced,3930171,UEFA Euro,2024,2024-06-20,Denmark,England,1,1,0,0,0.3353,True
+target_over_2_5,history_any,random_forest_balanced,3930172,UEFA Euro,2024,2024-06-20,Spain,Italy,1,0,0,1,0.6025,False
+target_over_2_5,history_any,random_forest_balanced,3939969,Copa America,2024,2024-06-21,Argentina,Canada,2,0,0,1,0.6311,False
+target_over_2_5,history_any,random_forest_balanced,3930173,UEFA Euro,2024,2024-06-21,Netherlands,France,0,0,0,1,0.6246,False
+target_over_2_5,history_any,random_forest_balanced,3938640,UEFA Euro,2024,2024-06-21,Slovakia,Ukraine,1,2,1,1,0.5087,True
+target_over_2_5,history_any,random_forest_balanced,3938641,UEFA Euro,2024,2024-06-21,Poland,Austria,1,3,1,0,0.383,False
+target_over_2_5,history_any,random_forest_balanced,3930174,UEFA Euro,2024,2024-06-22,Turkey,Portugal,0,3,1,1,0.5461,True
+target_over_2_5,history_any,random_forest_balanced,3930175,UEFA Euro,2024,2024-06-22,Belgium,Romania,2,0,0,0,0.3141,True
+target_over_2_5,history_any,random_forest_balanced,3938642,UEFA Euro,2024,2024-06-22,Georgia,Czech Republic,1,1,0,1,0.5032,False
+target_over_2_5,history_any,random_forest_balanced,3930176,UEFA Euro,2024,2024-06-23,Switzerland,Germany,1,1,0,0,0.3178,True
+target_over_2_5,history_any,random_forest_balanced,3930177,UEFA Euro,2024,2024-06-23,Scotland,Hungary,0,1,0,1,0.5699,False
+target_over_2_5,history_any,random_forest_balanced,3939973,Copa America,2024,2024-06-24,Uruguay,Panama,3,1,1,1,0.5986,True
+target_over_2_5,history_any,random_forest_balanced,3930178,UEFA Euro,2024,2024-06-24,Croatia,Italy,1,1,0,1,0.6764,False
+target_over_2_5,history_any,random_forest_balanced,3930179,UEFA Euro,2024,2024-06-24,Albania,Spain,0,1,0,1,0.5749,False
+target_over_2_5,history_any,random_forest_balanced,3939976,Copa America,2024,2024-06-25,Brazil,Costa Rica,0,0,0,1,0.6398,False
+target_over_2_5,history_any,random_forest_balanced,3939978,Copa America,2024,2024-06-25,Peru,Canada,0,1,0,0,0.4392,True
+target_over_2_5,history_any,random_forest_balanced,3930180,UEFA Euro,2024,2024-06-25,Netherlands,Austria,2,3,1,0,0.4028,False
+target_over_2_5,history_any,random_forest_balanced,3930181,UEFA Euro,2024,2024-06-25,England,Slovenia,0,0,0,0,0.42,True
+target_over_2_5,history_any,random_forest_balanced,3930182,UEFA Euro,2024,2024-06-25,Denmark,Serbia,0,0,0,0,0.4803,True
+target_over_2_5,history_any,random_forest_balanced,3938643,UEFA Euro,2024,2024-06-25,France,Poland,1,1,0,0,0.4906,True
+target_over_2_5,history_any,random_forest_balanced,3939977,Copa America,2024,2024-06-26,Chile,Argentina,0,1,0,1,0.5581,False
+target_over_2_5,history_any,random_forest_balanced,3939980,Copa America,2024,2024-06-26,Ecuador,Jamaica,3,1,1,0,0.4376,False
+target_over_2_5,history_any,random_forest_balanced,3930183,UEFA Euro,2024,2024-06-26,Slovakia,Romania,1,1,0,1,0.5008,False
+target_over_2_5,history_any,random_forest_balanced,3930184,UEFA Euro,2024,2024-06-26,Czech Republic,Turkey,1,2,1,1,0.5537,True
+target_over_2_5,history_any,random_forest_balanced,3938644,UEFA Euro,2024,2024-06-26,Georgia,Portugal,2,0,0,1,0.5175,False
+target_over_2_5,history_any,random_forest_balanced,3938645,UEFA Euro,2024,2024-06-26,Ukraine,Belgium,0,0,0,0,0.4697,True
+target_over_2_5,history_any,random_forest_balanced,3939979,Copa America,2024,2024-06-27,Venezuela,Mexico,1,0,0,1,0.6896,False
+target_over_2_5,history_any,random_forest_balanced,3939981,Copa America,2024,2024-06-27,Panama,United States,2,1,1,1,0.5631,True
+target_over_2_5,history_any,random_forest_balanced,3939982,Copa America,2024,2024-06-28,Uruguay,Bolivia,5,0,1,1,0.6518,True
+target_over_2_5,history_any,random_forest_balanced,3939984,Copa America,2024,2024-06-28,Colombia,Costa Rica,3,0,1,0,0.4311,False
+target_over_2_5,history_any,random_forest_balanced,3939983,Copa America,2024,2024-06-29,Paraguay,Brazil,1,4,1,0,0.471,False
+target_over_2_5,history_any,random_forest_balanced,3940878,UEFA Euro,2024,2024-06-29,Switzerland,Italy,2,0,0,1,0.547,False
+target_over_2_5,history_any,random_forest_balanced,3940983,UEFA Euro,2024,2024-06-29,Germany,Denmark,2,0,0,1,0.6734,False
+target_over_2_5,history_any,random_forest_balanced,3939985,Copa America,2024,2024-06-30,Canada,Chile,0,0,0,1,0.5304,False
+target_over_2_5,history_any,random_forest_balanced,3939986,Copa America,2024,2024-06-30,Argentina,Peru,2,0,0,1,0.5454,False
+target_over_2_5,history_any,random_forest_balanced,3941017,UEFA Euro,2024,2024-06-30,England,Slovakia,2,1,1,1,0.5208,True
+target_over_2_5,history_any,random_forest_balanced,3941018,UEFA Euro,2024,2024-06-30,Spain,Georgia,4,1,1,1,0.6272,True
+target_over_2_5,history_any,random_forest_balanced,3939987,Copa America,2024,2024-07-01,Jamaica,Venezuela,0,3,1,0,0.4947,False
+target_over_2_5,history_any,random_forest_balanced,3939988,Copa America,2024,2024-07-01,Mexico,Ecuador,0,0,0,1,0.6031,False
+target_over_2_5,history_any,random_forest_balanced,3941019,UEFA Euro,2024,2024-07-01,France,Belgium,1,0,0,1,0.7166,False
+target_over_2_5,history_any,random_forest_balanced,3941020,UEFA Euro,2024,2024-07-01,Portugal,Slovenia,0,0,0,1,0.5462,False
+target_over_2_5,history_any,random_forest_balanced,3939989,Copa America,2024,2024-07-02,Bolivia,Panama,1,3,1,0,0.4741,False
+target_over_2_5,history_any,random_forest_balanced,3939990,Copa America,2024,2024-07-02,United States,Uruguay,0,1,0,0,0.4684,True
+target_over_2_5,history_any,random_forest_balanced,3941021,UEFA Euro,2024,2024-07-02,Romania,Netherlands,0,3,1,1,0.5661,True
+target_over_2_5,history_any,random_forest_balanced,3941022,UEFA Euro,2024,2024-07-02,Austria,Turkey,1,2,1,0,0.4549,False
+target_over_2_5,history_any,random_forest_balanced,3939991,Copa America,2024,2024-07-03,Brazil,Colombia,1,1,0,1,0.5956,False
+target_over_2_5,history_any,random_forest_balanced,3939992,Copa America,2024,2024-07-03,Costa Rica,Paraguay,2,1,1,1,0.5516,True
+target_over_2_5,history_any,random_forest_balanced,3942228,Copa America,2024,2024-07-05,Argentina,Ecuador,1,1,0,1,0.6382,False
+target_over_2_5,history_any,random_forest_balanced,3942226,UEFA Euro,2024,2024-07-05,Spain,Germany,2,1,1,0,0.4095,False
+target_over_2_5,history_any,random_forest_balanced,3942349,UEFA Euro,2024,2024-07-05,Portugal,France,0,0,0,1,0.6952,False
+target_over_2_5,history_any,random_forest_balanced,3942229,Copa America,2024,2024-07-06,Venezuela,Canada,1,1,0,0,0.4392,True
+target_over_2_5,history_any,random_forest_balanced,3942416,Copa America,2024,2024-07-06,Colombia,Panama,5,0,1,1,0.5038,True
+target_over_2_5,history_any,random_forest_balanced,3942227,UEFA Euro,2024,2024-07-06,England,Switzerland,1,1,0,1,0.564,False
+target_over_2_5,history_any,random_forest_balanced,3942382,UEFA Euro,2024,2024-07-06,Netherlands,Turkey,2,1,1,1,0.6085,True
+target_over_2_5,history_any,random_forest_balanced,3942415,Copa America,2024,2024-07-07,Uruguay,Brazil,0,0,0,0,0.4974,True
+target_over_2_5,history_any,random_forest_balanced,3942752,UEFA Euro,2024,2024-07-09,Spain,France,2,1,1,1,0.5751,True
+target_over_2_5,history_any,random_forest_balanced,3942785,Copa America,2024,2024-07-10,Argentina,Canada,2,0,0,1,0.6794,False
+target_over_2_5,history_any,random_forest_balanced,3942819,UEFA Euro,2024,2024-07-10,Netherlands,England,1,2,1,1,0.6508,True
+target_over_2_5,history_any,random_forest_balanced,3942852,Copa America,2024,2024-07-11,Uruguay,Colombia,0,1,0,1,0.5755,False
+target_over_2_5,history_any,random_forest_balanced,3943076,Copa America,2024,2024-07-14,Canada,Uruguay,2,2,1,0,0.4267,False
+target_over_2_5,history_any,random_forest_balanced,3943043,UEFA Euro,2024,2024-07-14,Spain,England,2,1,1,1,0.5922,True
+target_over_2_5,history_any,random_forest_balanced,3943077,Copa America,2024,2024-07-15,Argentina,Colombia,1,0,0,0,0.4469,True
+target_btts,history_any,dummy_most_frequent,3930165,UEFA Euro,2024,2024-06-17,Austria,France,0,1,0,1,1.0,False
+target_btts,history_any,dummy_most_frequent,3930166,UEFA Euro,2024,2024-06-18,Portugal,Czech Republic,2,1,1,1,1.0,True
+target_btts,history_any,dummy_most_frequent,3930167,UEFA Euro,2024,2024-06-19,Croatia,Albania,2,2,1,1,1.0,True
+target_btts,history_any,dummy_most_frequent,3930168,UEFA Euro,2024,2024-06-19,Germany,Hungary,2,0,0,1,1.0,False
+target_btts,history_any,dummy_most_frequent,3930169,UEFA Euro,2024,2024-06-19,Scotland,Switzerland,1,1,1,1,1.0,True
+target_btts,history_any,dummy_most_frequent,3930170,UEFA Euro,2024,2024-06-20,Slovenia,Serbia,1,1,1,1,1.0,True
+target_btts,history_any,dummy_most_frequent,3930171,UEFA Euro,2024,2024-06-20,Denmark,England,1,1,1,1,1.0,True
+target_btts,history_any,dummy_most_frequent,3930172,UEFA Euro,2024,2024-06-20,Spain,Italy,1,0,0,1,1.0,False
+target_btts,history_any,dummy_most_frequent,3939969,Copa America,2024,2024-06-21,Argentina,Canada,2,0,0,1,1.0,False
+target_btts,history_any,dummy_most_frequent,3930173,UEFA Euro,2024,2024-06-21,Netherlands,France,0,0,0,1,1.0,False
+target_btts,history_any,dummy_most_frequent,3938640,UEFA Euro,2024,2024-06-21,Slovakia,Ukraine,1,2,1,1,1.0,True
+target_btts,history_any,dummy_most_frequent,3938641,UEFA Euro,2024,2024-06-21,Poland,Austria,1,3,1,1,1.0,True
+target_btts,history_any,dummy_most_frequent,3930174,UEFA Euro,2024,2024-06-22,Turkey,Portugal,0,3,0,1,1.0,False
+target_btts,history_any,dummy_most_frequent,3930175,UEFA Euro,2024,2024-06-22,Belgium,Romania,2,0,0,1,1.0,False
+target_btts,history_any,dummy_most_frequent,3938642,UEFA Euro,2024,2024-06-22,Georgia,Czech Republic,1,1,1,1,1.0,True
+target_btts,history_any,dummy_most_frequent,3930176,UEFA Euro,2024,2024-06-23,Switzerland,Germany,1,1,1,1,1.0,True
+target_btts,history_any,dummy_most_frequent,3930177,UEFA Euro,2024,2024-06-23,Scotland,Hungary,0,1,0,1,1.0,False
+target_btts,history_any,dummy_most_frequent,3939973,Copa America,2024,2024-06-24,Uruguay,Panama,3,1,1,1,1.0,True
+target_btts,history_any,dummy_most_frequent,3930178,UEFA Euro,2024,2024-06-24,Croatia,Italy,1,1,1,1,1.0,True
+target_btts,history_any,dummy_most_frequent,3930179,UEFA Euro,2024,2024-06-24,Albania,Spain,0,1,0,1,1.0,False
+target_btts,history_any,dummy_most_frequent,3939976,Copa America,2024,2024-06-25,Brazil,Costa Rica,0,0,0,1,1.0,False
+target_btts,history_any,dummy_most_frequent,3939978,Copa America,2024,2024-06-25,Peru,Canada,0,1,0,1,1.0,False
+target_btts,history_any,dummy_most_frequent,3930180,UEFA Euro,2024,2024-06-25,Netherlands,Austria,2,3,1,1,1.0,True
+target_btts,history_any,dummy_most_frequent,3930181,UEFA Euro,2024,2024-06-25,England,Slovenia,0,0,0,1,1.0,False
+target_btts,history_any,dummy_most_frequent,3930182,UEFA Euro,2024,2024-06-25,Denmark,Serbia,0,0,0,1,1.0,False
+target_btts,history_any,dummy_most_frequent,3938643,UEFA Euro,2024,2024-06-25,France,Poland,1,1,1,1,1.0,True
+target_btts,history_any,dummy_most_frequent,3939977,Copa America,2024,2024-06-26,Chile,Argentina,0,1,0,1,1.0,False
+target_btts,history_any,dummy_most_frequent,3939980,Copa America,2024,2024-06-26,Ecuador,Jamaica,3,1,1,1,1.0,True
+target_btts,history_any,dummy_most_frequent,3930183,UEFA Euro,2024,2024-06-26,Slovakia,Romania,1,1,1,1,1.0,True
+target_btts,history_any,dummy_most_frequent,3930184,UEFA Euro,2024,2024-06-26,Czech Republic,Turkey,1,2,1,1,1.0,True
+target_btts,history_any,dummy_most_frequent,3938644,UEFA Euro,2024,2024-06-26,Georgia,Portugal,2,0,0,1,1.0,False
+target_btts,history_any,dummy_most_frequent,3938645,UEFA Euro,2024,2024-06-26,Ukraine,Belgium,0,0,0,1,1.0,False
+target_btts,history_any,dummy_most_frequent,3939979,Copa America,2024,2024-06-27,Venezuela,Mexico,1,0,0,1,1.0,False
+target_btts,history_any,dummy_most_frequent,3939981,Copa America,2024,2024-06-27,Panama,United States,2,1,1,1,1.0,True
+target_btts,history_any,dummy_most_frequent,3939982,Copa America,2024,2024-06-28,Uruguay,Bolivia,5,0,0,1,1.0,False
+target_btts,history_any,dummy_most_frequent,3939984,Copa America,2024,2024-06-28,Colombia,Costa Rica,3,0,0,1,1.0,False
+target_btts,history_any,dummy_most_frequent,3939983,Copa America,2024,2024-06-29,Paraguay,Brazil,1,4,1,1,1.0,True
+target_btts,history_any,dummy_most_frequent,3940878,UEFA Euro,2024,2024-06-29,Switzerland,Italy,2,0,0,1,1.0,False
+target_btts,history_any,dummy_most_frequent,3940983,UEFA Euro,2024,2024-06-29,Germany,Denmark,2,0,0,1,1.0,False
+target_btts,history_any,dummy_most_frequent,3939985,Copa America,2024,2024-06-30,Canada,Chile,0,0,0,1,1.0,False
+target_btts,history_any,dummy_most_frequent,3939986,Copa America,2024,2024-06-30,Argentina,Peru,2,0,0,1,1.0,False
+target_btts,history_any,dummy_most_frequent,3941017,UEFA Euro,2024,2024-06-30,England,Slovakia,2,1,1,1,1.0,True
+target_btts,history_any,dummy_most_frequent,3941018,UEFA Euro,2024,2024-06-30,Spain,Georgia,4,1,1,1,1.0,True
+target_btts,history_any,dummy_most_frequent,3939987,Copa America,2024,2024-07-01,Jamaica,Venezuela,0,3,0,1,1.0,False
+target_btts,history_any,dummy_most_frequent,3939988,Copa America,2024,2024-07-01,Mexico,Ecuador,0,0,0,1,1.0,False
+target_btts,history_any,dummy_most_frequent,3941019,UEFA Euro,2024,2024-07-01,France,Belgium,1,0,0,1,1.0,False
+target_btts,history_any,dummy_most_frequent,3941020,UEFA Euro,2024,2024-07-01,Portugal,Slovenia,0,0,0,1,1.0,False
+target_btts,history_any,dummy_most_frequent,3939989,Copa America,2024,2024-07-02,Bolivia,Panama,1,3,1,1,1.0,True
+target_btts,history_any,dummy_most_frequent,3939990,Copa America,2024,2024-07-02,United States,Uruguay,0,1,0,1,1.0,False
+target_btts,history_any,dummy_most_frequent,3941021,UEFA Euro,2024,2024-07-02,Romania,Netherlands,0,3,0,1,1.0,False
+target_btts,history_any,dummy_most_frequent,3941022,UEFA Euro,2024,2024-07-02,Austria,Turkey,1,2,1,1,1.0,True
+target_btts,history_any,dummy_most_frequent,3939991,Copa America,2024,2024-07-03,Brazil,Colombia,1,1,1,1,1.0,True
+target_btts,history_any,dummy_most_frequent,3939992,Copa America,2024,2024-07-03,Costa Rica,Paraguay,2,1,1,1,1.0,True
+target_btts,history_any,dummy_most_frequent,3942228,Copa America,2024,2024-07-05,Argentina,Ecuador,1,1,1,1,1.0,True
+target_btts,history_any,dummy_most_frequent,3942226,UEFA Euro,2024,2024-07-05,Spain,Germany,2,1,1,1,1.0,True
+target_btts,history_any,dummy_most_frequent,3942349,UEFA Euro,2024,2024-07-05,Portugal,France,0,0,0,1,1.0,False
+target_btts,history_any,dummy_most_frequent,3942229,Copa America,2024,2024-07-06,Venezuela,Canada,1,1,1,1,1.0,True
+target_btts,history_any,dummy_most_frequent,3942416,Copa America,2024,2024-07-06,Colombia,Panama,5,0,0,1,1.0,False
+target_btts,history_any,dummy_most_frequent,3942227,UEFA Euro,2024,2024-07-06,England,Switzerland,1,1,1,1,1.0,True
+target_btts,history_any,dummy_most_frequent,3942382,UEFA Euro,2024,2024-07-06,Netherlands,Turkey,2,1,1,1,1.0,True
+target_btts,history_any,dummy_most_frequent,3942415,Copa America,2024,2024-07-07,Uruguay,Brazil,0,0,0,1,1.0,False
+target_btts,history_any,dummy_most_frequent,3942752,UEFA Euro,2024,2024-07-09,Spain,France,2,1,1,1,1.0,True
+target_btts,history_any,dummy_most_frequent,3942785,Copa America,2024,2024-07-10,Argentina,Canada,2,0,0,1,1.0,False
+target_btts,history_any,dummy_most_frequent,3942819,UEFA Euro,2024,2024-07-10,Netherlands,England,1,2,1,1,1.0,True
+target_btts,history_any,dummy_most_frequent,3942852,Copa America,2024,2024-07-11,Uruguay,Colombia,0,1,0,1,1.0,False
+target_btts,history_any,dummy_most_frequent,3943076,Copa America,2024,2024-07-14,Canada,Uruguay,2,2,1,1,1.0,True
+target_btts,history_any,dummy_most_frequent,3943043,UEFA Euro,2024,2024-07-14,Spain,England,2,1,1,1,1.0,True
+target_btts,history_any,dummy_most_frequent,3943077,Copa America,2024,2024-07-15,Argentina,Colombia,1,0,0,1,1.0,False
+target_btts,history_any,logistic_regression_balanced,3930165,UEFA Euro,2024,2024-06-17,Austria,France,0,1,0,1,0.6378,False
+target_btts,history_any,logistic_regression_balanced,3930166,UEFA Euro,2024,2024-06-18,Portugal,Czech Republic,2,1,1,1,0.5197,True
+target_btts,history_any,logistic_regression_balanced,3930167,UEFA Euro,2024,2024-06-19,Croatia,Albania,2,2,1,1,0.5553,True
+target_btts,history_any,logistic_regression_balanced,3930168,UEFA Euro,2024,2024-06-19,Germany,Hungary,2,0,0,1,0.5679,False
+target_btts,history_any,logistic_regression_balanced,3930169,UEFA Euro,2024,2024-06-19,Scotland,Switzerland,1,1,1,0,0.4434,False
+target_btts,history_any,logistic_regression_balanced,3930170,UEFA Euro,2024,2024-06-20,Slovenia,Serbia,1,1,1,1,0.5412,True
+target_btts,history_any,logistic_regression_balanced,3930171,UEFA Euro,2024,2024-06-20,Denmark,England,1,1,1,1,0.5554,True
+target_btts,history_any,logistic_regression_balanced,3930172,UEFA Euro,2024,2024-06-20,Spain,Italy,1,0,0,1,0.5729,False
+target_btts,history_any,logistic_regression_balanced,3939969,Copa America,2024,2024-06-21,Argentina,Canada,2,0,0,1,0.6586,False
+target_btts,history_any,logistic_regression_balanced,3930173,UEFA Euro,2024,2024-06-21,Netherlands,France,0,0,0,1,0.5569,False
+target_btts,history_any,logistic_regression_balanced,3938640,UEFA Euro,2024,2024-06-21,Slovakia,Ukraine,1,2,1,0,0.4961,False
+target_btts,history_any,logistic_regression_balanced,3938641,UEFA Euro,2024,2024-06-21,Poland,Austria,1,3,1,0,0.2928,False
+target_btts,history_any,logistic_regression_balanced,3930174,UEFA Euro,2024,2024-06-22,Turkey,Portugal,0,3,0,0,0.4327,True
+target_btts,history_any,logistic_regression_balanced,3930175,UEFA Euro,2024,2024-06-22,Belgium,Romania,2,0,0,1,0.5042,False
+target_btts,history_any,logistic_regression_balanced,3938642,UEFA Euro,2024,2024-06-22,Georgia,Czech Republic,1,1,1,0,0.444,False
+target_btts,history_any,logistic_regression_balanced,3930176,UEFA Euro,2024,2024-06-23,Switzerland,Germany,1,1,1,0,0.4313,False
+target_btts,history_any,logistic_regression_balanced,3930177,UEFA Euro,2024,2024-06-23,Scotland,Hungary,0,1,0,0,0.4252,True
+target_btts,history_any,logistic_regression_balanced,3939973,Copa America,2024,2024-06-24,Uruguay,Panama,3,1,1,0,0.4858,False
+target_btts,history_any,logistic_regression_balanced,3930178,UEFA Euro,2024,2024-06-24,Croatia,Italy,1,1,1,1,0.5684,True
+target_btts,history_any,logistic_regression_balanced,3930179,UEFA Euro,2024,2024-06-24,Albania,Spain,0,1,0,0,0.4403,True
+target_btts,history_any,logistic_regression_balanced,3939976,Copa America,2024,2024-06-25,Brazil,Costa Rica,0,0,0,0,0.484,True
+target_btts,history_any,logistic_regression_balanced,3939978,Copa America,2024,2024-06-25,Peru,Canada,0,1,0,1,0.6393,False
+target_btts,history_any,logistic_regression_balanced,3930180,UEFA Euro,2024,2024-06-25,Netherlands,Austria,2,3,1,0,0.4126,False
+target_btts,history_any,logistic_regression_balanced,3930181,UEFA Euro,2024,2024-06-25,England,Slovenia,0,0,0,0,0.3402,True
+target_btts,history_any,logistic_regression_balanced,3930182,UEFA Euro,2024,2024-06-25,Denmark,Serbia,0,0,0,1,0.5761,False
+target_btts,history_any,logistic_regression_balanced,3938643,UEFA Euro,2024,2024-06-25,France,Poland,1,1,1,1,0.5307,True
+target_btts,history_any,logistic_regression_balanced,3939977,Copa America,2024,2024-06-26,Chile,Argentina,0,1,0,1,0.5957,False
+target_btts,history_any,logistic_regression_balanced,3939980,Copa America,2024,2024-06-26,Ecuador,Jamaica,3,1,1,1,0.6221,True
+target_btts,history_any,logistic_regression_balanced,3930183,UEFA Euro,2024,2024-06-26,Slovakia,Romania,1,1,1,1,0.5193,True
+target_btts,history_any,logistic_regression_balanced,3930184,UEFA Euro,2024,2024-06-26,Czech Republic,Turkey,1,2,1,0,0.4505,False
+target_btts,history_any,logistic_regression_balanced,3938644,UEFA Euro,2024,2024-06-26,Georgia,Portugal,2,0,0,0,0.3418,True
+target_btts,history_any,logistic_regression_balanced,3938645,UEFA Euro,2024,2024-06-26,Ukraine,Belgium,0,0,0,0,0.4156,True
+target_btts,history_any,logistic_regression_balanced,3939979,Copa America,2024,2024-06-27,Venezuela,Mexico,1,0,0,0,0.4685,True
+target_btts,history_any,logistic_regression_balanced,3939981,Copa America,2024,2024-06-27,Panama,United States,2,1,1,1,0.6324,True
+target_btts,history_any,logistic_regression_balanced,3939982,Copa America,2024,2024-06-28,Uruguay,Bolivia,5,0,0,1,0.5872,False
+target_btts,history_any,logistic_regression_balanced,3939984,Copa America,2024,2024-06-28,Colombia,Costa Rica,3,0,0,1,0.5458,False
+target_btts,history_any,logistic_regression_balanced,3939983,Copa America,2024,2024-06-29,Paraguay,Brazil,1,4,1,0,0.4806,False
+target_btts,history_any,logistic_regression_balanced,3940878,UEFA Euro,2024,2024-06-29,Switzerland,Italy,2,0,0,1,0.5074,False
+target_btts,history_any,logistic_regression_balanced,3940983,UEFA Euro,2024,2024-06-29,Germany,Denmark,2,0,0,1,0.5037,False
+target_btts,history_any,logistic_regression_balanced,3939985,Copa America,2024,2024-06-30,Canada,Chile,0,0,0,1,0.7113,False
+target_btts,history_any,logistic_regression_balanced,3939986,Copa America,2024,2024-06-30,Argentina,Peru,2,0,0,1,0.6506,False
+target_btts,history_any,logistic_regression_balanced,3941017,UEFA Euro,2024,2024-06-30,England,Slovakia,2,1,1,1,0.5051,True
+target_btts,history_any,logistic_regression_balanced,3941018,UEFA Euro,2024,2024-06-30,Spain,Georgia,4,1,1,1,0.5708,True
+target_btts,history_any,logistic_regression_balanced,3939987,Copa America,2024,2024-07-01,Jamaica,Venezuela,0,3,0,0,0.3764,True
+target_btts,history_any,logistic_regression_balanced,3939988,Copa America,2024,2024-07-01,Mexico,Ecuador,0,0,0,1,0.6256,False
+target_btts,history_any,logistic_regression_balanced,3941019,UEFA Euro,2024,2024-07-01,France,Belgium,1,0,0,1,0.5886,False
+target_btts,history_any,logistic_regression_balanced,3941020,UEFA Euro,2024,2024-07-01,Portugal,Slovenia,0,0,0,1,0.507,False
+target_btts,history_any,logistic_regression_balanced,3939989,Copa America,2024,2024-07-02,Bolivia,Panama,1,3,1,0,0.444,False
+target_btts,history_any,logistic_regression_balanced,3939990,Copa America,2024,2024-07-02,United States,Uruguay,0,1,0,1,0.5423,False
+target_btts,history_any,logistic_regression_balanced,3941021,UEFA Euro,2024,2024-07-02,Romania,Netherlands,0,3,0,0,0.3521,True
+target_btts,history_any,logistic_regression_balanced,3941022,UEFA Euro,2024,2024-07-02,Austria,Turkey,1,2,1,0,0.4131,False
+target_btts,history_any,logistic_regression_balanced,3939991,Copa America,2024,2024-07-03,Brazil,Colombia,1,1,1,0,0.4846,False
+target_btts,history_any,logistic_regression_balanced,3939992,Copa America,2024,2024-07-03,Costa Rica,Paraguay,2,1,1,0,0.4144,False
+target_btts,history_any,logistic_regression_balanced,3942228,Copa America,2024,2024-07-05,Argentina,Ecuador,1,1,1,1,0.5114,True
+target_btts,history_any,logistic_regression_balanced,3942226,UEFA Euro,2024,2024-07-05,Spain,Germany,2,1,1,1,0.6522,True
+target_btts,history_any,logistic_regression_balanced,3942349,UEFA Euro,2024,2024-07-05,Portugal,France,0,0,0,1,0.6914,False
+target_btts,history_any,logistic_regression_balanced,3942229,Copa America,2024,2024-07-06,Venezuela,Canada,1,1,1,1,0.6311,True
+target_btts,history_any,logistic_regression_balanced,3942416,Copa America,2024,2024-07-06,Colombia,Panama,5,0,0,1,0.632,False
+target_btts,history_any,logistic_regression_balanced,3942227,UEFA Euro,2024,2024-07-06,England,Switzerland,1,1,1,0,0.441,False
+target_btts,history_any,logistic_regression_balanced,3942382,UEFA Euro,2024,2024-07-06,Netherlands,Turkey,2,1,1,0,0.4738,False
+target_btts,history_any,logistic_regression_balanced,3942415,Copa America,2024,2024-07-07,Uruguay,Brazil,0,0,0,1,0.5169,False
+target_btts,history_any,logistic_regression_balanced,3942752,UEFA Euro,2024,2024-07-09,Spain,France,2,1,1,1,0.5149,True
+target_btts,history_any,logistic_regression_balanced,3942785,Copa America,2024,2024-07-10,Argentina,Canada,2,0,0,1,0.7293,False
+target_btts,history_any,logistic_regression_balanced,3942819,UEFA Euro,2024,2024-07-10,Netherlands,England,1,2,1,0,0.4903,False
+target_btts,history_any,logistic_regression_balanced,3942852,Copa America,2024,2024-07-11,Uruguay,Colombia,0,1,0,1,0.5445,False
+target_btts,history_any,logistic_regression_balanced,3943076,Copa America,2024,2024-07-14,Canada,Uruguay,2,2,1,1,0.7297,True
+target_btts,history_any,logistic_regression_balanced,3943043,UEFA Euro,2024,2024-07-14,Spain,England,2,1,1,1,0.5169,True
+target_btts,history_any,logistic_regression_balanced,3943077,Copa America,2024,2024-07-15,Argentina,Colombia,1,0,0,1,0.5931,False
+target_btts,history_any,random_forest_balanced,3930165,UEFA Euro,2024,2024-06-17,Austria,France,0,1,0,0,0.4769,True
+target_btts,history_any,random_forest_balanced,3930166,UEFA Euro,2024,2024-06-18,Portugal,Czech Republic,2,1,1,0,0.402,False
+target_btts,history_any,random_forest_balanced,3930167,UEFA Euro,2024,2024-06-19,Croatia,Albania,2,2,1,0,0.4955,False
+target_btts,history_any,random_forest_balanced,3930168,UEFA Euro,2024,2024-06-19,Germany,Hungary,2,0,0,1,0.6231,False
+target_btts,history_any,random_forest_balanced,3930169,UEFA Euro,2024,2024-06-19,Scotland,Switzerland,1,1,1,1,0.5181,True
+target_btts,history_any,random_forest_balanced,3930170,UEFA Euro,2024,2024-06-20,Slovenia,Serbia,1,1,1,1,0.5642,True
+target_btts,history_any,random_forest_balanced,3930171,UEFA Euro,2024,2024-06-20,Denmark,England,1,1,1,0,0.3093,False
+target_btts,history_any,random_forest_balanced,3930172,UEFA Euro,2024,2024-06-20,Spain,Italy,1,0,0,0,0.4918,True
+target_btts,history_any,random_forest_balanced,3939969,Copa America,2024,2024-06-21,Argentina,Canada,2,0,0,1,0.6208,False
+target_btts,history_any,random_forest_balanced,3930173,UEFA Euro,2024,2024-06-21,Netherlands,France,0,0,0,0,0.4444,True
+target_btts,history_any,random_forest_balanced,3938640,UEFA Euro,2024,2024-06-21,Slovakia,Ukraine,1,2,1,1,0.6647,True
+target_btts,history_any,random_forest_balanced,3938641,UEFA Euro,2024,2024-06-21,Poland,Austria,1,3,1,0,0.4696,False
+target_btts,history_any,random_forest_balanced,3930174,UEFA Euro,2024,2024-06-22,Turkey,Portugal,0,3,0,0,0.3719,True
+target_btts,history_any,random_forest_balanced,3930175,UEFA Euro,2024,2024-06-22,Belgium,Romania,2,0,0,0,0.4332,True
+target_btts,history_any,random_forest_balanced,3938642,UEFA Euro,2024,2024-06-22,Georgia,Czech Republic,1,1,1,0,0.435,False
+target_btts,history_any,random_forest_balanced,3930176,UEFA Euro,2024,2024-06-23,Switzerland,Germany,1,1,1,0,0.497,False
+target_btts,history_any,random_forest_balanced,3930177,UEFA Euro,2024,2024-06-23,Scotland,Hungary,0,1,0,1,0.5297,False
+target_btts,history_any,random_forest_balanced,3939973,Copa America,2024,2024-06-24,Uruguay,Panama,3,1,1,0,0.472,False
+target_btts,history_any,random_forest_balanced,3930178,UEFA Euro,2024,2024-06-24,Croatia,Italy,1,1,1,1,0.5037,True
+target_btts,history_any,random_forest_balanced,3930179,UEFA Euro,2024,2024-06-24,Albania,Spain,0,1,0,0,0.4072,True
+target_btts,history_any,random_forest_balanced,3939976,Copa America,2024,2024-06-25,Brazil,Costa Rica,0,0,0,1,0.5887,False
+target_btts,history_any,random_forest_balanced,3939978,Copa America,2024,2024-06-25,Peru,Canada,0,1,0,1,0.5777,False
+target_btts,history_any,random_forest_balanced,3930180,UEFA Euro,2024,2024-06-25,Netherlands,Austria,2,3,1,0,0.3944,False
+target_btts,history_any,random_forest_balanced,3930181,UEFA Euro,2024,2024-06-25,England,Slovenia,0,0,0,0,0.401,True
+target_btts,history_any,random_forest_balanced,3930182,UEFA Euro,2024,2024-06-25,Denmark,Serbia,0,0,0,0,0.4364,True
+target_btts,history_any,random_forest_balanced,3938643,UEFA Euro,2024,2024-06-25,France,Poland,1,1,1,1,0.5183,True
+target_btts,history_any,random_forest_balanced,3939977,Copa America,2024,2024-06-26,Chile,Argentina,0,1,0,1,0.5462,False
+target_btts,history_any,random_forest_balanced,3939980,Copa America,2024,2024-06-26,Ecuador,Jamaica,3,1,1,0,0.4891,False
+target_btts,history_any,random_forest_balanced,3930183,UEFA Euro,2024,2024-06-26,Slovakia,Romania,1,1,1,1,0.5809,True
+target_btts,history_any,random_forest_balanced,3930184,UEFA Euro,2024,2024-06-26,Czech Republic,Turkey,1,2,1,0,0.3795,False
+target_btts,history_any,random_forest_balanced,3938644,UEFA Euro,2024,2024-06-26,Georgia,Portugal,2,0,0,0,0.3642,True
+target_btts,history_any,random_forest_balanced,3938645,UEFA Euro,2024,2024-06-26,Ukraine,Belgium,0,0,0,0,0.3814,True
+target_btts,history_any,random_forest_balanced,3939979,Copa America,2024,2024-06-27,Venezuela,Mexico,1,0,0,1,0.5468,False
+target_btts,history_any,random_forest_balanced,3939981,Copa America,2024,2024-06-27,Panama,United States,2,1,1,1,0.5495,True
+target_btts,history_any,random_forest_balanced,3939982,Copa America,2024,2024-06-28,Uruguay,Bolivia,5,0,0,1,0.6152,False
+target_btts,history_any,random_forest_balanced,3939984,Copa America,2024,2024-06-28,Colombia,Costa Rica,3,0,0,0,0.4556,True
+target_btts,history_any,random_forest_balanced,3939983,Copa America,2024,2024-06-29,Paraguay,Brazil,1,4,1,1,0.5149,True
+target_btts,history_any,random_forest_balanced,3940878,UEFA Euro,2024,2024-06-29,Switzerland,Italy,2,0,0,0,0.3238,True
+target_btts,history_any,random_forest_balanced,3940983,UEFA Euro,2024,2024-06-29,Germany,Denmark,2,0,0,1,0.5271,False
+target_btts,history_any,random_forest_balanced,3939985,Copa America,2024,2024-06-30,Canada,Chile,0,0,0,0,0.4599,True
+target_btts,history_any,random_forest_balanced,3939986,Copa America,2024,2024-06-30,Argentina,Peru,2,0,0,1,0.5566,False
+target_btts,history_any,random_forest_balanced,3941017,UEFA Euro,2024,2024-06-30,England,Slovakia,2,1,1,0,0.3766,False
+target_btts,history_any,random_forest_balanced,3941018,UEFA Euro,2024,2024-06-30,Spain,Georgia,4,1,1,1,0.5569,True
+target_btts,history_any,random_forest_balanced,3939987,Copa America,2024,2024-07-01,Jamaica,Venezuela,0,3,0,0,0.4467,True
+target_btts,history_any,random_forest_balanced,3939988,Copa America,2024,2024-07-01,Mexico,Ecuador,0,0,0,1,0.5759,False
+target_btts,history_any,random_forest_balanced,3941019,UEFA Euro,2024,2024-07-01,France,Belgium,1,0,0,1,0.5795,False
+target_btts,history_any,random_forest_balanced,3941020,UEFA Euro,2024,2024-07-01,Portugal,Slovenia,0,0,0,1,0.5236,False
+target_btts,history_any,random_forest_balanced,3939989,Copa America,2024,2024-07-02,Bolivia,Panama,1,3,1,0,0.494,False
+target_btts,history_any,random_forest_balanced,3939990,Copa America,2024,2024-07-02,United States,Uruguay,0,1,0,0,0.4626,True
+target_btts,history_any,random_forest_balanced,3941021,UEFA Euro,2024,2024-07-02,Romania,Netherlands,0,3,0,0,0.3878,True
+target_btts,history_any,random_forest_balanced,3941022,UEFA Euro,2024,2024-07-02,Austria,Turkey,1,2,1,0,0.3459,False
+target_btts,history_any,random_forest_balanced,3939991,Copa America,2024,2024-07-03,Brazil,Colombia,1,1,1,1,0.6099,True
+target_btts,history_any,random_forest_balanced,3939992,Copa America,2024,2024-07-03,Costa Rica,Paraguay,2,1,1,1,0.5547,True
+target_btts,history_any,random_forest_balanced,3942228,Copa America,2024,2024-07-05,Argentina,Ecuador,1,1,1,1,0.597,True
+target_btts,history_any,random_forest_balanced,3942226,UEFA Euro,2024,2024-07-05,Spain,Germany,2,1,1,1,0.6983,True
+target_btts,history_any,random_forest_balanced,3942349,UEFA Euro,2024,2024-07-05,Portugal,France,0,0,0,1,0.5791,False
+target_btts,history_any,random_forest_balanced,3942229,Copa America,2024,2024-07-06,Venezuela,Canada,1,1,1,1,0.5903,True
+target_btts,history_any,random_forest_balanced,3942416,Copa America,2024,2024-07-06,Colombia,Panama,5,0,0,0,0.4415,True
+target_btts,history_any,random_forest_balanced,3942227,UEFA Euro,2024,2024-07-06,England,Switzerland,1,1,1,1,0.5304,True
+target_btts,history_any,random_forest_balanced,3942382,UEFA Euro,2024,2024-07-06,Netherlands,Turkey,2,1,1,1,0.5095,True
+target_btts,history_any,random_forest_balanced,3942415,Copa America,2024,2024-07-07,Uruguay,Brazil,0,0,0,1,0.5814,False
+target_btts,history_any,random_forest_balanced,3942752,UEFA Euro,2024,2024-07-09,Spain,France,2,1,1,1,0.5975,True
+target_btts,history_any,random_forest_balanced,3942785,Copa America,2024,2024-07-10,Argentina,Canada,2,0,0,0,0.4572,True
+target_btts,history_any,random_forest_balanced,3942819,UEFA Euro,2024,2024-07-10,Netherlands,England,1,2,1,1,0.5504,True
+target_btts,history_any,random_forest_balanced,3942852,Copa America,2024,2024-07-11,Uruguay,Colombia,0,1,0,1,0.6107,False
+target_btts,history_any,random_forest_balanced,3943076,Copa America,2024,2024-07-14,Canada,Uruguay,2,2,1,0,0.4759,False
+target_btts,history_any,random_forest_balanced,3943043,UEFA Euro,2024,2024-07-14,Spain,England,2,1,1,1,0.5105,True
+target_btts,history_any,random_forest_balanced,3943077,Copa America,2024,2024-07-15,Argentina,Colombia,1,0,0,1,0.541,False
+target_over_1_5,full_last_5,dummy_most_frequent,3938643,UEFA Euro,2024,2024-06-25,France,Poland,1,1,1,1,1.0,True
+target_over_1_5,full_last_5,dummy_most_frequent,3930184,UEFA Euro,2024,2024-06-26,Czech Republic,Turkey,1,2,1,1,1.0,True
+target_over_1_5,full_last_5,dummy_most_frequent,3938645,UEFA Euro,2024,2024-06-26,Ukraine,Belgium,0,0,0,1,1.0,False
+target_over_1_5,full_last_5,dummy_most_frequent,3939984,Copa America,2024,2024-06-28,Colombia,Costa Rica,3,0,1,1,1.0,True
+target_over_1_5,full_last_5,dummy_most_frequent,3940878,UEFA Euro,2024,2024-06-29,Switzerland,Italy,2,0,1,1,1.0,True
+target_over_1_5,full_last_5,dummy_most_frequent,3940983,UEFA Euro,2024,2024-06-29,Germany,Denmark,2,0,1,1,1.0,True
+target_over_1_5,full_last_5,dummy_most_frequent,3939986,Copa America,2024,2024-06-30,Argentina,Peru,2,0,1,1,1.0,True
+target_over_1_5,full_last_5,dummy_most_frequent,3941017,UEFA Euro,2024,2024-06-30,England,Slovakia,2,1,1,1,1.0,True
+target_over_1_5,full_last_5,dummy_most_frequent,3939988,Copa America,2024,2024-07-01,Mexico,Ecuador,0,0,0,1,1.0,False
+target_over_1_5,full_last_5,dummy_most_frequent,3941019,UEFA Euro,2024,2024-07-01,France,Belgium,1,0,0,1,1.0,False
+target_over_1_5,full_last_5,dummy_most_frequent,3939990,Copa America,2024,2024-07-02,United States,Uruguay,0,1,0,1,1.0,False
+target_over_1_5,full_last_5,dummy_most_frequent,3941022,UEFA Euro,2024,2024-07-02,Austria,Turkey,1,2,1,1,1.0,True
+target_over_1_5,full_last_5,dummy_most_frequent,3939991,Copa America,2024,2024-07-03,Brazil,Colombia,1,1,1,1,1.0,True
+target_over_1_5,full_last_5,dummy_most_frequent,3942228,Copa America,2024,2024-07-05,Argentina,Ecuador,1,1,1,1,1.0,True
+target_over_1_5,full_last_5,dummy_most_frequent,3942226,UEFA Euro,2024,2024-07-05,Spain,Germany,2,1,1,1,1.0,True
+target_over_1_5,full_last_5,dummy_most_frequent,3942349,UEFA Euro,2024,2024-07-05,Portugal,France,0,0,0,1,1.0,False
+target_over_1_5,full_last_5,dummy_most_frequent,3942416,Copa America,2024,2024-07-06,Colombia,Panama,5,0,1,1,1.0,True
+target_over_1_5,full_last_5,dummy_most_frequent,3942227,UEFA Euro,2024,2024-07-06,England,Switzerland,1,1,1,1,1.0,True
+target_over_1_5,full_last_5,dummy_most_frequent,3942382,UEFA Euro,2024,2024-07-06,Netherlands,Turkey,2,1,1,1,1.0,True
+target_over_1_5,full_last_5,dummy_most_frequent,3942415,Copa America,2024,2024-07-07,Uruguay,Brazil,0,0,0,1,1.0,False
+target_over_1_5,full_last_5,dummy_most_frequent,3942752,UEFA Euro,2024,2024-07-09,Spain,France,2,1,1,1,1.0,True
+target_over_1_5,full_last_5,dummy_most_frequent,3942785,Copa America,2024,2024-07-10,Argentina,Canada,2,0,1,1,1.0,True
+target_over_1_5,full_last_5,dummy_most_frequent,3942819,UEFA Euro,2024,2024-07-10,Netherlands,England,1,2,1,1,1.0,True
+target_over_1_5,full_last_5,dummy_most_frequent,3942852,Copa America,2024,2024-07-11,Uruguay,Colombia,0,1,0,1,1.0,False
+target_over_1_5,full_last_5,dummy_most_frequent,3943076,Copa America,2024,2024-07-14,Canada,Uruguay,2,2,1,1,1.0,True
+target_over_1_5,full_last_5,dummy_most_frequent,3943043,UEFA Euro,2024,2024-07-14,Spain,England,2,1,1,1,1.0,True
+target_over_1_5,full_last_5,dummy_most_frequent,3943077,Copa America,2024,2024-07-15,Argentina,Colombia,1,0,0,1,1.0,False
+target_over_1_5,full_last_5,logistic_regression_balanced,3938643,UEFA Euro,2024,2024-06-25,France,Poland,1,1,1,0,0.2412,False
+target_over_1_5,full_last_5,logistic_regression_balanced,3930184,UEFA Euro,2024,2024-06-26,Czech Republic,Turkey,1,2,1,0,0.0976,False
+target_over_1_5,full_last_5,logistic_regression_balanced,3938645,UEFA Euro,2024,2024-06-26,Ukraine,Belgium,0,0,0,1,0.9352,False
+target_over_1_5,full_last_5,logistic_regression_balanced,3939984,Copa America,2024,2024-06-28,Colombia,Costa Rica,3,0,1,0,0.0136,False
+target_over_1_5,full_last_5,logistic_regression_balanced,3940878,UEFA Euro,2024,2024-06-29,Switzerland,Italy,2,0,1,1,0.7279,True
+target_over_1_5,full_last_5,logistic_regression_balanced,3940983,UEFA Euro,2024,2024-06-29,Germany,Denmark,2,0,1,1,0.9699,True
+target_over_1_5,full_last_5,logistic_regression_balanced,3939986,Copa America,2024,2024-06-30,Argentina,Peru,2,0,1,1,0.993,True
+target_over_1_5,full_last_5,logistic_regression_balanced,3941017,UEFA Euro,2024,2024-06-30,England,Slovakia,2,1,1,1,0.5303,True
+target_over_1_5,full_last_5,logistic_regression_balanced,3939988,Copa America,2024,2024-07-01,Mexico,Ecuador,0,0,0,1,0.8002,False
+target_over_1_5,full_last_5,logistic_regression_balanced,3941019,UEFA Euro,2024,2024-07-01,France,Belgium,1,0,0,1,0.9913,False
+target_over_1_5,full_last_5,logistic_regression_balanced,3939990,Copa America,2024,2024-07-02,United States,Uruguay,0,1,0,1,0.8674,False
+target_over_1_5,full_last_5,logistic_regression_balanced,3941022,UEFA Euro,2024,2024-07-02,Austria,Turkey,1,2,1,0,0.2523,False
+target_over_1_5,full_last_5,logistic_regression_balanced,3939991,Copa America,2024,2024-07-03,Brazil,Colombia,1,1,1,1,0.9812,True
+target_over_1_5,full_last_5,logistic_regression_balanced,3942228,Copa America,2024,2024-07-05,Argentina,Ecuador,1,1,1,1,0.9338,True
+target_over_1_5,full_last_5,logistic_regression_balanced,3942226,UEFA Euro,2024,2024-07-05,Spain,Germany,2,1,1,1,0.8446,True
+target_over_1_5,full_last_5,logistic_regression_balanced,3942349,UEFA Euro,2024,2024-07-05,Portugal,France,0,0,0,1,0.9643,False
+target_over_1_5,full_last_5,logistic_regression_balanced,3942416,Copa America,2024,2024-07-06,Colombia,Panama,5,0,1,0,0.1095,False
+target_over_1_5,full_last_5,logistic_regression_balanced,3942227,UEFA Euro,2024,2024-07-06,England,Switzerland,1,1,1,0,0.3743,False
+target_over_1_5,full_last_5,logistic_regression_balanced,3942382,UEFA Euro,2024,2024-07-06,Netherlands,Turkey,2,1,1,0,0.3032,False
+target_over_1_5,full_last_5,logistic_regression_balanced,3942415,Copa America,2024,2024-07-07,Uruguay,Brazil,0,0,0,1,0.7972,False
+target_over_1_5,full_last_5,logistic_regression_balanced,3942752,UEFA Euro,2024,2024-07-09,Spain,France,2,1,1,1,0.9965,True
+target_over_1_5,full_last_5,logistic_regression_balanced,3942785,Copa America,2024,2024-07-10,Argentina,Canada,2,0,1,1,0.9601,True
+target_over_1_5,full_last_5,logistic_regression_balanced,3942819,UEFA Euro,2024,2024-07-10,Netherlands,England,1,2,1,1,0.9695,True
+target_over_1_5,full_last_5,logistic_regression_balanced,3942852,Copa America,2024,2024-07-11,Uruguay,Colombia,0,1,0,1,0.6457,False
+target_over_1_5,full_last_5,logistic_regression_balanced,3943076,Copa America,2024,2024-07-14,Canada,Uruguay,2,2,1,1,0.8994,True
+target_over_1_5,full_last_5,logistic_regression_balanced,3943043,UEFA Euro,2024,2024-07-14,Spain,England,2,1,1,1,0.9461,True
+target_over_1_5,full_last_5,logistic_regression_balanced,3943077,Copa America,2024,2024-07-15,Argentina,Colombia,1,0,0,1,0.9283,False
+target_over_1_5,full_last_5,random_forest_balanced,3938643,UEFA Euro,2024,2024-06-25,France,Poland,1,1,1,0,0.487,False
+target_over_1_5,full_last_5,random_forest_balanced,3930184,UEFA Euro,2024,2024-06-26,Czech Republic,Turkey,1,2,1,1,0.5789,True
+target_over_1_5,full_last_5,random_forest_balanced,3938645,UEFA Euro,2024,2024-06-26,Ukraine,Belgium,0,0,0,1,0.6461,False
+target_over_1_5,full_last_5,random_forest_balanced,3939984,Copa America,2024,2024-06-28,Colombia,Costa Rica,3,0,1,0,0.3625,False
+target_over_1_5,full_last_5,random_forest_balanced,3940878,UEFA Euro,2024,2024-06-29,Switzerland,Italy,2,0,1,1,0.6128,True
+target_over_1_5,full_last_5,random_forest_balanced,3940983,UEFA Euro,2024,2024-06-29,Germany,Denmark,2,0,1,1,0.8193,True
+target_over_1_5,full_last_5,random_forest_balanced,3939986,Copa America,2024,2024-06-30,Argentina,Peru,2,0,1,1,0.8385,True
+target_over_1_5,full_last_5,random_forest_balanced,3941017,UEFA Euro,2024,2024-06-30,England,Slovakia,2,1,1,0,0.3918,False
+target_over_1_5,full_last_5,random_forest_balanced,3939988,Copa America,2024,2024-07-01,Mexico,Ecuador,0,0,0,1,0.8865,False
+target_over_1_5,full_last_5,random_forest_balanced,3941019,UEFA Euro,2024,2024-07-01,France,Belgium,1,0,0,1,0.8824,False
+target_over_1_5,full_last_5,random_forest_balanced,3939990,Copa America,2024,2024-07-02,United States,Uruguay,0,1,0,1,0.8177,False
+target_over_1_5,full_last_5,random_forest_balanced,3941022,UEFA Euro,2024,2024-07-02,Austria,Turkey,1,2,1,0,0.4752,False
+target_over_1_5,full_last_5,random_forest_balanced,3939991,Copa America,2024,2024-07-03,Brazil,Colombia,1,1,1,1,0.9,True
+target_over_1_5,full_last_5,random_forest_balanced,3942228,Copa America,2024,2024-07-05,Argentina,Ecuador,1,1,1,1,0.8717,True
+target_over_1_5,full_last_5,random_forest_balanced,3942226,UEFA Euro,2024,2024-07-05,Spain,Germany,2,1,1,1,0.8673,True
+target_over_1_5,full_last_5,random_forest_balanced,3942349,UEFA Euro,2024,2024-07-05,Portugal,France,0,0,0,1,0.8318,False
+target_over_1_5,full_last_5,random_forest_balanced,3942416,Copa America,2024,2024-07-06,Colombia,Panama,5,0,1,1,0.5794,True
+target_over_1_5,full_last_5,random_forest_balanced,3942227,UEFA Euro,2024,2024-07-06,England,Switzerland,1,1,1,1,0.7967,True
+target_over_1_5,full_last_5,random_forest_balanced,3942382,UEFA Euro,2024,2024-07-06,Netherlands,Turkey,2,1,1,1,0.6973,True
+target_over_1_5,full_last_5,random_forest_balanced,3942415,Copa America,2024,2024-07-07,Uruguay,Brazil,0,0,0,1,0.6983,False
+target_over_1_5,full_last_5,random_forest_balanced,3942752,UEFA Euro,2024,2024-07-09,Spain,France,2,1,1,1,0.791,True
+target_over_1_5,full_last_5,random_forest_balanced,3942785,Copa America,2024,2024-07-10,Argentina,Canada,2,0,1,1,0.7655,True
+target_over_1_5,full_last_5,random_forest_balanced,3942819,UEFA Euro,2024,2024-07-10,Netherlands,England,1,2,1,1,0.8881,True
+target_over_1_5,full_last_5,random_forest_balanced,3942852,Copa America,2024,2024-07-11,Uruguay,Colombia,0,1,0,1,0.8138,False
+target_over_1_5,full_last_5,random_forest_balanced,3943076,Copa America,2024,2024-07-14,Canada,Uruguay,2,2,1,1,0.5911,True
+target_over_1_5,full_last_5,random_forest_balanced,3943043,UEFA Euro,2024,2024-07-14,Spain,England,2,1,1,1,0.7902,True
+target_over_1_5,full_last_5,random_forest_balanced,3943077,Copa America,2024,2024-07-15,Argentina,Colombia,1,0,0,1,0.8444,False
+target_over_2_5,full_last_5,dummy_most_frequent,3938643,UEFA Euro,2024,2024-06-25,France,Poland,1,1,0,1,1.0,False
+target_over_2_5,full_last_5,dummy_most_frequent,3930184,UEFA Euro,2024,2024-06-26,Czech Republic,Turkey,1,2,1,1,1.0,True
+target_over_2_5,full_last_5,dummy_most_frequent,3938645,UEFA Euro,2024,2024-06-26,Ukraine,Belgium,0,0,0,1,1.0,False
+target_over_2_5,full_last_5,dummy_most_frequent,3939984,Copa America,2024,2024-06-28,Colombia,Costa Rica,3,0,1,1,1.0,True
+target_over_2_5,full_last_5,dummy_most_frequent,3940878,UEFA Euro,2024,2024-06-29,Switzerland,Italy,2,0,0,1,1.0,False
+target_over_2_5,full_last_5,dummy_most_frequent,3940983,UEFA Euro,2024,2024-06-29,Germany,Denmark,2,0,0,1,1.0,False
+target_over_2_5,full_last_5,dummy_most_frequent,3939986,Copa America,2024,2024-06-30,Argentina,Peru,2,0,0,1,1.0,False
+target_over_2_5,full_last_5,dummy_most_frequent,3941017,UEFA Euro,2024,2024-06-30,England,Slovakia,2,1,1,1,1.0,True
+target_over_2_5,full_last_5,dummy_most_frequent,3939988,Copa America,2024,2024-07-01,Mexico,Ecuador,0,0,0,1,1.0,False
+target_over_2_5,full_last_5,dummy_most_frequent,3941019,UEFA Euro,2024,2024-07-01,France,Belgium,1,0,0,1,1.0,False
+target_over_2_5,full_last_5,dummy_most_frequent,3939990,Copa America,2024,2024-07-02,United States,Uruguay,0,1,0,1,1.0,False
+target_over_2_5,full_last_5,dummy_most_frequent,3941022,UEFA Euro,2024,2024-07-02,Austria,Turkey,1,2,1,1,1.0,True
+target_over_2_5,full_last_5,dummy_most_frequent,3939991,Copa America,2024,2024-07-03,Brazil,Colombia,1,1,0,1,1.0,False
+target_over_2_5,full_last_5,dummy_most_frequent,3942228,Copa America,2024,2024-07-05,Argentina,Ecuador,1,1,0,1,1.0,False
+target_over_2_5,full_last_5,dummy_most_frequent,3942226,UEFA Euro,2024,2024-07-05,Spain,Germany,2,1,1,1,1.0,True
+target_over_2_5,full_last_5,dummy_most_frequent,3942349,UEFA Euro,2024,2024-07-05,Portugal,France,0,0,0,1,1.0,False
+target_over_2_5,full_last_5,dummy_most_frequent,3942416,Copa America,2024,2024-07-06,Colombia,Panama,5,0,1,1,1.0,True
+target_over_2_5,full_last_5,dummy_most_frequent,3942227,UEFA Euro,2024,2024-07-06,England,Switzerland,1,1,0,1,1.0,False
+target_over_2_5,full_last_5,dummy_most_frequent,3942382,UEFA Euro,2024,2024-07-06,Netherlands,Turkey,2,1,1,1,1.0,True
+target_over_2_5,full_last_5,dummy_most_frequent,3942415,Copa America,2024,2024-07-07,Uruguay,Brazil,0,0,0,1,1.0,False
+target_over_2_5,full_last_5,dummy_most_frequent,3942752,UEFA Euro,2024,2024-07-09,Spain,France,2,1,1,1,1.0,True
+target_over_2_5,full_last_5,dummy_most_frequent,3942785,Copa America,2024,2024-07-10,Argentina,Canada,2,0,0,1,1.0,False
+target_over_2_5,full_last_5,dummy_most_frequent,3942819,UEFA Euro,2024,2024-07-10,Netherlands,England,1,2,1,1,1.0,True
+target_over_2_5,full_last_5,dummy_most_frequent,3942852,Copa America,2024,2024-07-11,Uruguay,Colombia,0,1,0,1,1.0,False
+target_over_2_5,full_last_5,dummy_most_frequent,3943076,Copa America,2024,2024-07-14,Canada,Uruguay,2,2,1,1,1.0,True
+target_over_2_5,full_last_5,dummy_most_frequent,3943043,UEFA Euro,2024,2024-07-14,Spain,England,2,1,1,1,1.0,True
+target_over_2_5,full_last_5,dummy_most_frequent,3943077,Copa America,2024,2024-07-15,Argentina,Colombia,1,0,0,1,1.0,False
+target_over_2_5,full_last_5,logistic_regression_balanced,3938643,UEFA Euro,2024,2024-06-25,France,Poland,1,1,0,1,0.6603,False
+target_over_2_5,full_last_5,logistic_regression_balanced,3930184,UEFA Euro,2024,2024-06-26,Czech Republic,Turkey,1,2,1,0,0.2734,False
+target_over_2_5,full_last_5,logistic_regression_balanced,3938645,UEFA Euro,2024,2024-06-26,Ukraine,Belgium,0,0,0,0,0.4881,True
+target_over_2_5,full_last_5,logistic_regression_balanced,3939984,Copa America,2024,2024-06-28,Colombia,Costa Rica,3,0,1,1,0.5432,True
+target_over_2_5,full_last_5,logistic_regression_balanced,3940878,UEFA Euro,2024,2024-06-29,Switzerland,Italy,2,0,0,1,0.6038,False
+target_over_2_5,full_last_5,logistic_regression_balanced,3940983,UEFA Euro,2024,2024-06-29,Germany,Denmark,2,0,0,0,0.2784,True
+target_over_2_5,full_last_5,logistic_regression_balanced,3939986,Copa America,2024,2024-06-30,Argentina,Peru,2,0,0,1,0.8257,False
+target_over_2_5,full_last_5,logistic_regression_balanced,3941017,UEFA Euro,2024,2024-06-30,England,Slovakia,2,1,1,1,0.765,True
+target_over_2_5,full_last_5,logistic_regression_balanced,3939988,Copa America,2024,2024-07-01,Mexico,Ecuador,0,0,0,0,0.274,True
+target_over_2_5,full_last_5,logistic_regression_balanced,3941019,UEFA Euro,2024,2024-07-01,France,Belgium,1,0,0,1,0.6536,False
+target_over_2_5,full_last_5,logistic_regression_balanced,3939990,Copa America,2024,2024-07-02,United States,Uruguay,0,1,0,0,0.402,True
+target_over_2_5,full_last_5,logistic_regression_balanced,3941022,UEFA Euro,2024,2024-07-02,Austria,Turkey,1,2,1,0,0.4762,False
+target_over_2_5,full_last_5,logistic_regression_balanced,3939991,Copa America,2024,2024-07-03,Brazil,Colombia,1,1,0,1,0.65,False
+target_over_2_5,full_last_5,logistic_regression_balanced,3942228,Copa America,2024,2024-07-05,Argentina,Ecuador,1,1,0,1,0.6265,False
+target_over_2_5,full_last_5,logistic_regression_balanced,3942226,UEFA Euro,2024,2024-07-05,Spain,Germany,2,1,1,0,0.1602,False
+target_over_2_5,full_last_5,logistic_regression_balanced,3942349,UEFA Euro,2024,2024-07-05,Portugal,France,0,0,0,1,0.5493,False
+target_over_2_5,full_last_5,logistic_regression_balanced,3942416,Copa America,2024,2024-07-06,Colombia,Panama,5,0,1,1,0.5882,True
+target_over_2_5,full_last_5,logistic_regression_balanced,3942227,UEFA Euro,2024,2024-07-06,England,Switzerland,1,1,0,0,0.3687,True
+target_over_2_5,full_last_5,logistic_regression_balanced,3942382,UEFA Euro,2024,2024-07-06,Netherlands,Turkey,2,1,1,0,0.473,False
+target_over_2_5,full_last_5,logistic_regression_balanced,3942415,Copa America,2024,2024-07-07,Uruguay,Brazil,0,0,0,0,0.27,True
+target_over_2_5,full_last_5,logistic_regression_balanced,3942752,UEFA Euro,2024,2024-07-09,Spain,France,2,1,1,0,0.4567,False
+target_over_2_5,full_last_5,logistic_regression_balanced,3942785,Copa America,2024,2024-07-10,Argentina,Canada,2,0,0,1,0.8208,False
+target_over_2_5,full_last_5,logistic_regression_balanced,3942819,UEFA Euro,2024,2024-07-10,Netherlands,England,1,2,1,1,0.5304,True
+target_over_2_5,full_last_5,logistic_regression_balanced,3942852,Copa America,2024,2024-07-11,Uruguay,Colombia,0,1,0,1,0.5259,False
+target_over_2_5,full_last_5,logistic_regression_balanced,3943076,Copa America,2024,2024-07-14,Canada,Uruguay,2,2,1,1,0.7466,True
+target_over_2_5,full_last_5,logistic_regression_balanced,3943043,UEFA Euro,2024,2024-07-14,Spain,England,2,1,1,0,0.2783,False
+target_over_2_5,full_last_5,logistic_regression_balanced,3943077,Copa America,2024,2024-07-15,Argentina,Colombia,1,0,0,1,0.6317,False
+target_over_2_5,full_last_5,random_forest_balanced,3938643,UEFA Euro,2024,2024-06-25,France,Poland,1,1,0,1,0.5592,False
+target_over_2_5,full_last_5,random_forest_balanced,3930184,UEFA Euro,2024,2024-06-26,Czech Republic,Turkey,1,2,1,0,0.4918,False
+target_over_2_5,full_last_5,random_forest_balanced,3938645,UEFA Euro,2024,2024-06-26,Ukraine,Belgium,0,0,0,0,0.4153,True
+target_over_2_5,full_last_5,random_forest_balanced,3939984,Copa America,2024,2024-06-28,Colombia,Costa Rica,3,0,1,0,0.4105,False
+target_over_2_5,full_last_5,random_forest_balanced,3940878,UEFA Euro,2024,2024-06-29,Switzerland,Italy,2,0,0,0,0.3488,True
+target_over_2_5,full_last_5,random_forest_balanced,3940983,UEFA Euro,2024,2024-06-29,Germany,Denmark,2,0,0,1,0.7246,False
+target_over_2_5,full_last_5,random_forest_balanced,3939986,Copa America,2024,2024-06-30,Argentina,Peru,2,0,0,1,0.6822,False
+target_over_2_5,full_last_5,random_forest_balanced,3941017,UEFA Euro,2024,2024-06-30,England,Slovakia,2,1,1,0,0.442,False
+target_over_2_5,full_last_5,random_forest_balanced,3939988,Copa America,2024,2024-07-01,Mexico,Ecuador,0,0,0,0,0.4197,True
+target_over_2_5,full_last_5,random_forest_balanced,3941019,UEFA Euro,2024,2024-07-01,France,Belgium,1,0,0,1,0.6685,False
+target_over_2_5,full_last_5,random_forest_balanced,3939990,Copa America,2024,2024-07-02,United States,Uruguay,0,1,0,0,0.2956,True
+target_over_2_5,full_last_5,random_forest_balanced,3941022,UEFA Euro,2024,2024-07-02,Austria,Turkey,1,2,1,0,0.4358,False
+target_over_2_5,full_last_5,random_forest_balanced,3939991,Copa America,2024,2024-07-03,Brazil,Colombia,1,1,0,1,0.63,False
+target_over_2_5,full_last_5,random_forest_balanced,3942228,Copa America,2024,2024-07-05,Argentina,Ecuador,1,1,0,1,0.6543,False
+target_over_2_5,full_last_5,random_forest_balanced,3942226,UEFA Euro,2024,2024-07-05,Spain,Germany,2,1,1,0,0.2801,False
+target_over_2_5,full_last_5,random_forest_balanced,3942349,UEFA Euro,2024,2024-07-05,Portugal,France,0,0,0,1,0.5867,False
+target_over_2_5,full_last_5,random_forest_balanced,3942416,Copa America,2024,2024-07-06,Colombia,Panama,5,0,1,1,0.5578,True
+target_over_2_5,full_last_5,random_forest_balanced,3942227,UEFA Euro,2024,2024-07-06,England,Switzerland,1,1,0,1,0.6767,False
+target_over_2_5,full_last_5,random_forest_balanced,3942382,UEFA Euro,2024,2024-07-06,Netherlands,Turkey,2,1,1,1,0.588,True
+target_over_2_5,full_last_5,random_forest_balanced,3942415,Copa America,2024,2024-07-07,Uruguay,Brazil,0,0,0,0,0.4745,True
+target_over_2_5,full_last_5,random_forest_balanced,3942752,UEFA Euro,2024,2024-07-09,Spain,France,2,1,1,0,0.4298,False
+target_over_2_5,full_last_5,random_forest_balanced,3942785,Copa America,2024,2024-07-10,Argentina,Canada,2,0,0,1,0.6586,False
+target_over_2_5,full_last_5,random_forest_balanced,3942819,UEFA Euro,2024,2024-07-10,Netherlands,England,1,2,1,1,0.662,True
+target_over_2_5,full_last_5,random_forest_balanced,3942852,Copa America,2024,2024-07-11,Uruguay,Colombia,0,1,0,1,0.5229,False
+target_over_2_5,full_last_5,random_forest_balanced,3943076,Copa America,2024,2024-07-14,Canada,Uruguay,2,2,1,0,0.2915,False
+target_over_2_5,full_last_5,random_forest_balanced,3943043,UEFA Euro,2024,2024-07-14,Spain,England,2,1,1,1,0.6254,True
+target_over_2_5,full_last_5,random_forest_balanced,3943077,Copa America,2024,2024-07-15,Argentina,Colombia,1,0,0,0,0.4294,True
+target_btts,full_last_5,dummy_most_frequent,3938643,UEFA Euro,2024,2024-06-25,France,Poland,1,1,1,1,1.0,True
+target_btts,full_last_5,dummy_most_frequent,3930184,UEFA Euro,2024,2024-06-26,Czech Republic,Turkey,1,2,1,1,1.0,True
+target_btts,full_last_5,dummy_most_frequent,3938645,UEFA Euro,2024,2024-06-26,Ukraine,Belgium,0,0,0,1,1.0,False
+target_btts,full_last_5,dummy_most_frequent,3939984,Copa America,2024,2024-06-28,Colombia,Costa Rica,3,0,0,1,1.0,False
+target_btts,full_last_5,dummy_most_frequent,3940878,UEFA Euro,2024,2024-06-29,Switzerland,Italy,2,0,0,1,1.0,False
+target_btts,full_last_5,dummy_most_frequent,3940983,UEFA Euro,2024,2024-06-29,Germany,Denmark,2,0,0,1,1.0,False
+target_btts,full_last_5,dummy_most_frequent,3939986,Copa America,2024,2024-06-30,Argentina,Peru,2,0,0,1,1.0,False
+target_btts,full_last_5,dummy_most_frequent,3941017,UEFA Euro,2024,2024-06-30,England,Slovakia,2,1,1,1,1.0,True
+target_btts,full_last_5,dummy_most_frequent,3939988,Copa America,2024,2024-07-01,Mexico,Ecuador,0,0,0,1,1.0,False
+target_btts,full_last_5,dummy_most_frequent,3941019,UEFA Euro,2024,2024-07-01,France,Belgium,1,0,0,1,1.0,False
+target_btts,full_last_5,dummy_most_frequent,3939990,Copa America,2024,2024-07-02,United States,Uruguay,0,1,0,1,1.0,False
+target_btts,full_last_5,dummy_most_frequent,3941022,UEFA Euro,2024,2024-07-02,Austria,Turkey,1,2,1,1,1.0,True
+target_btts,full_last_5,dummy_most_frequent,3939991,Copa America,2024,2024-07-03,Brazil,Colombia,1,1,1,1,1.0,True
+target_btts,full_last_5,dummy_most_frequent,3942228,Copa America,2024,2024-07-05,Argentina,Ecuador,1,1,1,1,1.0,True
+target_btts,full_last_5,dummy_most_frequent,3942226,UEFA Euro,2024,2024-07-05,Spain,Germany,2,1,1,1,1.0,True
+target_btts,full_last_5,dummy_most_frequent,3942349,UEFA Euro,2024,2024-07-05,Portugal,France,0,0,0,1,1.0,False
+target_btts,full_last_5,dummy_most_frequent,3942416,Copa America,2024,2024-07-06,Colombia,Panama,5,0,0,1,1.0,False
+target_btts,full_last_5,dummy_most_frequent,3942227,UEFA Euro,2024,2024-07-06,England,Switzerland,1,1,1,1,1.0,True
+target_btts,full_last_5,dummy_most_frequent,3942382,UEFA Euro,2024,2024-07-06,Netherlands,Turkey,2,1,1,1,1.0,True
+target_btts,full_last_5,dummy_most_frequent,3942415,Copa America,2024,2024-07-07,Uruguay,Brazil,0,0,0,1,1.0,False
+target_btts,full_last_5,dummy_most_frequent,3942752,UEFA Euro,2024,2024-07-09,Spain,France,2,1,1,1,1.0,True
+target_btts,full_last_5,dummy_most_frequent,3942785,Copa America,2024,2024-07-10,Argentina,Canada,2,0,0,1,1.0,False
+target_btts,full_last_5,dummy_most_frequent,3942819,UEFA Euro,2024,2024-07-10,Netherlands,England,1,2,1,1,1.0,True
+target_btts,full_last_5,dummy_most_frequent,3942852,Copa America,2024,2024-07-11,Uruguay,Colombia,0,1,0,1,1.0,False
+target_btts,full_last_5,dummy_most_frequent,3943076,Copa America,2024,2024-07-14,Canada,Uruguay,2,2,1,1,1.0,True
+target_btts,full_last_5,dummy_most_frequent,3943043,UEFA Euro,2024,2024-07-14,Spain,England,2,1,1,1,1.0,True
+target_btts,full_last_5,dummy_most_frequent,3943077,Copa America,2024,2024-07-15,Argentina,Colombia,1,0,0,1,1.0,False
+target_btts,full_last_5,logistic_regression_balanced,3938643,UEFA Euro,2024,2024-06-25,France,Poland,1,1,1,1,0.5009,True
+target_btts,full_last_5,logistic_regression_balanced,3930184,UEFA Euro,2024,2024-06-26,Czech Republic,Turkey,1,2,1,0,0.4629,False
+target_btts,full_last_5,logistic_regression_balanced,3938645,UEFA Euro,2024,2024-06-26,Ukraine,Belgium,0,0,0,1,0.8528,False
+target_btts,full_last_5,logistic_regression_balanced,3939984,Copa America,2024,2024-06-28,Colombia,Costa Rica,3,0,0,0,0.1346,True
+target_btts,full_last_5,logistic_regression_balanced,3940878,UEFA Euro,2024,2024-06-29,Switzerland,Italy,2,0,0,0,0.4825,True
+target_btts,full_last_5,logistic_regression_balanced,3940983,UEFA Euro,2024,2024-06-29,Germany,Denmark,2,0,0,1,0.8108,False
+target_btts,full_last_5,logistic_regression_balanced,3939986,Copa America,2024,2024-06-30,Argentina,Peru,2,0,0,1,0.8822,False
+target_btts,full_last_5,logistic_regression_balanced,3941017,UEFA Euro,2024,2024-06-30,England,Slovakia,2,1,1,0,0.2574,False
+target_btts,full_last_5,logistic_regression_balanced,3939988,Copa America,2024,2024-07-01,Mexico,Ecuador,0,0,0,1,0.5043,False
+target_btts,full_last_5,logistic_regression_balanced,3941019,UEFA Euro,2024,2024-07-01,France,Belgium,1,0,0,1,0.9698,False
+target_btts,full_last_5,logistic_regression_balanced,3939990,Copa America,2024,2024-07-02,United States,Uruguay,0,1,0,1,0.6114,False
+target_btts,full_last_5,logistic_regression_balanced,3941022,UEFA Euro,2024,2024-07-02,Austria,Turkey,1,2,1,1,0.6191,True
+target_btts,full_last_5,logistic_regression_balanced,3939991,Copa America,2024,2024-07-03,Brazil,Colombia,1,1,1,1,0.5134,True
+target_btts,full_last_5,logistic_regression_balanced,3942228,Copa America,2024,2024-07-05,Argentina,Ecuador,1,1,1,1,0.695,True
+target_btts,full_last_5,logistic_regression_balanced,3942226,UEFA Euro,2024,2024-07-05,Spain,Germany,2,1,1,1,0.893,True
+target_btts,full_last_5,logistic_regression_balanced,3942349,UEFA Euro,2024,2024-07-05,Portugal,France,0,0,0,1,0.7169,False
+target_btts,full_last_5,logistic_regression_balanced,3942416,Copa America,2024,2024-07-06,Colombia,Panama,5,0,0,0,0.1407,True
+target_btts,full_last_5,logistic_regression_balanced,3942227,UEFA Euro,2024,2024-07-06,England,Switzerland,1,1,1,0,0.343,False
+target_btts,full_last_5,logistic_regression_balanced,3942382,UEFA Euro,2024,2024-07-06,Netherlands,Turkey,2,1,1,1,0.5226,True
+target_btts,full_last_5,logistic_regression_balanced,3942415,Copa America,2024,2024-07-07,Uruguay,Brazil,0,0,0,1,0.7703,False
+target_btts,full_last_5,logistic_regression_balanced,3942752,UEFA Euro,2024,2024-07-09,Spain,France,2,1,1,1,0.965,True
+target_btts,full_last_5,logistic_regression_balanced,3942785,Copa America,2024,2024-07-10,Argentina,Canada,2,0,0,1,0.618,False
+target_btts,full_last_5,logistic_regression_balanced,3942819,UEFA Euro,2024,2024-07-10,Netherlands,England,1,2,1,1,0.72,True
+target_btts,full_last_5,logistic_regression_balanced,3942852,Copa America,2024,2024-07-11,Uruguay,Colombia,0,1,0,0,0.4068,True
+target_btts,full_last_5,logistic_regression_balanced,3943076,Copa America,2024,2024-07-14,Canada,Uruguay,2,2,1,1,0.8149,True
+target_btts,full_last_5,logistic_regression_balanced,3943043,UEFA Euro,2024,2024-07-14,Spain,England,2,1,1,1,0.7755,True
+target_btts,full_last_5,logistic_regression_balanced,3943077,Copa America,2024,2024-07-15,Argentina,Colombia,1,0,0,1,0.5665,False
+target_btts,full_last_5,random_forest_balanced,3938643,UEFA Euro,2024,2024-06-25,France,Poland,1,1,1,1,0.5221,True
+target_btts,full_last_5,random_forest_balanced,3930184,UEFA Euro,2024,2024-06-26,Czech Republic,Turkey,1,2,1,0,0.3366,False
+target_btts,full_last_5,random_forest_balanced,3938645,UEFA Euro,2024,2024-06-26,Ukraine,Belgium,0,0,0,1,0.5012,False
+target_btts,full_last_5,random_forest_balanced,3939984,Copa America,2024,2024-06-28,Colombia,Costa Rica,3,0,0,0,0.365,True
+target_btts,full_last_5,random_forest_balanced,3940878,UEFA Euro,2024,2024-06-29,Switzerland,Italy,2,0,0,0,0.37,True
+target_btts,full_last_5,random_forest_balanced,3940983,UEFA Euro,2024,2024-06-29,Germany,Denmark,2,0,0,1,0.6256,False
+target_btts,full_last_5,random_forest_balanced,3939986,Copa America,2024,2024-06-30,Argentina,Peru,2,0,0,1,0.6795,False
+target_btts,full_last_5,random_forest_balanced,3941017,UEFA Euro,2024,2024-06-30,England,Slovakia,2,1,1,0,0.3372,False
+target_btts,full_last_5,random_forest_balanced,3939988,Copa America,2024,2024-07-01,Mexico,Ecuador,0,0,0,1,0.5173,False
+target_btts,full_last_5,random_forest_balanced,3941019,UEFA Euro,2024,2024-07-01,France,Belgium,1,0,0,1,0.636,False
+target_btts,full_last_5,random_forest_balanced,3939990,Copa America,2024,2024-07-02,United States,Uruguay,0,1,0,1,0.563,False
+target_btts,full_last_5,random_forest_balanced,3941022,UEFA Euro,2024,2024-07-02,Austria,Turkey,1,2,1,0,0.3341,False
+target_btts,full_last_5,random_forest_balanced,3939991,Copa America,2024,2024-07-03,Brazil,Colombia,1,1,1,1,0.5964,True
+target_btts,full_last_5,random_forest_balanced,3942228,Copa America,2024,2024-07-05,Argentina,Ecuador,1,1,1,1,0.6011,True
+target_btts,full_last_5,random_forest_balanced,3942226,UEFA Euro,2024,2024-07-05,Spain,Germany,2,1,1,1,0.8149,True
+target_btts,full_last_5,random_forest_balanced,3942349,UEFA Euro,2024,2024-07-05,Portugal,France,0,0,0,1,0.5827,False
+target_btts,full_last_5,random_forest_balanced,3942416,Copa America,2024,2024-07-06,Colombia,Panama,5,0,0,0,0.4983,True
+target_btts,full_last_5,random_forest_balanced,3942227,UEFA Euro,2024,2024-07-06,England,Switzerland,1,1,1,1,0.6282,True
+target_btts,full_last_5,random_forest_balanced,3942382,UEFA Euro,2024,2024-07-06,Netherlands,Turkey,2,1,1,0,0.4727,False
+target_btts,full_last_5,random_forest_balanced,3942415,Copa America,2024,2024-07-07,Uruguay,Brazil,0,0,0,1,0.6505,False
+target_btts,full_last_5,random_forest_balanced,3942752,UEFA Euro,2024,2024-07-09,Spain,France,2,1,1,1,0.5993,True
+target_btts,full_last_5,random_forest_balanced,3942785,Copa America,2024,2024-07-10,Argentina,Canada,2,0,0,1,0.5329,False
+target_btts,full_last_5,random_forest_balanced,3942819,UEFA Euro,2024,2024-07-10,Netherlands,England,1,2,1,1,0.595,True
+target_btts,full_last_5,random_forest_balanced,3942852,Copa America,2024,2024-07-11,Uruguay,Colombia,0,1,0,1,0.595,False
+target_btts,full_last_5,random_forest_balanced,3943076,Copa America,2024,2024-07-14,Canada,Uruguay,2,2,1,1,0.5994,True
+target_btts,full_last_5,random_forest_balanced,3943043,UEFA Euro,2024,2024-07-14,Spain,England,2,1,1,1,0.6521,True
+target_btts,full_last_5,random_forest_balanced,3943077,Copa America,2024,2024-07-15,Argentina,Colombia,1,0,0,1,0.6174,False
