@@ -1,0 +1,70 @@
+﻿RubyBets - Decision V18.3.2 global selector
+
+Fichier :
+reports/evidence/ml_training/364_v18_3_2_global_selector_decision.txt
+
+Version analysee :
+V18.3.2 - Global selector threshold search
+
+Contexte :
+V18.3.2 a ete lancee apres V18.3 et V18.3.1 afin d'augmenter la couverture du selecteur global sans perdre trop de fiabilite, tout en reduisant la dependance excessive au marche DOUBLE_CHANCE.
+
+Objectifs fixes :
+- Reliability minimale : 0.895
+- Coverage minimale : 0.50
+- DOUBLE_CHANCE share maximale : 0.72
+
+Resultats obtenus :
+- Configurations testees : 5184
+- Configurations atteignant les objectifs : 1289
+- Meilleure variante : v18_3_2_s760_o15780_o25680_b750_dc150_capnone_reference_order_btts1
+- Reliability : 0.8961
+- Coverage : 0.5783
+- Selected rows : 1126
+- Abstention rate : 0.4217
+- DOUBLE_CHANCE rows : 793
+- DOUBLE_CHANCE share selected : 0.7043
+- Direct market share selected : 0.2957
+
+Seuils retenus :
+- STRICT_1X2 min confidence : 0.76
+- OVER_1_5 YES min confidence : 0.78
+- OVER_2_5 min confidence : 0.68
+- BTTS NO min confidence : 0.75
+- DOUBLE_CHANCE excluded probability max : 0.15
+- DOUBLE_CHANCE share cap : None
+- BTTS autorise : True
+- Priorite : STRICT_1X2 > OVER_1_5 > OVER_2_5 > BTTS > DOUBLE_CHANCE
+
+Repartition du meilleur selecteur :
+- STRICT_1X2 : rows=276, accuracy=0.9094
+- DOUBLE_CHANCE : rows=793, accuracy=0.9004
+- OVER_1_5 : rows=23, accuracy=0.9130
+- OVER_2_5 : rows=33, accuracy=0.6667
+- BTTS : rows=1, accuracy=1.0000
+- ABSTAIN : rows=821
+
+Analyse :
+V18.3.2 atteint les objectifs fixes pour cette experience. Elle ameliore nettement la coverage par rapport a V18.3.1 et obtient une coverage legerement superieure a V18.3.
+
+Elle reduit aussi la dependance a DOUBLE_CHANCE par rapport a V18.3 :
+- V18.3 DOUBLE_CHANCE share selected : 0.7676
+- V18.3.2 DOUBLE_CHANCE share selected : 0.7043
+
+Cependant, V18.3.2 descend sous le seuil de 0.90 de reliability. Elle ne doit donc pas remplacer V18.3.1 comme variante prudente.
+
+Decision :
+- V18.3 reste la reference globale fiable.
+- V18.3.1 reste la variante equilibree prudente.
+- V18.3.2 est retenue comme variante coverage boost experimentale.
+
+Decision produit :
+V18.3.2 ne doit pas etre integree au frontend maintenant.
+La couche backend d'inference doit d'abord etre proprement formalisee avant toute exposition dans l'application.
+
+Prochaine etape possible :
+1. Committer ensemble V18.3.1 et V18.3.2 comme variantes documentees.
+2. Ou lancer V18.3.3 avec une contrainte stricte reliability >= 0.90 et une coverage maximale.
+
+Conclusion :
+V18.3.2 est une variante interessante pour augmenter la couverture globale, mais son niveau de fiabilite la positionne comme une variante experimentale de type coverage boost, et non comme la nouvelle reference prudente.

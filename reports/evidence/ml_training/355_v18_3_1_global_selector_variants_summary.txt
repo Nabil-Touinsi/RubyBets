@@ -1,0 +1,69 @@
+OK - Evaluation V18.3.1 global selector variants terminee.
+
+Contexte :
+- Phase : V18.3.1 national global multi-market.
+- Objectif : reduire la dependance a DOUBLE_CHANCE sans perdre la fiabilite du selecteur V18.3.
+- StatsBomb : non utilise dans V18.3.1 global.
+- DOUBLE_CHANCE : toujours derivee des probabilites 1X2, jamais entrainee comme target separee.
+- ABSTAIN : conserve comme mecanisme de prudence.
+
+Fichier utilise :
+- Predictions test : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\348_v18_3_global_multimarket_test_predictions.csv
+
+Objectifs de decision V18.3.1 :
+- Reliability cible minimale : 0.9
+- Coverage cible minimale : 0.35
+- Part DOUBLE_CHANCE cible maximale parmi les selections : 0.7
+
+Reference V18.3 :
+- Reliability : 0.9071
+- Coverage : 0.5747
+- Selected rows : 1119
+- DOUBLE_CHANCE rows : 859
+- DOUBLE_CHANCE share selected : 0.7676
+
+Meilleure variante V18.3.1 selon le score de qualite :
+- Variante retenue : v18_3_1_market_balanced_p012
+- Description : Variante equilibree avec un peu plus de couverture via DOUBLE_CHANCE <= 0.12.
+- Reliability : 0.9013
+- Coverage : 0.4735
+- Selected rows : 922
+- Abstention rate : 0.5265
+- DOUBLE_CHANCE rows : 618
+- DOUBLE_CHANCE share selected : 0.6703
+- Direct market share selected : 0.3297
+- Quality score : 0.7520
+- Objectifs V18.3.1 atteints : True
+
+Repartition du meilleur selecteur :
+- STRICT_1X2 : rows=236, accuracy=0.9110, avg_conf=0.8557, share_selected=0.2560
+- DOUBLE_CHANCE : rows=618, accuracy=0.9223, avg_conf=0.9265, share_selected=0.6703
+- OVER_1_5 : rows=4, accuracy=1.0000, avg_conf=0.8214, share_selected=0.0043
+- OVER_2_5 : rows=60, accuracy=0.6500, avg_conf=0.7261, share_selected=0.0651
+- BTTS : rows=4, accuracy=0.7500, avg_conf=0.7368, share_selected=0.0043
+- ABSTAIN : rows=1025, accuracy=NA, avg_conf=NA, share_selected=0.0000
+
+Comparaison des variantes :
+- v18_3_baseline_reference | reliability=0.9071 | coverage=0.5747 | dc_share=0.7676 | selected=1119 | score=0.7704
+- v18_3_1_dc_strict_p012 | reliability=0.9213 | coverage=0.4700 | dc_share=0.7158 | selected=915 | score=0.7566
+- v18_3_1_market_balanced_p012 | reliability=0.9013 | coverage=0.4735 | dc_share=0.6703 | selected=922 | score=0.7520
+- v18_3_1_dc_strict_p010 | reliability=0.9247 | coverage=0.4027 | dc_share=0.6684 | selected=784 | score=0.7462
+- v18_3_1_market_balanced | reliability=0.9016 | coverage=0.4073 | dc_share=0.6166 | selected=793 | score=0.7410
+- v18_3_1_conservative_no_btts_dc_p010 | reliability=0.9304 | coverage=0.3986 | dc_share=0.7345 | selected=776 | score=0.7114
+- v18_3_1_no_dc_reference | reliability=0.9115 | coverage=0.1335 | dc_share=0.0000 | selected=260 | score=0.7092
+
+Repartition competitions test :
+- WCQ : 1819
+- WC : 128
+
+Fichiers generes :
+- Synthese : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\355_v18_3_1_global_selector_variants_summary.txt
+- Comparaison variantes : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\356_v18_3_1_global_selector_variants_comparison.csv
+- Resultats meilleur selecteur : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\357_v18_3_1_global_selector_best_results.csv
+- Repartition meilleur selecteur : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\358_v18_3_1_global_selector_best_market_breakdown.csv
+
+Decision technique :
+- V18.3.1 sert a comparer des variantes, pas encore a integrer le frontend.
+- La meilleure variante doit etre analysee avant commit definitif comme nouvelle reference.
+- Si la baisse de coverage est trop forte, V18.3 peut rester la reference et V18.3.1 devenir une variante prudente.
+- Les resultats restent experimentaux et ne promettent aucun resultat sportif.

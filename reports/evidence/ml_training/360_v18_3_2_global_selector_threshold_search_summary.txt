@@ -1,0 +1,83 @@
+OK - Optimisation V18.3.2 global selector thresholds terminee.
+
+Contexte :
+- Phase : V18.3.2 national global multi-market.
+- Objectif : augmenter la couverture sans perdre trop de fiabilite.
+- StatsBomb : non utilise dans V18.3.2 global.
+- DOUBLE_CHANCE : derivee des probabilites 1X2, jamais entrainee comme target separee.
+- ABSTAIN : conserve comme mecanisme de prudence.
+
+Fichier utilise :
+- Predictions test : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\348_v18_3_global_multimarket_test_predictions.csv
+
+References :
+- V18.3 : reliability=0.9071, coverage=0.5747, dc_share=0.7676, selected=1119
+- V18.3.1 : reliability=0.9013, coverage=0.4735, dc_share=0.6703, selected=922
+
+Objectifs V18.3.2 :
+- Reliability minimale : 0.895
+- Coverage minimale : 0.5
+- DOUBLE_CHANCE share maximale : 0.72
+
+Recherche effectuee :
+- Configurations testees : 5184
+- Configurations atteignant les objectifs : 1289
+- Lignes test analysees : 1947
+
+Meilleure configuration V18.3.2 :
+- Variante retenue : v18_3_2_s760_o15780_o25680_b750_dc150_capnone_reference_order_btts1
+- Reliability : 0.8961
+- Coverage : 0.5783
+- Selected rows : 1126
+- Abstention rate : 0.4217
+- DOUBLE_CHANCE rows : 793
+- DOUBLE_CHANCE share selected : 0.7043
+- Direct market share selected : 0.2957
+- Quality score : 0.7141
+- Objectifs V18.3.2 atteints : True
+
+Seuils retenus :
+- STRICT_1X2 min confidence : 0.76
+- OVER_1_5 YES min confidence : 0.78
+- OVER_2_5 min confidence : 0.68
+- BTTS NO min confidence : 0.75
+- DOUBLE_CHANCE excluded probability max : 0.15
+- DOUBLE_CHANCE share cap : None
+- BTTS autorise : True
+- Priorite : STRICT_1X2 > OVER_1_5 > OVER_2_5 > BTTS > DOUBLE_CHANCE
+
+Repartition du meilleur selecteur :
+- STRICT_1X2 : rows=276, accuracy=0.9094, avg_conf=0.8432, share_selected=0.2451
+- DOUBLE_CHANCE : rows=793, accuracy=0.9004, avg_conf=0.9092, share_selected=0.7043
+- OVER_1_5 : rows=23, accuracy=0.9130, avg_conf=0.8172, share_selected=0.0204
+- OVER_2_5 : rows=33, accuracy=0.6667, avg_conf=0.7095, share_selected=0.0293
+- BTTS : rows=1, accuracy=1.0000, avg_conf=0.7762, share_selected=0.0009
+- ABSTAIN : rows=821, accuracy=NA, avg_conf=NA, share_selected=0.0000
+
+Top 10 configurations par quality_score :
+- v18_3_2_s760_o15760_o25640_b720_dc150_cap700_reference_order_btts1 | reliability=0.8817 | coverage=0.5860 | dc_share=0.6643 | selected=1141 | score=0.7147 | targets=False
+- v18_3_2_s760_o15760_o25640_b720_dc150_capnone_reference_order_btts1 | reliability=0.8817 | coverage=0.5860 | dc_share=0.6643 | selected=1141 | score=0.7147 | targets=False
+- v18_3_2_s760_o15760_o25640_b720_dc150_cap720_reference_order_btts1 | reliability=0.8817 | coverage=0.5860 | dc_share=0.6643 | selected=1141 | score=0.7147 | targets=False
+- v18_3_2_s760_o15780_o25640_b720_dc150_capnone_reference_order_btts1 | reliability=0.8832 | coverage=0.5850 | dc_share=0.6699 | selected=1139 | score=0.7145 | targets=False
+- v18_3_2_s760_o15780_o25640_b720_dc150_cap720_reference_order_btts1 | reliability=0.8832 | coverage=0.5850 | dc_share=0.6699 | selected=1139 | score=0.7145 | targets=False
+- v18_3_2_s760_o15780_o25640_b720_dc150_cap700_reference_order_btts1 | reliability=0.8832 | coverage=0.5850 | dc_share=0.6699 | selected=1139 | score=0.7145 | targets=False
+- v18_3_2_s760_o15760_o25680_b750_dc150_capnone_reference_order_btts1 | reliability=0.8937 | coverage=0.5799 | dc_share=0.6971 | selected=1129 | score=0.7144 | targets=False
+- v18_3_2_s760_o15760_o25680_b750_dc150_cap700_reference_order_btts1 | reliability=0.8937 | coverage=0.5799 | dc_share=0.6971 | selected=1129 | score=0.7144 | targets=False
+- v18_3_2_s760_o15760_o25680_b750_dc150_cap720_reference_order_btts1 | reliability=0.8937 | coverage=0.5799 | dc_share=0.6971 | selected=1129 | score=0.7144 | targets=False
+- v18_3_2_s760_o15760_o25640_b700_dc150_cap720_reference_order_btts1 | reliability=0.8799 | coverage=0.5860 | dc_share=0.6608 | selected=1141 | score=0.7143 | targets=False
+
+Repartition competitions test :
+- WCQ : 1819
+- WC : 128
+
+Fichiers generes :
+- Synthese : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\360_v18_3_2_global_selector_threshold_search_summary.txt
+- Resultats recherche seuils : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\361_v18_3_2_global_selector_threshold_search_results.csv
+- Resultats meilleur selecteur : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\362_v18_3_2_global_selector_best_results.csv
+- Repartition meilleur selecteur : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\363_v18_3_2_global_selector_best_market_breakdown.csv
+
+Decision technique provisoire :
+- V18.3.2 sert a optimiser les seuils, pas encore a integrer le frontend.
+- La configuration retenue doit etre analysee avant commit definitif comme nouvelle variante.
+- Si la reliability descend trop bas, conserver V18.3.1 comme variante equilibree et V18.3 comme reference globale.
+- Les resultats restent experimentaux et ne promettent aucun resultat sportif.

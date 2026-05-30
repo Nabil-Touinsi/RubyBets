@@ -1,0 +1,82 @@
+OK - Decision V18.3.1 global selector variants formalisee.
+
+Contexte :
+- Phase : V18.3.1 national global multi-market.
+- Objectif : reduire la dependance du selecteur V18.3 a DOUBLE_CHANCE sans perdre la fiabilite globale.
+- Perimetre : base nationale ml_national, predictions test V18.3, sans StatsBomb comme feature globale.
+- StatsBomb reste une preuve d'enrichissement ciblee Coupe du Monde, mais n'est pas utilise dans V18.3.1 global.
+
+Reference V18.3 :
+- Variante : v18_3_baseline_reference
+- Reliability : 0.9071
+- Coverage : 0.5747
+- Selected rows : 1119
+- DOUBLE_CHANCE share selected : 0.7676
+- Lecture : tres fiable et plus couvrant, mais trop dependant du marche DOUBLE_CHANCE.
+
+Objectifs V18.3.1 :
+- Reliability cible minimale : 0.9000
+- Coverage cible minimale : 0.3500
+- DOUBLE_CHANCE share selected cible maximale : 0.7000
+
+Variante retenue :
+- Variante : v18_3_1_market_balanced_p012
+- Description : variante plus equilibree, avec DOUBLE_CHANCE limitee via une probabilite d'issue exclue <= 0.12.
+- Reliability : 0.9013
+- Coverage : 0.4735
+- Selected rows : 922
+- Abstention rate : 0.5265
+- DOUBLE_CHANCE rows : 618
+- DOUBLE_CHANCE share selected : 0.6703
+- Direct market share selected : 0.3297
+- Quality score : 0.7520
+- Objectifs V18.3.1 atteints : oui
+
+Comparaison V18.3 vs V18.3.1 :
+- Reliability : 0.9071 -> 0.9013
+- Coverage : 0.5747 -> 0.4735
+- Selected rows : 1119 -> 922
+- DOUBLE_CHANCE share selected : 0.7676 -> 0.6703
+- Abstention rate : 0.4253 -> 0.5265
+
+Repartition du meilleur selecteur V18.3.1 :
+- STRICT_1X2 : rows=236, accuracy=0.9110, avg_conf=0.8557, share_selected=0.2560
+- DOUBLE_CHANCE : rows=618, accuracy=0.9223, avg_conf=0.9265, share_selected=0.6703
+- OVER_1_5 : rows=4, accuracy=1.0000, avg_conf=0.8214, share_selected=0.0043
+- OVER_2_5 : rows=60, accuracy=0.6500, avg_conf=0.7261, share_selected=0.0651
+- BTTS : rows=4, accuracy=0.7500, avg_conf=0.7368, share_selected=0.0043
+- ABSTAIN : rows=1025
+
+Decision technique :
+- V18.3 reste la reference globale la plus couvrante.
+- V18.3.1 est retenue comme variante equilibree, car elle atteint les trois objectifs fixes.
+- La baisse de reliability est faible et acceptable : 0.9071 -> 0.9013.
+- La baisse de coverage est notable mais acceptable pour une variante prudente : 0.5747 -> 0.4735.
+- La dependance a DOUBLE_CHANCE est reduite de facon significative : 0.7676 -> 0.6703.
+- V18.3.1 ne remplace pas brutalement V18.3, mais devient une variante candidate plus equilibree pour les prochaines phases.
+- V18.3.1 ne doit pas encore etre integree directement au frontend.
+- Une couche backend d'inference propre devra etre creee avant toute exposition produit.
+
+Decision produit :
+- Ne pas presenter V18.3.1 comme une garantie de resultat sportif.
+- Presenter V18.3.1 comme une experimentation ML nationale prudente et documentee.
+- Conserver ABSTAIN comme mecanisme central de prudence.
+- Conserver DOUBLE_CHANCE comme marche derive des probabilites 1X2, jamais comme target entrainee separement.
+- Surveiller OVER_2_5, car il augmente la diversite du selecteur mais reste moins fiable que 1X2/DC.
+- Garder BTTS tres filtre, car il reste fragile globalement.
+
+Fichiers de preuve associes :
+- 355_v18_3_1_global_selector_variants_summary.txt
+- 356_v18_3_1_global_selector_variants_comparison.csv
+- 357_v18_3_1_global_selector_best_results.csv
+- 358_v18_3_1_global_selector_best_market_breakdown.csv
+- 359_v18_3_1_global_selector_decision.txt
+
+Statut :
+- Evaluation des variantes V18.3.1 : realisee.
+- Decision V18.3.1 : formalisee.
+- Integration frontend : non lancee.
+- Backend inference : a produire dans une phase suivante.
+
+Conclusion :
+V18.3.1 valide une amelioration controlee du selecteur V18.3. Elle accepte une baisse de couverture pour obtenir un selecteur moins dependant de DOUBLE_CHANCE et plus equilibre. Cette variante est retenue comme piste solide pour une future couche backend d'inference, mais reste experimentale a ce stade.
