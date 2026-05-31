@@ -1,0 +1,8 @@
+Decision V18.3.4 - reduction d'abstention
+=========================================
+Best variant analyse : v18_3_4_candidate_dc018
+Aucune variante ne respecte tous les garde-fous. La variante indiquee est seulement la meilleure piste a analyser, pas une decision produit.
+
+Regle de prudence : ne pas remplacer V18.3.3 directement.
+La variante V18.3.4 doit rester experimentale tant qu'elle n'est pas testee sur les matchs dynamiques WC actuels.
+Aucune garantie de resultat sportif ne doit etre formulee.

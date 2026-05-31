@@ -1,0 +1,39 @@
+Audit V18.3.3 dynamique - abstention World Cup
+================================================
+Cache analyse : C:\dev_classe\RNCP\RubyBets\backend\app\data\cache\matches_wc_scheduled_all_start_dates_all_end_dates.json
+CSV detaille : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\371_v18_3_3_dynamic_wc_abstention_audit_results.csv
+
+Matchs analyses : 104
+Recommandations : 21 (0.2019)
+Abstentions strictes : 51 (0.4904)
+Indisponibles : 32 (0.3077)
+Erreurs techniques : 0
+
+Repartition dynamic_status :
+- computed: 72
+- unavailable: 32
+
+Repartition selector_status :
+- ABSTAIN: 51
+- None: 32
+- RECOMMEND: 21
+
+Repartition selected_market :
+- ABSTAIN: 51
+- None: 32
+- DOUBLE_CHANCE: 20
+- STRICT_1X2: 1
+
+Principales raisons d'abstention ou d'indisponibilite :
+- 32 x Les equipes du match ne sont pas encore connues, inference impossible.
+- 16 x STRICT_1X2 refuse car prediction DRAW | OVER_1_5 refuse car prediction NO | OVER_2_5 sous seuil 0.70 | BTTS refuse car prediction YES | DOUBLE_CHANCE au-dessus du seuil exclu 0.15
+- 8 x STRICT_1X2 sous seuil 0.76 | OVER_1_5 refuse car prediction NO | OVER_2_5 sous seuil 0.70 | BTTS refuse car prediction YES | DOUBLE_CHANCE au-dessus du seuil exclu 0.15
+- 8 x STRICT_1X2 sous seuil 0.76 | OVER_1_5 YES sous seuil 0.78 | OVER_2_5 sous seuil 0.70 | BTTS refuse car prediction YES | DOUBLE_CHANCE au-dessus du seuil exclu 0.15
+- 7 x STRICT_1X2 refuse car prediction DRAW | OVER_1_5 YES sous seuil 0.78 | OVER_2_5 sous seuil 0.70 | BTTS refuse car prediction YES | DOUBLE_CHANCE au-dessus du seuil exclu 0.15
+- 6 x STRICT_1X2 refuse car prediction DRAW | OVER_1_5 refuse car prediction NO | OVER_2_5 sous seuil 0.70 | BTTS NO sous seuil 0.75 | DOUBLE_CHANCE au-dessus du seuil exclu 0.15
+- 4 x STRICT_1X2 sous seuil 0.76 | OVER_1_5 YES sous seuil 0.78 | OVER_2_5 sous seuil 0.70 | BTTS NO sous seuil 0.75 | DOUBLE_CHANCE au-dessus du seuil exclu 0.15
+- 1 x STRICT_1X2 sous seuil 0.76 | OVER_1_5 refuse car prediction NO | OVER_2_5 sous seuil 0.70 | BTTS NO sous seuil 0.75 | DOUBLE_CHANCE au-dessus du seuil exclu 0.15
+- 1 x STRICT_1X2 refuse car prediction DRAW | OVER_1_5 YES sous seuil 0.78 | OVER_2_5 sous seuil 0.70 | BTTS NO sous seuil 0.75 | DOUBLE_CHANCE au-dessus du seuil exclu 0.15
+
+Decision recommandee :
+Ne pas modifier V18.3.3 directement. Utiliser cet audit pour definir une variante experimentale V18.3.4 plus souple, puis comparer couverture et prudence avant integration produit.

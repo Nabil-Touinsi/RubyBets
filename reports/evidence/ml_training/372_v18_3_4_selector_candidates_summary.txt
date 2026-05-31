@@ -1,0 +1,25 @@
+Evaluation V18.3.4 - candidats de reduction d'abstention
+========================================================
+CSV historique analyse : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\348_v18_3_global_multimarket_test_predictions.csv
+Lignes historiques : 1947
+
+Reference V18.3.3 :
+- coverage : 0.575244
+- reliability : 0.900893
+- abstention_rate : 0.424756
+- double_chance_rows : 802
+
+Meilleur candidat retenu pour analyse :
+- selector_variant : v18_3_4_candidate_dc018
+- coverage : 0.665639
+- reliability : 0.886574
+- abstention_rate : 0.334361
+- double_chance_rows : 978
+- double_chance_share_selected : 0.75463
+
+Decision :
+Aucune variante ne respecte tous les garde-fous. La variante indiquee est seulement la meilleure piste a analyser, pas une decision produit.
+
+Comparaison CSV : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\373_v18_3_4_selector_candidates_comparison.csv
+Resultats detailles meilleur candidat : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\374_v18_3_4_selector_best_candidate_results.csv
+Breakdown meilleur candidat : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\375_v18_3_4_selector_best_candidate_breakdown.csv

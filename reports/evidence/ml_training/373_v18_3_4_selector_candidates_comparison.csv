@@ -1,0 +1,5 @@
+selector_variant,total_rows,selected_rows,abstain_rows,coverage,abstention_rate,reliability,avg_confidence,strict_1x2_rows,over_1_5_rows,over_2_5_rows,btts_rows,double_chance_rows,double_chance_share_selected,strict_1x2_min_confidence,over_1_5_yes_min_confidence,over_2_5_min_confidence,btts_no_min_confidence,double_chance_max_excluded_probability,priority
+v18_3_3_reference_dc015,1947,1120,827,0.575244,0.424756,0.900893,0.888105,276,23,18,1,802,0.716071,0.76,0.78,0.7,0.75,0.15,STRICT_1X2 > OVER_1_5 > OVER_2_5 > BTTS > DOUBLE_CHANCE
+v18_3_4_candidate_dc018,1947,1296,651,0.665639,0.334361,0.886574,0.880866,276,23,18,1,978,0.75463,0.76,0.78,0.7,0.75,0.18,STRICT_1X2 > OVER_1_5 > OVER_2_5 > BTTS > DOUBLE_CHANCE
+v18_3_4_candidate_dc020,1947,1431,516,0.734977,0.265023,0.871419,0.874222,276,23,18,1,1113,0.777778,0.76,0.78,0.7,0.75,0.2,STRICT_1X2 > OVER_1_5 > OVER_2_5 > BTTS > DOUBLE_CHANCE
+v18_3_4_candidate_dc022,1947,1540,407,0.79096,0.20904,0.862338,0.868256,276,23,18,1,1222,0.793506,0.76,0.78,0.7,0.75,0.22,STRICT_1X2 > OVER_1_5 > OVER_2_5 > BTTS > DOUBLE_CHANCE

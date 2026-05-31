@@ -1,0 +1,41 @@
+Audit dynamique WC - comparaison V18.3.3 vs V18.3.4 dc018
+===========================================================
+Cache analyse : C:\dev_classe\RNCP\RubyBets\backend\app\data\cache\matches_wc_scheduled_all_start_dates_all_end_dates.json
+CSV detaille : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\378_v18_3_4_dynamic_wc_dc018_audit_results.csv
+CSV switches : C:\dev_classe\RNCP\RubyBets\reports\evidence\ml_training\379_v18_3_4_dynamic_wc_dc018_switches.csv
+
+Matchs analyses : 104
+Matchs calculables : 72
+Indisponibles : 32
+Erreurs techniques : 0
+
+V18.3.3 reference dynamique :
+- recommandations : 21 (0.2019 total / 0.2917 calculable)
+- abstentions strictes : 51
+
+V18.3.4 candidat dc018 dynamique :
+- recommandations : 37 (0.3558 total / 0.5139 calculable)
+- abstentions strictes : 35
+- abstentions devenues recommandations : 16
+- confiance moyenne des recommandations : 0.867152
+
+Transitions :
+- SAME_ABSTENTION: 35
+- UNAVAILABLE: 32
+- SAME_RECOMMENDATION: 21
+- ABSTAIN_TO_RECOMMEND: 16
+
+Repartition marches V18.3.3 :
+- ABSTAIN: 51
+- None: 32
+- DOUBLE_CHANCE: 20
+- STRICT_1X2: 1
+
+Repartition marches V18.3.4 dc018 :
+- DOUBLE_CHANCE: 36
+- ABSTAIN: 35
+- None: 32
+- STRICT_1X2: 1
+
+Decision recommandee :
+Utiliser ces resultats comme audit produit uniquement. Ne pas remplacer V18.3.3 sans inspection des matchs passes de ABSTAIN a RECOMMEND et sans validation de prudence.

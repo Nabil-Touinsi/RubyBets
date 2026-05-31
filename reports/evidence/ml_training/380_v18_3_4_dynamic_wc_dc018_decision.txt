@@ -1,0 +1,10 @@
+Decision dynamique WC - V18.3.4 dc018
+=======================================
+Recommandations V18.3.3 : 21
+Recommandations V18.3.4 dc018 : 37
+Abstentions converties en recommandations : 16
+
+Decision :
+V18.3.4 dc018 reste une variante experimentale d'audit.
+Elle ne doit pas remplacer V18.3.3 tant que les nouveaux matchs recommandes ne sont pas verifies.
+Aucune garantie de resultat sportif ne doit etre formulee.
