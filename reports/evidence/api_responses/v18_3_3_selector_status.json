@@ -1,0 +1,10 @@
+﻿{
+    "source":  "rubybets_ml_national_v18_3_3_api",
+    "scope":  "experimental_backend",
+    "status":  "available",
+    "selector_version":  "v18.3.3",
+    "selector_profile":  "strict_reliability",
+    "selector_variant":  "v18_3_2_s760_o15780_o25700_b750_dc150_capnone_reference_order_btts1",
+    "message":  "Selecteur national V18.3.3 strict reliability disponible en API experimentale. Non integre au frontend.",
+    "responsible_note":  "Profil analytique experimental sans garantie de resultat sportif."
+}

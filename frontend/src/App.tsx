@@ -37,6 +37,7 @@ import RecommendationScreen from "./screens/RecommendationScreen";
 import StatusPanel from "./components/StatusPanel";
 import GlossaryScreen from "./screens/GlossaryScreen";
 import ResponsibleInfoScreen from "./screens/ResponsibleInfoScreen";
+import MlLabNational from "./components/MlLabNational";
 
 function App() {
   // État de navigation interne utilisé pour afficher un écran MVP à la fois.
@@ -166,7 +167,6 @@ function App() {
   useEffect(() => {
     setMatchesStatus("Chargement des matchs...");
 
-    // On réinitialise les données du match précédent et la recommandation en cours.
     setSelectedMatchDetails(null);
     setSelectedMatchContext(null);
     setSelectedMatchAnalysis(null);
@@ -335,12 +335,12 @@ function App() {
 
       return (
         <AnalysisScreen
-      matchAnalysis={selectedMatchAnalysis}
-      matchDetails={selectedMatchDetails}
-      matchContext={selectedMatchContext}
-      matchAnalysisStatus={matchAnalysisStatus}
-      onNavigate={setCurrentScreen}
-      />
+          matchAnalysis={selectedMatchAnalysis}
+          matchDetails={selectedMatchDetails}
+          matchContext={selectedMatchContext}
+          matchAnalysisStatus={matchAnalysisStatus}
+          onNavigate={setCurrentScreen}
+        />
       );
     }
 
@@ -350,13 +350,13 @@ function App() {
       }
 
       return (
-              <PredictionsScreen
-        matchPredictions={selectedMatchPredictions}
-        matchDetails={selectedMatchDetails}
-        matchContext={selectedMatchContext}
-        matchPredictionsStatus={matchPredictionsStatus}
-        onNavigate={setCurrentScreen}
-      />
+        <PredictionsScreen
+          matchPredictions={selectedMatchPredictions}
+          matchDetails={selectedMatchDetails}
+          matchContext={selectedMatchContext}
+          matchPredictionsStatus={matchPredictionsStatus}
+          onNavigate={setCurrentScreen}
+        />
       );
     }
 
@@ -374,25 +374,29 @@ function App() {
       );
     }
 
+    if (currentScreen === "lab-ml-v1833") {
+      return <MlLabNational />;
+    }
+
     if (currentScreen === "glossary") {
-  return (
-    <GlossaryScreen
-      glossary={glossary}
-      glossaryStatus={glossaryStatus}
-    />
+      return (
+        <GlossaryScreen
+          glossary={glossary}
+          glossaryStatus={glossaryStatus}
+        />
       );
     }
 
     if (currentScreen === "responsible") {
-  return (
-    <ResponsibleInfoScreen
-      responsibleInfo={responsibleInfo}
-      responsibleInfoStatus={responsibleInfoStatus}
-    />
-    );
-  }
+      return (
+        <ResponsibleInfoScreen
+          responsibleInfo={responsibleInfo}
+          responsibleInfoStatus={responsibleInfoStatus}
+        />
+      );
+    }
 
-return null;
+    return null;
   }
 
   return (
@@ -428,4 +432,5 @@ export default App;
 // ├── appelle services/api.ts pour récupérer les données backend
 // ├── pilote la navigation via currentScreen
 // ├── utilise AppShell.tsx pour structurer l’application
-// └── affiche les écrans du dossier screens/ ou les composants existants selon l’écran actif
+// ├── affiche les écrans du dossier screens/ ou les composants existants selon l’écran actif
+// └── ajoute MlLabNational comme espace experimental sans toucher aux prédictions officielles

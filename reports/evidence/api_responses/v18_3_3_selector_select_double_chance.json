@@ -1,0 +1,25 @@
+﻿{
+    "source":  "rubybets_ml_national_v18_3_3_api",
+    "scope":  "experimental_backend",
+    "status":  "computed",
+    "result":  {
+                   "source":  "rubybets_ml_national_v18_3_3_selector",
+                   "scope":  "experimental_backend",
+                   "status":  "RECOMMEND",
+                   "selector_version":  "v18.3.3",
+                   "selector_profile":  "strict_reliability",
+                   "selector_variant":  "v18_3_2_s760_o15780_o25700_b750_dc150_capnone_reference_order_btts1",
+                   "selected_market":  "DOUBLE_CHANCE",
+                   "selected_prediction":  "TEAM_A_OR_DRAW",
+                   "selected_confidence":  0.87,
+                   "risk_level":  "low",
+                   "selector_rule":  "DOUBLE_CHANCE si probabilite de l\u0027issue exclue \u003c= 0.15",
+                   "reference_reliability":  0.900893,
+                   "reference_coverage":  0.575244,
+                   "reference_selected_rows":  1120,
+                   "reference_double_chance_share":  0.716071,
+                   "responsible_note":  "Recommandation analytique experimentale sans garantie de resultat sportif. Ne pas presenter comme pari reel ni promesse de performance.",
+                   "excluded_outcome":  "TEAM_B_WIN",
+                   "excluded_probability":  0.13
+               }
+}

@@ -1,0 +1,38 @@
+﻿{
+    "source":  "rubybets_ml_national_v18_3_3_api",
+    "scope":  "experimental_backend",
+    "status":  "computed",
+    "data_source_file":  "348_v18_3_global_multimarket_test_predictions.csv",
+    "match":  {
+                  "clean_match_id":  "7789",
+                  "feature_id":  "7789",
+                  "feature_version":  "national_v1_elo_form",
+                  "match_date_utc":  "2017-10-08T00:00:00+02:00",
+                  "season":  "2017",
+                  "competition_code":  "WCQ",
+                  "competition_name":  "FIFA World Cup qualification",
+                  "stage":  null,
+                  "group_name":  null,
+                  "team_a_name":  "Slovakia",
+                  "team_b_name":  "Malta"
+              },
+    "selector_result":  {
+                            "source":  "rubybets_ml_national_v18_3_3_selector",
+                            "scope":  "experimental_backend",
+                            "status":  "RECOMMEND",
+                            "selector_version":  "v18.3.3",
+                            "selector_profile":  "strict_reliability",
+                            "selector_variant":  "v18_3_2_s760_o15780_o25700_b750_dc150_capnone_reference_order_btts1",
+                            "selected_market":  "STRICT_1X2",
+                            "selected_prediction":  "TEAM_A_WIN",
+                            "selected_confidence":  0.883557,
+                            "risk_level":  "low",
+                            "selector_rule":  "1X2 non-DRAW avec confiance \u003e= 0.76",
+                            "reference_reliability":  0.900893,
+                            "reference_coverage":  0.575244,
+                            "reference_selected_rows":  1120,
+                            "reference_double_chance_share":  0.716071,
+                            "responsible_note":  "Recommandation analytique experimentale sans garantie de resultat sportif. Ne pas presenter comme pari reel ni promesse de performance."
+                        },
+    "responsible_note":  "Resultat experimental de laboratoire ML. Ne remplace pas les predictions officielles RubyBets et ne garantit aucun resultat sportif."
+}

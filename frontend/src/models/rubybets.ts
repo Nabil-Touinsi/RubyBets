@@ -285,8 +285,56 @@ export type ResponsibleInfoResponse = {
   };
 };
 
+// Ce type décrit les métadonnées d’un match réel issu du CSV V18.3 global.
+export type V1833MatchMetadata = {
+  clean_match_id: string;
+  feature_id: string;
+  feature_version: string;
+  match_date_utc: string;
+  season: string;
+  competition_code: string;
+  competition_name: string;
+  stage: string | null;
+  group_name: string | null;
+  team_a_name: string;
+  team_b_name: string;
+};
+
+// Ce type décrit le résultat du sélecteur expérimental V18.3.3.
+export type V1833SelectorResult = {
+  source: string;
+  scope: string;
+  status: "RECOMMEND" | "ABSTAIN";
+  selector_version: string;
+  selector_profile: string;
+  selector_variant: string;
+  selected_market: string;
+  selected_prediction: string | null;
+  selected_confidence: number | null;
+  risk_level: string;
+  selector_rule: string;
+  reference_reliability: number;
+  reference_coverage: number;
+  reference_selected_rows: number;
+  reference_double_chance_share: number;
+  responsible_note: string;
+  excluded_outcome?: string;
+};
+
+// Ce type décrit la réponse API expérimentale V18.3.3 pour un match réel.
+export type V1833MatchPredictionResponse = {
+  source: string;
+  scope: string;
+  status: "computed";
+  data_source_file: string;
+  match: V1833MatchMetadata;
+  selector_result: V1833SelectorResult;
+  responsible_note: string;
+};
+
 // Schéma de communication du fichier :
 // rubybets.ts
 // ├── utilisé par api.ts pour typer les réponses backend
 // ├── utilisé par App.tsx pour stocker les données dans les states React
-// └── utilisé par les composants frontend pour afficher matchs, analyses, prédictions et recommandations
+// ├── utilisé par les composants frontend pour afficher matchs, analyses, prédictions et recommandations
+// └── prépare le typage du Lab ML V18.3.3 expérimental sans toucher aux prédictions officielles

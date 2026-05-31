@@ -1,10 +1,13 @@
 ﻿# Role du fichier :
-# Ces tests verifient le selecteur national V18.3.3 cote service et cote API experimentale.
-# Ils securisent STRICT_1X2, OVER_1_5, DOUBLE_CHANCE, ABSTAIN et les routes FastAPI.
+# Ces tests verifient le selecteur national V18.3.3 cote service, API experimentale
+# et adaptateur d'inference depuis une ligne de predictions V18.3.
 
 from fastapi.testclient import TestClient
 
 from app.main import app
+from app.services.ml_national_v18_3_3_inference_adapter import (
+    select_v18_3_3_from_prediction_row,
+)
 from app.services.ml_national_v18_3_3_selector import (
     ABSTAIN_STATUS,
     DOUBLE_CHANCE_MARKET,
@@ -165,9 +168,105 @@ def test_v18_3_3_select_endpoint_computes_manual_payload():
     assert result["excluded_outcome"] == "TEAM_B_WIN"
 
 
+# Verifie que la route par match lit le CSV 348 et retourne match + selector_result.
+def test_v18_3_3_match_endpoint_returns_existing_csv_match():
+    response = client.get("/api/experimental/ml-national/v18-3-3/matches/7789")
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert data["status"] == "computed"
+    assert data["scope"] == "experimental_backend"
+    assert data["data_source_file"] == "348_v18_3_global_multimarket_test_predictions.csv"
+    assert "match" in data
+    assert "selector_result" in data
+
+    assert data["match"]["clean_match_id"] == "7789"
+    assert data["match"]["team_a_name"] == "Slovakia"
+    assert data["match"]["team_b_name"] == "Malta"
+    assert data["match"]["competition_code"] == "WCQ"
+
+    assert data["selector_result"]["status"] in ["RECOMMEND", "ABSTAIN"]
+    assert "selected_market" in data["selector_result"]
+    assert "responsible_note" in data
+
+
+# Verifie que la route par match renvoie une erreur claire si le clean_match_id est absent.
+def test_v18_3_3_match_endpoint_returns_404_for_unknown_match():
+    response = client.get("/api/experimental/ml-national/v18-3-3/matches/999999999")
+
+    assert response.status_code == 404
+
+    data = response.json()
+    detail = data["detail"]
+
+    assert detail["status"] == "MATCH_NOT_FOUND"
+    assert detail["clean_match_id"] == "999999999"
+    assert detail["data_source_file"] == "348_v18_3_global_multimarket_test_predictions.csv"
+
+
+# Verifie que l'adaptateur transforme une ligne V18.3 complete en selection V18.3.3.
+def test_v18_3_3_adapter_computes_from_prediction_row():
+    row = {
+        "clean_match_id": 1001,
+        "feature_id": 9001,
+        "feature_version": "v18_3_global_multimarket",
+        "match_date_utc": "2026-06-01T18:00:00Z",
+        "season": "2026",
+        "competition_code": "WC",
+        "competition_name": "World Cup",
+        "stage": "Group stage",
+        "group_name": "Group A",
+        "team_a_name": "Team A",
+        "team_b_name": "Team B",
+        "1x2_prediction": "TEAM_A_WIN",
+        "1x2_prob_TEAM_A_WIN": 0.81,
+        "1x2_prob_DRAW": 0.11,
+        "1x2_prob_TEAM_B_WIN": 0.08,
+        "1x2_max_probability": 0.81,
+        "over_1_5_prediction": "YES",
+        "over_1_5_prob_YES": 0.79,
+        "over_1_5_max_probability": 0.79,
+        "over_2_5_prediction": "YES",
+        "over_2_5_prob_YES": 0.71,
+        "over_2_5_prob_NO": 0.29,
+        "over_2_5_max_probability": 0.71,
+        "btts_prediction": "NO",
+        "btts_prob_YES": 0.24,
+        "btts_prob_NO": 0.76,
+        "btts_max_probability": 0.76,
+    }
+
+    result = select_v18_3_3_from_prediction_row(row)
+
+    assert result["status"] == "computed"
+    assert result["match"]["clean_match_id"] == 1001
+    assert result["match"]["team_a_name"] == "Team A"
+    assert result["match"]["team_b_name"] == "Team B"
+    assert result["selector_result"]["status"] == "RECOMMEND"
+    assert result["selector_result"]["selected_market"] == "STRICT_1X2"
+
+
+# Verifie que l'adaptateur refuse une ligne incomplete au lieu de produire une fausse selection.
+def test_v18_3_3_adapter_rejects_incomplete_prediction_row():
+    row = {
+        "clean_match_id": 1002,
+        "team_a_name": "Team A",
+        "team_b_name": "Team B",
+    }
+
+    result = select_v18_3_3_from_prediction_row(row)
+
+    assert result["status"] == "INVALID_INPUT"
+    assert "missing_columns" in result
+    assert "1x2_prediction" in result["missing_columns"]
+
+
 # Schema de communication :
 # test_ml_national_v18_3_3_selector.py
 #   -> teste backend/app/services/ml_national_v18_3_3_selector.py
+#   -> teste backend/app/services/ml_national_v18_3_3_inference_adapter.py
 #   -> teste backend/app/api/experimental_ml_national_v18_3_3.py
 #   -> verifie que la route est bien incluse dans backend/app/main.py
 #   -> securise le futur branchement API backend sans toucher au frontend

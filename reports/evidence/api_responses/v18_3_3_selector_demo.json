@@ -1,0 +1,24 @@
+﻿{
+    "source":  "rubybets_ml_national_v18_3_3_api",
+    "scope":  "experimental_backend",
+    "status":  "demo_only",
+    "demo_features_profile":  "controlled_strict_1x2_case",
+    "result":  {
+                   "source":  "rubybets_ml_national_v18_3_3_selector",
+                   "scope":  "experimental_backend",
+                   "status":  "RECOMMEND",
+                   "selector_version":  "v18.3.3",
+                   "selector_profile":  "strict_reliability",
+                   "selector_variant":  "v18_3_2_s760_o15780_o25700_b750_dc150_capnone_reference_order_btts1",
+                   "selected_market":  "STRICT_1X2",
+                   "selected_prediction":  "TEAM_A_WIN",
+                   "selected_confidence":  0.81,
+                   "risk_level":  "medium",
+                   "selector_rule":  "1X2 non-DRAW avec confiance \u003e= 0.76",
+                   "reference_reliability":  0.900893,
+                   "reference_coverage":  0.575244,
+                   "reference_selected_rows":  1120,
+                   "reference_double_chance_share":  0.716071,
+                   "responsible_note":  "Recommandation analytique experimentale sans garantie de resultat sportif. Ne pas presenter comme pari reel ni promesse de performance."
+               }
+}

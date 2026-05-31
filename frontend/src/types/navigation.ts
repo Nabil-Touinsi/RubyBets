@@ -7,6 +7,7 @@ export type AppScreen =
   | "analysis"
   | "predictions"
   | "recommendation"
+  | "lab-ml-v1833"
   | "glossary"
   | "responsible";
 
@@ -23,6 +24,7 @@ export const NAVIGATION_ITEMS: NavigationItem[] = [
   { id: "analysis", label: "Analyse", requiresMatch: true },
   { id: "predictions", label: "Prédictions", requiresMatch: true },
   { id: "recommendation", label: "Recommandation" },
+  { id: "lab-ml-v1833", label: "Lab ML national" },
   { id: "glossary", label: "Glossaire" },
   { id: "responsible", label: "Infos responsables" },
 ];
@@ -31,4 +33,5 @@ export const NAVIGATION_ITEMS: NavigationItem[] = [
 // navigation.ts
 // ├── fournit la liste des écrans MVP
 // ├── alimente TopNavigation.tsx pour afficher le menu
-// └── alimente App.tsx pour contrôler l’écran actif
+// ├── alimente App.tsx pour contrôler l’écran actif
+// └── ajoute le Lab ML national comme espace experimental separe du parcours officiel

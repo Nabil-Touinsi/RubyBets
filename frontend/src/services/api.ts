@@ -12,6 +12,7 @@ import type {
   MatchesResponse,
   MultiMatchRecommendationResponse,
   ResponsibleInfoResponse,
+  V1833MatchPredictionResponse,
 } from "../models/rubybets";
 
 const API_BASE_URL = "http://127.0.0.1:8000";
@@ -95,6 +96,16 @@ export async function getMatchPredictions(
   );
 }
 
+// Cette fonction récupère une prédiction expérimentale V18.3.3 à partir d’un clean_match_id réel du CSV 348.
+export async function getV1833PredictionByMatchId(
+  cleanMatchId: string
+): Promise<V1833MatchPredictionResponse> {
+  return fetchJson<V1833MatchPredictionResponse>(
+    `/api/experimental/ml-national/v18-3-3/matches/${cleanMatchId}`,
+    "Erreur lors du chargement du résultat expérimental V18.3.3."
+  );
+}
+
 // Cette fonction demande au backend de générer une recommandation multi-matchs selon une compétition, un nombre de matchs et un niveau de risque.
 export async function getMultiMatchRecommendation(
   competitionCode: string,
@@ -139,4 +150,5 @@ export async function getResponsibleInfo(): Promise<ResponsibleInfoResponse> {
 // ├── appelle le backend FastAPI RubyBets
 // ├── utilise rubybets.ts pour typer les réponses reçues
 // ├── alimente App.tsx avec des données sécurisées
-// └── transmet les données aux composants React d’affichage
+// ├── transmet les données aux composants React d’affichage
+// └── expose getV18.3.3 PredictionByMatchId pour le futur Lab ML V18.3.3 expérimental
