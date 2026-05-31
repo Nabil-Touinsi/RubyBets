@@ -1,4 +1,4 @@
-﻿# Role du fichier :
+# Role du fichier :
 # Cette route expose le selecteur national V18.3.3 strict reliability en API experimentale.
 # Elle sert a tester le service backend sans l'integrer au frontend ni remplacer le scoring V1.
 
@@ -11,6 +11,11 @@ from typing import Any
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
+from app.services.cache_service import build_cache_name, get_cached_football_data
+from app.services.ml_national_v18_3_3_dynamic_inference_service import (
+    get_match_last_updated,
+    infer_v18_3_3_for_rubybets_match,
+)
 from app.services.ml_national_v18_3_3_inference_adapter import (
     select_v18_3_3_from_prediction_row,
 )
@@ -25,6 +30,8 @@ from app.services.ml_national_v18_3_3_selector import (
 V18_3_TEST_PREDICTIONS_RELATIVE_PATH = Path(
     "reports/evidence/ml_training/348_v18_3_global_multimarket_test_predictions.csv"
 )
+
+MATCH_DETAIL_CACHE_TTL_MINUTES = 30
 
 router = APIRouter(
     prefix="/api/experimental/ml-national/v18-3-3",
@@ -229,6 +236,29 @@ async def get_v18_3_3_prediction_by_clean_match_id(
     }
 
 
+# Applique V18.3.3 dynamiquement au match RubyBets selectionne dans le frontend.
+@router.get("/rubybets-matches/{match_id}")
+async def get_v18_3_3_dynamic_prediction_by_rubybets_match_id(
+    match_id: int,
+) -> dict[str, Any]:
+    data, data_freshness = await get_cached_football_data(
+        cache_name=build_cache_name("match", match_id),
+        endpoint=f"/matches/{match_id}",
+        ttl_minutes=MATCH_DETAIL_CACHE_TTL_MINUTES,
+    )
+    match = data.get("match", data)
+    inference_response = infer_v18_3_3_for_rubybets_match(match)
+
+    return {
+        **inference_response,
+        "rubybets_match_id": match_id,
+        "data_freshness": {
+            "match_cache": data_freshness,
+            "match_last_updated": get_match_last_updated(match),
+        },
+    }
+
+
 # Applique le selecteur V18.3.3 a des features envoyees manuellement.
 @router.post("/select")
 async def select_with_v18_3_3(
@@ -247,8 +277,9 @@ async def select_with_v18_3_3(
 
 # Schema de communication :
 # experimental_ml_national_v18_3_3.py
-#   -> expose /status, /demo, /select et /matches/{clean_match_id}
+#   -> expose /status, /demo, /select, /matches/{clean_match_id} et /rubybets-matches/{match_id}
 #   -> lit le CSV reports/evidence/ml_training/348_v18_3_global_multimarket_test_predictions.csv
-#   -> appelle backend/app/services/ml_national_v18_3_3_inference_adapter.py
+#   -> appelle backend/app/services/ml_national_v18_3_3_inference_adapter.py pour les tests CSV
+#   -> appelle backend/app/services/ml_national_v18_3_3_dynamic_inference_service.py pour le match frontend
 #   -> appelle indirectement backend/app/services/ml_national_v18_3_3_selector.py
 #   -> retourne match + selector_result pour un lab experimental sans toucher aux routes officielles

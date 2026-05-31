@@ -106,6 +106,16 @@ export async function getV1833PredictionByMatchId(
   );
 }
 
+// Cette fonction demande au backend de calculer V18.3.3 dynamiquement pour le match RubyBets sélectionné.
+export async function getV1833DynamicPredictionByRubyBetsMatchId(
+  matchId: number
+): Promise<V1833MatchPredictionResponse> {
+  return fetchJson<V1833MatchPredictionResponse>(
+    `/api/experimental/ml-national/v18-3-3/rubybets-matches/${matchId}`,
+    "Erreur lors du calcul dynamique expérimental V18.3.3."
+  );
+}
+
 // Cette fonction demande au backend de générer une recommandation multi-matchs selon une compétition, un nombre de matchs et un niveau de risque.
 export async function getMultiMatchRecommendation(
   competitionCode: string,
@@ -151,4 +161,4 @@ export async function getResponsibleInfo(): Promise<ResponsibleInfoResponse> {
 // ├── utilise rubybets.ts pour typer les réponses reçues
 // ├── alimente App.tsx avec des données sécurisées
 // ├── transmet les données aux composants React d’affichage
-// └── expose getV18.3.3 PredictionByMatchId pour le futur Lab ML V18.3.3 expérimental
+// └── expose les appels V18.3.3 historique et dynamique pour le bloc expérimental

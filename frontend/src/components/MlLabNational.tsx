@@ -1,16 +1,25 @@
-// Ce fichier affiche le Lab ML national experimental.
-// Il permet de tester une prediction nationale V18.3.3 par clean_match_id sans remplacer les predictions officielles RubyBets.
+// Ce fichier affiche le bloc ML national expérimental V18.3.3 dans l’écran Prédictions.
+// Il calcule automatiquement le match sélectionné quand il est compatible, sans remplacer les prédictions officielles RubyBets.
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
-import { getV1833PredictionByMatchId } from "../services/api";
+import {
+  getV1833DynamicPredictionByRubyBetsMatchId,
+  getV1833PredictionByMatchId,
+} from "../services/api";
 import type {
+  Match,
   V1833MatchMetadata,
   V1833MatchPredictionResponse,
   V1833SelectorResult,
 } from "../models/rubybets";
+import { getTeamDisplayName, hasKnownTeams } from "../helpers/displayText";
 
-// Cette fonction formate une valeur numerique en pourcentage lisible.
+type MlLabNationalProps = {
+  selectedMatch: Match | null;
+};
+
+// Cette fonction formate une valeur numérique en pourcentage lisible.
 function formatPercent(value: number | null | undefined) {
   if (typeof value !== "number") {
     return "Non disponible";
@@ -19,38 +28,40 @@ function formatPercent(value: number | null | undefined) {
   return `${(value * 100).toFixed(1)} %`;
 }
 
-// Cette fonction transforme le marche technique en libelle lisible.
+// Cette fonction transforme le marché technique en libellé lisible.
 function formatSelectedMarket(value: string) {
   const labels: Record<string, string> = {
     STRICT_1X2: "1X2 strict",
     DOUBLE_CHANCE: "Double chance",
     OVER_1_5: "Plus de 1,5 but",
     OVER_2_5: "Plus de 2,5 buts",
-    BTTS: "Les deux equipes marquent",
+    BTTS: "Les deux équipes marquent",
     ABSTAIN: "Abstention",
   };
 
   return labels[value] ?? value;
 }
 
-// Cette fonction transforme la prediction technique en libelle comprehensible.
+// Cette fonction transforme la prédiction technique en libellé compréhensible.
 function formatSelectedPrediction(
   result: V1833SelectorResult,
   match: V1833MatchMetadata
 ) {
   const prediction = result.selected_prediction;
+  const teamAName = match.team_a_name ?? "Équipe A";
+  const teamBName = match.team_b_name ?? "Équipe B";
 
   if (!prediction || result.status === "ABSTAIN") {
-    return "Abstention recommandee";
+    return "Abstention recommandée";
   }
 
   const labels: Record<string, string> = {
-    TEAM_A_WIN: `Victoire ${match.team_a_name}`,
-    TEAM_B_WIN: `Victoire ${match.team_b_name}`,
+    TEAM_A_WIN: `Victoire ${teamAName}`,
+    TEAM_B_WIN: `Victoire ${teamBName}`,
     DRAW: "Match nul",
-    TEAM_A_OR_DRAW: `${match.team_a_name} ou match nul`,
-    TEAM_B_OR_DRAW: `${match.team_b_name} ou match nul`,
-    TEAM_A_OR_TEAM_B: `${match.team_a_name} ou ${match.team_b_name}`,
+    TEAM_A_OR_DRAW: `${teamAName} ou match nul`,
+    TEAM_B_OR_DRAW: `${teamBName} ou match nul`,
+    TEAM_A_OR_TEAM_B: `${teamAName} ou ${teamBName}`,
     YES: "Oui",
     NO: "Non",
     OVER: "Over",
@@ -65,61 +76,107 @@ function formatRiskLevel(value: string) {
   const labels: Record<string, string> = {
     low: "Faible",
     medium: "Moyen",
-    high: "Eleve",
+    high: "Élevé",
+    none: "Aucun",
   };
 
   return labels[value] ?? value;
 }
 
-// Ce composant affiche les metadonnees du match issu du CSV V18.3 global.
-function LabMatchCard({ match }: { match: V1833MatchMetadata }) {
+// Cette fonction indique si la réponse contient vraiment un résultat sélectionnable.
+function isComputedResponse(response: V1833MatchPredictionResponse | null) {
+  return Boolean(response && response.status === "computed" && response.selector_result);
+}
+
+// Ce composant affiche les métadonnées du match analysé par V18.3.3.
+function LabMatchCard({
+  match,
+  title,
+}: {
+  match: V1833MatchMetadata;
+  title: string;
+}) {
   return (
     <article className="rb-prediction-side-card">
-      <p className="rb-prediction-kicker">Match reel du CSV 348</p>
+      <p className="rb-prediction-kicker">{title}</p>
       <h3>
-        {match.team_a_name} vs {match.team_b_name}
+        {match.team_a_name ?? "Équipe A"} vs {match.team_b_name ?? "Équipe B"}
       </h3>
 
       <div className="rb-prediction-global-tags">
         <span>
-          Competition <strong>{match.competition_name}</strong>
+          Compétition <strong>{match.competition_name ?? "Non disponible"}</strong>
         </span>
         <span>
-          Code <strong>{match.competition_code}</strong>
+          Code <strong>{match.competition_code ?? "N/A"}</strong>
         </span>
         <span>
-          Saison <strong>{match.season}</strong>
+          Saison <strong>{match.season ?? "N/A"}</strong>
         </span>
         <span>
-          ID <strong>{match.clean_match_id}</strong>
+          ID <strong>{match.rubybets_match_id ?? match.clean_match_id}</strong>
         </span>
       </div>
     </article>
   );
 }
 
-// Ce composant affiche le resultat du selecteur V18.3.3.
+// Ce composant affiche un message clair quand V18.3.3 ne peut pas analyser le match sélectionné.
+function LabUnavailableCard({
+  response,
+  selectedMatch,
+}: {
+  response: V1833MatchPredictionResponse | null;
+  selectedMatch: Match | null;
+}) {
+  const reason = response?.unavailable_reason ??
+    "L’analyse dynamique V18.3.3 n’est pas disponible pour ce match.";
+
+  return (
+    <article className="rb-prediction-card rb-prediction-empty-state">
+      <p className="rb-prediction-kicker">Analyse ML nationale expérimentale</p>
+      <h3>V18.3.3 indisponible pour ce match</h3>
+      <p>{reason}</p>
+
+      {selectedMatch ? (
+        <div className="rb-prediction-card-tags">
+          <span>{getTeamDisplayName(selectedMatch.home_team)}</span>
+          <span>{getTeamDisplayName(selectedMatch.away_team)}</span>
+          <span>{selectedMatch.competition.code}</span>
+        </div>
+      ) : null}
+    </article>
+  );
+}
+
+// Ce composant affiche le résultat du sélecteur V18.3.3.
 function LabSelectorResultCard({
   response,
+  title,
 }: {
   response: V1833MatchPredictionResponse;
+  title: string;
 }) {
   const { match, selector_result: result } = response;
+
+  if (!result) {
+    return <LabUnavailableCard response={response} selectedMatch={null} />;
+  }
 
   return (
     <section className="rb-prediction-main-section">
       <div className="rb-prediction-section-header">
         <div>
-          <p className="rb-prediction-kicker">Resultat experimental</p>
-          <h3>Selection V18.3.3 strict reliability</h3>
+          <p className="rb-prediction-kicker">{title}</p>
+          <h3>Sélection V18.3.3 strict reliability</h3>
           <p>
-            Ce resultat provient du laboratoire ML national. Il ne remplace pas
-            les predictions officielles RubyBets.
+            Ce résultat provient du laboratoire ML national. Il reste séparé des
+            prédictions officielles RubyBets.
           </p>
         </div>
 
         <span className="rb-prediction-soft-badge">
-          {result.status === "RECOMMEND" ? "Recommandation" : "Abstention"}
+          {result.status === "RECOMMEND" ? "Signal expérimental" : "Abstention"}
         </span>
       </div>
 
@@ -127,14 +184,14 @@ function LabSelectorResultCard({
         <article className="rb-prediction-main-card">
           <div className="rb-prediction-main-card__header">
             <div>
-              <h3>Marche selectionne</h3>
-              <span>Choix du selecteur</span>
+              <h3>Marché sélectionné</h3>
+              <span>Choix du sélecteur</span>
             </div>
             <span>◎</span>
           </div>
 
           <div className="rb-prediction-main-card__highlight">
-            <span>Marche</span>
+            <span>Marché</span>
             <strong>{formatSelectedMarket(result.selected_market)}</strong>
           </div>
 
@@ -149,8 +206,8 @@ function LabSelectorResultCard({
         <article className="rb-prediction-main-card">
           <div className="rb-prediction-main-card__header">
             <div>
-              <h3>Prediction</h3>
-              <span>Lecture utilisateur</span>
+              <h3>Lecture expérimentale</h3>
+              <span>Sortie utilisateur</span>
             </div>
             <span>▣</span>
           </div>
@@ -161,20 +218,20 @@ function LabSelectorResultCard({
           </div>
 
           <p>
-            Confiance selectionnee :{" "}
+            Confiance sélectionnée :{" "}
             <strong>{formatPercent(result.selected_confidence)}</strong>
           </p>
 
           <div className="rb-prediction-card-tags">
             <span>Profil {result.selector_profile}</span>
-            <span>Scope experimental</span>
+            <span>Scope non officiel</span>
           </div>
         </article>
 
         <article className="rb-prediction-main-card">
           <div className="rb-prediction-main-card__header">
             <div>
-              <h3>Reference V18.3.3</h3>
+              <h3>Référence V18.3.3</h3>
               <span>Performance globale test</span>
             </div>
             <span>△</span>
@@ -188,7 +245,7 @@ function LabSelectorResultCard({
           <p>
             Coverage : <strong>{formatPercent(result.reference_coverage)}</strong>
             <br />
-            Lignes selectionnees :{" "}
+            Lignes sélectionnées :{" "}
             <strong>{result.reference_selected_rows}</strong>
           </p>
 
@@ -205,7 +262,7 @@ function LabSelectorResultCard({
 
         <div>
           <p className="rb-prediction-kicker">Cadre responsable</p>
-          <h3>Lab experimental uniquement</h3>
+          <h3>Expérimentation uniquement</h3>
           <p>{response.responsible_note}</p>
           <p>{result.responsible_note}</p>
         </div>
@@ -214,18 +271,59 @@ function LabSelectorResultCard({
   );
 }
 
-// Ce composant permet de saisir un clean_match_id et d'appeler la route experimentale V18.3.3.
-function MlLabNational() {
+// Ce composant affiche les cartes de contexte du bloc expérimental dynamique.
+function DynamicContextCards({
+  response,
+}: {
+  response: V1833MatchPredictionResponse | null;
+}) {
+  return (
+    <div className="rb-prediction-card-grid">
+      {response?.match ? (
+        <LabMatchCard match={response.match} title="Match sélectionné analysé" />
+      ) : (
+        <article className="rb-prediction-side-card">
+          <p className="rb-prediction-kicker">Match sélectionné</p>
+          <h3>En attente</h3>
+          <p>
+            Sélectionne un match national compatible pour lancer l’analyse
+            dynamique V18.3.3.
+          </p>
+        </article>
+      )}
+
+      <article className="rb-prediction-side-card">
+        <p className="rb-prediction-kicker">Mode</p>
+        <h3>Dynamique expérimental</h3>
+        <p>
+          Le backend construit les features du match sélectionné, charge les
+          modèles sauvegardés V18.3 et applique le sélecteur V18.3.3.
+        </p>
+      </article>
+
+      <article className="rb-prediction-side-card">
+        <p className="rb-prediction-kicker">Limite</p>
+        <h3>Non officiel</h3>
+        <p>
+          Ce bloc ne remplace pas les prédictions RubyBets officielles et ne
+          garantit aucun résultat sportif.
+        </p>
+      </article>
+    </div>
+  );
+}
+
+// Ce composant permet de tester un clean_match_id historique sans le confondre avec le match sélectionné.
+function HistoricalCleanMatchTest() {
   const [cleanMatchId, setCleanMatchId] = useState<string>("7789");
   const [statusMessage, setStatusMessage] = useState<string>(
-    "Saisis un clean_match_id puis lance le test experimental."
+    "Test technique séparé : aucun résultat historique n’est chargé."
   );
   const [response, setResponse] =
     useState<V1833MatchPredictionResponse | null>(null);
-
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  // Cette fonction lance l'appel API experimental vers le backend.
+  // Cette fonction lance l’appel API historique vers le CSV 348.
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
@@ -233,24 +331,26 @@ function MlLabNational() {
 
     if (!trimmedMatchId) {
       setResponse(null);
-      setStatusMessage("Le clean_match_id est obligatoire.");
+      setStatusMessage("Le clean_match_id est obligatoire pour le test historique.");
       return;
     }
 
     setIsLoading(true);
-    setStatusMessage("Chargement du resultat V18.3.3...");
+    setStatusMessage("Chargement du test historique V18.3.3...");
 
     getV1833PredictionByMatchId(trimmedMatchId)
       .then((data) => {
         setResponse(data);
-        setStatusMessage("Resultat V18.3.3 charge avec succes.");
+        setStatusMessage(
+          "Test historique chargé. Il ne correspond pas forcément au match sélectionné."
+        );
       })
       .catch((error: unknown) => {
         setResponse(null);
         setStatusMessage(
           error instanceof Error
             ? error.message
-            : "Impossible de charger le resultat experimental V18.3.3."
+            : "Impossible de charger le test historique V18.3.3."
         );
       })
       .finally(() => {
@@ -259,100 +359,140 @@ function MlLabNational() {
   }
 
   return (
-    <div className="rb-predictions-screen rb-predictions-screen--mockup">
-      <header className="rb-prediction-topbar">
-        <h2>Lab ML national</h2>
-      </header>
-
-      <section className="rb-prediction-hero rb-prediction-hero--empty">
-        <p className="rb-prediction-kicker">Experimental</p>
-        <h2>Test du selecteur national V18.3.3</h2>
-        <p>
-          Cet espace permet de tester le selecteur strict reliability sur un
-          match reel du fichier CSV 348. Il ne remplace pas les predictions
-          officielles RubyBets.
-        </p>
-      </section>
-
-      <main className="rb-prediction-dashboard-grid">
-        <div className="rb-prediction-dashboard-grid__main">
-          <section className="rb-prediction-main-section">
-            <div className="rb-prediction-section-header">
-              <div>
-                <p className="rb-prediction-kicker">Recherche par match</p>
-                <h3>clean_match_id</h3>
-                <p>
-                  Exemple valide deja teste : <strong>7789</strong>.
-                </p>
-              </div>
-
-              <span className="rb-prediction-soft-badge">Lab backend</span>
-            </div>
-
-            <form onSubmit={handleSubmit}>
-              <label htmlFor="v18-3-3-clean-match-id">
-                Identifiant du match
-              </label>
-
-              <input
-                id="v18-3-3-clean-match-id"
-                type="text"
-                value={cleanMatchId}
-                onChange={(event) => setCleanMatchId(event.target.value)}
-                placeholder="Exemple : 7789"
-              />
-
-              <button type="submit" disabled={isLoading}>
-                {isLoading ? "Chargement..." : "Tester V18.3.3"}
-              </button>
-            </form>
-
-            <div className="rb-prediction-message">
-              <p>{statusMessage}</p>
-            </div>
-          </section>
-
-          {response ? <LabSelectorResultCard response={response} /> : null}
+    <section className="rb-prediction-main-section">
+      <div className="rb-prediction-section-header">
+        <div>
+          <p className="rb-prediction-kicker">Test technique historique</p>
+          <h3>clean_match_id CSV 348</h3>
+          <p>
+            Cette zone sert uniquement à vérifier une ligne historique du CSV.
+            Elle est séparée du match actuellement sélectionné.
+          </p>
         </div>
 
-        <aside className="rb-prediction-dashboard-grid__side">
-          {response ? (
-            <LabMatchCard match={response.match} />
-          ) : (
-            <article className="rb-prediction-side-card">
-              <p className="rb-prediction-kicker">Aucune selection chargee</p>
-              <h3>En attente de test</h3>
-              <p>
-                Lance un appel avec un clean_match_id present dans le CSV 348
-                pour afficher le resultat du selecteur.
-              </p>
-            </article>
-          )}
+        <span className="rb-prediction-soft-badge">Lab manuel</span>
+      </div>
 
-          <article className="rb-prediction-side-card">
-            <p className="rb-prediction-kicker">Important</p>
-            <h3>Non officiel</h3>
-            <p>
-              V18.3.3 reste un laboratoire ML experimental. Le parcours officiel
-              RubyBets continue d'utiliser les routes de predictions existantes.
-            </p>
-          </article>
-        </aside>
-      </main>
+      <form onSubmit={handleSubmit}>
+        <label htmlFor="v18-3-3-clean-match-id">Identifiant historique</label>
 
-      <p className="rb-prediction-footer-note">
-        Outil d'aide analytique avant-match. Aucune prise de pari reelle,
-        aucune promesse de resultat sportif.
-      </p>
-    </div>
+        <input
+          id="v18-3-3-clean-match-id"
+          type="text"
+          value={cleanMatchId}
+          onChange={(event) => setCleanMatchId(event.target.value)}
+          placeholder="Exemple : 7789"
+        />
+
+        <button type="submit" disabled={isLoading}>
+          {isLoading ? "Chargement..." : "Tester un match historique"}
+        </button>
+      </form>
+
+      <div className="rb-prediction-message">
+        <p>{statusMessage}</p>
+      </div>
+
+      {response && isComputedResponse(response) ? (
+        <LabSelectorResultCard response={response} title="Résultat historique" />
+      ) : null}
+    </section>
+  );
+}
+
+// Ce composant affiche l’analyse V18.3.3 dynamique pour le match sélectionné.
+function MlLabNational({ selectedMatch }: MlLabNationalProps) {
+  const [dynamicStatus, setDynamicStatus] = useState<string>(
+    "En attente d’un match national compatible."
+  );
+  const [dynamicResponse, setDynamicResponse] =
+    useState<V1833MatchPredictionResponse | null>(null);
+  const [isDynamicLoading, setIsDynamicLoading] = useState<boolean>(false);
+
+  // Cette fonction lance automatiquement l’inférence dynamique quand le match sélectionné change.
+  useEffect(() => {
+    if (!selectedMatch) {
+      setDynamicResponse(null);
+      setDynamicStatus("Sélectionne un match pour lancer V18.3.3 dynamique.");
+      return;
+    }
+
+    if (!hasKnownTeams(selectedMatch)) {
+      setDynamicResponse(null);
+      setDynamicStatus(
+        "Les équipes ne sont pas encore connues : V18.3.3 dynamique est indisponible."
+      );
+      return;
+    }
+
+    setIsDynamicLoading(true);
+    setDynamicStatus("Calcul dynamique V18.3.3 en cours pour le match sélectionné...");
+
+    getV1833DynamicPredictionByRubyBetsMatchId(selectedMatch.id)
+      .then((data) => {
+        setDynamicResponse(data);
+        setDynamicStatus(
+          data.status === "computed"
+            ? "Analyse V18.3.3 calculée pour le match sélectionné."
+            : "V18.3.3 dynamique indisponible pour ce match."
+        );
+      })
+      .catch((error: unknown) => {
+        setDynamicResponse(null);
+        setDynamicStatus(
+          error instanceof Error
+            ? error.message
+            : "Impossible de calculer V18.3.3 pour ce match."
+        );
+      })
+      .finally(() => {
+        setIsDynamicLoading(false);
+      });
+  }, [selectedMatch]);
+
+  return (
+    <section className="rb-prediction-main-section">
+      <div className="rb-prediction-section-header">
+        <div>
+          <p className="rb-prediction-kicker">Bloc expérimental séparé</p>
+          <h3>Analyse ML nationale expérimentale</h3>
+          <p>
+            Ce bloc calcule V18.3.3 sur le match national sélectionné quand les
+            données nécessaires sont disponibles. Il ne remplace pas les
+            prédictions officielles RubyBets.
+          </p>
+        </div>
+
+        <span className="rb-prediction-soft-badge">
+          {isDynamicLoading ? "Calcul en cours" : "V18.3.3 non officiel"}
+        </span>
+      </div>
+
+      <div className="rb-prediction-message">
+        <p>{dynamicStatus}</p>
+      </div>
+
+      {dynamicResponse && isComputedResponse(dynamicResponse) ? (
+        <LabSelectorResultCard
+          response={dynamicResponse}
+          title="Résultat dynamique du match sélectionné"
+        />
+      ) : (
+        <LabUnavailableCard response={dynamicResponse} selectedMatch={selectedMatch} />
+      )}
+
+      <DynamicContextCards response={dynamicResponse} />
+      <HistoricalCleanMatchTest />
+    </section>
   );
 }
 
 export default MlLabNational;
 
-// Schema de communication :
+// Schéma de communication :
 // MlLabNational.tsx
-// ├── appelle getV18.3.3PredictionByMatchId dans services/api.ts
-// ├── utilise les types V18.3.3 definis dans models/rubybets.ts
-// ├── affiche une zone Lab ML nationale experimentale separee des predictions officielles
-// └── est rendu par App.tsx via l'ecran lab-ml-v18.3.3
+// ├── reçoit selectedMatch depuis PredictionsScreen.tsx
+// ├── appelle getV1833DynamicPredictionByRubyBetsMatchId dans services/api.ts
+// ├── garde getV1833PredictionByMatchId uniquement comme test historique séparé
+// ├── utilise les types V18.3.3 définis dans models/rubybets.ts
+// └── reste expérimental, séparé du moteur officiel RubyBets

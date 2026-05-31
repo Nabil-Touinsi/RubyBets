@@ -1,4 +1,4 @@
-// Ce fichier affiche l’écran Prédictions.
+// Ce fichier affiche l’écran Prédictions avec les prédictions officielles et le bloc ML national expérimental.
 
 import type {
   Match,
@@ -16,6 +16,7 @@ import {
 } from "../helpers/displayText";
 import MatchPredictionsSection from "../components/MatchPredictionsSection";
 import PredictionSummaryPanel from "../components/PredictionSummaryPanel";
+import MlLabNational from "../components/MlLabNational";
 
 type PredictionsScreenProps = {
   matchPredictions: MatchPredictionsResponse | null;
@@ -192,7 +193,7 @@ function PredictionResponsibleSummary({
   );
 }
 
-// Ce composant structure l’écran Prédictions avec hero, cartes, baromètre et résumé.
+// Ce composant structure l’écran Prédictions avec le bloc officiel puis le bloc ML national expérimental.
 function PredictionsScreen({
   matchPredictions,
   matchDetails,
@@ -201,6 +202,7 @@ function PredictionsScreen({
   onNavigate,
 }: PredictionsScreenProps) {
   const selectedMatch = getSelectedMatch(matchDetails, matchContext);
+  const hasCompleteTeams = !selectedMatch || hasKnownTeams(selectedMatch);
 
   return (
     <div className="rb-predictions-screen rb-predictions-screen--mockup">
@@ -218,7 +220,7 @@ function PredictionsScreen({
 
       <PredictionMatchHero match={selectedMatch} />
 
-      {selectedMatch && !hasKnownTeams(selectedMatch) ? (
+      {selectedMatch && !hasCompleteTeams ? (
         <article className="rb-prediction-card rb-prediction-empty-state">
           <p className="rb-prediction-kicker">Données partielles</p>
           <h3>Prédictions officielles désactivées</h3>
@@ -232,15 +234,21 @@ function PredictionsScreen({
 
       <main className="rb-prediction-dashboard-grid">
         <div className="rb-prediction-dashboard-grid__main">
-          {matchPredictions && (!selectedMatch || hasKnownTeams(selectedMatch)) ? (
+          {matchPredictions && hasCompleteTeams ? (
             <MatchPredictionsSection matchPredictions={matchPredictions} />
           ) : (
             <article className="rb-prediction-card rb-prediction-empty-state">
-              <p className="rb-prediction-kicker">Prédictions</p>
+              <p className="rb-prediction-kicker">Prédictions officielles</p>
               <h3>Prédictions indisponibles</h3>
-              <p>{selectedMatch && !hasKnownTeams(selectedMatch) ? "Équipes à confirmer" : matchPredictionsStatus}</p>
+              <p>
+                {selectedMatch && !hasCompleteTeams
+                  ? "Équipes à confirmer"
+                  : matchPredictionsStatus}
+              </p>
             </article>
           )}
+
+          <MlLabNational selectedMatch={selectedMatch} />
         </div>
 
         <aside className="rb-prediction-dashboard-grid__side">
@@ -261,9 +269,7 @@ export default PredictionsScreen;
 
 // Schéma de communication du fichier :
 // PredictionsScreen.tsx
-// ├── reçoit matchPredictions, matchDetails et matchContext depuis App.tsx
-// ├── affiche le hero du match à partir des données déjà chargées
-// ├── utilise MatchPredictionsSection.tsx pour les cartes principales
-// ├── utilise PredictionSummaryPanel.tsx pour la synthèse globale avec baromètre
-// ├── limite les prédictions officielles si les équipes ne sont pas encore connues
-// └── conserve la navigation vers Matchs et Analyse via onNavigate
+// ├── reçoit les données chargées par App.tsx
+// ├── affiche MatchPredictionsSection.tsx pour les prédictions officielles
+// ├── intègre MlLabNational.tsx comme bloc expérimental dynamique séparé
+// └── utilise displayText.ts pour sécuriser les noms d’équipes et les états partiels

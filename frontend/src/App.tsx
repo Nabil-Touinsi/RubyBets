@@ -37,8 +37,8 @@ import RecommendationScreen from "./screens/RecommendationScreen";
 import StatusPanel from "./components/StatusPanel";
 import GlossaryScreen from "./screens/GlossaryScreen";
 import ResponsibleInfoScreen from "./screens/ResponsibleInfoScreen";
-import MlLabNational from "./components/MlLabNational";
 
+// Ce composant orchestre le chargement des données, la navigation et le rendu des écrans RubyBets.
 function App() {
   // État de navigation interne utilisé pour afficher un écran MVP à la fois.
   const [currentScreen, setCurrentScreen] = useState<AppScreen>("dashboard");
@@ -374,10 +374,6 @@ function App() {
       );
     }
 
-    if (currentScreen === "lab-ml-v1833") {
-      return <MlLabNational />;
-    }
-
     if (currentScreen === "glossary") {
       return (
         <GlossaryScreen
@@ -432,5 +428,5 @@ export default App;
 // ├── appelle services/api.ts pour récupérer les données backend
 // ├── pilote la navigation via currentScreen
 // ├── utilise AppShell.tsx pour structurer l’application
-// ├── affiche les écrans du dossier screens/ ou les composants existants selon l’écran actif
-// └── ajoute MlLabNational comme espace experimental sans toucher aux prédictions officielles
+// ├── affiche les écrans du dossier screens/ selon l’écran actif
+// └── garde le Lab ML national intégré dans PredictionsScreen plutôt que dans la navigation

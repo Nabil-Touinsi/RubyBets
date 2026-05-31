@@ -16,7 +16,6 @@ const navigationIcons: Record<AppScreen, string> = {
   analysis: "✦",
   predictions: "◎",
   recommendation: "✓",
-  "lab-ml-v1833": "⚙",
   glossary: "□",
   responsible: "ⓘ",
 };
@@ -64,4 +63,4 @@ export default TopNavigation;
 // ├── reçoit les écrans depuis navigation.ts
 // ├── reçoit currentScreen et onNavigate depuis AppShell.tsx
 // ├── déclenche le changement d’écran affiché dans App.tsx
-// └── affiche aussi l’entrée Lab ML national sans modifier les écrans officiels
+// └── affiche uniquement les entrées produit principales de RubyBets

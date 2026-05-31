@@ -289,16 +289,18 @@ export type ResponsibleInfoResponse = {
 // Ce type décrit les métadonnées d’un match réel issu du CSV V18.3 global.
 export type V1833MatchMetadata = {
   clean_match_id: string;
+  rubybets_match_id?: number | null;
   feature_id: string;
   feature_version: string;
-  match_date_utc: string;
-  season: string;
-  competition_code: string;
-  competition_name: string;
+  match_date_utc: string | null;
+  season: string | null;
+  competition_code: string | null;
+  competition_name: string | null;
   stage: string | null;
   group_name: string | null;
-  team_a_name: string;
-  team_b_name: string;
+  team_a_name: string | null;
+  team_b_name: string | null;
+  inference_mode?: string;
 };
 
 // Ce type décrit le résultat du sélecteur expérimental V18.3.3.
@@ -322,14 +324,28 @@ export type V1833SelectorResult = {
   excluded_outcome?: string;
 };
 
-// Ce type décrit la réponse API expérimentale V18.3.3 pour un match réel.
+// Ce type décrit une prédiction brute par marché pour l'inférence dynamique V18.3.3.
+export type V1833MarketPrediction = {
+  model_name: string;
+  prediction: string;
+  probabilities: Record<string, number>;
+  max_probability: number;
+};
+
+// Ce type décrit les features construites dynamiquement pour le match sélectionné.
+export type V1833DynamicFeatures = Record<string, number | null>;
+
+// Ce type décrit la réponse API expérimentale V18.3.3 pour un match réel ou sélectionné.
 export type V1833MatchPredictionResponse = {
   source: string;
   scope: string;
-  status: "computed";
+  status: "computed" | "unavailable";
   data_source_file: string;
   match: V1833MatchMetadata;
-  selector_result: V1833SelectorResult;
+  dynamic_features?: V1833DynamicFeatures;
+  market_predictions?: Record<string, V1833MarketPrediction>;
+  selector_result: V1833SelectorResult | null;
+  unavailable_reason?: string;
   responsible_note: string;
 };
 
@@ -338,4 +354,4 @@ export type V1833MatchPredictionResponse = {
 // ├── utilisé par api.ts pour typer les réponses backend
 // ├── utilisé par App.tsx pour stocker les données dans les states React
 // ├── utilisé par les composants frontend pour afficher matchs, analyses, prédictions et recommandations
-// └── prépare le typage du Lab ML V18.3.3 expérimental sans toucher aux prédictions officielles
+// └── prépare le typage du Lab ML V18.3.3 dynamique sans toucher aux prédictions officielles

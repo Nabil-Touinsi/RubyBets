@@ -270,3 +270,114 @@ def test_v18_3_3_adapter_rejects_incomplete_prediction_row():
 #   -> teste backend/app/api/experimental_ml_national_v18_3_3.py
 #   -> verifie que la route est bien incluse dans backend/app/main.py
 #   -> securise le futur branchement API backend sans toucher au frontend
+
+# Cree un match World Cup format RubyBets compatible avec l'inference dynamique V18.3.3.
+def build_fake_world_cup_match_for_dynamic_inference() -> dict:
+    return {
+        "id": 537327,
+        "utc_date": "2026-06-11T19:00:00Z",
+        "status": "TIMED",
+        "matchday": 1,
+        "stage": "GROUP_STAGE",
+        "group": "GROUP_A",
+        "last_updated": "2025-12-06T20:20:44Z",
+        "competition": {
+            "id": 2000,
+            "code": "WC",
+            "name": "FIFA World Cup",
+            "type": "CUP",
+        },
+        "season": {
+            "id": 2398,
+            "start_date": "2026-06-11",
+            "end_date": "2026-07-19",
+        },
+        "home_team": {
+            "id": 769,
+            "name": "Mexico",
+            "short_name": "Mexico",
+            "tla": "MEX",
+        },
+        "away_team": {
+            "id": 774,
+            "name": "South Africa",
+            "short_name": "South Africa",
+            "tla": "RSA",
+        },
+    }
+
+
+# Verifie que le service dynamique construit une prediction pour le match RubyBets selectionne.
+def test_v18_3_3_dynamic_service_computes_selected_world_cup_match():
+    from app.services.ml_national_v18_3_3_dynamic_inference_service import (
+        infer_v18_3_3_for_rubybets_match,
+    )
+
+    match = build_fake_world_cup_match_for_dynamic_inference()
+    result = infer_v18_3_3_for_rubybets_match(match)
+
+    assert result["status"] == "computed"
+    assert result["match"]["rubybets_match_id"] == 537327
+    assert result["match"]["team_a_name"] == "Mexico"
+    assert result["match"]["team_b_name"] == "South Africa"
+    assert result["selector_result"]["status"] in ["RECOMMEND", "ABSTAIN"]
+    assert result["data_source_file"] == "dynamic_selected_match_inference"
+
+
+# Verifie que le service dynamique refuse proprement un match club hors perimetre national.
+def test_v18_3_3_dynamic_service_returns_unavailable_for_club_match():
+    from app.services.ml_national_v18_3_3_dynamic_inference_service import (
+        infer_v18_3_3_for_rubybets_match,
+    )
+
+    match = build_fake_world_cup_match_for_dynamic_inference()
+    match["competition"] = {"code": "PL", "name": "Premier League"}
+
+    result = infer_v18_3_3_for_rubybets_match(match)
+
+    assert result["status"] == "unavailable"
+    assert result["selector_result"] is None
+    assert "limite aux matchs nationaux" in result["unavailable_reason"]
+
+
+# Verifie que la route dynamique par match RubyBets appelle le calcul V18.3.3 du match selectionne.
+def test_v18_3_3_dynamic_endpoint_returns_selected_match(monkeypatch):
+    from app.api import experimental_ml_national_v18_3_3 as v18_api
+
+    async def fake_get_cached_football_data(
+        cache_name: str,
+        endpoint: str,
+        params=None,
+        ttl_minutes: int = 30,
+    ):
+        assert cache_name == "match_537327"
+        assert endpoint == "/matches/537327"
+        return {"match": build_fake_world_cup_match_for_dynamic_inference()}, {
+            "source": "test",
+            "from_cache": True,
+            "updated_at": "2026-05-31T00:00:00Z",
+            "ttl_minutes": 30,
+        }
+
+    monkeypatch.setattr(
+        v18_api,
+        "get_cached_football_data",
+        fake_get_cached_football_data,
+    )
+
+    response = client.get("/api/experimental/ml-national/v18-3-3/rubybets-matches/537327")
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert data["status"] == "computed"
+    assert data["rubybets_match_id"] == 537327
+    assert data["match"]["team_a_name"] == "Mexico"
+    assert data["match"]["team_b_name"] == "South Africa"
+    assert data["selector_result"]["status"] in ["RECOMMEND", "ABSTAIN"]
+
+
+# Schema de communication complementaire :
+# Ces tests dynamiques verifient aussi ml_national_v18_3_3_dynamic_inference_service.py
+# et la route /api/experimental/ml-national/v18-3-3/rubybets-matches/{match_id}.
