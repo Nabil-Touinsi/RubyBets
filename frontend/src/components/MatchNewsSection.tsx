@@ -1,15 +1,11 @@
 // Ce composant prépare la zone Actualités & contexte d’un match sans appel backend pour le moment.
 
 import type { Match } from "../models/rubybets";
+import { getFixtureDisplayName } from "../helpers/displayText";
 
 type MatchNewsSectionProps = {
   match: Match;
 };
-
-// Cette fonction retourne un libellé court pour une équipe.
-function getTeamShortLabel(name: string, shortName?: string) {
-  return shortName && shortName.trim().length > 0 ? shortName : name;
-}
 
 // Ce composant affiche un emplacement propre pour les futures actualités du match.
 function MatchNewsSection({ match }: MatchNewsSectionProps) {
@@ -30,8 +26,7 @@ function MatchNewsSection({ match }: MatchNewsSectionProps) {
             <strong>Actualités du match</strong>
             <p>
               Emplacement prévu pour les informations liées à{" "}
-              {getTeamShortLabel(match.home_team.name, match.home_team.short_name)}{" "}
-              vs {getTeamShortLabel(match.away_team.name, match.away_team.short_name)}.
+              {getFixtureDisplayName(match)}.
             </p>
           </div>
         </article>
@@ -68,5 +63,6 @@ export default MatchNewsSection;
 // MatchNewsSection.tsx
 // ├── reçoit le match depuis MatchDetailsScreen.tsx
 // ├── prépare l’emplacement frontend des actualités du match
+// ├── sécurise l’affichage quand les équipes sont inconnues
 // ├── ne lance aucun appel API
 // └── pourra être relié plus tard à une route backend dédiée

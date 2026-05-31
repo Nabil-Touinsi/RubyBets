@@ -8,7 +8,12 @@ import type {
   Team,
 } from "../models/rubybets";
 import type { AppScreen } from "../types/navigation";
-import { formatMatchStatus } from "../helpers/displayText";
+import {
+  formatMatchStatus,
+  getTeamInitials,
+  getTeamShortName,
+  hasKnownTeams,
+} from "../helpers/displayText";
 import MatchPredictionsSection from "../components/MatchPredictionsSection";
 import PredictionSummaryPanel from "../components/PredictionSummaryPanel";
 
@@ -57,24 +62,12 @@ function formatKickoffTime(value: string) {
   }).format(date);
 }
 
-// Cette fonction prépare un fallback court si le logo d’équipe est absent.
-function getTeamInitials(team: Team) {
-  if (team.tla) {
-    return team.tla;
-  }
-
-  return (team.short_name || team.name)
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((word) => word.charAt(0).toUpperCase())
-    .join("");
-}
-
 // Ce composant affiche un logo d’équipe avec fallback texte.
 function PredictionTeamLogo({ team }: { team: Team }) {
+  const teamLabel = getTeamShortName(team);
+
   return (
-    <span className="rb-prediction-team-logo" aria-label={`Logo ${team.name}`}>
+    <span className="rb-prediction-team-logo" aria-label={`Logo ${teamLabel}`}>
       <span className="rb-prediction-team-logo__fallback">
         {getTeamInitials(team)}
       </span>
@@ -114,7 +107,7 @@ function PredictionMatchHero({ match }: { match: Match | null }) {
         <PredictionTeamLogo team={match.home_team} />
         <div>
           <span>{match.competition.name}</span>
-          <strong>{match.home_team.short_name || match.home_team.name}</strong>
+          <strong>{getTeamShortName(match.home_team)}</strong>
         </div>
       </div>
 
@@ -131,7 +124,7 @@ function PredictionMatchHero({ match }: { match: Match | null }) {
       <div className="rb-prediction-hero__team rb-prediction-hero__team--away">
         <div>
           <span>Adversaire</span>
-          <strong>{match.away_team.short_name || match.away_team.name}</strong>
+          <strong>{getTeamShortName(match.away_team)}</strong>
         </div>
         <PredictionTeamLogo team={match.away_team} />
       </div>
@@ -225,15 +218,27 @@ function PredictionsScreen({
 
       <PredictionMatchHero match={selectedMatch} />
 
+      {selectedMatch && !hasKnownTeams(selectedMatch) ? (
+        <article className="rb-prediction-card rb-prediction-empty-state">
+          <p className="rb-prediction-kicker">Données partielles</p>
+          <h3>Prédictions officielles désactivées</h3>
+          <p>
+            Les équipes ne sont pas encore connues pour cette affiche. RubyBets
+            conserve le match visible, mais ne génère pas de prédiction officielle
+            tant que les données sportives de base restent incomplètes.
+          </p>
+        </article>
+      ) : null}
+
       <main className="rb-prediction-dashboard-grid">
         <div className="rb-prediction-dashboard-grid__main">
-          {matchPredictions ? (
+          {matchPredictions && (!selectedMatch || hasKnownTeams(selectedMatch)) ? (
             <MatchPredictionsSection matchPredictions={matchPredictions} />
           ) : (
             <article className="rb-prediction-card rb-prediction-empty-state">
               <p className="rb-prediction-kicker">Prédictions</p>
               <h3>Prédictions indisponibles</h3>
-              <p>{matchPredictionsStatus}</p>
+              <p>{selectedMatch && !hasKnownTeams(selectedMatch) ? "Équipes à confirmer" : matchPredictionsStatus}</p>
             </article>
           )}
         </div>
@@ -260,4 +265,5 @@ export default PredictionsScreen;
 // ├── affiche le hero du match à partir des données déjà chargées
 // ├── utilise MatchPredictionsSection.tsx pour les cartes principales
 // ├── utilise PredictionSummaryPanel.tsx pour la synthèse globale avec baromètre
+// ├── limite les prédictions officielles si les équipes ne sont pas encore connues
 // └── conserve la navigation vers Matchs et Analyse via onNavigate

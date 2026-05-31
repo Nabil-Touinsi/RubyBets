@@ -1,5 +1,10 @@
 // Ce fichier regroupe les fonctions qui transforment les valeurs techniques en textes lisibles pour l'interface RubyBets.
 
+import type { Match, Team } from "../models/rubybets";
+
+const UNKNOWN_TEAM_LABEL = "Équipe à confirmer";
+const UNKNOWN_FIXTURE_LABEL = "Affiche à confirmer";
+
 // Cette fonction évite d'afficher des puces vides lorsque le backend renvoie une chaîne vide.
 export function cleanTextItems(items: string[]) {
   return items.filter((item) => item.trim().length > 0);
@@ -103,8 +108,99 @@ export function formatTtlMinutes(value: number | null | undefined) {
   return `${value} minutes`;
 }
 
+// Cette fonction vérifie si un texte est réellement exploitable pour l'interface.
+function hasReadableValue(value: string | null | undefined) {
+  return Boolean(value && value.trim().length > 0);
+}
+
+// Cette fonction indique si une équipe possède un nom exploitable.
+export function hasKnownTeam(team: Team | null | undefined) {
+  return hasReadableValue(team?.name) || hasReadableValue(team?.short_name) || hasReadableValue(team?.tla);
+}
+
+// Cette fonction indique si les deux équipes d'un match sont connues.
+export function hasKnownTeams(match: Match | null | undefined) {
+  return hasKnownTeam(match?.home_team) && hasKnownTeam(match?.away_team);
+}
+
+// Cette fonction retourne le nom lisible d'une équipe avec un fallback pour les matchs incomplets.
+export function getTeamDisplayName(team: Team | null | undefined, fallback = UNKNOWN_TEAM_LABEL) {
+  if (hasReadableValue(team?.name)) {
+    return team!.name!.trim();
+  }
+
+  if (hasReadableValue(team?.short_name)) {
+    return team!.short_name!.trim();
+  }
+
+  if (hasReadableValue(team?.tla)) {
+    return team!.tla!.trim();
+  }
+
+  return fallback;
+}
+
+// Cette fonction retourne un nom court d'équipe en privilégiant short_name et tla.
+export function getTeamShortName(team: Team | null | undefined, fallback = UNKNOWN_TEAM_LABEL) {
+  if (hasReadableValue(team?.short_name)) {
+    return team!.short_name!.trim();
+  }
+
+  if (hasReadableValue(team?.tla)) {
+    return team!.tla!.trim();
+  }
+
+  if (hasReadableValue(team?.name)) {
+    return team!.name!.trim();
+  }
+
+  return fallback;
+}
+
+// Cette fonction génère des initiales lisibles même lorsque l'équipe n'est pas encore connue.
+export function getTeamInitials(team: Team | null | undefined, fallback = "?") {
+  if (hasReadableValue(team?.tla)) {
+    return team!.tla!.trim().slice(0, 3).toUpperCase();
+  }
+
+  const label = getTeamShortName(team, fallback);
+
+  if (label === fallback) {
+    return fallback;
+  }
+
+  return label
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((word) => word.charAt(0).toUpperCase())
+    .join("") || fallback;
+}
+
+// Cette fonction retourne un libellé complet de rencontre avec fallback pour les affiches inconnues.
+export function getFixtureDisplayName(match: Match | null | undefined) {
+  if (!match) {
+    return UNKNOWN_FIXTURE_LABEL;
+  }
+
+  if (!hasKnownTeams(match)) {
+    return UNKNOWN_FIXTURE_LABEL;
+  }
+
+  return `${getTeamShortName(match.home_team)} vs ${getTeamShortName(match.away_team)}`;
+}
+
+// Cette fonction construit un texte de recherche sécurisé pour les filtres côté frontend.
+export function getTeamSearchText(team: Team | null | undefined) {
+  return [team?.name, team?.short_name, team?.tla]
+    .filter((value): value is string => hasReadableValue(value))
+    .join(" ")
+    .toLowerCase();
+}
+
 // Schéma de communication du fichier :
 // displayText.ts
 // ├── utilisé par les composants React pour afficher des libellés compréhensibles
-// ├── utilisé par les blocs prédictions, recommandations, contexte et statuts
+// ├── sécurise les noms d'équipes lorsque l'API renvoie des valeurs nulles
+// ├── utilisé par les blocs matchs, détails, analyse, prédictions et recommandations
 // └── préparé pour afficher les informations de fraîcheur des données backend

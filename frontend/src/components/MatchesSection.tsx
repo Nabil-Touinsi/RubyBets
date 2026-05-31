@@ -1,6 +1,11 @@
 // Ce composant affiche les matchs à venir sous forme de liste premium avec logos, date, statut et action.
 
-import type { Match } from "../models/rubybets";
+import type { Match, Team } from "../models/rubybets";
+import {
+  getTeamInitials,
+  getTeamShortName,
+  hasKnownTeams,
+} from "../helpers/displayText";
 
 type MatchesSectionProps = {
   selectedCompetition: string;
@@ -9,19 +14,8 @@ type MatchesSectionProps = {
 };
 
 type TeamLogoProps = {
-  name: string;
-  crest?: string | null;
+  team: Team | null | undefined;
 };
-
-// Cette fonction génère des initiales lisibles si le logo d’une équipe est absent.
-function getTeamInitials(name: string) {
-  return name
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((word) => word.charAt(0).toUpperCase())
-    .join("");
-}
 
 // Cette fonction formate la date pour une lecture compacte dans la liste des matchs.
 function formatMatchDate(dateValue: string) {
@@ -56,24 +50,22 @@ function formatMatchTime(dateValue: string) {
 function isAnalysisAvailable(match: Match) {
   const status = match.status?.toUpperCase();
 
-  return (
-    Boolean(match.home_team?.name) &&
-    Boolean(match.away_team?.name) &&
-    (status === "SCHEDULED" || status === "TIMED")
-  );
+  return hasKnownTeams(match) && (status === "SCHEDULED" || status === "TIMED");
 }
 
 // Ce composant affiche le logo d’une équipe avec un fallback propre.
-function TeamLogo({ name, crest }: TeamLogoProps) {
+function TeamLogo({ team }: TeamLogoProps) {
+  const teamLabel = getTeamShortName(team);
+
   return (
-    <span className="rb-match-team-logo" aria-label={`Logo ${name}`}>
+    <span className="rb-match-team-logo" aria-label={`Logo ${teamLabel}`}>
       <span className="rb-match-team-logo__fallback">
-        {getTeamInitials(name)}
+        {getTeamInitials(team)}
       </span>
 
-      {crest ? (
+      {team?.crest ? (
         <img
-          src={crest}
+          src={team.crest}
           alt=""
           loading="lazy"
           onError={(event) => {
@@ -105,6 +97,8 @@ function MatchesSection({
         <div className="rb-match-table" role="list">
           {matches.map((match) => {
             const analysisAvailable = isAnalysisAvailable(match);
+            const homeTeamLabel = getTeamShortName(match.home_team);
+            const awayTeamLabel = getTeamShortName(match.away_team);
 
             return (
               <article className="rb-match-row" key={match.id} role="listitem">
@@ -121,23 +115,17 @@ function MatchesSection({
                 <div className="rb-match-row__fixture">
                   <div className="rb-match-team rb-match-team--home">
                     <span className="rb-match-team__name">
-                      {match.home_team.short_name || match.home_team.name}
+                      {homeTeamLabel}
                     </span>
-                    <TeamLogo
-                      name={match.home_team.name}
-                      crest={match.home_team.crest}
-                    />
+                    <TeamLogo team={match.home_team} />
                   </div>
 
                   <span className="rb-match-versus">VS</span>
 
                   <div className="rb-match-team rb-match-team--away">
-                    <TeamLogo
-                      name={match.away_team.name}
-                      crest={match.away_team.crest}
-                    />
+                    <TeamLogo team={match.away_team} />
                     <span className="rb-match-team__name">
-                      {match.away_team.short_name || match.away_team.name}
+                      {awayTeamLabel}
                     </span>
                   </div>
                 </div>
@@ -150,7 +138,7 @@ function MatchesSection({
                         : "rb-match-status rb-match-status--pending"
                     }
                   >
-                    {analysisAvailable ? "Analyse disponible" : "En préparation"}
+                    {analysisAvailable ? "Analyse disponible" : "Équipes à confirmer"}
                   </span>
 
                   <button
@@ -175,6 +163,6 @@ export default MatchesSection;
 // MatchesSection.tsx
 // ├── reçoit matches depuis MatchesScreen.tsx
 // ├── utilise le type Match défini dans models/rubybets.ts
-// ├── affiche les logos home_team.crest et away_team.crest
+// ├── sécurise les équipes inconnues via helpers/displayText.ts
 // ├── déclenche onSelectMatch pour ouvrir la fiche du match
 // └── utilise App.css pour la liste premium de l’écran Matchs

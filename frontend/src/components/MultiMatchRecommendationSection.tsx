@@ -5,6 +5,8 @@ import {
   cleanTextItems,
   formatConfidenceLevel,
   formatRiskLevel,
+  getTeamInitials,
+  getTeamShortName,
 } from "../helpers/displayText";
 
 type RiskLevel = "low" | "medium" | "high";
@@ -48,21 +50,7 @@ function formatShortDate(value: string) {
 
 // Cette fonction retourne un nom court d’équipe.
 function getTeamLabel(team: RecommendationTeam) {
-  return team.short_name || team.tla || team.name;
-}
-
-// Cette fonction retourne un fallback textuel pour les logos absents.
-function getTeamInitials(team: RecommendationTeam) {
-  if (team.tla) {
-    return team.tla;
-  }
-
-  return getTeamLabel(team)
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((word) => word.charAt(0).toUpperCase())
-    .join("");
+  return getTeamShortName(team);
 }
 
 // Cette fonction convertit un niveau de confiance en score visuel.
@@ -106,8 +94,10 @@ function formatMarketLabel(market: string) {
 
 // Ce composant affiche un logo d’équipe avec fallback.
 function TeamLogo({ team }: { team: RecommendationTeam }) {
+  const teamLabel = getTeamLabel(team);
+
   return (
-    <span className="rb-reco-team-logo" aria-label={`Logo ${team.name}`}>
+    <span className="rb-reco-team-logo" aria-label={`Logo ${teamLabel}`}>
       <span className="rb-reco-team-logo__fallback">{getTeamInitials(team)}</span>
 
       {team.crest ? (
@@ -392,4 +382,5 @@ export default MultiMatchRecommendationSection;
 // ├── reçoit les paramètres et résultats depuis RecommendationScreen.tsx
 // ├── conserve les callbacks onChangeMatchCount, onChangeRiskLevel et onGenerateRecommendation
 // ├── affiche les sélections reçues du backend sous forme de tableau compact
+// ├── sécurise les libellés des équipes si une source retourne une valeur incomplète
 // └── ne modifie ni API, ni backend, ni modèle de données

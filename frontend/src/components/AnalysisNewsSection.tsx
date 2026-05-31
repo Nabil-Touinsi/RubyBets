@@ -1,20 +1,19 @@
 // Ce composant prépare la zone Actualités & contexte récent de l’écran Analyse sans appel backend.
 
 import type { Match } from "../models/rubybets";
+import { getFixtureDisplayName } from "../helpers/displayText";
 
 type AnalysisNewsSectionProps = {
   match: Match | null;
 };
 
-// Cette fonction retourne un libellé court et lisible pour une équipe.
-function getTeamLabel(match: Match | null) {
+// Cette fonction retourne un libellé court et lisible pour la rencontre.
+function getMatchLabel(match: Match | null) {
   if (!match) {
     return "la rencontre sélectionnée";
   }
 
-  return `${match.home_team.short_name || match.home_team.name} vs ${
-    match.away_team.short_name || match.away_team.name
-  }`;
+  return getFixtureDisplayName(match).toLowerCase();
 }
 
 // Ce composant affiche un placeholder propre pour les futures actualités de l’analyse.
@@ -35,7 +34,7 @@ function AnalysisNewsSection({ match }: AnalysisNewsSectionProps) {
           <div>
             <strong>Contexte récent du match</strong>
             <p>
-              Emplacement prévu pour les informations récentes liées à {getTeamLabel(match)}.
+              Emplacement prévu pour les informations récentes liées à {getMatchLabel(match)}.
             </p>
           </div>
         </article>
@@ -70,5 +69,6 @@ export default AnalysisNewsSection;
 // AnalysisNewsSection.tsx
 // ├── reçoit le match sélectionné depuis AnalysisScreen.tsx
 // ├── affiche une zone actualités dédiée à l’écran Analyse
+// ├── sécurise l’affichage quand les équipes sont inconnues
 // ├── ne fait aucun fetch et ne modifie pas services/api.ts
 // └── pourra être branché plus tard à une route backend dédiée

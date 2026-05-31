@@ -7,7 +7,14 @@ import type {
   Team,
 } from "../models/rubybets";
 import type { AppScreen } from "../types/navigation";
-import { formatDateTime, formatMatchStatus } from "../helpers/displayText";
+import {
+  formatDateTime,
+  formatMatchStatus,
+  getTeamDisplayName,
+  getTeamInitials,
+  getTeamShortName,
+  hasKnownTeams,
+} from "../helpers/displayText";
 import MatchDetailsSection from "../components/MatchDetailsSection";
 import MatchContextSection from "../components/MatchContextSection";
 import MatchNewsSection from "../components/MatchNewsSection";
@@ -91,18 +98,11 @@ function getStandingLabel(
 
 // Ce composant affiche un logo d’équipe avec un fallback texte.
 function TeamLogo({ team }: { team: Team }) {
-  const fallback =
-    team.tla ??
-    team.short_name
-      .split(" ")
-      .map((word) => word.charAt(0))
-      .join("")
-      .slice(0, 3)
-      .toUpperCase();
+  const teamLabel = getTeamDisplayName(team);
 
   return (
-    <span className="rb-detail-team-logo" aria-label={`Logo ${team.name}`}>
-      <span className="rb-detail-team-logo__fallback">{fallback}</span>
+    <span className="rb-detail-team-logo" aria-label={`Logo ${teamLabel}`}>
+      <span className="rb-detail-team-logo__fallback">{getTeamInitials(team)}</span>
       {team.crest ? (
         <img
           src={team.crest}
@@ -129,7 +129,7 @@ function MatchSummaryHero({
     <section className="rb-detail-hero rb-detail-hero--compact">
       <div className="rb-detail-team rb-detail-team--home">
         <div>
-          <h2>{match.home_team.name}</h2>
+          <h2>{getTeamDisplayName(match.home_team)}</h2>
           <p>{getStandingLabel(matchContext, "home")}</p>
         </div>
         <TeamLogo team={match.home_team} />
@@ -150,7 +150,7 @@ function MatchSummaryHero({
       <div className="rb-detail-team rb-detail-team--away">
         <TeamLogo team={match.away_team} />
         <div>
-          <h2>{match.away_team.name}</h2>
+          <h2>{getTeamDisplayName(match.away_team)}</h2>
           <p>{getStandingLabel(matchContext, "away")}</p>
         </div>
       </div>
@@ -172,12 +172,12 @@ function AvailabilityPlaceholder({ match }: { match: Match }) {
 
       <div className="rb-detail-availability-grid">
         <article>
-          <strong>{match.home_team.short_name}</strong>
+          <strong>{getTeamShortName(match.home_team)}</strong>
           <p>Aucune donnée d’absence n’est encore reliée côté backend.</p>
         </article>
 
         <article>
-          <strong>{match.away_team.short_name}</strong>
+          <strong>{getTeamShortName(match.away_team)}</strong>
           <p>Zone prévue pour les blessures, suspensions ou incertitudes.</p>
         </article>
       </div>
@@ -301,21 +301,40 @@ function MatchDetailsScreen({
       </section>
 
       <section className="rb-detail-actions-grid">
-        <DetailActionCard
-          icon="↗"
-          title="Analyse pré-match"
-          description="Découvrir les facteurs clés, tendances et limites de données pour cette rencontre."
-          buttonLabel="Voir l’analyse"
-          onClick={() => onNavigate("analysis")}
-        />
+        {hasKnownTeams(selectedMatch) ? (
+          <>
+            <DetailActionCard
+              icon="↗"
+              title="Analyse pré-match"
+              description="Découvrir les facteurs clés, tendances et limites de données pour cette rencontre."
+              buttonLabel="Voir l’analyse"
+              onClick={() => onNavigate("analysis")}
+            />
 
-        <DetailActionCard
-          icon="◎"
-          title="Prédictions"
-          description="Accéder aux tendances explicables générées à partir des données disponibles."
-          buttonLabel="Voir les prédictions"
-          onClick={() => onNavigate("predictions")}
-        />
+            <DetailActionCard
+              icon="◎"
+              title="Prédictions"
+              description="Accéder aux tendances explicables générées à partir des données disponibles."
+              buttonLabel="Voir les prédictions"
+              onClick={() => onNavigate("predictions")}
+            />
+          </>
+        ) : (
+          <article className="rb-detail-action-card">
+            <span className="rb-detail-action-card__icon">!</span>
+            <div>
+              <h3>Analyse limitée</h3>
+              <p>
+                Les équipes ne sont pas encore connues pour cette affiche. RubyBets
+                affiche le match, mais l’analyse et les prédictions officielles restent
+                désactivées jusqu’à confirmation des équipes.
+              </p>
+              <button type="button" onClick={() => onNavigate("matches")}>
+                Retour aux matchs
+              </button>
+            </div>
+          </article>
+        )}
       </section>
 
       <p className="rb-detail-footer-note">
@@ -334,4 +353,5 @@ export default MatchDetailsScreen;
 // ├── utilise MatchDetailsSection.tsx pour les statistiques et métadonnées
 // ├── utilise MatchContextSection.tsx pour le contexte avant-match
 // ├── utilise MatchNewsSection.tsx comme zone actualités non branchée
+// ├── limite analyse/prédictions si les équipes ne sont pas encore connues
 // └── déclenche la navigation vers Matchs, Analyse et Prédictions via onNavigate

@@ -48,12 +48,13 @@ export type Competition = {
 };
 
 // Ce type décrit une équipe affichée dans les matchs, classements et recommandations.
+// Certains champs peuvent être null lorsque l’API expose des matchs dont les affiches ne sont pas encore connues.
 export type Team = {
-  id: number;
-  name: string;
-  short_name: string;
-  tla?: string;
-  crest: string;
+  id: number | null;
+  name: string | null;
+  short_name: string | null;
+  tla?: string | null;
+  crest: string | null;
 };
 
 // Ce type décrit un match football formaté par le backend.

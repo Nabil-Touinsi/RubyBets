@@ -2,6 +2,11 @@
 
 import type { Competition, Match, Team } from "../models/rubybets";
 import type { AppScreen } from "../types/navigation";
+import {
+  getTeamInitials,
+  getTeamShortName,
+  hasKnownTeams,
+} from "../helpers/displayText";
 
 type DashboardScreenProps = {
   apiStatus: string;
@@ -21,49 +26,46 @@ function formatDashboardDate(value: string) {
     return "Date à confirmer";
   }
 
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "Date à confirmer";
+  }
+
   return new Intl.DateTimeFormat("fr-FR", {
     day: "2-digit",
     month: "short",
     hour: "2-digit",
     minute: "2-digit",
-  }).format(new Date(value));
+  }).format(date);
 }
 
 // Réduit un nom d’équipe long pour préserver la lisibilité des petites cartes.
-function getTeamLabel(team: Team) {
-  return team.short_name || team.tla || team.name;
+function getTeamLabel(team: Team | null | undefined) {
+  return getTeamShortName(team);
 }
 
 // Construit un libellé accessible stable pour l’action d’analyse d’un match.
 function getMatchActionAriaLabel(match: Match) {
+  if (!hasKnownTeams(match)) {
+    return "Voir le match : affiche à confirmer";
+  }
+
   return `${MATCH_ACTION_LABEL} : ${getTeamLabel(match.home_team)} contre ${getTeamLabel(
-    match.away_team
+    match.away_team,
   )}`;
 }
 
-// Génère un fallback textuel quand le logo d’une équipe n’est pas disponible.
-function getTeamInitials(team: Team) {
-  const label = team.tla || team.short_name || team.name;
-
-  return label
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((word) => word[0])
-    .join("")
-    .toUpperCase();
-}
-
 // Affiche le logo d’une équipe ou un fallback propre basé sur les initiales.
-function renderTeamLogo(team: Team) {
+function renderTeamLogo(team: Team | null | undefined) {
   const teamLabel = getTeamLabel(team);
-  const logoClassName = team.crest
+  const logoClassName = team?.crest
     ? "rb-home-team-logo rb-home-team-logo--with-image"
     : "rb-home-team-logo rb-home-team-logo--fallback";
 
   return (
     <span className={logoClassName} aria-label={`Logo ${teamLabel}`} title={teamLabel}>
-      {team.crest ? (
+      {team?.crest ? (
         <img src={team.crest} alt="" loading="lazy" decoding="async" />
       ) : (
         <span className="rb-home-team-logo__fallback">{getTeamInitials(team)}</span>
@@ -81,6 +83,7 @@ function getCompetitionIcon(code: string) {
     PD: "🇪🇸",
     BL1: "🇩🇪",
     CL: "★",
+    WC: "🏆",
   };
 
   return icons[code] || "◆";
@@ -95,9 +98,15 @@ function getCompetitionLabel(competition: Competition) {
     PD: "Liga",
     BL1: "Bundesliga",
     CL: "Champions League",
+    WC: "FIFA World Cup",
   };
 
   return labels[competition.code] || competition.name;
+}
+
+// Cette fonction retourne le libellé d’action adapté au niveau de complétude du match.
+function getMatchActionLabel(match: Match) {
+  return hasKnownTeams(match) ? MATCH_ACTION_LABEL : "Voir le match";
 }
 
 // Ce composant structure l’écran d’accueil selon la maquette : hero, terrain, indicateurs, ligues, matchs et accès secondaires.
@@ -208,46 +217,50 @@ function DashboardScreen({
 
           <div className="rb-home-match-row">
             {featuredMatches.length > 0 ? (
-              featuredMatches.map((match) => (
-                <article key={match.id} className="rb-home-match-card">
-                  <div className="rb-home-match-card__top">
-                    <p className="rb-home-match-card__league">{match.competition.name}</p>
-                    <span>{formatDashboardDate(match.utc_date)}</span>
-                  </div>
+              featuredMatches.map((match) => {
+                const actionLabel = getMatchActionLabel(match);
 
-                  <button
-                    type="button"
-                    className="rb-home-match-card__button"
-                    onClick={() => onSelectMatch(match.id)}
-                    aria-label={getMatchActionAriaLabel(match)}
-                  >
-                    <span className="rb-home-match-card__fixture">
-                      <span className="rb-home-match-team rb-home-match-team--home">
-                        {renderTeamLogo(match.home_team)}
+                return (
+                  <article key={match.id} className="rb-home-match-card">
+                    <div className="rb-home-match-card__top">
+                      <p className="rb-home-match-card__league">{match.competition.name}</p>
+                      <span>{formatDashboardDate(match.utc_date)}</span>
+                    </div>
+
+                    <button
+                      type="button"
+                      className="rb-home-match-card__button"
+                      onClick={() => onSelectMatch(match.id)}
+                      aria-label={getMatchActionAriaLabel(match)}
+                    >
+                      <span className="rb-home-match-card__fixture">
+                        <span className="rb-home-match-team rb-home-match-team--home">
+                          {renderTeamLogo(match.home_team)}
+                        </span>
+                        <span className="rb-home-vs">VS</span>
+                        <span className="rb-home-match-team rb-home-match-team--away">
+                          {renderTeamLogo(match.away_team)}
+                        </span>
                       </span>
-                      <span className="rb-home-vs">VS</span>
-                      <span className="rb-home-match-team rb-home-match-team--away">
-                        {renderTeamLogo(match.away_team)}
+
+                      <span className="rb-home-match-card__names">
+                        <strong title={getTeamLabel(match.home_team)}>{getTeamLabel(match.home_team)}</strong>
+                        <strong title={getTeamLabel(match.away_team)}>{getTeamLabel(match.away_team)}</strong>
                       </span>
-                    </span>
+                    </button>
 
-                    <span className="rb-home-match-card__names">
-                      <strong title={getTeamLabel(match.home_team)}>{getTeamLabel(match.home_team)}</strong>
-                      <strong title={getTeamLabel(match.away_team)}>{getTeamLabel(match.away_team)}</strong>
-                    </span>
-                  </button>
-
-                  <button
-                    type="button"
-                    className="rb-home-match-action"
-                    onClick={() => onSelectMatch(match.id)}
-                    aria-label={getMatchActionAriaLabel(match)}
-                  >
-                    <span className="rb-home-match-action__icon" aria-hidden="true">▥</span>
-                    <span className="rb-home-match-action__label">{MATCH_ACTION_LABEL}</span>
-                  </button>
-                </article>
-              ))
+                    <button
+                      type="button"
+                      className="rb-home-match-action"
+                      onClick={() => onSelectMatch(match.id)}
+                      aria-label={getMatchActionAriaLabel(match)}
+                    >
+                      <span className="rb-home-match-action__icon" aria-hidden="true">▥</span>
+                      <span className="rb-home-match-action__label">{actionLabel}</span>
+                    </button>
+                  </article>
+                );
+              })
             ) : (
               <article className="rb-home-empty-card">
                 <h4>Aucun match disponible</h4>
@@ -295,8 +308,8 @@ function DashboardScreen({
             <span className="rb-home-stat-card__icon" aria-hidden="true">▦</span>
             <div>
               <strong>{matches.length}</strong>
-              <p>Matchs analysables</p>
-              <small>Données chargées</small>
+              <p>Matchs affichables</p>
+              <small>Données chargées, même partielles</small>
             </div>
           </article>
 
@@ -337,5 +350,6 @@ export default DashboardScreen;
 // DashboardScreen.tsx
 // ├── reçoit compétitions, matchs, statut API et actions depuis App.tsx
 // ├── utilise les modèles Competition, Match et Team de models/rubybets.ts
+// ├── sécurise les équipes inconnues via helpers/displayText.ts
 // ├── déclenche la sélection compétition/match via les callbacks existants
 // └── déclenche la navigation vers Matchs, Glossaire et Informations responsables

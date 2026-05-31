@@ -8,7 +8,12 @@ import type {
   Team,
 } from "../models/rubybets";
 import type { AppScreen } from "../types/navigation";
-import { cleanTextItems, formatMatchStatus } from "../helpers/displayText";
+import {
+  cleanTextItems,
+  formatMatchStatus,
+  getTeamInitials,
+  getTeamShortName,
+} from "../helpers/displayText";
 import MatchAnalysisSection from "../components/MatchAnalysisSection";
 import AnalysisNewsSection from "../components/AnalysisNewsSection";
 
@@ -74,24 +79,12 @@ function getLimitedItems(items: string[] | undefined, limit: number) {
   return cleanTextItems(items ?? []).slice(0, limit);
 }
 
-// Cette fonction prépare un fallback court si le logo d’équipe est absent.
-function getTeamInitials(team: Team) {
-  if (team.tla) {
-    return team.tla;
-  }
-
-  return (team.short_name || team.name)
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((word) => word.charAt(0).toUpperCase())
-    .join("");
-}
-
 // Ce composant affiche le logo d’une équipe avec fallback texte.
 function AnalysisTeamLogo({ team }: { team: Team }) {
+  const teamLabel = getTeamShortName(team);
+
   return (
-    <span className="rb-analysis-team-logo" aria-label={`Logo ${team.name}`}>
+    <span className="rb-analysis-team-logo" aria-label={`Logo ${teamLabel}`}>
       <span className="rb-analysis-team-logo__fallback">{getTeamInitials(team)}</span>
       {team.crest ? (
         <img
@@ -123,7 +116,7 @@ function AnalysisMatchHero({ match }: { match: Match | null }) {
     <section className="rb-analysis-hero">
       <div className="rb-analysis-hero-team rb-analysis-hero-team--home">
         <AnalysisTeamLogo team={match.home_team} />
-        <strong>{match.home_team.short_name || match.home_team.name}</strong>
+        <strong>{getTeamShortName(match.home_team)}</strong>
       </div>
 
       <div className="rb-analysis-hero-center">
@@ -135,7 +128,7 @@ function AnalysisMatchHero({ match }: { match: Match | null }) {
       </div>
 
       <div className="rb-analysis-hero-team rb-analysis-hero-team--away">
-        <strong>{match.away_team.short_name || match.away_team.name}</strong>
+        <strong>{getTeamShortName(match.away_team)}</strong>
         <AnalysisTeamLogo team={match.away_team} />
       </div>
     </section>
@@ -291,4 +284,5 @@ export default AnalysisScreen;
 // ├── reçoit matchAnalysis, matchDetails et matchContext depuis App.tsx
 // ├── utilise MatchAnalysisSection.tsx pour l’analyse principale
 // ├── utilise AnalysisNewsSection.tsx pour la future zone actualités
+// ├── sécurise les équipes inconnues via helpers/displayText.ts
 // └── conserve la navigation vers Matchs et Prédictions via onNavigate

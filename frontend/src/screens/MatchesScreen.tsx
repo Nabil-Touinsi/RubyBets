@@ -3,6 +3,10 @@
 import { useMemo, useState } from "react";
 import type { Competition, Match } from "../models/rubybets";
 import type { AppScreen } from "../types/navigation";
+import {
+  getTeamSearchText,
+  hasKnownTeams,
+} from "../helpers/displayText";
 import CompetitionsSection from "../components/CompetitionsSection";
 import MatchesSection from "../components/MatchesSection";
 
@@ -23,11 +27,7 @@ type SortMode = "date_asc" | "date_desc" | "competition";
 function isAnalysisAvailable(match: Match) {
   const status = match.status?.toUpperCase();
 
-  return (
-    Boolean(match.home_team?.name) &&
-    Boolean(match.away_team?.name) &&
-    (status === "SCHEDULED" || status === "TIMED")
-  );
+  return hasKnownTeams(match) && (status === "SCHEDULED" || status === "TIMED");
 }
 
 // Cette fonction filtre les matchs selon la période choisie.
@@ -68,6 +68,21 @@ function sortMatches(matches: Match[], sortMode: SortMode) {
   });
 }
 
+// Cette fonction vérifie si un match correspond à la recherche équipe sans casser sur les valeurs nulles.
+function matchContainsTeamSearch(match: Match, searchValue: string) {
+  if (!searchValue) {
+    return true;
+  }
+
+  const homeTeamSearchText = getTeamSearchText(match.home_team);
+  const awayTeamSearchText = getTeamSearchText(match.away_team);
+
+  return (
+    homeTeamSearchText.includes(searchValue) ||
+    awayTeamSearchText.includes(searchValue)
+  );
+}
+
 // Ce composant structure l’écran Matchs sans modifier les appels API existants.
 function MatchesScreen({
   competitions,
@@ -88,20 +103,10 @@ function MatchesScreen({
 
   const filteredMatches = useMemo(() => {
     const matchesFilteredByDate = filterMatchesByDate(matches, dateFilter);
+    const searchValue = teamSearch.trim().toLowerCase();
 
     const matchesFilteredByTeam = matchesFilteredByDate.filter((match) => {
-      const searchValue = teamSearch.trim().toLowerCase();
-
-      if (!searchValue) {
-        return true;
-      }
-
-      return (
-        match.home_team.name.toLowerCase().includes(searchValue) ||
-        match.home_team.short_name.toLowerCase().includes(searchValue) ||
-        match.away_team.name.toLowerCase().includes(searchValue) ||
-        match.away_team.short_name.toLowerCase().includes(searchValue)
-      );
+      return matchContainsTeamSearch(match, searchValue);
     });
 
     return sortMatches(matchesFilteredByTeam, sortMode);
@@ -236,7 +241,7 @@ function MatchesScreen({
 
             <div className="rb-matches-side-stat">
               <span className="rb-dot rb-dot--warning" />
-              <span>En préparation</span>
+              <span>Équipes à confirmer</span>
               <strong>{pendingMatchesCount}</strong>
             </div>
 
@@ -256,7 +261,7 @@ function MatchesScreen({
             </div>
 
             <div className="rb-matches-quick-row">
-              <span>En préparation</span>
+              <span>Équipes à confirmer</span>
               <strong>{pendingMatchesCount}</strong>
             </div>
 
@@ -274,8 +279,9 @@ function MatchesScreen({
           <article className="rb-matches-side-card">
             <h3>Astuces</h3>
             <p>
-              Sélectionnez une rencontre pour consulter son détail, puis
-              accéder à l’analyse avant-match et aux prédictions explicables.
+              Sélectionnez une rencontre pour consulter son détail. Les matchs
+              dont les équipes ne sont pas encore connues restent affichés comme
+              données partielles.
             </p>
 
             <button
@@ -302,6 +308,7 @@ export default MatchesScreen;
 // MatchesScreen.tsx
 // ├── reçoit compétitions et matchs depuis App.tsx
 // ├── filtre les matchs côté frontend sans modifier l’API
+// ├── sécurise la recherche lorsque les équipes sont inconnues
 // ├── utilise CompetitionsSection.tsx pour les ligues
 // ├── utilise MatchesSection.tsx pour la liste des rencontres
 // └── renvoie la sélection d’un match vers App.tsx via onSelectMatch
