@@ -1,4 +1,4 @@
-// Ce fichier affiche le bloc ML national expérimental V18.3.3 dans l’écran Prédictions.
+// Ce fichier affiche le bloc ML national expérimental V18.3.4 dans l’écran Prédictions.
 // Il calcule automatiquement le match sélectionné quand il est compatible, sans remplacer les prédictions officielles RubyBets.
 
 import { useEffect, useState } from "react";
@@ -88,7 +88,7 @@ function isComputedResponse(response: V1833MatchPredictionResponse | null) {
   return Boolean(response && response.status === "computed" && response.selector_result);
 }
 
-// Ce composant affiche les métadonnées du match analysé par V18.3.3.
+// Ce composant affiche les métadonnées du match analysé par V18.3.4.
 function LabMatchCard({
   match,
   title,
@@ -121,7 +121,7 @@ function LabMatchCard({
   );
 }
 
-// Ce composant affiche un message clair quand V18.3.3 ne peut pas analyser le match sélectionné.
+// Ce composant affiche un message clair quand V18.3.4 ne peut pas analyser le match sélectionné.
 function LabUnavailableCard({
   response,
   selectedMatch,
@@ -130,12 +130,12 @@ function LabUnavailableCard({
   selectedMatch: Match | null;
 }) {
   const reason = response?.unavailable_reason ??
-    "L’analyse dynamique V18.3.3 n’est pas disponible pour ce match.";
+    "L’analyse dynamique V18.3.4 n’est pas disponible pour ce match.";
 
   return (
     <article className="rb-prediction-card rb-prediction-empty-state">
       <p className="rb-prediction-kicker">Analyse ML nationale expérimentale</p>
-      <h3>V18.3.3 indisponible pour ce match</h3>
+      <h3>V18.3.4 indisponible pour ce match</h3>
       <p>{reason}</p>
 
       {selectedMatch ? (
@@ -149,7 +149,7 @@ function LabUnavailableCard({
   );
 }
 
-// Ce composant affiche le résultat du sélecteur V18.3.3.
+// Ce composant affiche le résultat du sélecteur V18.3.4 dc018.
 function LabSelectorResultCard({
   response,
   title,
@@ -168,7 +168,7 @@ function LabSelectorResultCard({
       <div className="rb-prediction-section-header">
         <div>
           <p className="rb-prediction-kicker">{title}</p>
-          <h3>Sélection V18.3.3 strict reliability</h3>
+          <h3>Sélection V18.3.4 dc018</h3>
           <p>
             Ce résultat provient du laboratoire ML national. Il reste séparé des
             prédictions officielles RubyBets.
@@ -231,7 +231,7 @@ function LabSelectorResultCard({
         <article className="rb-prediction-main-card">
           <div className="rb-prediction-main-card__header">
             <div>
-              <h3>Référence V18.3.3</h3>
+              <h3>Référence V18.3.4</h3>
               <span>Performance globale test</span>
             </div>
             <span>△</span>
@@ -287,7 +287,7 @@ function DynamicContextCards({
           <h3>En attente</h3>
           <p>
             Sélectionne un match national compatible pour lancer l’analyse
-            dynamique V18.3.3.
+            dynamique V18.3.4.
           </p>
         </article>
       )}
@@ -297,7 +297,7 @@ function DynamicContextCards({
         <h3>Dynamique expérimental</h3>
         <p>
           Le backend construit les features du match sélectionné, charge les
-          modèles sauvegardés V18.3 et applique le sélecteur V18.3.3.
+          modèles sauvegardés V18.3 et applique le sélecteur V18.3.4 dc018.
         </p>
       </article>
 
@@ -365,8 +365,8 @@ function HistoricalCleanMatchTest() {
           <p className="rb-prediction-kicker">Test technique historique</p>
           <h3>clean_match_id CSV 348</h3>
           <p>
-            Cette zone sert uniquement à vérifier une ligne historique du CSV.
-            Elle est séparée du match actuellement sélectionné.
+            Cette zone sert uniquement à vérifier une ligne historique du CSV 348 avec V18.3.3.
+            Elle est séparée du match actuellement sélectionné, qui utilise V18.3.4 dc018.
           </p>
         </div>
 
@@ -400,7 +400,7 @@ function HistoricalCleanMatchTest() {
   );
 }
 
-// Ce composant affiche l’analyse V18.3.3 dynamique pour le match sélectionné.
+// Ce composant affiche l’analyse V18.3.4 dynamique pour le match sélectionné.
 function MlLabNational({ selectedMatch }: MlLabNationalProps) {
   const [dynamicStatus, setDynamicStatus] = useState<string>(
     "En attente d’un match national compatible."
@@ -413,28 +413,28 @@ function MlLabNational({ selectedMatch }: MlLabNationalProps) {
   useEffect(() => {
     if (!selectedMatch) {
       setDynamicResponse(null);
-      setDynamicStatus("Sélectionne un match pour lancer V18.3.3 dynamique.");
+      setDynamicStatus("Sélectionne un match pour lancer V18.3.4 dynamique.");
       return;
     }
 
     if (!hasKnownTeams(selectedMatch)) {
       setDynamicResponse(null);
       setDynamicStatus(
-        "Les équipes ne sont pas encore connues : V18.3.3 dynamique est indisponible."
+        "Les équipes ne sont pas encore connues : V18.3.4 dynamique est indisponible."
       );
       return;
     }
 
     setIsDynamicLoading(true);
-    setDynamicStatus("Calcul dynamique V18.3.3 en cours pour le match sélectionné...");
+    setDynamicStatus("Calcul dynamique V18.3.4 en cours pour le match sélectionné...");
 
     getV1833DynamicPredictionByRubyBetsMatchId(selectedMatch.id)
       .then((data) => {
         setDynamicResponse(data);
         setDynamicStatus(
           data.status === "computed"
-            ? "Analyse V18.3.3 calculée pour le match sélectionné."
-            : "V18.3.3 dynamique indisponible pour ce match."
+            ? "Analyse V18.3.4 calculée pour le match sélectionné."
+            : "V18.3.4 dynamique indisponible pour ce match."
         );
       })
       .catch((error: unknown) => {
@@ -442,7 +442,7 @@ function MlLabNational({ selectedMatch }: MlLabNationalProps) {
         setDynamicStatus(
           error instanceof Error
             ? error.message
-            : "Impossible de calculer V18.3.3 pour ce match."
+            : "Impossible de calculer V18.3.4 pour ce match."
         );
       })
       .finally(() => {
@@ -457,14 +457,14 @@ function MlLabNational({ selectedMatch }: MlLabNationalProps) {
           <p className="rb-prediction-kicker">Bloc expérimental séparé</p>
           <h3>Analyse ML nationale expérimentale</h3>
           <p>
-            Ce bloc calcule V18.3.3 sur le match national sélectionné quand les
+            Ce bloc calcule V18.3.4 sur le match national sélectionné quand les
             données nécessaires sont disponibles. Il ne remplace pas les
             prédictions officielles RubyBets.
           </p>
         </div>
 
         <span className="rb-prediction-soft-badge">
-          {isDynamicLoading ? "Calcul en cours" : "V18.3.3 non officiel"}
+          {isDynamicLoading ? "Calcul en cours" : "V18.3.4 non officiel"}
         </span>
       </div>
 
@@ -494,5 +494,5 @@ export default MlLabNational;
 // ├── reçoit selectedMatch depuis PredictionsScreen.tsx
 // ├── appelle getV1833DynamicPredictionByRubyBetsMatchId dans services/api.ts
 // ├── garde getV1833PredictionByMatchId uniquement comme test historique séparé
-// ├── utilise les types V18.3.3 définis dans models/rubybets.ts
+// ├── utilise les types V18.3.3/V18.3.4 définis dans models/rubybets.ts
 // └── reste expérimental, séparé du moteur officiel RubyBets

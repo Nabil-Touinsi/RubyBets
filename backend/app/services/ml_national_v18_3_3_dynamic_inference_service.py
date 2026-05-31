@@ -1,6 +1,6 @@
 # Role du fichier :
-# Ce service construit les features nationales V18.3.3 pour un match RubyBets selectionne
-# et applique les modeles sauvegardes sans modifier le moteur officiel RubyBets.
+# Ce service construit les features nationales pour un match RubyBets selectionne
+# et applique la variante experimentale V18.3.4 dc018 sans modifier le moteur officiel RubyBets.
 
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ from typing import Any
 import joblib
 import pandas as pd
 
-from app.services.ml_national_v18_3_3_selector import select_market_with_v18_3_3
+from app.services.ml_national_v18_3_3_selector import select_market_with_v18_3_4_dc018
 
 
 SUPPORTED_DYNAMIC_COMPETITION_CODES = {"WC"}
@@ -401,7 +401,7 @@ def validate_dynamic_match_scope(match: dict[str, Any]) -> tuple[bool, str]:
     if competition_code not in SUPPORTED_DYNAMIC_COMPETITION_CODES:
         return (
             False,
-            "V18.3.3 dynamique est limite aux matchs nationaux World Cup dans cette phase.",
+            "V18.3.4 dc018 dynamique est limite aux matchs nationaux World Cup dans cette phase.",
         )
 
     home_team_name = get_team_payload(match, "homeTeam", "home_team").get("name")
@@ -417,14 +417,14 @@ def validate_dynamic_match_scope(match: dict[str, Any]) -> tuple[bool, str]:
     if match_date is None:
         return False, "La date du match est indisponible, inference impossible."
 
-    return True, "Match compatible avec l'inference experimentale V18.3.3."
+    return True, "Match compatible avec l'inference experimentale V18.3.4 dc018."
 
 
-# Construit les features V18.3.3 dynamiques a partir du match RubyBets selectionne.
+# Construit les features nationales dynamiques a partir du match RubyBets selectionne.
 def build_v18_3_3_dynamic_features(match: dict[str, Any]) -> dict[str, Any]:
     match_date = parse_datetime(get_match_utc_date(match))
     if match_date is None:
-        raise ValueError("Date du match invalide pour V18.3.3 dynamique.")
+        raise ValueError("Date du match invalide pour V18.3.4 dc018 dynamique.")
 
     home_team_source_name = get_team_payload(match, "homeTeam", "home_team").get("name")
     away_team_source_name = get_team_payload(match, "awayTeam", "away_team").get("name")
@@ -491,7 +491,7 @@ def build_dynamic_match_metadata(match: dict[str, Any]) -> dict[str, Any]:
         "clean_match_id": f"rubybets_match_{match.get('id')}",
         "rubybets_match_id": match.get("id"),
         "feature_id": "dynamic_frontend_match",
-        "feature_version": "national_v1_elo_form_dynamic_v18_3_3",
+        "feature_version": "national_v1_elo_form_dynamic_v18_3_4_dc018",
         "match_date_utc": get_match_utc_date(match),
         "season": season,
         "competition_code": competition.get("code"),
@@ -539,7 +539,7 @@ def predict_market_from_features(
     }
 
 
-# Transforme les sorties des modeles en features compatibles avec le selecteur V18.3.3.
+# Transforme les sorties des modeles en features compatibles avec le selecteur V18.3.4 dc018.
 def build_selector_features_from_dynamic_predictions(
     predictions: dict[str, dict[str, Any]],
 ) -> dict[str, Any]:
@@ -575,7 +575,7 @@ def build_unavailable_dynamic_response(
     reason: str,
 ) -> dict[str, Any]:
     return {
-        "source": "rubybets_ml_national_v18_3_3_dynamic_inference",
+        "source": "rubybets_ml_national_v18_3_4_dynamic_inference",
         "scope": "experimental_backend",
         "status": "unavailable",
         "data_source_file": "dynamic_selected_match_inference",
@@ -583,13 +583,13 @@ def build_unavailable_dynamic_response(
         "selector_result": None,
         "unavailable_reason": reason,
         "responsible_note": (
-            "V18.3.3 reste experimental. Aucune prediction officielle RubyBets "
+            "V18.3.4 dc018 reste experimental. Aucune prediction officielle RubyBets "
             "n'est remplacee et aucun resultat sportif n'est garanti."
         ),
     }
 
 
-# Orchestre l'inference dynamique V18.3.3 pour un match RubyBets selectionne.
+# Orchestre l'inference dynamique V18.3.4 dc018 pour un match RubyBets selectionne.
 def infer_v18_3_3_for_rubybets_match(match: dict[str, Any]) -> dict[str, Any]:
     is_valid, validation_message = validate_dynamic_match_scope(match)
 
@@ -602,10 +602,10 @@ def infer_v18_3_3_for_rubybets_match(match: dict[str, Any]) -> dict[str, Any]:
         for market_key in MODEL_FILES
     }
     selector_features = build_selector_features_from_dynamic_predictions(predictions)
-    selector_result = select_market_with_v18_3_3(selector_features)
+    selector_result = select_market_with_v18_3_4_dc018(selector_features)
 
     return {
-        "source": "rubybets_ml_national_v18_3_3_dynamic_inference",
+        "source": "rubybets_ml_national_v18_3_4_dynamic_inference",
         "scope": "experimental_backend",
         "status": "computed",
         "data_source_file": "dynamic_selected_match_inference",
@@ -614,7 +614,7 @@ def infer_v18_3_3_for_rubybets_match(match: dict[str, Any]) -> dict[str, Any]:
         "market_predictions": predictions,
         "selector_result": selector_result,
         "responsible_note": (
-            "Resultat experimental calcule dynamiquement pour le match selectionne. "
+            "Resultat experimental V18.3.4 dc018 calcule dynamiquement pour le match selectionne. "
             "Il ne remplace pas les predictions officielles RubyBets et ne garantit "
             "aucun resultat sportif."
         ),
@@ -626,5 +626,5 @@ def infer_v18_3_3_for_rubybets_match(match: dict[str, Any]) -> dict[str, Any]:
 #   -> lit les donnees historiques data/external/national_results/results.csv
 #   -> lit les ratings reports/evidence/ml_training/299_national_elo_final_rankings.csv
 #   -> charge les modeles models/ml_national/v18_3_global_multimarket/*.joblib
-#   -> appelle ml_national_v18_3_3_selector.py
+#   -> appelle ml_national_v18_3_3_selector.py avec la variante V18.3.4 dc018
 #   -> retourne une analyse experimentale au routeur experimental_ml_national_v18_3_3.py

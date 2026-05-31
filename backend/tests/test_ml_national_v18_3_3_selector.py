@@ -1,4 +1,4 @@
-﻿# Role du fichier :
+# Role du fichier :
 # Ces tests verifient le selecteur national V18.3.3 cote service, API experimentale
 # et adaptateur d'inference depuis une ligne de predictions V18.3.
 
@@ -15,6 +15,7 @@ from app.services.ml_national_v18_3_3_selector import (
     RECOMMEND_STATUS,
     STRICT_1X2_MARKET,
     select_market_with_v18_3_3,
+    select_market_with_v18_3_4_dc018,
 )
 
 
@@ -81,6 +82,33 @@ def test_v18_3_3_selects_double_chance_from_1x2_probabilities():
     assert result["selected_market"] == DOUBLE_CHANCE_MARKET
     assert result["selected_prediction"] == "TEAM_A_OR_DRAW"
     assert result["excluded_outcome"] == "TEAM_B_WIN"
+
+
+# Verifie que V18.3.4 dc018 convertit une double chance refusee par V18.3.3.
+def test_v18_3_4_dc018_accepts_wider_double_chance_threshold():
+    features = {
+        "1x2_prediction": "TEAM_A_WIN",
+        "1x2_max_probability": 0.55,
+        "over_1_5_prediction": "NO",
+        "over_1_5_prob_YES": 0.40,
+        "over_2_5_prediction": "UNDER",
+        "over_2_5_max_probability": 0.60,
+        "btts_prediction": "YES",
+        "btts_prob_NO": 0.35,
+        "1x2_prob_TEAM_A_WIN": 0.44,
+        "1x2_prob_DRAW": 0.39,
+        "1x2_prob_TEAM_B_WIN": 0.17,
+    }
+
+    strict_result = select_market_with_v18_3_3(features)
+    coverage_result = select_market_with_v18_3_4_dc018(features)
+
+    assert strict_result["status"] == ABSTAIN_STATUS
+    assert coverage_result["status"] == RECOMMEND_STATUS
+    assert coverage_result["selected_market"] == DOUBLE_CHANCE_MARKET
+    assert coverage_result["selected_prediction"] == "TEAM_A_OR_DRAW"
+    assert coverage_result["selector_version"] == "v18.3.4"
+    assert coverage_result["excluded_probability"] == 0.17
 
 
 # Verifie que le selecteur s'abstient quand aucun signal ne passe les seuils.
@@ -188,6 +216,7 @@ def test_v18_3_3_match_endpoint_returns_existing_csv_match():
     assert data["match"]["competition_code"] == "WCQ"
 
     assert data["selector_result"]["status"] in ["RECOMMEND", "ABSTAIN"]
+    assert data["selector_result"]["selector_version"] == "v18.3.3"
     assert "selected_market" in data["selector_result"]
     assert "responsible_note" in data
 
@@ -307,8 +336,8 @@ def build_fake_world_cup_match_for_dynamic_inference() -> dict:
     }
 
 
-# Verifie que le service dynamique construit une prediction pour le match RubyBets selectionne.
-def test_v18_3_3_dynamic_service_computes_selected_world_cup_match():
+# Verifie que le service dynamique construit une prediction V18.3.4 pour le match RubyBets selectionne.
+def test_v18_3_4_dynamic_service_computes_selected_world_cup_match():
     from app.services.ml_national_v18_3_3_dynamic_inference_service import (
         infer_v18_3_3_for_rubybets_match,
     )
@@ -321,11 +350,12 @@ def test_v18_3_3_dynamic_service_computes_selected_world_cup_match():
     assert result["match"]["team_a_name"] == "Mexico"
     assert result["match"]["team_b_name"] == "South Africa"
     assert result["selector_result"]["status"] in ["RECOMMEND", "ABSTAIN"]
+    assert result["selector_result"]["selector_version"] == "v18.3.4"
     assert result["data_source_file"] == "dynamic_selected_match_inference"
 
 
 # Verifie que le service dynamique refuse proprement un match club hors perimetre national.
-def test_v18_3_3_dynamic_service_returns_unavailable_for_club_match():
+def test_v18_3_4_dynamic_service_returns_unavailable_for_club_match():
     from app.services.ml_national_v18_3_3_dynamic_inference_service import (
         infer_v18_3_3_for_rubybets_match,
     )
@@ -340,8 +370,8 @@ def test_v18_3_3_dynamic_service_returns_unavailable_for_club_match():
     assert "limite aux matchs nationaux" in result["unavailable_reason"]
 
 
-# Verifie que la route dynamique par match RubyBets appelle le calcul V18.3.3 du match selectionne.
-def test_v18_3_3_dynamic_endpoint_returns_selected_match(monkeypatch):
+# Verifie que la route dynamique par match RubyBets appelle le calcul V18.3.4 du match selectionne.
+def test_v18_3_4_dynamic_endpoint_returns_selected_match(monkeypatch):
     from app.api import experimental_ml_national_v18_3_3 as v18_api
 
     async def fake_get_cached_football_data(
@@ -376,8 +406,9 @@ def test_v18_3_3_dynamic_endpoint_returns_selected_match(monkeypatch):
     assert data["match"]["team_a_name"] == "Mexico"
     assert data["match"]["team_b_name"] == "South Africa"
     assert data["selector_result"]["status"] in ["RECOMMEND", "ABSTAIN"]
+    assert data["selector_result"]["selector_version"] == "v18.3.4"
 
 
 # Schema de communication complementaire :
 # Ces tests dynamiques verifient aussi ml_national_v18_3_3_dynamic_inference_service.py
-# et la route /api/experimental/ml-national/v18-3-3/rubybets-matches/{match_id}.
+# avec la variante V18.3.4 dc018 et la route /api/experimental/ml-national/v18-3-3/rubybets-matches/{match_id}.
