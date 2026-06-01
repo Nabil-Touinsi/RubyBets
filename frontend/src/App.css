@@ -11403,3 +11403,813 @@ section.rb-screen-container:has(.rb-responsible-screen--mockup) {
     font-size: 0.94rem;
   }
 }
+
+/*
+  Correctif Phase 3A - Ergonomie desktop RubyBets.
+  Ce bloc élargit les écrans principaux et augmente la lisibilité sans changer la logique React ni les appels API.
+*/
+@media (min-width: 1181px) {
+  main.rb-app-shell {
+    font-size: 16.5px;
+  }
+
+  .rb-app-header {
+    padding: 1.35rem 2.25rem;
+    gap: 2rem;
+  }
+
+  .rb-brand__mark {
+    width: 3rem;
+    height: 3rem;
+  }
+
+  .rb-brand h1 {
+    font-size: 1.48rem;
+  }
+
+  .rb-brand p {
+    font-size: 0.98rem;
+  }
+
+  .rb-top-navigation {
+    gap: 0.62rem;
+  }
+
+  .rb-top-navigation__item {
+    min-height: 2.8rem;
+    padding: 0.78rem 1.08rem;
+    font-size: 0.96rem;
+  }
+
+  section.rb-screen-container,
+  section.rb-screen-container:has(.rb-predictions-screen--mockup),
+  section.rb-screen-container:has(.rb-home-dashboard) {
+    width: min(1540px, calc(100% - 56px)) !important;
+    max-width: 1540px !important;
+    padding-top: 36px !important;
+    padding-bottom: 32px !important;
+  }
+
+  .rb-status-footer {
+    width: min(1540px, calc(100% - 56px));
+    max-width: 1540px;
+  }
+
+  .rb-page-hero,
+  .rb-match-details-hero {
+    gap: 1.5rem;
+  }
+
+  .rb-page-hero > div,
+  .rb-page-hero__aside,
+  .rb-match-details-hero > div,
+  .rb-match-details-hero > aside,
+  .rb-matches-filters,
+  .rb-matches-main,
+  .rb-matches-aside,
+  .rb-match-details-main,
+  .rb-match-details-aside,
+  .rb-analysis-main,
+  .rb-analysis-aside,
+  .rb-predictions-main,
+  .rb-predictions-aside,
+  .rb-recommendation-main,
+  .rb-recommendation-aside {
+    padding: 1.55rem;
+    border-radius: 1.75rem;
+  }
+
+  .rb-page-hero h2,
+  .rb-match-details-hero h2 {
+    font-size: clamp(2.35rem, 3vw, 4rem);
+  }
+
+  .rb-page-hero p:not(.rb-eyebrow),
+  .rb-match-details-hero p:not(.rb-eyebrow) {
+    font-size: 1.03rem;
+    line-height: 1.72;
+  }
+
+  .rb-matches-layout,
+  .rb-match-details-layout,
+  .rb-analysis-layout,
+  .rb-predictions-layout,
+  .rb-recommendation-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(340px, 370px);
+    gap: 1.5rem;
+  }
+
+  .rb-matches-aside,
+  .rb-match-details-aside,
+  .rb-analysis-aside,
+  .rb-predictions-aside,
+  .rb-recommendation-aside {
+    top: 8.25rem;
+  }
+
+  .rb-match-list {
+    gap: 1rem;
+  }
+
+  .rb-match-card,
+  .rb-matches-main article,
+  .rb-matches-main li {
+    padding: 1.05rem 1.15rem;
+    border-radius: 1.25rem;
+  }
+
+  .rb-match-card__teams {
+    grid-template-columns: minmax(180px, 1fr) 3rem minmax(180px, 1fr);
+    gap: 1.1rem;
+  }
+
+  .rb-team-logo-wrap {
+    width: 2.55rem;
+    height: 2.55rem;
+  }
+
+  .rb-team-name {
+    font-size: 1.05rem;
+  }
+
+  .rb-versus {
+    min-width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .rb-home-dashboard {
+    gap: 24px;
+  }
+
+  .rb-home-hero {
+    grid-template-columns: minmax(400px, 1.16fr) minmax(390px, 1fr) 300px;
+    gap: 22px;
+    min-height: 340px;
+    padding: 26px;
+  }
+
+  .rb-home-hero__copy {
+    padding: 42px;
+  }
+
+  .rb-home-hero__copy h2 {
+    font-size: clamp(2.6rem, 3.6vw, 4.7rem);
+  }
+
+  .rb-home-hero__copy > p:not(.rb-home-kicker) {
+    font-size: 1.04rem;
+  }
+
+  .rb-home-main-grid {
+    grid-template-columns: minmax(0, 1fr) 330px;
+    gap: 24px;
+  }
+
+  .rb-home-content,
+  .rb-home-side-panel,
+  .rb-home-link-card {
+    padding: 26px;
+    border-radius: 22px;
+  }
+
+  .rb-home-match-row {
+    gap: 16px;
+  }
+
+  .rb-home-match-card {
+    min-height: 188px;
+    padding: 16px;
+  }
+
+  .rb-home-match-card__names strong {
+    font-size: 0.8rem;
+  }
+
+  .rb-home-team-logo {
+    width: 46px;
+    height: 46px;
+  }
+
+  .rb-predictions-screen--mockup {
+    gap: 14px !important;
+  }
+
+  .rb-predictions-screen--mockup .rb-prediction-dashboard-grid {
+    grid-template-columns: minmax(0, 1fr) 340px !important;
+    gap: 14px !important;
+  }
+
+  .rb-predictions-screen--mockup .rb-prediction-dashboard-grid__main,
+  .rb-predictions-screen--mockup .rb-prediction-dashboard-grid__side {
+    gap: 14px !important;
+  }
+
+  .rb-predictions-screen--mockup .rb-prediction-topbar h2 {
+    font-size: 1.7rem !important;
+  }
+
+  .rb-predictions-screen--mockup .rb-prediction-hero {
+    min-height: 96px !important;
+    padding: 14px 18px !important;
+    gap: 14px !important;
+  }
+
+  .rb-predictions-screen--mockup .rb-prediction-team-logo {
+    width: 50px !important;
+    height: 50px !important;
+  }
+
+  .rb-predictions-screen--mockup .rb-prediction-hero__team strong,
+  .rb-predictions-screen--mockup .rb-prediction-hero__meta strong {
+    font-size: 0.86rem !important;
+  }
+
+  .rb-predictions-screen--mockup .rb-prediction-main-section {
+    gap: 12px !important;
+    padding: 14px !important;
+    border-radius: 13px !important;
+  }
+
+  .rb-predictions-screen--mockup .rb-prediction-card-grid {
+    gap: 12px !important;
+  }
+
+  .rb-predictions-screen--mockup .rb-prediction-main-card {
+    min-height: 250px !important;
+    padding: 14px !important;
+    border-radius: 13px !important;
+  }
+
+  .rb-predictions-screen--mockup .rb-prediction-main-card__header h3 {
+    font-size: 0.94rem !important;
+  }
+
+  .rb-predictions-screen--mockup .rb-prediction-main-card__highlight strong {
+    font-size: 1.18rem !important;
+  }
+
+  .rb-predictions-screen--mockup .rb-prediction-main-card > p,
+  .rb-predictions-screen--mockup .rb-prediction-section-header p:not(.rb-prediction-kicker),
+  .rb-predictions-screen--mockup .rb-prediction-global-reading p:not(.rb-prediction-kicker),
+  .rb-predictions-screen--mockup .rb-prediction-side-card p,
+  .rb-predictions-screen--mockup .rb-prediction-summary-text {
+    font-size: 0.72rem !important;
+    line-height: 1.48 !important;
+  }
+
+  .rb-predictions-screen--mockup .rb-prediction-summary-card,
+  .rb-predictions-screen--mockup .rb-prediction-side-card {
+    padding: 14px !important;
+    border-radius: 13px !important;
+  }
+
+  .rb-predictions-screen--mockup .rb-prediction-gauge {
+    width: 148px !important;
+    height: 148px !important;
+  }
+
+  .rb-predictions-screen--mockup .rb-prediction-gauge div {
+    width: 102px !important;
+    height: 102px !important;
+  }
+}
+
+/*
+  Schéma de communication Phase 3A :
+  App.css
+  ├── élargit AppShell et rb-screen-container pour le desktop
+  ├── améliore DashboardScreen, MatchesScreen et PredictionsScreen
+  ├── garde les composants React et les appels API inchangés
+  └── conserve la direction visuelle sombre Obsidian Teal
+*/
+
+/*
+  Phase 3B — stabilisation UI système.
+  Ce bloc harmonise les largeurs, la navigation, la typographie et les grilles sans modifier la logique React ou les appels API.
+*/
+:root {
+  --rb-page-max: 1480px;
+  --rb-page-wide: 1560px;
+  --rb-page-gap: clamp(18px, 2.4vw, 36px);
+  --rb-section-gap: clamp(16px, 1.8vw, 24px);
+  --rb-card-radius-lg: 22px;
+  --rb-card-radius-md: 16px;
+  --rb-readable-text: clamp(0.88rem, 0.18vw + 0.84rem, 1rem);
+  --rb-small-readable: 0.82rem;
+}
+
+.rb-app-header {
+  padding: 0.85rem var(--rb-page-gap) 0.95rem;
+}
+
+.rb-app-header__inner {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(18px, 2vw, 34px);
+  width: min(var(--rb-page-wide), 100%);
+  margin: 0 auto;
+}
+
+.rb-app-header__right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.55rem;
+  min-width: 0;
+}
+
+.rb-brand {
+  gap: 0.75rem;
+}
+
+.rb-brand__mark {
+  width: 2.45rem;
+  height: 2.45rem;
+  border-radius: 0.85rem;
+  box-shadow: 0 0 22px rgba(20, 184, 166, 0.26);
+}
+
+.rb-brand h1 {
+  font-size: clamp(1.1rem, 1.2vw, 1.28rem);
+  line-height: 1.1;
+}
+
+.rb-brand p:not(.rb-eyebrow) {
+  font-size: 0.92rem;
+  line-height: 1.25;
+}
+
+.rb-eyebrow {
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+}
+
+.rb-top-navigation {
+  justify-content: flex-start;
+  gap: 0.5rem;
+  max-width: 100%;
+}
+
+.rb-top-navigation__item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0.58rem 0.96rem;
+  border-color: rgba(148, 163, 184, 0.2);
+  background: rgba(15, 23, 42, 0.5);
+  color: #b9c8cd;
+  font-size: 0.9rem;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  box-shadow: none;
+}
+
+.rb-top-navigation__label {
+  color: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  white-space: nowrap;
+}
+
+.rb-top-navigation__item--active,
+.rb-top-navigation__item[aria-current="page"] {
+  border-color: rgba(45, 212, 191, 0.86);
+  background: linear-gradient(135deg, rgba(20, 184, 166, 0.22), rgba(8, 47, 51, 0.28));
+  color: #f8ffff;
+  box-shadow: 0 0 0 1px rgba(45, 212, 191, 0.08), 0 10px 24px rgba(20, 184, 166, 0.11);
+}
+
+.rb-top-navigation__item:disabled,
+.rb-top-navigation__item[data-disabled="true"] {
+  opacity: 0.52;
+  filter: saturate(0.7);
+}
+
+.rb-top-navigation__item:focus-visible {
+  outline: 3px solid rgba(45, 212, 191, 0.4);
+  outline-offset: 3px;
+}
+
+.rb-header-badge {
+  color: #a9bbbf;
+  font-size: 0.88rem;
+  line-height: 1.25;
+}
+
+.rb-screen-container,
+.rb-status-footer {
+  width: min(var(--rb-page-max), calc(100% - (var(--rb-page-gap) * 2)));
+}
+
+.rb-screen-container {
+  padding-top: clamp(1.35rem, 2vw, 2rem);
+}
+
+.rb-status-footer {
+  padding-bottom: 1.65rem;
+}
+
+.rb-home-dashboard,
+.rb-matches-screen,
+.rb-detail-screen--mockup,
+.rb-analysis-screen--mockup,
+.rb-predictions-screen--mockup,
+.rb-recommendation-screen--mockup,
+.rb-glossary-screen--mockup,
+.rb-responsible-screen--mockup {
+  gap: var(--rb-section-gap) !important;
+}
+
+.rb-home-hero,
+.rb-home-main-grid,
+.rb-matches-layout,
+.rb-match-details-layout,
+.rb-analysis-layout,
+.rb-predictions-layout,
+.rb-recommendation-layout,
+.rb-glossary-layout,
+.rb-responsible-layout,
+.rb-prediction-dashboard-grid,
+.rb-recommendation-screen--mockup .rb-recommendation-layout {
+  gap: var(--rb-section-gap) !important;
+}
+
+/* Dashboard : hero plus compact et matchs à venir plus proches de la zone visible. */
+.rb-home-hero {
+  grid-template-columns: minmax(360px, 0.95fr) minmax(320px, 0.95fr) minmax(240px, 0.55fr) !important;
+  align-items: stretch !important;
+}
+
+.rb-home-hero__copy,
+.rb-home-pitch-card,
+.rb-home-confidence,
+.rb-home-content,
+.rb-home-quick-panel,
+.rb-home-link-card,
+.rb-home-match-card {
+  border-radius: var(--rb-card-radius-lg) !important;
+}
+
+.rb-home-hero__copy {
+  min-height: 420px !important;
+  padding: clamp(1.6rem, 2.4vw, 2.4rem) !important;
+  justify-content: center !important;
+}
+
+.rb-home-hero__copy h2 {
+  max-width: 640px !important;
+  font-size: clamp(2.45rem, 3.6vw, 4.35rem) !important;
+  line-height: 1.02 !important;
+  letter-spacing: -0.065em !important;
+}
+
+.rb-home-hero__copy > p:not(.rb-home-kicker) {
+  max-width: 560px !important;
+  font-size: 1rem !important;
+  line-height: 1.58 !important;
+}
+
+.rb-home-pitch-card {
+  min-height: 420px !important;
+  padding: 1.25rem !important;
+}
+
+.rb-home-pitch {
+  transform: scale(0.9) !important;
+  transform-origin: center;
+}
+
+.rb-home-confidence {
+  min-height: 420px !important;
+  padding: 1.25rem !important;
+}
+
+.rb-home-confidence strong {
+  font-size: clamp(1.45rem, 2.1vw, 2rem) !important;
+  line-height: 1.1 !important;
+}
+
+.rb-home-main-grid {
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 320px) !important;
+  align-items: start !important;
+}
+
+.rb-home-content {
+  padding: clamp(1.1rem, 1.5vw, 1.45rem) !important;
+}
+
+.rb-home-match-row {
+  grid-template-columns: repeat(5, minmax(150px, 1fr)) !important;
+  gap: 0.95rem !important;
+}
+
+.rb-home-match-card {
+  min-height: 190px !important;
+  padding: 1rem !important;
+}
+
+.rb-home-match-card__names strong,
+.rb-home-match-card__league,
+.rb-home-match-card__top span {
+  overflow-wrap: normal !important;
+  word-break: normal !important;
+}
+
+/* Pages avec listes ou colonnes latérales : plus de largeur utile et asides moins étouffés. */
+.rb-page-hero,
+.rb-matches-layout,
+.rb-analysis-layout,
+.rb-predictions-layout,
+.rb-recommendation-layout,
+.rb-glossary-layout,
+.rb-responsible-layout {
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 330px) !important;
+}
+
+.rb-matches-main,
+.rb-analysis-main,
+.rb-predictions-main,
+.rb-recommendation-main,
+.rb-glossary-main,
+.rb-responsible-main,
+.rb-match-details-main,
+.rb-match-context-panel,
+.rb-matches-aside,
+.rb-analysis-aside,
+.rb-predictions-aside,
+.rb-recommendation-aside,
+.rb-glossary-aside,
+.rb-responsible-aside,
+.rb-match-details-aside {
+  border-radius: var(--rb-card-radius-lg) !important;
+}
+
+.rb-matches-main article,
+.rb-matches-main li {
+  padding: 0.88rem 1rem !important;
+}
+
+.rb-matches-main strong,
+.rb-matches-main b,
+.rb-matches-main span,
+.rb-matches-main p {
+  overflow-wrap: normal !important;
+  word-break: normal !important;
+}
+
+.rb-matches-main button {
+  min-height: 38px;
+  padding-inline: 1rem !important;
+  font-size: 0.9rem !important;
+}
+
+.rb-matches-aside article,
+.rb-analysis-aside article,
+.rb-predictions-aside article,
+.rb-recommendation-aside article,
+.rb-glossary-aside article,
+.rb-responsible-aside article {
+  padding: 1rem !important;
+}
+
+/* Détail et Analyse : hiérarchie plus claire, moins de micro-badges visuels. */
+.rb-detail-screen--mockup .rb-detail-card,
+.rb-detail-screen--mockup .rb-detail-action-card,
+.rb-analysis-main article,
+.rb-analysis-aside article {
+  border-radius: var(--rb-card-radius-md) !important;
+}
+
+.rb-detail-screen--mockup .rb-detail-card__header h3,
+.rb-analysis-main section > h2,
+.rb-analysis-main section > h3 {
+  font-size: clamp(1.08rem, 0.5vw + 0.95rem, 1.45rem) !important;
+  line-height: 1.25 !important;
+}
+
+.rb-detail-screen--mockup :is(p, li, span),
+.rb-analysis-screen--mockup :is(p, li, span),
+.rb-predictions-screen--mockup :is(p, li, span),
+.rb-recommendation-screen--mockup :is(p, li, span),
+.rb-glossary-screen--mockup :is(p, li, span),
+.rb-responsible-screen--mockup :is(p, li, span) {
+  font-size: max(var(--rb-small-readable), 13px) !important;
+  line-height: 1.52 !important;
+}
+
+.rb-detail-screen--mockup :is(.rb-status-pill, [class*="badge"], [class*="tag"]),
+.rb-analysis-screen--mockup :is(.rb-status-pill, [class*="badge"], [class*="tag"]),
+.rb-predictions-screen--mockup :is(.rb-status-pill, [class*="badge"], [class*="tag"]),
+.rb-recommendation-screen--mockup :is(.rb-status-pill, [class*="badge"], [class*="tag"]) {
+  min-height: 28px;
+  padding: 0.36rem 0.62rem !important;
+  font-size: 0.78rem !important;
+  line-height: 1.15 !important;
+}
+
+/* Prédictions : bloc officiel plus compact, bloc V18.3.4 plus visible dans le premier écran. */
+section.rb-screen-container:has(.rb-predictions-screen--mockup) {
+  width: min(1500px, calc(100% - (var(--rb-page-gap) * 2))) !important;
+}
+
+.rb-predictions-screen--mockup {
+  max-width: 100% !important;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-dashboard-grid {
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 330px) !important;
+  gap: 1rem !important;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-hero {
+  min-height: 86px !important;
+  padding: 0.95rem 1.15rem !important;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-card-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 0.9rem !important;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-main-card {
+  min-height: 215px !important;
+  padding: 1rem !important;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-main-card__highlight strong {
+  font-size: clamp(1.15rem, 1vw, 1.45rem) !important;
+  line-height: 1.18 !important;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-global-reading {
+  padding: 1rem !important;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-main-section + .rb-prediction-main-section,
+.rb-predictions-screen--mockup .rb-prediction-dashboard-grid + .rb-prediction-main-section {
+  margin-top: 1rem !important;
+}
+
+.rb-predictions-screen--mockup .rb-prediction-main-section:has(.rb-prediction-section-header h3) {
+  scroll-margin-top: 140px;
+}
+
+/* Recommandation : état vide et CTA plus visibles sans fausse donnée. */
+.rb-recommendation-main button[type="submit"],
+.rb-recommendation-main button:not(:disabled) {
+  min-height: 44px;
+}
+
+.rb-recommendation-main .rb-empty-state,
+.rb-recommendation-main article:has(h3) {
+  border-color: rgba(250, 204, 21, 0.28) !important;
+}
+
+/* Glossaire et informations responsables : meilleure largeur de lecture. */
+section.rb-screen-container:has(.rb-glossary-screen--mockup),
+section.rb-screen-container:has(.rb-responsible-screen--mockup) {
+  width: min(1320px, calc(100% - (var(--rb-page-gap) * 2))) !important;
+}
+
+.rb-glossary-screen--mockup {
+  font-size: var(--rb-readable-text) !important;
+}
+
+.rb-glossary-screen--mockup input,
+.rb-glossary-screen--mockup button {
+  min-height: 40px;
+}
+
+.rb-responsible-screen--mockup h2,
+.rb-responsible-hero--mockup h2 {
+  max-width: 780px !important;
+  font-size: clamp(2rem, 3.1vw, 3.4rem) !important;
+  line-height: 1.05 !important;
+  letter-spacing: -0.055em !important;
+}
+
+.rb-responsible-screen--mockup .rb-responsible-card-grid,
+.rb-responsible-screen--mockup .rb-responsible-info--mockup > div:has(article) {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 1rem !important;
+}
+
+/* Accessibilité : focus visible et états désactivés compréhensibles. */
+.rb-app-shell :is(a, button, select, input, textarea):focus-visible {
+  outline: 3px solid rgba(45, 212, 191, 0.46) !important;
+  outline-offset: 3px !important;
+  box-shadow: 0 0 0 6px rgba(45, 212, 191, 0.09) !important;
+}
+
+.rb-app-shell button:disabled {
+  cursor: not-allowed !important;
+  opacity: 0.55 !important;
+}
+
+@media (max-width: 1280px) {
+  .rb-home-hero,
+  .rb-home-main-grid,
+  .rb-page-hero,
+  .rb-matches-layout,
+  .rb-match-details-layout,
+  .rb-analysis-layout,
+  .rb-predictions-layout,
+  .rb-recommendation-layout,
+  .rb-glossary-layout,
+  .rb-responsible-layout,
+  .rb-predictions-screen--mockup .rb-prediction-dashboard-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .rb-home-pitch-card,
+  .rb-home-confidence,
+  .rb-matches-aside,
+  .rb-analysis-aside,
+  .rb-predictions-aside,
+  .rb-recommendation-aside,
+  .rb-glossary-aside,
+  .rb-responsible-aside {
+    position: static !important;
+  }
+
+  .rb-home-pitch-card,
+  .rb-home-confidence {
+    min-height: 260px !important;
+  }
+}
+
+@media (max-width: 860px) {
+  .rb-app-header {
+    position: static;
+    padding: 0.9rem 1rem;
+  }
+
+  .rb-app-header__inner {
+    grid-template-columns: 1fr;
+  }
+
+  .rb-top-navigation {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+  }
+
+  .rb-top-navigation__item {
+    width: 100%;
+    min-height: 42px;
+  }
+
+  .rb-screen-container,
+  .rb-status-footer {
+    width: min(100% - 24px, var(--rb-page-max)) !important;
+  }
+
+  .rb-home-hero__copy h2 {
+    font-size: clamp(2rem, 10vw, 3.15rem) !important;
+  }
+
+  .rb-home-match-row,
+  .rb-predictions-screen--mockup .rb-prediction-card-grid,
+  .rb-responsible-screen--mockup .rb-responsible-card-grid,
+  .rb-responsible-screen--mockup .rb-responsible-info--mockup > div:has(article) {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 520px) {
+  .rb-top-navigation {
+    grid-template-columns: 1fr;
+  }
+
+  .rb-brand {
+    align-items: flex-start;
+  }
+
+  .rb-brand__mark {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+
+  .rb-home-hero__copy,
+  .rb-home-content,
+  .rb-matches-main,
+  .rb-analysis-main,
+  .rb-predictions-main,
+  .rb-recommendation-main,
+  .rb-glossary-main,
+  .rb-responsible-main {
+    padding: 1rem !important;
+    border-radius: 16px !important;
+  }
+}
+
+/*
+  Schéma de communication Phase 3B :
+  App.css
+  ├── stabilise AppShell.tsx et TopNavigation.tsx par les classes rb-app-* et rb-top-navigation-*
+  ├── harmonise les écrans Dashboard, Matchs, Détail, Analyse, Prédictions, Recommandation, Glossaire et Infos responsables
+  ├── ne modifie pas les appels API, les modèles ML ni les données affichées
+  └── conserve la direction Obsidian Teal avec une grille plus professionnelle
+*/

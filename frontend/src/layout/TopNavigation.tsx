@@ -1,4 +1,5 @@
-// Ce composant affiche la navigation principale horizontale de RubyBets, alignée avec les maquettes MVP.
+// Ce composant affiche la navigation principale horizontale de RubyBets sans pictogrammes instables.
+// Il clarifie les états actif, disponible et désactivé pour une lecture plus professionnelle en soutenance.
 
 import type { AppScreen, NavigationItem } from "../types/navigation";
 
@@ -7,17 +8,6 @@ type TopNavigationProps = {
   items: NavigationItem[];
   hasSelectedMatch: boolean;
   onNavigate: (screen: AppScreen) => void;
-};
-
-const navigationIcons: Record<AppScreen, string> = {
-  dashboard: "⌂",
-  matches: "▦",
-  "match-details": "◇",
-  analysis: "✦",
-  predictions: "◎",
-  recommendation: "✓",
-  glossary: "□",
-  responsible: "ⓘ",
 };
 
 // Ce composant affiche les boutons de navigation et désactive les écrans qui nécessitent un match sélectionné.
@@ -30,11 +20,11 @@ function TopNavigation({
   return (
     <nav className="rb-top-navigation" aria-label="Navigation principale RubyBets">
       {items.map((item) => {
+        const isActive = currentScreen === item.id;
         const isDisabled = Boolean(item.requiresMatch && !hasSelectedMatch);
-        const itemClassName =
-          currentScreen === item.id
-            ? "rb-top-navigation__item rb-top-navigation__item--active"
-            : "rb-top-navigation__item";
+        const itemClassName = isActive
+          ? "rb-top-navigation__item rb-top-navigation__item--active"
+          : "rb-top-navigation__item";
 
         return (
           <button
@@ -42,12 +32,11 @@ function TopNavigation({
             type="button"
             className={itemClassName}
             disabled={isDisabled}
+            data-disabled={isDisabled ? "true" : "false"}
+            aria-current={isActive ? "page" : undefined}
             onClick={() => onNavigate(item.id)}
             title={isDisabled ? "Sélectionnez d’abord un match" : item.label}
           >
-            <span className="rb-top-navigation__icon" aria-hidden="true">
-              {navigationIcons[item.id]}
-            </span>
             <span className="rb-top-navigation__label">{item.label}</span>
           </button>
         );
@@ -63,4 +52,4 @@ export default TopNavigation;
 // ├── reçoit les écrans depuis navigation.ts
 // ├── reçoit currentScreen et onNavigate depuis AppShell.tsx
 // ├── déclenche le changement d’écran affiché dans App.tsx
-// └── affiche uniquement les entrées produit principales de RubyBets
+// └── garde une navigation sans icônes fragiles, alignée avec App.css
