@@ -13504,3 +13504,175 @@ body:has(.rb-home-premium) .rb-status-footer {
   ├── conserve DashboardScreen.tsx, App.tsx et les callbacks existants
   └── ne modifie ni backend, ni API, ni logique métier, ni modèles ML
 */
+/*
+  Lot C.2 - Logos réels des compétitions :
+  Ce bloc normalise l’affichage des emblèmes de compétitions déjà fournis par l’API
+  afin de remplacer les icônes génériques dans les chips et le KPI compétition active.
+*/
+
+.rb-home-premium-competition-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  flex: 0 0 auto;
+  border-radius: 8px;
+  background:
+    radial-gradient(circle at 35% 25%, rgba(45, 212, 191, 0.22), transparent 55%),
+    rgba(15, 24, 39, 0.78);
+  border: 1px solid rgba(45, 212, 191, 0.22);
+  overflow: hidden;
+}
+
+.rb-home-premium-competition-logo img {
+  width: 78%;
+  height: 78%;
+  object-fit: contain;
+  display: block;
+}
+
+.rb-home-premium-competition-logo--kpi {
+  width: 50px;
+  height: 50px;
+  border-radius: 14px;
+}
+
+.rb-home-premium-competition-logo--kpi img {
+  width: 70%;
+  height: 70%;
+}
+
+.rb-home-premium-competition-logo--fallback span {
+  font-size: 0.58rem;
+  font-weight: 800;
+  color: var(--rb-accent, #2dd4bf);
+  letter-spacing: 0.02em;
+}
+
+/*
+  Schéma de communication du lot C.2 :
+  App.css
+  ├── normalise les emblèmes Competition.emblem affichés par DashboardScreen.tsx
+  ├── conserve les logos fournis par l’API/backend
+  ├── garde Lucide pour les fonctions produit
+  └── ne modifie ni backend, ni API, ni modèles ML, ni calculs
+*/
+/*
+  Lot C.3 - Polish compétitions et prochains matchs :
+  Ce bloc améliore l’affichage des logos de compétitions et ajoute une lecture plus premium
+  aux prochains matchs avec logos d’équipes, sans modifier les données ni la logique métier.
+*/
+
+/* Amélioration des logos de compétitions dans les chips */
+.rb-home-premium-chip {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.72rem !important;
+}
+
+.rb-home-premium-chip .rb-home-premium-competition-logo {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 10px !important;
+  background:
+    radial-gradient(circle at 35% 20%, rgba(255, 255, 255, 0.16), transparent 45%),
+    rgba(8, 16, 28, 0.72) !important;
+  border: 1px solid rgba(148, 163, 184, 0.22) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.035);
+}
+
+.rb-home-premium-chip .rb-home-premium-competition-logo img {
+  width: 82% !important;
+  height: 82% !important;
+  object-fit: contain !important;
+}
+
+.rb-home-premium-chip--active .rb-home-premium-competition-logo {
+  background: rgba(3, 10, 18, 0.32) !important;
+  border-color: rgba(8, 16, 28, 0.2) !important;
+}
+
+.rb-home-premium-chip--active .rb-home-premium-competition-logo img {
+  filter: saturate(1.08) contrast(1.04);
+}
+
+/* Amélioration du logo compétition dans le KPI actif */
+.rb-home-premium-kpi .rb-home-premium-competition-logo--kpi {
+  width: 52px !important;
+  height: 52px !important;
+  border-radius: 14px !important;
+}
+
+.rb-home-premium-kpi .rb-home-premium-competition-logo--kpi img {
+  width: 78% !important;
+  height: 78% !important;
+}
+
+/* Liste Prochains matchs proche de la maquette : date + équipe + logo + VS + logo + équipe */
+.rb-home-premium-upcoming-item {
+  display: grid !important;
+  grid-template-columns: 104px minmax(120px, 1fr) 34px minmax(120px, 1fr) 22px !important;
+  align-items: center !important;
+  gap: 0.72rem !important;
+}
+
+.rb-home-premium-upcoming-date {
+  color: rgba(226, 232, 240, 0.72) !important;
+  font-weight: 650 !important;
+  white-space: nowrap !important;
+}
+
+.rb-home-premium-upcoming-team {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.55rem !important;
+  min-width: 0 !important;
+}
+
+.rb-home-premium-upcoming-team--home {
+  justify-content: flex-end !important;
+  text-align: right !important;
+}
+
+.rb-home-premium-upcoming-team--away {
+  justify-content: flex-start !important;
+  text-align: left !important;
+}
+
+.rb-home-premium-upcoming-team strong {
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.rb-home-premium-upcoming-item .rb-home-premium-team-logo {
+  width: 34px !important;
+  height: 34px !important;
+  border-radius: 10px !important;
+}
+
+.rb-home-premium-upcoming-item .rb-home-premium-team-logo img {
+  width: 82% !important;
+  height: 82% !important;
+  object-fit: contain !important;
+}
+
+.rb-home-premium-upcoming-item em {
+  justify-self: center !important;
+  min-width: 30px !important;
+  color: var(--rb-accent, #2dd4bf) !important;
+  font-style: normal !important;
+  font-weight: 850 !important;
+  text-transform: uppercase !important;
+}
+
+/*
+  Schéma de communication du lot C.3 :
+  App.css
+  ├── améliore les logos Competition.emblem utilisés par DashboardScreen.tsx
+  ├── améliore les logos Team.crest dans les prochains matchs
+  ├── conserve les données existantes fournies par App.tsx
+  └── ne modifie ni backend, ni API, ni modèles ML, ni calculs
+*/
