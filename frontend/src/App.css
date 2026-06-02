@@ -13104,3 +13104,48 @@ section.rb-screen-container:has(.rb-home-premium) {
   ├── n’impacte pas les écrans Matchs, Analyse, Prédictions ou Recommandation
   └── ne modifie ni services API, ni backend, ni logique métier, ni modèles ML
 */
+/*
+  Lot A.3 - Typographie premium RubyBets :
+  Ce bloc active Geist Sans et Geist Mono sur l’interface sans modifier la logique,
+  les appels API, le backend ou les modèles ML.
+*/
+
+:root {
+  --rb-font-sans: "Geist Sans", Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --rb-font-mono: "Geist Mono", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+}
+
+body,
+button,
+input,
+select,
+textarea {
+  font-family: var(--rb-font-sans);
+}
+
+.rb-home-premium,
+.rb-home-premium button,
+.rb-home-premium input,
+.rb-home-premium select {
+  font-family: var(--rb-font-sans);
+}
+
+.rb-home-premium :is(.rb-home-premium-kicker, .rb-home-premium-label, .rb-home-premium-meta, .rb-home-premium-source) {
+  font-family: var(--rb-font-mono);
+  letter-spacing: 0.08em;
+}
+
+.rb-home-premium-title {
+  font-family: var(--rb-font-sans);
+  font-weight: 800;
+  letter-spacing: -0.055em;
+}
+
+/*
+  Schéma de communication du lot A.3 :
+  App.css
+  ├── utilise les polices chargées dans main.tsx
+  ├── applique Geist Sans à l’interface RubyBets
+  ├── applique Geist Mono aux petits labels techniques
+  └── ne modifie ni backend, ni API, ni logique métier
+*/
