@@ -12213,3 +12213,894 @@ section.rb-screen-container:has(.rb-responsible-screen--mockup) {
   ├── ne modifie pas les appels API, les modèles ML ni les données affichées
   └── conserve la direction Obsidian Teal avec une grille plus professionnelle
 */
+
+/*
+  Phase UI Option B - Accueil premium fidèle à la maquette :
+  Ce bloc stylise uniquement la nouvelle structure rb-home-premium de DashboardScreen.tsx.
+  Il ne modifie pas les appels API, le backend, les calculs ou les modèles ML.
+*/
+section.rb-screen-container:has(.rb-home-premium) {
+  width: min(1320px, calc(100% - 32px)) !important;
+  max-width: 1320px !important;
+  margin: 0 auto !important;
+  padding: 22px 0 28px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.rb-home-premium,
+.rb-home-premium * {
+  box-sizing: border-box;
+}
+
+.rb-home-premium {
+  position: relative;
+  display: grid;
+  gap: 16px;
+  width: 100%;
+  min-width: 0;
+  margin: 0 auto;
+  padding: 20px;
+  overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 10% 0%, rgba(45, 212, 191, 0.12), transparent 34rem),
+    radial-gradient(circle at 92% 22%, rgba(20, 184, 166, 0.12), transparent 24rem),
+    linear-gradient(145deg, rgba(2, 10, 13, 0.96), rgba(5, 18, 22, 0.98));
+  box-shadow:
+    0 30px 90px rgba(0, 0, 0, 0.36),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.025);
+  color: #e5f7eb;
+}
+
+.rb-home-premium::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(45, 212, 191, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(45, 212, 191, 0.03) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.65), transparent 70%);
+}
+
+.rb-home-premium > * {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  margin: 0 !important;
+}
+
+.rb-home-premium :is(h2, h3, h4, p, span, strong, small, dt, dd, button, em) {
+  overflow-wrap: normal !important;
+  word-break: normal !important;
+}
+
+.rb-home-premium :is(h2, h3, h4, p, dl, dd) {
+  margin: 0;
+}
+
+.rb-home-premium :is(h2, h3)::after {
+  content: none !important;
+}
+
+.rb-home-premium button {
+  max-width: 100%;
+  margin: 0;
+  box-shadow: none;
+  white-space: nowrap !important;
+}
+
+.rb-home-premium-eyebrow {
+  color: #2dd4bf !important;
+  font-size: 0.72rem;
+  font-weight: 950;
+  letter-spacing: 0.14em;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+.rb-home-premium-hero,
+.rb-home-premium-kpis,
+.rb-home-premium-competitions,
+.rb-home-premium-featured-match,
+.rb-home-premium-upcoming,
+.rb-home-premium-value-grid,
+.rb-home-premium-resources {
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  background:
+    linear-gradient(145deg, rgba(17, 24, 39, 0.78), rgba(8, 47, 51, 0.34)),
+    rgba(2, 6, 23, 0.32);
+  box-shadow:
+    0 18px 46px rgba(0, 0, 0, 0.2),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.016);
+}
+
+.rb-home-premium-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.42fr) minmax(360px, 0.82fr);
+  gap: 16px;
+  min-height: 286px;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 18px;
+}
+
+.rb-home-premium-hero__copy {
+  position: relative;
+  display: grid;
+  align-content: center;
+  gap: 18px;
+  min-width: 0;
+  min-height: 286px;
+  padding: 42px 48px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 78% 38%, rgba(45, 212, 191, 0.26), transparent 24%),
+    linear-gradient(120deg, rgba(15, 23, 42, 0.92), rgba(8, 47, 51, 0.52));
+}
+
+.rb-home-premium-hero__copy::after {
+  content: "";
+  position: absolute;
+  top: 16%;
+  right: -5%;
+  width: min(52%, 420px);
+  height: 68%;
+  opacity: 0.38;
+  background:
+    radial-gradient(ellipse at 50% 70%, rgba(45, 212, 191, 0.7) 0 1px, transparent 2px),
+    linear-gradient(16deg, transparent 0 30%, rgba(45, 212, 191, 0.28) 31% 32%, transparent 33% 100%),
+    linear-gradient(160deg, transparent 0 34%, rgba(45, 212, 191, 0.18) 35% 36%, transparent 37% 100%),
+    linear-gradient(180deg, rgba(45, 212, 191, 0.16), transparent 58%);
+  border: 1px solid rgba(45, 212, 191, 0.14);
+  border-radius: 24px;
+  transform: skewX(-14deg) perspective(560px) rotateY(-18deg);
+  filter: blur(0.2px);
+}
+
+.rb-home-premium-hero__copy > * {
+  position: relative;
+  z-index: 1;
+}
+
+.rb-home-premium-hero__copy h2 {
+  max-width: 560px;
+  color: #f6fbff;
+  font-size: clamp(2.55rem, 4.25vw, 4.35rem);
+  font-weight: 950;
+  line-height: 1.04;
+  letter-spacing: -0.07em;
+  text-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+}
+
+.rb-home-premium-hero__lead {
+  max-width: 610px;
+  color: #d7e7e7 !important;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.65;
+}
+
+.rb-home-premium-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.rb-home-premium-button,
+.rb-home-premium-upcoming__header button,
+.rb-home-premium-resources button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 0.72rem 1.18rem;
+  border-radius: 10px;
+  color: #041313;
+  font-size: 0.86rem;
+  font-weight: 950;
+  line-height: 1;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease,
+    filter 160ms ease;
+}
+
+.rb-home-premium-button--primary,
+.rb-home-premium-button--wide {
+  border: 1px solid rgba(45, 212, 191, 0.86);
+  background: linear-gradient(135deg, #2dd4bf, #14b8a6);
+  box-shadow: 0 18px 36px rgba(20, 184, 166, 0.24);
+}
+
+.rb-home-premium-button--secondary,
+.rb-home-premium-upcoming__header button,
+.rb-home-premium-resources button {
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  background: rgba(2, 6, 23, 0.28);
+  color: #dffefe;
+}
+
+.rb-home-premium-button:hover,
+.rb-home-premium-upcoming__header button:hover,
+.rb-home-premium-resources button:hover,
+.rb-home-premium-chip:hover,
+.rb-home-premium-upcoming-item:hover,
+.rb-home-premium-featured-fixture:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
+
+.rb-home-premium-hero__note {
+  display: inline-flex;
+  width: fit-content;
+  max-width: 100%;
+  padding: 0.38rem 0.66rem;
+  border: 1px solid rgba(45, 212, 191, 0.16);
+  border-radius: 999px;
+  background: rgba(2, 6, 23, 0.22);
+  color: #aec3c4 !important;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.rb-home-premium-data {
+  display: grid;
+  align-content: space-between;
+  gap: 18px;
+  min-width: 0;
+  padding: 28px 28px 24px;
+  background:
+    radial-gradient(circle at 72% 18%, rgba(45, 212, 191, 0.2), transparent 36%),
+    linear-gradient(150deg, rgba(15, 23, 42, 0.88), rgba(8, 47, 51, 0.62));
+}
+
+.rb-home-premium-section-title {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.rb-home-premium-status-pill,
+.rb-home-premium-data-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 24px;
+  padding: 0.28rem 0.62rem;
+  border: 1px solid rgba(34, 197, 94, 0.22);
+  border-radius: 999px;
+  background: rgba(34, 197, 94, 0.12);
+  color: #7bf7a6 !important;
+  font-size: 0.7rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.rb-home-premium-status-pill span {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #22c55e;
+  box-shadow: 0 0 14px rgba(34, 197, 94, 0.7);
+}
+
+.rb-home-premium-data-list {
+  display: grid;
+  gap: 10px;
+}
+
+.rb-home-premium-data-list div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  min-height: 42px;
+  padding: 10px 12px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.46);
+}
+
+.rb-home-premium-data-list dt {
+  color: #c9d6d6;
+  font-size: 0.78rem;
+  font-weight: 780;
+}
+
+.rb-home-premium-data-list dd {
+  color: #ffffff;
+  font-size: 0.86rem;
+  font-weight: 950;
+  text-align: right;
+}
+
+.rb-home-premium-source {
+  border-top: 1px solid rgba(148, 163, 184, 0.12);
+  padding-top: 12px;
+  color: #9fb5b6 !important;
+  font-size: 0.74rem;
+}
+
+.rb-home-premium-source strong {
+  color: #2dd4bf;
+}
+
+.rb-home-premium-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 14px;
+}
+
+.rb-home-premium-kpi {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+  min-height: 82px;
+  margin: 0 !important;
+  padding: 18px 22px;
+  border: 0;
+  border-right: 1px solid rgba(148, 163, 184, 0.15);
+  border-radius: 0;
+  background: transparent;
+}
+
+.rb-home-premium-kpi:last-child {
+  border-right: 0;
+}
+
+.rb-home-premium-kpi > span,
+.rb-home-premium-value-grid article > span,
+.rb-home-premium-resources article > span {
+  display: inline-grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(45, 212, 191, 0.22);
+  border-radius: 12px;
+  background: rgba(20, 184, 166, 0.12);
+  color: #2dd4bf !important;
+  font-size: 1rem;
+  font-weight: 950;
+}
+
+.rb-home-premium-kpi strong {
+  display: block;
+  color: #ffffff;
+  font-size: 1.12rem;
+  font-weight: 950;
+  line-height: 1.05;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rb-home-premium-kpi p {
+  color: #c4d2d2 !important;
+  font-size: 0.78rem;
+  font-weight: 650;
+  line-height: 1.25;
+}
+
+.rb-home-premium-kpi--success strong {
+  color: #22c55e;
+}
+
+.rb-home-premium-competitions {
+  display: grid;
+  gap: 10px;
+  padding: 18px;
+  border-radius: 14px;
+}
+
+.rb-home-premium-competitions h3,
+.rb-home-premium-featured-match h3,
+.rb-home-premium-upcoming h3 {
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 950;
+  line-height: 1.12;
+  letter-spacing: -0.035em;
+}
+
+.rb-home-premium-competition-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.rb-home-premium-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 42px;
+  padding: 0.62rem 1.05rem;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 9px;
+  background: rgba(15, 23, 42, 0.32);
+  color: #dffefe;
+  font-size: 0.82rem;
+  font-weight: 880;
+}
+
+.rb-home-premium-chip span {
+  color: #2dd4bf !important;
+  font-size: 0.86rem;
+  font-weight: 950;
+}
+
+.rb-home-premium-chip--active {
+  border-color: rgba(45, 212, 191, 0.75);
+  background: linear-gradient(135deg, rgba(45, 212, 191, 0.9), rgba(20, 184, 166, 0.82));
+  color: #041313;
+  box-shadow: 0 14px 28px rgba(20, 184, 166, 0.2);
+}
+
+.rb-home-premium-chip--active span {
+  color: #041313 !important;
+}
+
+.rb-home-premium-match-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(360px, 0.75fr);
+  gap: 16px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.rb-home-premium-featured-match,
+.rb-home-premium-upcoming {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  min-height: 238px;
+  padding: 24px;
+  border-radius: 14px;
+}
+
+.rb-home-premium-featured-fixture {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 64px minmax(0, 1fr);
+  gap: 18px;
+  align-items: center;
+  width: 100%;
+  min-height: 86px;
+  padding: 16px 18px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 13px;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(45, 212, 191, 0.14), transparent 32%),
+    rgba(2, 6, 23, 0.24);
+  color: #ffffff;
+}
+
+.rb-home-premium-featured-team {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.rb-home-premium-featured-team--home {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.rb-home-premium-featured-team--away {
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.rb-home-premium-featured-team strong {
+  min-width: 0;
+  color: #ffffff;
+  font-size: 1.22rem;
+  font-weight: 950;
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rb-home-premium-team-logo {
+  position: relative;
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 50% 18%, rgba(45, 212, 191, 0.22), transparent 64%),
+    rgba(2, 6, 23, 0.58);
+}
+
+.rb-home-premium-team-logo--featured {
+  width: 58px;
+  height: 58px;
+  border-radius: 15px;
+}
+
+.rb-home-premium-team-logo img {
+  position: absolute;
+  inset: 6px;
+  width: calc(100% - 12px);
+  height: calc(100% - 12px);
+  object-fit: contain;
+}
+
+.rb-home-premium-team-logo--featured img {
+  inset: 8px;
+  width: calc(100% - 16px);
+  height: calc(100% - 16px);
+}
+
+.rb-home-premium-team-logo span {
+  color: #99f6e4 !important;
+  font-size: 0.68rem;
+  font-weight: 950;
+}
+
+.rb-home-premium-vs {
+  display: inline-grid;
+  place-items: center;
+  justify-self: center;
+  width: 48px;
+  height: 48px;
+  border: 1px solid rgba(45, 212, 191, 0.2);
+  background: linear-gradient(135deg, rgba(20, 184, 166, 0.22), rgba(15, 118, 110, 0.08));
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+  color: #2dd4bf !important;
+  font-size: 0.72rem;
+  font-weight: 950;
+  line-height: 1;
+}
+
+.rb-home-premium-featured-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+.rb-home-premium-featured-meta span {
+  display: inline-flex;
+  min-height: 24px;
+  padding: 0.26rem 0.6rem;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.38);
+  color: #c8dada !important;
+  font-size: 0.72rem;
+  font-weight: 760;
+}
+
+.rb-home-premium-button--wide {
+  width: 100%;
+  min-height: 46px;
+}
+
+.rb-home-premium-upcoming__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.rb-home-premium-upcoming__header button {
+  min-height: 34px;
+  padding: 0.48rem 0.82rem;
+  border-radius: 999px;
+  font-size: 0.74rem;
+}
+
+.rb-home-premium-upcoming-list {
+  display: grid;
+  gap: 0;
+  overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  border-radius: 12px;
+  background: rgba(2, 6, 23, 0.18);
+}
+
+.rb-home-premium-upcoming-item {
+  display: grid;
+  grid-template-columns: 86px minmax(0, 1fr) 28px minmax(0, 1fr) 18px;
+  gap: 10px;
+  align-items: center;
+  min-height: 46px;
+  padding: 0 14px;
+  border: 0;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+  border-radius: 0;
+  background: transparent;
+  color: #dffefe;
+  text-align: left;
+}
+
+.rb-home-premium-upcoming-item:last-child {
+  border-bottom: 0;
+}
+
+.rb-home-premium-upcoming-item span:first-child {
+  color: #a9c1c2 !important;
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+.rb-home-premium-upcoming-item strong {
+  min-width: 0;
+  color: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 880;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rb-home-premium-upcoming-item em {
+  color: #2dd4bf;
+  font-size: 0.7rem;
+  font-style: normal;
+  font-weight: 900;
+  text-align: center;
+}
+
+.rb-home-premium-upcoming-item span:last-child {
+  color: #2dd4bf !important;
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.rb-home-premium-value-grid,
+.rb-home-premium-resources {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border-radius: 14px;
+}
+
+.rb-home-premium-value-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.rb-home-premium-value-grid article,
+.rb-home-premium-resources article {
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+  min-width: 0;
+  margin: 0 !important;
+  padding: 18px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 12px;
+  background:
+    linear-gradient(145deg, rgba(15, 23, 42, 0.54), rgba(8, 47, 51, 0.28)),
+    rgba(2, 6, 23, 0.2);
+}
+
+.rb-home-premium-value-grid article > span,
+.rb-home-premium-resources article > span {
+  width: 52px;
+  height: 52px;
+  border-radius: 13px;
+  font-size: 1.2rem;
+}
+
+.rb-home-premium-value-grid h3,
+.rb-home-premium-resources h3 {
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 950;
+  line-height: 1.18;
+}
+
+.rb-home-premium-value-grid p,
+.rb-home-premium-resources p {
+  margin-top: 4px;
+  color: #b7caca !important;
+  font-size: 0.78rem;
+  font-weight: 640;
+  line-height: 1.42;
+}
+
+.rb-home-premium-resources {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.rb-home-premium-resources article {
+  grid-template-columns: 52px minmax(0, 1fr) 42px;
+}
+
+.rb-home-premium-resources button {
+  width: 42px;
+  height: 42px;
+  min-height: 42px;
+  padding: 0;
+  border-radius: 999px;
+  font-size: 1.2rem;
+}
+
+.rb-home-premium-footer-note {
+  justify-self: center;
+  width: fit-content;
+  max-width: min(100%, 780px);
+  margin-top: 2px !important;
+  padding: 0.46rem 0.84rem;
+  border: 1px solid rgba(45, 212, 191, 0.14);
+  border-radius: 999px;
+  background: rgba(2, 6, 23, 0.2);
+  color: #98acad !important;
+  font-size: 0.7rem;
+  font-weight: 650;
+  line-height: 1.32;
+  text-align: center;
+}
+
+.rb-home-premium-empty-state {
+  display: grid;
+  gap: 4px;
+  padding: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 12px;
+  background: rgba(2, 6, 23, 0.2);
+}
+
+.rb-home-premium-empty-state h4 {
+  color: #ffffff;
+  font-size: 0.9rem;
+}
+
+.rb-home-premium-empty-state p {
+  color: #b7caca !important;
+  font-size: 0.76rem;
+  line-height: 1.42;
+}
+
+@media (max-width: 1180px) {
+  section.rb-screen-container:has(.rb-home-premium) {
+    width: min(100% - 24px, 960px) !important;
+  }
+
+  .rb-home-premium-hero,
+  .rb-home-premium-match-grid,
+  .rb-home-premium-value-grid,
+  .rb-home-premium-resources {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rb-home-premium-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .rb-home-premium-kpi:nth-child(2) {
+    border-right: 0;
+  }
+
+  .rb-home-premium-kpi:nth-child(-n + 2) {
+    border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+  }
+}
+
+@media (max-width: 760px) {
+  section.rb-screen-container:has(.rb-home-premium) {
+    width: min(100% - 14px, 100%) !important;
+    padding-top: 14px !important;
+  }
+
+  .rb-home-premium {
+    gap: 12px;
+    padding: 12px;
+    border-radius: 18px;
+  }
+
+  .rb-home-premium-hero__copy,
+  .rb-home-premium-data,
+  .rb-home-premium-featured-match,
+  .rb-home-premium-upcoming,
+  .rb-home-premium-competitions,
+  .rb-home-premium-value-grid,
+  .rb-home-premium-resources {
+    padding: 16px;
+    border-radius: 13px;
+  }
+
+  .rb-home-premium-hero__copy h2 {
+    font-size: clamp(2rem, 11vw, 3rem);
+    letter-spacing: -0.06em;
+  }
+
+  .rb-home-premium-hero__lead {
+    font-size: 0.88rem;
+  }
+
+  .rb-home-premium-kpis,
+  .rb-home-premium-featured-fixture,
+  .rb-home-premium-resources article,
+  .rb-home-premium-data-list div {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rb-home-premium-kpi {
+    border-right: 0;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+  }
+
+  .rb-home-premium-kpi:last-child {
+    border-bottom: 0;
+  }
+
+  .rb-home-premium-data-list dd {
+    text-align: left;
+  }
+
+  .rb-home-premium-featured-team,
+  .rb-home-premium-featured-team--home,
+  .rb-home-premium-featured-team--away {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .rb-home-premium-featured-team--away {
+    flex-direction: column-reverse;
+  }
+
+  .rb-home-premium-featured-team--home {
+    flex-direction: column;
+  }
+
+  .rb-home-premium-vs {
+    width: 40px;
+    height: 40px;
+  }
+
+  .rb-home-premium-upcoming-item {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+    min-height: auto;
+    padding: 12px;
+  }
+
+  .rb-home-premium-upcoming-item strong {
+    white-space: normal;
+  }
+
+  .rb-home-premium-resources button {
+    width: 100%;
+  }
+
+  .rb-home-premium-footer-note {
+    width: 100%;
+    border-radius: 12px;
+    text-align: left;
+  }
+}
+
+/*
+  Schéma de communication Phase UI Option B - Accueil premium :
+  App.css
+  ├── stylise la structure rb-home-premium rendue par DashboardScreen.tsx
+  ├── conserve les données et callbacks fournis par App.tsx
+  ├── n’impacte pas les écrans Matchs, Analyse, Prédictions ou Recommandation
+  └── ne modifie ni services API, ni backend, ni logique métier, ni modèles ML
+*/

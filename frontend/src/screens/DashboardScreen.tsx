@@ -1,4 +1,4 @@
-// Ce fichier affiche le Dashboard RubyBets avec une mise en page compacte proche de la maquette Obsidian Teal.
+// Ce fichier affiche l’écran d’accueil RubyBets avec une mise en page premium fidèle à la maquette produit validée.
 
 import type { Competition, Match, Team } from "../models/rubybets";
 import type { AppScreen } from "../types/navigation";
@@ -18,9 +18,9 @@ type DashboardScreenProps = {
   onNavigate: (screen: AppScreen) => void;
 };
 
-const MATCH_ACTION_LABEL = "Voir l’analyse";
+const MATCH_ANALYSIS_LABEL = "Voir l’analyse complète";
 
-// Formate une date de match en version courte pour les cartes du dashboard.
+// Formate une date de match en version courte pour les listes compactes de l’accueil.
 function formatDashboardDate(value: string) {
   if (!value) {
     return "Date à confirmer";
@@ -34,13 +34,34 @@ function formatDashboardDate(value: string) {
 
   return new Intl.DateTimeFormat("fr-FR", {
     day: "2-digit",
-    month: "short",
+    month: "2-digit",
     hour: "2-digit",
     minute: "2-digit",
   }).format(date);
 }
 
-// Réduit un nom d’équipe long pour préserver la lisibilité des petites cartes.
+// Formate une date plus lisible pour le match principal mis en avant.
+function formatFeaturedMatchDate(value: string) {
+  if (!value) {
+    return "Date à confirmer";
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "Date à confirmer";
+  }
+
+  return new Intl.DateTimeFormat("fr-FR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
+}
+
+// Réduit un nom d’équipe long tout en conservant un fallback pour les équipes inconnues.
 function getTeamLabel(team: Team | null | undefined) {
   return getTeamShortName(team);
 }
@@ -48,68 +69,87 @@ function getTeamLabel(team: Team | null | undefined) {
 // Construit un libellé accessible stable pour l’action d’analyse d’un match.
 function getMatchActionAriaLabel(match: Match) {
   if (!hasKnownTeams(match)) {
-    return "Voir le match : affiche à confirmer";
+    return "Voir le match : équipes à confirmer";
   }
 
-  return `${MATCH_ACTION_LABEL} : ${getTeamLabel(match.home_team)} contre ${getTeamLabel(
+  return `${MATCH_ANALYSIS_LABEL} : ${getTeamLabel(match.home_team)} contre ${getTeamLabel(
     match.away_team,
   )}`;
 }
 
 // Affiche le logo d’une équipe ou un fallback propre basé sur les initiales.
-function renderTeamLogo(team: Team | null | undefined) {
+function renderTeamLogo(team: Team | null | undefined, variant: "default" | "featured" = "default") {
   const teamLabel = getTeamLabel(team);
-  const logoClassName = team?.crest
-    ? "rb-home-team-logo rb-home-team-logo--with-image"
-    : "rb-home-team-logo rb-home-team-logo--fallback";
+  const className = [
+    "rb-home-premium-team-logo",
+    variant === "featured" ? "rb-home-premium-team-logo--featured" : "",
+    team?.crest ? "rb-home-premium-team-logo--image" : "rb-home-premium-team-logo--fallback",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
-    <span className={logoClassName} aria-label={`Logo ${teamLabel}`} title={teamLabel}>
+    <span className={className} aria-label={`Logo ${teamLabel}`} title={teamLabel}>
       {team?.crest ? (
         <img src={team.crest} alt="" loading="lazy" decoding="async" />
       ) : (
-        <span className="rb-home-team-logo__fallback">{getTeamInitials(team)}</span>
+        <span>{getTeamInitials(team)}</span>
       )}
     </span>
   );
 }
 
-// Retourne une icône textuelle simple pour identifier rapidement les compétitions.
+// Retourne une icône simple pour identifier rapidement les compétitions.
 function getCompetitionIcon(code: string) {
   const icons: Record<string, string> = {
-    PL: "🏴",
-    FL1: "🇫🇷",
-    SA: "🇮🇹",
-    PD: "🇪🇸",
-    BL1: "🇩🇪",
-    CL: "★",
+    PL: "♞",
+    FL1: "FR",
+    SA: "IT",
+    PD: "ES",
+    BL1: "DE",
+    CL: "⚽",
     WC: "🏆",
   };
 
   return icons[code] || "◆";
 }
 
-// Limite le nom d’une compétition pour garder des boutons compacts.
+// Retourne un libellé court et stable pour les compétitions du MVP.
 function getCompetitionLabel(competition: Competition) {
   const labels: Record<string, string> = {
     PL: "Premier League",
     FL1: "Ligue 1",
     SA: "Serie A",
-    PD: "Liga",
+    PD: "La Liga",
     BL1: "Bundesliga",
     CL: "Champions League",
-    WC: "FIFA World Cup",
+    WC: "World Cup",
   };
 
   return labels[competition.code] || competition.name;
 }
 
-// Cette fonction retourne le libellé d’action adapté au niveau de complétude du match.
-function getMatchActionLabel(match: Match) {
-  return hasKnownTeams(match) ? MATCH_ACTION_LABEL : "Voir le match";
+// Normalise le statut API en libellé court pour l’accueil.
+function getApiStatusLabel(apiStatus: string) {
+  const normalizedStatus = apiStatus.toLowerCase();
+
+  if (normalizedStatus.includes("connect")) {
+    return "Connectée";
+  }
+
+  if (normalizedStatus.includes("cours")) {
+    return "Vérification";
+  }
+
+  return apiStatus;
 }
 
-// Ce composant structure l’écran d’accueil selon la maquette : hero, terrain, indicateurs, ligues, matchs et accès secondaires.
+// Sélectionne le match principal à mettre en avant sur l’accueil.
+function getFeaturedMatch(matches: Match[]) {
+  return matches.find((match) => hasKnownTeams(match)) || matches[0] || null;
+}
+
+// Ce composant restitue l’accueil en bloc produit compact : hero, données, KPI, compétition, matchs, valeur et accès responsables.
 function DashboardScreen({
   apiStatus,
   competitions,
@@ -119,226 +159,295 @@ function DashboardScreen({
   onSelectMatch,
   onNavigate,
 }: DashboardScreenProps) {
-  const featuredMatches = matches.slice(0, 5);
-  const selectedCompetitionName =
-    competitions.find((competition) => competition.code === selectedCompetition)?.name ||
-    selectedCompetition;
+  const selectedCompetitionData = competitions.find(
+    (competition) => competition.code === selectedCompetition,
+  );
+  const selectedCompetitionName = selectedCompetitionData?.name || selectedCompetition;
+  const featuredMatch = getFeaturedMatch(matches);
+  const secondaryMatches = featuredMatch
+    ? matches.filter((match) => match.id !== featuredMatch.id).slice(0, 3)
+    : matches.slice(0, 3);
+  const completeMatchesCount = matches.filter((match) => hasKnownTeams(match)).length;
+  const apiStatusLabel = getApiStatusLabel(apiStatus);
+  const updatedLabel = featuredMatch?.last_updated
+    ? formatDashboardDate(featuredMatch.last_updated)
+    : "Temps réel";
 
   return (
-    <div className="rb-home-dashboard">
-      <section className="rb-home-hero" aria-labelledby="dashboard-title">
-        <div className="rb-home-hero__copy">
-          <p className="rb-home-kicker">RubyBets MVP</p>
-          <h2 id="dashboard-title">
-            RubyBets, votre copilote data & IA pour des décisions éclairées avant match.
-          </h2>
-          <p>
-            Analyses statistiques, scoring explicable et signaux clés pour comprendre les
-            dynamiques d’un match avant toute décision.
+    <div className="rb-home-premium" aria-labelledby="home-premium-title">
+      <section className="rb-home-premium-hero" aria-label="Présentation RubyBets">
+        <div className="rb-home-premium-hero__copy">
+          <p className="rb-home-premium-eyebrow">Bienvenue sur RubyBets</p>
+
+          <h2 id="home-premium-title">Analysez les matchs avant coup d’envoi.</h2>
+
+          <p className="rb-home-premium-hero__lead">
+            Données réelles, signaux avancés et scoring explicable pour une lecture claire,
+            rationnelle et responsable.
           </p>
-          <button type="button" className="rb-home-primary-action" onClick={() => onNavigate("matches")}>
-            Voir les matchs
-          </button>
-        </div>
 
-        <div className="rb-home-pitch-card" aria-hidden="true">
-          <div className="rb-home-pitch">
-            <span className="rb-home-pitch__line rb-home-pitch__line--middle" />
-            <span className="rb-home-pitch__circle" />
-            <span className="rb-home-pitch__box rb-home-pitch__box--left" />
-            <span className="rb-home-pitch__box rb-home-pitch__box--right" />
-            <span className="rb-home-pitch__dot rb-home-pitch__dot--one" />
-            <span className="rb-home-pitch__dot rb-home-pitch__dot--two" />
-            <span className="rb-home-pitch__dot rb-home-pitch__dot--three" />
-            <span className="rb-home-pitch__score">72%</span>
-          </div>
-        </div>
+          <div className="rb-home-premium-hero__actions" aria-label="Actions principales">
+            <button
+              type="button"
+              className="rb-home-premium-button rb-home-premium-button--primary"
+              onClick={() => onNavigate("matches")}
+            >
+              Explorer les matchs
+              <span aria-hidden="true">→</span>
+            </button>
 
-        <aside className="rb-home-confidence" aria-label="Statut global du MVP">
-          <div>
-            <p className="rb-home-panel-label">Statut global</p>
-            <strong>{apiStatus}</strong>
-            <span>Données réelles et moteur V1 explicable</span>
-          </div>
-
-          <ul>
-            <li>
-              <span>Compétitions</span>
-              <strong>{competitions.length}</strong>
-            </li>
-            <li>
-              <span>Matchs chargés</span>
-              <strong>{matches.length}</strong>
-            </li>
-            <li>
-              <span>Compétition active</span>
-              <strong>{selectedCompetition}</strong>
-            </li>
-          </ul>
-        </aside>
-      </section>
-
-      <div className="rb-home-main-grid">
-        <section className="rb-home-content" aria-labelledby="dashboard-leagues-title">
-          <div className="rb-home-section-heading">
-            <div>
-              <p className="rb-home-panel-label">Ligues principales</p>
-              <h3 id="dashboard-leagues-title">Compétitions MVP</h3>
-            </div>
-          </div>
-
-          <div className="rb-home-league-row" aria-label="Sélection des compétitions">
-            {competitions.map((competition) => (
-              <button
-                key={competition.id}
-                type="button"
-                className={
-                  competition.code === selectedCompetition
-                    ? "rb-home-league-pill rb-home-league-pill--active"
-                    : "rb-home-league-pill"
-                }
-                onClick={() => onSelectCompetition(competition.code)}
-              >
-                <span>{getCompetitionIcon(competition.code)}</span>
-                {getCompetitionLabel(competition)}
-              </button>
-            ))}
-          </div>
-
-          <div className="rb-home-section-heading rb-home-section-heading--matches">
-            <div>
-              <p className="rb-home-panel-label">Matchs à venir</p>
-              <h3>Rencontres à analyser — {selectedCompetition}</h3>
-            </div>
-            <button type="button" className="rb-home-secondary-action" onClick={() => onNavigate("matches")}>
-              Voir tous
+            <button
+              type="button"
+              className="rb-home-premium-button rb-home-premium-button--secondary"
+              onClick={() => onNavigate("recommendation")}
+            >
+              Voir les recommandations
             </button>
           </div>
 
-          <div className="rb-home-match-row">
-            {featuredMatches.length > 0 ? (
-              featuredMatches.map((match) => {
-                const actionLabel = getMatchActionLabel(match);
+          <p className="rb-home-premium-hero__note">Outil d’aide à la décision — aucune garantie sportive.</p>
+        </div>
 
-                return (
-                  <article key={match.id} className="rb-home-match-card">
-                    <div className="rb-home-match-card__top">
-                      <p className="rb-home-match-card__league">{match.competition.name}</p>
-                      <span>{formatDashboardDate(match.utc_date)}</span>
-                    </div>
+        <aside className="rb-home-premium-data" aria-label="État des données RubyBets">
+          <div className="rb-home-premium-section-title">
+            <p className="rb-home-premium-eyebrow">État des données</p>
+            <span className="rb-home-premium-status-pill">
+              <span aria-hidden="true" />
+              {apiStatusLabel}
+            </span>
+          </div>
 
-                    <button
-                      type="button"
-                      className="rb-home-match-card__button"
-                      onClick={() => onSelectMatch(match.id)}
-                      aria-label={getMatchActionAriaLabel(match)}
-                    >
-                      <span className="rb-home-match-card__fixture">
-                        <span className="rb-home-match-team rb-home-match-team--home">
-                          {renderTeamLogo(match.home_team)}
-                        </span>
-                        <span className="rb-home-vs">VS</span>
-                        <span className="rb-home-match-team rb-home-match-team--away">
-                          {renderTeamLogo(match.away_team)}
-                        </span>
-                      </span>
+          <dl className="rb-home-premium-data-list">
+            <div>
+              <dt>Compétition active</dt>
+              <dd>{selectedCompetitionName}</dd>
+            </div>
+            <div>
+              <dt>Matchs disponibles</dt>
+              <dd>{matches.length}</dd>
+            </div>
+            <div>
+              <dt>Analyses possibles</dt>
+              <dd>{completeMatchesCount}</dd>
+            </div>
+            <div>
+              <dt>Données mises à jour</dt>
+              <dd>{updatedLabel}</dd>
+            </div>
+            <div>
+              <dt>API</dt>
+              <dd>
+                <span className="rb-home-premium-data-badge">{apiStatusLabel}</span>
+              </dd>
+            </div>
+          </dl>
 
-                      <span className="rb-home-match-card__names">
-                        <strong title={getTeamLabel(match.home_team)}>{getTeamLabel(match.home_team)}</strong>
-                        <strong title={getTeamLabel(match.away_team)}>{getTeamLabel(match.away_team)}</strong>
-                      </span>
-                    </button>
+          <p className="rb-home-premium-source">
+            Source : <strong>Football-Data.org</strong>
+          </p>
+        </aside>
+      </section>
 
-                    <button
-                      type="button"
-                      className="rb-home-match-action"
-                      onClick={() => onSelectMatch(match.id)}
-                      aria-label={getMatchActionAriaLabel(match)}
-                    >
-                      <span className="rb-home-match-action__icon" aria-hidden="true">▥</span>
-                      <span className="rb-home-match-action__label">{actionLabel}</span>
-                    </button>
-                  </article>
-                );
-              })
+      <section className="rb-home-premium-kpis" aria-label="Indicateurs essentiels">
+        <article className="rb-home-premium-kpi">
+          <span aria-hidden="true">▣</span>
+          <div>
+            <strong>{matches.length}</strong>
+            <p>Matchs disponibles</p>
+          </div>
+        </article>
+
+        <article className="rb-home-premium-kpi">
+          <span aria-hidden="true">🏆</span>
+          <div>
+            <strong>{competitions.length}</strong>
+            <p>Compétitions suivies</p>
+          </div>
+        </article>
+
+        <article className="rb-home-premium-kpi">
+          <span aria-hidden="true">★</span>
+          <div>
+            <strong>{selectedCompetitionName}</strong>
+            <p>Compétition active</p>
+          </div>
+        </article>
+
+        <article className="rb-home-premium-kpi rb-home-premium-kpi--success">
+          <span aria-hidden="true">●</span>
+          <div>
+            <strong>API {apiStatusLabel}</strong>
+            <p>Données avant-match</p>
+          </div>
+        </article>
+      </section>
+
+      <section className="rb-home-premium-competitions" aria-labelledby="home-competitions-title">
+        <p className="rb-home-premium-eyebrow">Choisir une compétition</p>
+        <h3 id="home-competitions-title">Compétitions du MVP</h3>
+
+        <div className="rb-home-premium-competition-row" aria-label="Sélection des compétitions">
+          {competitions.map((competition) => (
+            <button
+              key={competition.id}
+              type="button"
+              className={
+                competition.code === selectedCompetition
+                  ? "rb-home-premium-chip rb-home-premium-chip--active"
+                  : "rb-home-premium-chip"
+              }
+              onClick={() => onSelectCompetition(competition.code)}
+            >
+              <span aria-hidden="true">{getCompetitionIcon(competition.code)}</span>
+              {getCompetitionLabel(competition)}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <section className="rb-home-premium-match-grid" aria-label="Rencontres à analyser">
+        <article className="rb-home-premium-featured-match">
+          <p className="rb-home-premium-eyebrow">Rencontre à analyser</p>
+          <h3>Match prioritaire</h3>
+
+          {featuredMatch ? (
+            <>
+              <button
+                type="button"
+                className="rb-home-premium-featured-fixture"
+                onClick={() => onSelectMatch(featuredMatch.id)}
+                aria-label={getMatchActionAriaLabel(featuredMatch)}
+              >
+                <span className="rb-home-premium-featured-team rb-home-premium-featured-team--home">
+                  {renderTeamLogo(featuredMatch.home_team, "featured")}
+                  <strong>{getTeamLabel(featuredMatch.home_team)}</strong>
+                </span>
+
+                <span className="rb-home-premium-vs" aria-hidden="true">VS</span>
+
+                <span className="rb-home-premium-featured-team rb-home-premium-featured-team--away">
+                  <strong>{getTeamLabel(featuredMatch.away_team)}</strong>
+                  {renderTeamLogo(featuredMatch.away_team, "featured")}
+                </span>
+              </button>
+
+              <div className="rb-home-premium-featured-meta">
+                <span>{featuredMatch.competition.name}</span>
+                <span>{formatFeaturedMatchDate(featuredMatch.utc_date)}</span>
+                <span>{hasKnownTeams(featuredMatch) ? "Données complètes" : "Équipes à confirmer"}</span>
+              </div>
+
+              <button
+                type="button"
+                className="rb-home-premium-button rb-home-premium-button--wide"
+                onClick={() => onSelectMatch(featuredMatch.id)}
+                aria-label={getMatchActionAriaLabel(featuredMatch)}
+              >
+                {hasKnownTeams(featuredMatch) ? MATCH_ANALYSIS_LABEL : "Voir le match"}
+                <span aria-hidden="true">→</span>
+              </button>
+            </>
+          ) : (
+            <div className="rb-home-premium-empty-state">
+              <h4>Aucun match disponible</h4>
+              <p>La compétition sélectionnée ne retourne pas encore de rencontre exploitable.</p>
+            </div>
+          )}
+        </article>
+
+        <aside className="rb-home-premium-upcoming" aria-label="Prochains matchs">
+          <div className="rb-home-premium-upcoming__header">
+            <div>
+              <p className="rb-home-premium-eyebrow">Prochains matchs</p>
+              <h3>Aperçu rapide</h3>
+            </div>
+            <button type="button" onClick={() => onNavigate("matches")}>Voir tous</button>
+          </div>
+
+          <div className="rb-home-premium-upcoming-list">
+            {secondaryMatches.length > 0 ? (
+              secondaryMatches.map((match) => (
+                <button
+                  key={match.id}
+                  type="button"
+                  className="rb-home-premium-upcoming-item"
+                  onClick={() => onSelectMatch(match.id)}
+                  aria-label={getMatchActionAriaLabel(match)}
+                >
+                  <span>{formatDashboardDate(match.utc_date)}</span>
+                  <strong>{getTeamLabel(match.home_team)}</strong>
+                  <em>vs</em>
+                  <strong>{getTeamLabel(match.away_team)}</strong>
+                  <span aria-hidden="true">›</span>
+                </button>
+              ))
             ) : (
-              <article className="rb-home-empty-card">
-                <h4>Aucun match disponible</h4>
-                <p>La compétition sélectionnée ne retourne pas encore de rencontre exploitable.</p>
-              </article>
+              <div className="rb-home-premium-empty-state rb-home-premium-empty-state--compact">
+                <h4>Aucun autre match</h4>
+                <p>Les prochaines rencontres apparaîtront ici dès disponibilité.</p>
+              </div>
             )}
           </div>
-          <div className="rb-home-link-grid rb-home-link-grid--dashboard" aria-label="Accès pédagogiques et responsables">
-            <article className="rb-home-link-card rb-home-link-card--glossary">
-              <span className="rb-home-link-card__icon" aria-hidden="true">□</span>
-              <div className="rb-home-link-card__content">
-                <p className="rb-home-panel-label">Glossaire</p>
-                <h3>Comprendre les termes</h3>
-                <p>Comprendre les indicateurs, niveaux de confiance et notions utilisées.</p>
-              </div>
-              <button type="button" className="rb-home-link-card__action" onClick={() => onNavigate("glossary")}>
-                Ouvrir
-              </button>
-            </article>
-
-            <article className="rb-home-link-card rb-home-link-card--responsible">
-              <span className="rb-home-link-card__icon" aria-hidden="true">ⓘ</span>
-              <div className="rb-home-link-card__content">
-                <p className="rb-home-panel-label">Cadre responsable</p>
-                <h3>Limites de l’outil</h3>
-                <p>RubyBets structure l’analyse et ne garantit aucun résultat sportif.</p>
-              </div>
-              <button type="button" className="rb-home-link-card__action" onClick={() => onNavigate("responsible")}>
-                Voir
-              </button>
-            </article>
-          </div>
-        </section>
-
-        <aside className="rb-home-side-panel rb-home-side-panel--quick" aria-label="Vue rapide">
-          <div className="rb-home-side-panel__title">
-            <div>
-              <p className="rb-home-panel-label">Vue rapide</p>
-              <h3>Indicateurs MVP</h3>
-            </div>
-            <span className="rb-home-side-panel__icon" aria-hidden="true">◎</span>
-          </div>
-
-          <article className="rb-home-stat-card rb-home-stat-card--primary">
-            <span className="rb-home-stat-card__icon" aria-hidden="true">▦</span>
-            <div>
-              <strong>{matches.length}</strong>
-              <p>Matchs affichables</p>
-              <small>Données chargées, même partielles</small>
-            </div>
-          </article>
-
-          <article className="rb-home-stat-card">
-            <span className="rb-home-stat-card__icon" aria-hidden="true">▥</span>
-            <div>
-              <strong>{competitions.length}</strong>
-              <p>Compétitions suivies</p>
-              <small>Ligues disponibles</small>
-            </div>
-          </article>
-
-          <article className="rb-home-stat-card">
-            <span className="rb-home-stat-card__icon" aria-hidden="true">✓</span>
-            <div>
-              <strong>{selectedCompetition}</strong>
-              <p>Compétition active</p>
-              <small>{selectedCompetitionName}</small>
-            </div>
-          </article>
         </aside>
-      </div>
+      </section>
 
-      <p className="rb-home-responsible-note" role="note">
-        <span className="rb-home-responsible-note__icon" aria-hidden="true">◇</span>
-        <span>
-          Outil d’aide à la décision. Les analyses proposées ne constituent ni un conseil
-          d’investissement, ni une garantie de résultat sportif.
-        </span>
+      <section className="rb-home-premium-value-grid" aria-label="Valeur produit RubyBets">
+        <article>
+          <span aria-hidden="true">▣</span>
+          <div>
+            <h3>Données réelles</h3>
+            <p>Sources fiables et données disponibles en temps réel.</p>
+          </div>
+        </article>
+
+        <article>
+          <span aria-hidden="true">▥</span>
+          <div>
+            <h3>Scoring explicable</h3>
+            <p>Un score basé sur des signaux clairs et transparents.</p>
+          </div>
+        </article>
+
+        <article>
+          <span aria-hidden="true">◇</span>
+          <div>
+            <h3>Usage responsable</h3>
+            <p>Un outil d’aide à la décision, pas une garantie de gain.</p>
+          </div>
+        </article>
+      </section>
+
+      <section className="rb-home-premium-resources" aria-label="Accès secondaires">
+        <article>
+          <span aria-hidden="true">▥</span>
+          <div>
+            <h3>Glossaire</h3>
+            <p>Comprendre les métriques, signaux et concepts utilisés.</p>
+          </div>
+          <button type="button" onClick={() => onNavigate("glossary")} aria-label="Ouvrir le glossaire">
+            →
+          </button>
+        </article>
+
+        <article>
+          <span aria-hidden="true">♙</span>
+          <div>
+            <h3>Informations responsables</h3>
+            <p>Nos engagements pour un usage sain et éclairé.</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => onNavigate("responsible")}
+            aria-label="Voir les informations responsables"
+          >
+            →
+          </button>
+        </article>
+      </section>
+
+      <p className="rb-home-premium-footer-note" role="note">
+        RubyBets est un outil d’aide à la décision avant-match. Les analyses proposées ne
+        constituent pas un conseil d’investissement, un pari ou une garantie de résultat sportif.
       </p>
     </div>
   );
@@ -352,4 +461,5 @@ export default DashboardScreen;
 // ├── utilise les modèles Competition, Match et Team de models/rubybets.ts
 // ├── sécurise les équipes inconnues via helpers/displayText.ts
 // ├── déclenche la sélection compétition/match via les callbacks existants
-// └── déclenche la navigation vers Matchs, Glossaire et Informations responsables
+// ├── déclenche la navigation vers Matchs, Recommandation, Glossaire et Informations responsables
+// └── ne modifie ni l’API, ni le backend, ni les calculs, ni les modèles ML
