@@ -13149,3 +13149,358 @@ textarea {
   ├── applique Geist Mono aux petits labels techniques
   └── ne modifie ni backend, ni API, ni logique métier
 */
+/*
+  Lot B.1 - Fidélité maquette centrale Dashboard :
+  Ce bloc ajuste uniquement le rendu de l'accueil premium RubyBets pour se rapprocher
+  de la maquette validée : container plus large, hero plus compact, cartes plus denses,
+  KPI mieux alignés et badges techniques masqués sur l'accueil.
+*/
+
+@media (min-width: 1180px) {
+  section.rb-screen-container:has(.rb-home-premium) {
+    width: min(1280px, calc(100% - 32px)) !important;
+    max-width: 1280px !important;
+    padding-top: 18px !important;
+    padding-bottom: 18px !important;
+  }
+
+  .rb-home-premium {
+    gap: 14px !important;
+    padding: 16px !important;
+    border-radius: 20px !important;
+  }
+
+  .rb-home-premium-hero {
+    grid-template-columns: minmax(0, 1.55fr) minmax(340px, 0.88fr) !important;
+    min-height: 300px !important;
+    border-radius: 16px !important;
+  }
+
+  .rb-home-premium-hero__copy {
+    min-height: 300px !important;
+    padding: 34px 40px !important;
+  }
+
+  .rb-home-premium-hero__copy h2 {
+    max-width: 620px !important;
+    font-size: clamp(2.45rem, 3.45vw, 3.45rem) !important;
+    line-height: 1.04 !important;
+    letter-spacing: -0.052em !important;
+  }
+
+  .rb-home-premium-hero__lead {
+    max-width: 580px !important;
+    font-size: 0.98rem !important;
+    line-height: 1.58 !important;
+  }
+
+  .rb-home-premium-data {
+    min-height: 300px !important;
+    padding: 28px !important;
+    border-radius: 16px !important;
+  }
+
+  .rb-home-premium-data-list {
+    gap: 8px !important;
+  }
+
+  .rb-home-premium-data-list div {
+    min-height: 42px !important;
+    padding: 0.66rem 0.78rem !important;
+    border-radius: 10px !important;
+  }
+
+  .rb-home-premium-kpis {
+    min-height: 76px !important;
+    padding: 0 !important;
+    border-radius: 14px !important;
+  }
+
+  .rb-home-premium-kpi {
+    grid-template-columns: 42px minmax(0, 1fr) !important;
+    min-height: 76px !important;
+    padding: 0.9rem 1.1rem !important;
+  }
+
+  .rb-home-premium-kpi > span,
+  .rb-home-premium-value-grid article > span,
+  .rb-home-premium-resources article > span {
+    width: 42px !important;
+    height: 42px !important;
+    border-radius: 12px !important;
+  }
+
+  .rb-home-premium-kpi strong {
+    font-size: 1.05rem !important;
+    line-height: 1.08 !important;
+  }
+
+  .rb-home-premium-kpi p {
+    font-size: 0.74rem !important;
+    line-height: 1.25 !important;
+  }
+
+  .rb-home-premium-competitions {
+    padding: 18px 20px !important;
+    border-radius: 14px !important;
+  }
+
+  .rb-home-premium-competition-row {
+    gap: 10px !important;
+  }
+
+  .rb-home-premium-chip {
+    min-height: 38px !important;
+    padding: 0.58rem 0.92rem !important;
+    border-radius: 10px !important;
+    font-size: 0.78rem !important;
+  }
+
+  .rb-home-premium-match-grid {
+    grid-template-columns: minmax(0, 1.35fr) minmax(340px, 0.8fr) !important;
+    gap: 14px !important;
+  }
+
+  .rb-home-premium-featured-match,
+  .rb-home-premium-upcoming {
+    min-height: 210px !important;
+    padding: 20px !important;
+    border-radius: 14px !important;
+  }
+
+  .rb-home-premium-featured-fixture {
+    min-height: 86px !important;
+    padding: 1.1rem !important;
+    border-radius: 12px !important;
+  }
+
+  .rb-home-premium-value-grid,
+  .rb-home-premium-resources {
+    gap: 14px !important;
+    padding: 14px !important;
+    border-radius: 14px !important;
+  }
+
+  .rb-home-premium-value-grid article,
+  .rb-home-premium-resources article {
+    min-height: 88px !important;
+    padding: 16px !important;
+    border-radius: 12px !important;
+  }
+
+  .rb-home-premium-footer-note {
+    margin-top: 0 !important;
+  }
+}
+
+/* Masque les badges techniques uniquement sur l'accueil premium pour obtenir un rendu produit final. */
+body:has(.rb-home-premium) .rb-status-footer {
+  display: none !important;
+}
+
+/* Corrige la sensation de titre trop lourd après activation de Geist. */
+.rb-home-premium-hero__copy h2 {
+  font-weight: 750 !important;
+  text-wrap: balance;
+}
+
+/* Donne plus de finesse aux petits labels techniques. */
+.rb-home-premium-eyebrow,
+.rb-home-premium-source,
+.rb-home-premium-data-list dt,
+.rb-home-premium-kpi p {
+  font-weight: 650 !important;
+}
+
+/*
+  Schéma de communication du lot B.1 :
+  App.css
+  ├── ajuste uniquement les classes rb-home-premium de DashboardScreen.tsx
+  ├── masque StatusPanel uniquement sur l'écran d'accueil premium
+  ├── conserve les données fournies par App.tsx
+  └── ne modifie ni backend, ni API, ni modèles ML, ni calculs
+*/
+
+/*
+  Lot B.2 - Décompression visuelle Dashboard :
+  Ce bloc élargit et redonne de la respiration à l’accueil premium RubyBets
+  pour se rapprocher de la maquette centrale validée.
+*/
+
+@media (min-width: 1180px) {
+  .rb-app-shell section.rb-screen-container:has(.rb-home-premium) {
+    width: min(1420px, calc(100% - 48px)) !important;
+    max-width: 1420px !important;
+    padding-top: 20px !important;
+  }
+
+  .rb-home-premium {
+    gap: 18px !important;
+    padding: 18px !important;
+  }
+
+  .rb-home-premium-hero {
+    grid-template-columns: minmax(0, 1.58fr) minmax(410px, 0.92fr) !important;
+    min-height: 360px !important;
+  }
+
+  .rb-home-premium-hero__copy {
+    min-height: 360px !important;
+    padding: 48px 54px !important;
+  }
+
+  .rb-home-premium-hero__copy h2 {
+    max-width: 680px !important;
+    font-size: clamp(3rem, 4vw, 4.45rem) !important;
+    line-height: 1.02 !important;
+  }
+
+  .rb-home-premium-hero__lead {
+    max-width: 640px !important;
+    margin-top: 8px !important;
+    font-size: 1.05rem !important;
+    line-height: 1.62 !important;
+  }
+
+  .rb-home-premium-hero__actions {
+    margin-top: 12px !important;
+  }
+
+  .rb-home-premium-button {
+    min-height: 46px !important;
+    padding: 0.78rem 1.15rem !important;
+    border-radius: 10px !important;
+  }
+
+  .rb-home-premium-data {
+    min-height: 360px !important;
+    padding: 34px 34px 28px !important;
+  }
+
+  .rb-home-premium-data-list {
+    gap: 12px !important;
+  }
+
+  .rb-home-premium-data-list div {
+    min-height: 52px !important;
+    padding: 0.8rem 0.95rem !important;
+  }
+
+  .rb-home-premium-data-list dt {
+    font-size: 0.82rem !important;
+  }
+
+  .rb-home-premium-data-list dd {
+    font-size: 0.92rem !important;
+  }
+
+  .rb-home-premium-kpis {
+    min-height: 94px !important;
+  }
+
+  .rb-home-premium-kpi {
+    grid-template-columns: 52px minmax(0, 1fr) !important;
+    min-height: 94px !important;
+    padding: 1.05rem 1.35rem !important;
+  }
+
+  .rb-home-premium-kpi > span {
+    width: 50px !important;
+    height: 50px !important;
+  }
+
+  .rb-home-premium-kpi strong {
+    font-size: 1.25rem !important;
+  }
+
+  .rb-home-premium-kpi p {
+    font-size: 0.82rem !important;
+  }
+
+  .rb-home-premium-competitions {
+    padding: 22px 26px !important;
+  }
+
+  .rb-home-premium-competition-row {
+    gap: 14px !important;
+  }
+
+  .rb-home-premium-chip {
+    min-height: 44px !important;
+    padding: 0.68rem 1.05rem !important;
+    border-radius: 12px !important;
+    font-size: 0.84rem !important;
+  }
+
+  .rb-home-premium-match-grid {
+    grid-template-columns: minmax(0, 1.32fr) minmax(420px, 0.82fr) !important;
+    gap: 18px !important;
+  }
+
+  .rb-home-premium-featured-match,
+  .rb-home-premium-upcoming {
+    min-height: 260px !important;
+    padding: 24px !important;
+  }
+
+  .rb-home-premium-featured-fixture {
+    min-height: 120px !important;
+    padding: 1.4rem !important;
+  }
+
+  .rb-home-premium-featured-team strong {
+    font-size: 1.35rem !important;
+  }
+
+  .rb-home-premium-team-logo--featured {
+    width: 68px !important;
+    height: 68px !important;
+  }
+
+  .rb-home-premium-vs {
+    width: 58px !important;
+    height: 58px !important;
+  }
+
+  .rb-home-premium-upcoming-item {
+    min-height: 54px !important;
+    padding: 0.8rem 0 !important;
+  }
+
+  .rb-home-premium-value-grid,
+  .rb-home-premium-resources {
+    padding: 18px !important;
+  }
+
+  .rb-home-premium-value-grid article,
+  .rb-home-premium-resources article {
+    min-height: 112px !important;
+    padding: 20px !important;
+  }
+
+  .rb-home-premium-value-grid article > span,
+  .rb-home-premium-resources article > span {
+    width: 58px !important;
+    height: 58px !important;
+  }
+
+  .rb-home-premium-value-grid h3,
+  .rb-home-premium-resources h3 {
+    font-size: 1.05rem !important;
+  }
+
+  .rb-home-premium-value-grid p,
+  .rb-home-premium-resources p {
+    font-size: 0.88rem !important;
+    line-height: 1.45 !important;
+  }
+}
+
+/*
+  Schéma de communication du lot B.2 :
+  App.css
+  ├── décompresse uniquement le dashboard premium rb-home-premium
+  ├── rapproche les proportions de la maquette centrale validée
+  ├── conserve DashboardScreen.tsx, App.tsx et les callbacks existants
+  └── ne modifie ni backend, ni API, ni logique métier, ni modèles ML
+*/
