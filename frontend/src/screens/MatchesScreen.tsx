@@ -1,6 +1,6 @@
 // Ce fichier affiche l’écran Matchs de RubyBets avec un rendu premium inspiré de la maquette Match Center.
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   CalendarDays,
   Database,
@@ -31,6 +31,9 @@ type MatchesScreenProps = {
 type DateFilter = "all" | "today" | "tomorrow" | "7d" | "30d";
 type StatusFilter = "all" | "upcoming" | "live" | "finished";
 type SortMode = "date_asc" | "date_desc" | "competition";
+
+// Cette constante limite la table à huit matchs pour éviter un long scroll sur desktop.
+const ITEMS_PER_PAGE = 8;
 
 // Cette fonction vérifie si un statut correspond à un match à venir.
 function isUpcomingStatus(statusValue: string | null | undefined) {
@@ -205,6 +208,8 @@ function MatchesScreen({
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [teamSearch, setTeamSearch] = useState("");
   const [sortMode, setSortMode] = useState<SortMode>("date_asc");
+  const [currentPage, setCurrentPage] = useState(1);
+  const tablePanelRef = useRef<HTMLElement | null>(null);
 
   const activeCompetition = competitions.find(
     (competition) => competition.code === selectedCompetition,
@@ -224,6 +229,54 @@ function MatchesScreen({
 
     return sortMatches(matchesFilteredByTeam, sortMode);
   }, [matches, dateFilter, statusFilter, teamSearch, sortMode]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredMatches.length / ITEMS_PER_PAGE));
+  const firstMatchIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const paginatedMatches = filteredMatches.slice(
+    firstMatchIndex,
+    firstMatchIndex + ITEMS_PER_PAGE,
+  );
+
+  // Cette fonction replace doucement la lecture au début de la table après un changement de page.
+  function scrollToTableTop() {
+    tablePanelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  // Cette fonction affiche la page précédente sans descendre sous la première page.
+  function goToPreviousPage() {
+    setCurrentPage((page) => {
+      const nextPage = Math.max(1, page - 1);
+
+      if (nextPage !== page) {
+        window.requestAnimationFrame(scrollToTableTop);
+      }
+
+      return nextPage;
+    });
+  }
+
+  // Cette fonction affiche la page suivante sans dépasser la dernière page calculée.
+  function goToNextPage() {
+    setCurrentPage((page) => {
+      const nextPage = Math.min(totalPages, page + 1);
+
+      if (nextPage !== page) {
+        window.requestAnimationFrame(scrollToTableTop);
+      }
+
+      return nextPage;
+    });
+  }
+
+  // Cette synchronisation ramène la pagination au début dès qu’un filtre ou le tri change.
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCompetition, dateFilter, statusFilter, teamSearch, sortMode]);
+
+  // Cette synchronisation garde la page courante valide si le nombre de résultats change après un chargement API.
+  useEffect(() => {
+    setCurrentPage((page) => Math.min(page, totalPages));
+  }, [totalPages]);
 
   const availableMatchesCount = filteredMatches.filter(isAnalysisAvailable).length;
   const partialMatchesCount = Math.max(
@@ -252,6 +305,7 @@ function MatchesScreen({
               setStatusFilter("all");
               setTeamSearch("");
               setSortMode("date_asc");
+              setCurrentPage(1);
             }}
           >
             <RotateCcw size={14} aria-hidden="true" />
@@ -422,25 +476,60 @@ function MatchesScreen({
           </label>
         </section>
 
-        <section className="rb-matches-clone-table-panel">
+        <section className="rb-matches-clone-table-panel" ref={tablePanelRef}>
           <div className="rb-matches-clone-table-header">
             <div>
               <span className="rb-matches-clone-label">Rencontres à analyser</span>
-              <h3>{filteredMatches.length} matchs affichés</h3>
+              <h3>{filteredMatches.length} matchs trouvés</h3>
             </div>
 
             <div className="rb-matches-clone-summary">
-              <span>{getDateFilterLabel(dateFilter)}</span>
-              <span>{availableMatchesCount} analyses disponibles</span>
-              <span>{partialMatchesCount} données partielles</span>
+              <span className="rb-matches-summary-pill rb-matches-summary-pill--neutral">
+                {getDateFilterLabel(dateFilter)}
+              </span>
+              <span className="rb-matches-summary-pill rb-matches-summary-pill--available">
+                {availableMatchesCount} analyses disponibles
+              </span>
+              <span className="rb-matches-summary-pill rb-matches-summary-pill--partial">
+                {partialMatchesCount} données partielles
+              </span>
             </div>
           </div>
 
           <MatchesSection
             selectedCompetition={selectedCompetition}
-            matches={filteredMatches}
+            matches={paginatedMatches}
             onSelectMatch={onSelectMatch}
           />
+
+          {filteredMatches.length > 0 ? (
+            <nav
+              className="rb-matches-pagination"
+              aria-label="Pagination des matchs affichés"
+            >
+              <button
+                className="rb-matches-pagination__button"
+                type="button"
+                onClick={goToPreviousPage}
+                disabled={currentPage === 1}
+              >
+                Précédent
+              </button>
+
+              <span className="rb-matches-pagination__label">
+                Page {currentPage} sur {totalPages}
+              </span>
+
+              <button
+                className="rb-matches-pagination__button"
+                type="button"
+                onClick={goToNextPage}
+                disabled={currentPage === totalPages}
+              >
+                Suivant
+              </button>
+            </nav>
+          ) : null}
         </section>
 
         <p className="rb-matches-clone-responsible-note">

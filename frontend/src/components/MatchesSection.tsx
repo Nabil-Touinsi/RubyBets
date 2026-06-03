@@ -185,6 +185,11 @@ function MatchRow({
         </span>
 
         <button
+          className={
+            analysisAvailable
+              ? "rb-match-action-button rb-match-action-button--analysis"
+              : "rb-match-action-button rb-match-action-button--view"
+          }
           type="button"
           onClick={() => onSelectMatch(match.id)}
           aria-label={`Ouvrir l’analyse du match ${homeTeamLabel} contre ${awayTeamLabel}`}
