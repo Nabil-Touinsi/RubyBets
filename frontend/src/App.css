@@ -15420,10 +15420,1846 @@ body:has(.rb-home-premium) .rb-status-footer {
 }
 
 /*
-  Schéma de communication CSS du correctif Matchs 24M.2 :
-  App.css
-  ├── affine l’écran Matchs rendu par MatchesScreen.tsx
-  ├── stabilise la table et la pagination de MatchesSection.tsx
-  ├── conserve les données réelles reçues depuis App.tsx
-  └── ne modifie ni backend, ni contrats API, ni logique ML
+  Correctif écran Détail match 23E sécurisé.
+  Ce bloc cible uniquement les classes rb-detail-v2-* pour éviter tout impact sur l’écran Matchs.
 */
+.rb-detail-v2,
+.rb-detail-v2 * {
+  box-sizing: border-box;
+}
+
+.rb-detail-v2 {
+  display: grid;
+  gap: 14px;
+  width: 100%;
+  min-width: 0;
+  color: #f8ffff;
+}
+
+.rb-detail-v2 :is(h2, h3, h4, p, span, strong, small, li, button) {
+  overflow-wrap: normal !important;
+  word-break: normal !important;
+}
+
+.rb-detail-v2 section,
+.rb-detail-v2 article,
+.rb-detail-v2 main,
+.rb-detail-v2 ul,
+.rb-detail-v2 li {
+  margin: 0;
+  box-shadow: none;
+}
+
+.rb-detail-v2 section:has(h2) h2::after,
+.rb-detail-v2 section:has(h3) h3::after {
+  content: none;
+}
+
+section.rb-screen-container:has(.rb-detail-v2) {
+  width: min(1360px, calc(100% - 24px)) !important;
+  max-width: 1360px !important;
+  padding-top: 18px !important;
+}
+
+.rb-detail-v2-topbar {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+  padding: 0 2px;
+}
+
+.rb-detail-v2-topbar > div {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  min-width: 0;
+  color: #9fb5b6;
+  font-size: 0.72rem;
+  font-weight: 750;
+}
+
+.rb-detail-v2-topbar strong {
+  color: #2dd4bf;
+  font-size: 0.72rem;
+  font-weight: 900;
+}
+
+.rb-detail-v2-topbar button,
+.rb-detail-v2-card button,
+.rb-detail-v2-side-card button,
+.rb-detail-v2-action-row button,
+.rb-detail-v2-empty-state button {
+  width: fit-content;
+  min-height: 34px;
+  margin: 0;
+  padding: 0.5rem 0.82rem;
+  border: 1px solid rgba(45, 212, 191, 0.24);
+  border-radius: 999px;
+  background: rgba(20, 184, 166, 0.08);
+  color: #dffefe;
+  font-size: 0.72rem;
+  font-weight: 850;
+  line-height: 1;
+  white-space: nowrap !important;
+  box-shadow: none;
+}
+
+.rb-detail-v2-topbar button:hover,
+.rb-detail-v2-card button:hover,
+.rb-detail-v2-side-card button:hover,
+.rb-detail-v2-action-row button:hover,
+.rb-detail-v2-empty-state button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(45, 212, 191, 0.58);
+  background: rgba(20, 184, 166, 0.14);
+}
+
+.rb-detail-v2-hero,
+.rb-detail-v2-card,
+.rb-detail-v2-side-card,
+.rb-detail-v2-responsible-card,
+.rb-detail-v2-action-row article,
+.rb-detail-v2-empty-state {
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  background:
+    linear-gradient(145deg, rgba(15, 23, 42, 0.9), rgba(8, 47, 51, 0.54)),
+    rgba(15, 23, 42, 0.74);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.2);
+}
+
+.rb-detail-v2-hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 0.62fr) minmax(0, 1fr);
+  gap: 18px;
+  align-items: center;
+  min-height: 220px;
+  overflow: hidden;
+  padding: 24px;
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(45, 212, 191, 0.2), transparent 34%),
+    linear-gradient(90deg, rgba(10, 15, 20, 0.94), rgba(10, 15, 20, 0.58), rgba(10, 15, 20, 0.94)),
+    repeating-linear-gradient(90deg, rgba(45, 212, 191, 0.06) 0, rgba(45, 212, 191, 0.06) 1px, transparent 1px, transparent 54px),
+    rgba(15, 23, 42, 0.92);
+}
+
+.rb-detail-v2-hero::before {
+  content: "";
+  position: absolute;
+  inset: auto 12% -34px;
+  height: 92px;
+  border: 1px solid rgba(45, 212, 191, 0.16);
+  border-radius: 50% 50% 0 0;
+  background: rgba(20, 184, 166, 0.04);
+}
+
+.rb-detail-v2-team {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  min-width: 0;
+}
+
+.rb-detail-v2-team--home {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.rb-detail-v2-team--away {
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.rb-detail-v2-team p {
+  color: #2dd4bf;
+  font-size: 0.7rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.rb-detail-v2-team h2 {
+  margin: 8px 0 6px;
+  color: #ffffff;
+  font-size: clamp(1.45rem, 2.25vw, 2.15rem);
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -0.055em;
+}
+
+.rb-detail-v2-team span {
+  color: #9fb5b6;
+  font-size: 0.78rem;
+  font-weight: 750;
+}
+
+.rb-detail-v2-team-logo {
+  position: relative;
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 92px;
+  height: 92px;
+  overflow: hidden;
+  border: 1px solid rgba(45, 212, 191, 0.28);
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 50% 20%, rgba(45, 212, 191, 0.2), transparent 64%),
+    rgba(2, 6, 23, 0.52);
+  box-shadow: 0 20px 42px rgba(0, 0, 0, 0.26);
+}
+
+.rb-detail-v2-team-logo__fallback {
+  color: #99f6e4 !important;
+  font-size: 0.82rem;
+  font-weight: 950;
+}
+
+.rb-detail-v2-team-logo img {
+  position: absolute;
+  inset: 11px;
+  width: calc(100% - 22px);
+  height: calc(100% - 22px);
+  object-fit: contain;
+}
+
+.rb-detail-v2-hero-center {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 7px;
+  justify-items: center;
+  text-align: center;
+}
+
+.rb-detail-v2-hero-center p {
+  color: #a9c1c2;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.rb-detail-v2-hero-center strong {
+  color: #ffffff;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.06em;
+}
+
+.rb-detail-v2-hero-center span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 0.25rem 0.65rem;
+  border: 1px solid rgba(45, 212, 191, 0.24);
+  border-radius: 999px;
+  background: rgba(20, 184, 166, 0.1);
+  color: #99f6e4 !important;
+  font-size: 0.66rem;
+  font-weight: 900;
+}
+
+.rb-detail-v2-hero-center small {
+  color: #8fa8a9;
+  font-size: 0.7rem;
+  font-weight: 750;
+}
+
+.rb-detail-v2-tabs {
+  display: flex;
+  min-width: 0;
+  overflow-x: auto;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+  scrollbar-width: none;
+}
+
+.rb-detail-v2-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.rb-detail-v2-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  flex: 0 0 auto;
+  min-height: 46px;
+  margin: 0;
+  padding: 0 16px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  color: #8fa8a9;
+  font-size: 0.76rem;
+  font-weight: 850;
+  box-shadow: none;
+}
+
+.rb-detail-v2-tab:hover {
+  transform: none;
+  background: rgba(20, 184, 166, 0.05);
+  color: #dffefe;
+}
+
+.rb-detail-v2-tab--active {
+  border-bottom-color: #2dd4bf;
+  color: #2dd4bf;
+}
+
+.rb-detail-v2-tab span {
+  color: inherit !important;
+  font-size: 0.8rem;
+}
+
+.rb-detail-v2-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 330px;
+  gap: 18px;
+  min-height: 0;
+  padding: 0;
+  color: inherit;
+  font-family: inherit;
+}
+
+.rb-detail-v2-main-column,
+.rb-detail-v2-side-column {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+  align-content: start;
+}
+
+.rb-detail-v2-side-column {
+  position: sticky;
+  top: 92px;
+}
+
+.rb-detail-v2-card,
+.rb-detail-v2-side-card,
+.rb-detail-v2-responsible-card,
+.rb-detail-v2-empty-state {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+  border-radius: 16px;
+}
+
+.rb-detail-v2-section-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.rb-detail-v2-section-header p,
+.rb-detail-v2-empty-state > p:first-child {
+  margin: 0;
+  color: #2dd4bf !important;
+  font-size: 0.66rem;
+  font-weight: 950;
+  letter-spacing: 0.14em;
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+
+.rb-detail-v2-section-header h3,
+.rb-detail-v2-side-card h3,
+.rb-detail-v2-empty-state h2,
+.rb-detail-v2-empty-state h3 {
+  margin: 4px 0 0;
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -0.035em;
+}
+
+.rb-detail-v2-section-header > span {
+  color: #8fa8a9;
+  font-size: 0.68rem;
+  font-weight: 750;
+}
+
+.rb-detail-v2-insight-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.rb-detail-v2-insight-card,
+.rb-detail-v2-metric-card,
+.rb-detail-v2-recent-team {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 14px;
+  background:
+    linear-gradient(145deg, rgba(2, 6, 23, 0.32), rgba(8, 47, 51, 0.2)),
+    rgba(2, 6, 23, 0.16);
+}
+
+.rb-detail-v2-insight-card > span {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(45, 212, 191, 0.14);
+  border-radius: 12px;
+  background: rgba(20, 184, 166, 0.1);
+  color: #2dd4bf !important;
+  font-size: 0.94rem;
+}
+
+.rb-detail-v2-insight-card h4,
+.rb-detail-v2-metric-card h4 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 0.82rem;
+  font-weight: 900;
+  line-height: 1.15;
+}
+
+.rb-detail-v2-insight-card p,
+.rb-detail-v2-metric-card span,
+.rb-detail-v2-recent-team span,
+.rb-detail-v2-empty-state p,
+.rb-detail-v2-pending-tab p {
+  color: #a9c1c2;
+  font-size: 0.7rem;
+  font-weight: 650;
+  line-height: 1.42;
+}
+
+.rb-detail-v2-insight-card strong {
+  width: fit-content;
+  min-height: 22px;
+  padding: 0.22rem 0.52rem;
+  border: 1px solid rgba(45, 212, 191, 0.18);
+  border-radius: 999px;
+  background: rgba(20, 184, 166, 0.08);
+  color: #99f6e4;
+  font-size: 0.58rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.rb-detail-v2-metric-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.rb-detail-v2-metric-values {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.rb-detail-v2-metric-values p {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  padding: 8px;
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.44);
+}
+
+.rb-detail-v2-metric-values small {
+  color: #8fa8a9;
+  font-size: 0.58rem;
+  font-weight: 850;
+}
+
+.rb-detail-v2-metric-values strong {
+  color: #2dd4bf;
+  font-size: 0.88rem;
+  line-height: 1.1;
+}
+
+.rb-detail-v2-recent-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.rb-detail-v2-recent-team strong {
+  color: #ffffff;
+  font-size: 0.82rem;
+}
+
+.rb-detail-v2-recent-team div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.rb-detail-v2-recent-team span {
+  display: inline-flex;
+  min-height: 24px;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.42);
+}
+
+.rb-detail-v2-info-list {
+  display: grid;
+  gap: 8px;
+}
+
+.rb-detail-v2-info-line {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 0.8fr) minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+}
+
+.rb-detail-v2-info-line span {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: rgba(20, 184, 166, 0.1);
+  color: #2dd4bf !important;
+  font-size: 0.72rem;
+}
+
+.rb-detail-v2-info-line small {
+  color: #8fa8a9;
+  font-size: 0.64rem;
+  font-weight: 750;
+}
+
+.rb-detail-v2-info-line strong {
+  color: #ffffff;
+  font-size: 0.68rem;
+  font-weight: 850;
+  line-height: 1.22;
+  text-align: right;
+}
+
+.rb-detail-v2-empty-mini {
+  display: grid;
+  gap: 8px;
+  justify-items: start;
+  padding: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 12px;
+  background: rgba(2, 6, 23, 0.22);
+}
+
+.rb-detail-v2-empty-mini span {
+  color: #2dd4bf !important;
+  font-size: 1rem;
+}
+
+.rb-detail-v2-empty-mini p,
+.rb-detail-v2-context-list li,
+.rb-detail-v2-responsible-card p {
+  color: #a9c1c2;
+  font-size: 0.7rem;
+  font-weight: 650;
+  line-height: 1.42;
+}
+
+.rb-detail-v2-side-card button {
+  width: 100%;
+  border-radius: 10px;
+}
+
+.rb-detail-v2-context-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rb-detail-v2-context-list li {
+  position: relative;
+  padding: 0 0 0 16px;
+  border: 0;
+  background: transparent;
+}
+
+.rb-detail-v2-context-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.5rem;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: #2dd4bf;
+}
+
+.rb-detail-v2-responsible-card {
+  border-color: rgba(45, 212, 191, 0.18);
+  background:
+    radial-gradient(circle at 12% 8%, rgba(45, 212, 191, 0.12), transparent 28%),
+    rgba(15, 23, 42, 0.68);
+}
+
+.rb-detail-v2-responsible-card strong {
+  color: #dffefe;
+  font-size: 0.8rem;
+}
+
+.rb-detail-v2-action-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.rb-detail-v2-action-row article {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  min-width: 0;
+  padding: 14px;
+  border-radius: 16px;
+}
+
+.rb-detail-v2-action-row article > span {
+  display: inline-grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border: 1px solid rgba(45, 212, 191, 0.18);
+  border-radius: 14px;
+  background: rgba(20, 184, 166, 0.12);
+  color: #2dd4bf !important;
+  font-size: 1.1rem;
+}
+
+.rb-detail-v2-action-row h3 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 0.9rem;
+  line-height: 1.15;
+}
+
+.rb-detail-v2-action-row p {
+  max-width: 520px;
+  margin-top: 4px;
+  color: #a9c1c2;
+  font-size: 0.7rem;
+  line-height: 1.42;
+}
+
+.rb-detail-v2-action-row button {
+  margin-top: 8px;
+  border-radius: 10px;
+}
+
+.rb-detail-v2-footer-note {
+  justify-self: center;
+  width: fit-content;
+  max-width: min(100%, 760px);
+  margin: 0;
+  padding: 0.42rem 0.72rem;
+  border: 1px solid rgba(45, 212, 191, 0.14);
+  border-radius: 999px;
+  background: rgba(2, 6, 23, 0.2);
+  color: #8fa8a9 !important;
+  font-size: 0.66rem;
+  font-weight: 650;
+  line-height: 1.35;
+  text-align: center;
+}
+
+.rb-detail-v2-empty-state {
+  padding: 18px;
+}
+
+.rb-detail-v2-empty-state button {
+  margin-top: 4px;
+}
+
+.rb-detail-v2-technical-status {
+  display: none;
+}
+
+@media (max-width: 1180px) {
+  .rb-detail-v2-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rb-detail-v2-side-column {
+    position: static;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .rb-detail-v2-responsible-card {
+    align-self: stretch;
+  }
+
+  .rb-detail-v2-insight-grid,
+  .rb-detail-v2-metric-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .rb-detail-v2-topbar,
+  .rb-detail-v2-hero,
+  .rb-detail-v2-action-row,
+  .rb-detail-v2-recent-grid,
+  .rb-detail-v2-side-column {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rb-detail-v2-topbar > div {
+    justify-content: flex-start;
+  }
+
+  .rb-detail-v2-topbar button {
+    width: fit-content;
+  }
+
+  .rb-detail-v2-team,
+  .rb-detail-v2-team--home,
+  .rb-detail-v2-team--away {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .rb-detail-v2-team--home {
+    flex-direction: column-reverse;
+  }
+
+  .rb-detail-v2-team--away {
+    flex-direction: column;
+  }
+
+  .rb-detail-v2-section-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  section.rb-screen-container:has(.rb-detail-v2) {
+    width: min(100% - 14px, 100%) !important;
+  }
+
+  .rb-detail-v2 {
+    gap: 10px;
+  }
+
+  .rb-detail-v2-hero,
+  .rb-detail-v2-card,
+  .rb-detail-v2-side-card,
+  .rb-detail-v2-responsible-card,
+  .rb-detail-v2-action-row article,
+  .rb-detail-v2-empty-state {
+    padding: 12px;
+    border-radius: 14px;
+  }
+
+  .rb-detail-v2-team-logo {
+    width: 64px;
+    height: 64px;
+    border-radius: 18px;
+  }
+
+  .rb-detail-v2-team h2 {
+    white-space: normal;
+  }
+
+  .rb-detail-v2-insight-grid,
+  .rb-detail-v2-metric-grid,
+  .rb-detail-v2-metric-values {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rb-detail-v2-info-line {
+    grid-template-columns: 24px minmax(0, 0.75fr) minmax(0, 1fr);
+  }
+
+  .rb-detail-v2-action-row article {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rb-detail-v2-action-row button,
+  .rb-detail-v2-empty-state button,
+  .rb-detail-v2-card button {
+    width: 100%;
+  }
+
+  .rb-detail-v2-footer-note {
+    width: 100%;
+    border-radius: 12px;
+    text-align: left;
+  }
+}
+
+/*
+  Schéma de communication CSS du correctif 23E sécurisé :
+  App.css
+  ├── ajoute uniquement des styles rb-detail-v2-* pour MatchDetailsScreen.tsx
+  ├── ne cible aucune classe rb-matches-* afin de protéger l’onglet Matchs
+  ├── garde les données réelles fournies par App.tsx et les modèles rubybets.ts
+  └── ne modifie ni API, ni backend, ni logique métier
+*/
+/*
+  Correctif écran Détail match V3 premium polish.
+  Ce bloc améliore uniquement l'écran Détail match via le préfixe rb-detail-v2--premium.
+*/
+section.rb-screen-container:has(.rb-detail-v2--premium) {
+  width: min(1440px, calc(100% - 48px)) !important;
+  max-width: 1440px !important;
+  padding-top: 24px !important;
+  padding-bottom: 20px !important;
+}
+
+.rb-detail-v2--premium,
+.rb-detail-v2--premium * {
+  box-sizing: border-box;
+}
+
+.rb-detail-v2--premium {
+  display: grid;
+  gap: 16px;
+  width: 100%;
+  min-width: 0;
+  color: #e5e7eb;
+}
+
+.rb-detail-v2--premium :is(h2, h3, h4, p, span, strong, small, li, button) {
+  overflow-wrap: normal !important;
+  word-break: normal !important;
+}
+
+.rb-detail-v2--premium :is(section, article, main, ul, li) {
+  margin: 0;
+  box-shadow: none;
+}
+
+.rb-detail-v2--premium section:has(h2) h2::after,
+.rb-detail-v2--premium section:has(h3) h3::after {
+  content: none;
+}
+
+.rb-detail-v2--premium button {
+  box-shadow: none;
+  white-space: nowrap !important;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-topbar {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) auto minmax(180px, 1fr);
+  gap: 18px;
+  align-items: center;
+  padding: 2px 4px 0;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-topbar > div {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  color: #aebfc2;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-topbar > div strong {
+  color: #2dd4bf;
+  font-size: 0.72rem;
+  font-weight: 900;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-topbar button {
+  justify-self: start;
+  min-height: 34px;
+  margin: 0;
+  padding: 0.46rem 0.82rem;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 999px;
+  background: rgba(2, 6, 23, 0.22);
+  color: #cbd5e1;
+  font-size: 0.78rem;
+  font-weight: 750;
+  line-height: 1;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-topbar button:last-child {
+  justify-self: end;
+  border-color: rgba(45, 212, 191, 0.24);
+  background: rgba(45, 212, 191, 0.06);
+  color: #dffefe;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-topbar button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(45, 212, 191, 0.48);
+  background: rgba(45, 212, 191, 0.1);
+}
+
+.rb-detail-v2--premium .rb-detail-v2-hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 0.64fr) minmax(0, 1fr);
+  gap: 26px;
+  align-items: center;
+  min-height: 232px;
+  overflow: hidden;
+  padding: 28px 52px;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 18px;
+  background:
+    linear-gradient(90deg, rgba(3, 7, 18, 0.95), rgba(3, 19, 23, 0.64), rgba(3, 7, 18, 0.95)),
+    radial-gradient(circle at 50% 18%, rgba(45, 212, 191, 0.16), transparent 34%),
+    linear-gradient(180deg, rgba(20, 184, 166, 0.1), rgba(15, 23, 42, 0.92));
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.02),
+    0 28px 80px rgba(0, 0, 0, 0.26);
+}
+
+.rb-detail-v2--premium .rb-detail-v2-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(rgba(45, 212, 191, 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(45, 212, 191, 0.045) 1px, transparent 1px);
+  background-size: 78px 78px;
+  opacity: 0.26;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.75), transparent 78%);
+}
+
+.rb-detail-v2--premium .rb-detail-v2-hero::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -92px;
+  width: min(78%, 900px);
+  height: 190px;
+  border: 1px solid rgba(45, 212, 191, 0.18);
+  border-bottom: 0;
+  border-radius: 50% 50% 0 0;
+  transform: translateX(-50%);
+  background: rgba(8, 47, 51, 0.14);
+  box-shadow: 0 -20px 90px rgba(45, 212, 191, 0.06);
+}
+
+.rb-detail-v2--premium .rb-detail-v2-hero__glow {
+  position: absolute;
+  inset: auto 16% -32% 16%;
+  height: 48%;
+  border-radius: 50%;
+  background: rgba(45, 212, 191, 0.1);
+  filter: blur(42px);
+  pointer-events: none;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-hero__pitch {
+  position: absolute;
+  left: 50%;
+  bottom: -28px;
+  width: min(58%, 680px);
+  height: 88px;
+  border: 1px solid rgba(45, 212, 191, 0.13);
+  border-radius: 50% 50% 0 0;
+  transform: translateX(-50%);
+  opacity: 0.82;
+  pointer-events: none;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-team,
+.rb-detail-v2--premium .rb-detail-v2-hero-center {
+  position: relative;
+  z-index: 1;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-team {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 18px;
+  align-items: center;
+  min-width: 0;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-team--home {
+  grid-template-columns: minmax(0, 1fr) auto;
+  text-align: right;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-team--home .rb-detail-v2-team-logo {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-team--home > div {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-team-logo {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 94px;
+  height: 94px;
+  overflow: hidden;
+  border: 1px solid rgba(45, 212, 191, 0.28);
+  border-radius: 26px;
+  background:
+    radial-gradient(circle at 50% 16%, rgba(45, 212, 191, 0.18), transparent 66%),
+    rgba(2, 6, 23, 0.64);
+  box-shadow:
+    0 18px 48px rgba(0, 0, 0, 0.34),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.035);
+}
+
+.rb-detail-v2--premium .rb-detail-v2-team-logo__fallback {
+  color: #99f6e4 !important;
+  font-size: 1rem;
+  font-weight: 950;
+  letter-spacing: 0.03em;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-team-logo img {
+  position: absolute;
+  inset: 12px;
+  width: calc(100% - 24px);
+  height: calc(100% - 24px);
+  object-fit: contain;
+  filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.28));
+}
+
+.rb-detail-v2--premium .rb-detail-v2-team p {
+  margin: 0 0 8px;
+  color: #2dd4bf;
+  font-size: 0.75rem;
+  font-weight: 950;
+  letter-spacing: 0.16em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-team h2 {
+  margin: 0;
+  color: #ffffff;
+  font-size: clamp(1.8rem, 2.7vw, 2.9rem);
+  font-weight: 850;
+  line-height: 0.98;
+  letter-spacing: -0.065em;
+  text-shadow: 0 14px 40px rgba(0, 0, 0, 0.4);
+}
+
+.rb-detail-v2--premium .rb-detail-v2-team span {
+  display: block;
+  margin-top: 10px;
+  color: #b4c5c8;
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-hero-center {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  min-width: 0;
+  text-align: center;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-hero-center p {
+  color: #cbd5e1;
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-hero-center strong {
+  color: #ffffff;
+  font-size: clamp(2.9rem, 4.6vw, 4.4rem);
+  font-weight: 850;
+  letter-spacing: -0.065em;
+  line-height: 0.92;
+  text-shadow: 0 18px 48px rgba(0, 0, 0, 0.42);
+}
+
+.rb-detail-v2--premium .rb-detail-v2-hero-center span {
+  min-height: 26px;
+  padding: 0.28rem 0.72rem;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.58);
+  color: #e5e7eb;
+  font-size: 0.72rem;
+  font-weight: 850;
+  line-height: 1;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-hero-center small {
+  color: #94a3b8;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-tabs {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  min-width: 0;
+  overflow-x: auto;
+  padding: 4px 0 0;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+  scrollbar-width: none;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+  min-height: 48px;
+  margin: 0;
+  padding: 0 6px 12px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  color: rgba(203, 213, 225, 0.72);
+  font-size: 0.82rem;
+  font-weight: 780;
+  line-height: 1;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-tab span {
+  color: inherit !important;
+  font-size: 0.82rem;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-tab:hover,
+.rb-detail-v2--premium .rb-detail-v2-tab--active {
+  transform: none;
+  border-bottom-color: #2dd4bf;
+  background: transparent;
+  color: #2dd4bf;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 32px;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-main-column,
+.rb-detail-v2--premium .rb-detail-v2-side-column {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+  align-content: start;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-side-column {
+  position: sticky;
+  top: 92px;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-card,
+.rb-detail-v2--premium .rb-detail-v2-side-card,
+.rb-detail-v2--premium .rb-detail-v2-responsible-card,
+.rb-detail-v2--premium .rb-detail-v2-empty-state {
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-radius: 16px;
+  background:
+    linear-gradient(145deg, rgba(15, 23, 42, 0.9), rgba(8, 47, 51, 0.54)),
+    rgba(15, 23, 42, 0.74);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.015),
+    0 18px 52px rgba(0, 0, 0, 0.2);
+}
+
+.rb-detail-v2--premium .rb-detail-v2-card {
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-section-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-section-header p,
+.rb-detail-v2--premium .rb-detail-v2-pending-tab > p:first-child {
+  margin: 0 0 4px;
+  color: #2dd4bf !important;
+  font-size: 0.68rem;
+  font-weight: 950;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-section-header h3,
+.rb-detail-v2--premium .rb-detail-v2-pending-tab h3 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 1.08rem;
+  font-weight: 820;
+  line-height: 1.12;
+  letter-spacing: -0.035em;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-section-header > span {
+  color: #93a4a7;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-section-header button {
+  min-height: 36px;
+  margin: 0;
+  padding: 0.52rem 0.85rem;
+  border: 1px solid rgba(45, 212, 191, 0.22);
+  border-radius: 999px;
+  background: rgba(45, 212, 191, 0.07);
+  color: #99f6e4;
+  font-size: 0.74rem;
+  font-weight: 850;
+  line-height: 1;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-section-header button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(45, 212, 191, 0.52);
+  background: rgba(45, 212, 191, 0.12);
+}
+
+.rb-detail-v2--premium .rb-detail-v2-insight-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-insight-card {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 12px;
+  min-height: 162px;
+  padding: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 13px;
+  background:
+    radial-gradient(circle at top left, rgba(45, 212, 191, 0.08), transparent 48%),
+    rgba(2, 6, 23, 0.2);
+}
+
+.rb-detail-v2--premium .rb-detail-v2-insight-card > span {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgba(45, 212, 191, 0.2);
+  border-radius: 11px;
+  background: rgba(45, 212, 191, 0.1);
+  color: #2dd4bf !important;
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-insight-card--red > span {
+  border-color: rgba(248, 113, 113, 0.24);
+  background: rgba(248, 113, 113, 0.1);
+  color: #f87171 !important;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-insight-card--amber > span {
+  border-color: rgba(251, 191, 36, 0.24);
+  background: rgba(251, 191, 36, 0.09);
+  color: #fbbf24 !important;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-insight-card--blue > span {
+  border-color: rgba(56, 189, 248, 0.22);
+  background: rgba(56, 189, 248, 0.09);
+  color: #38bdf8 !important;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-insight-card h4 {
+  margin: 0 0 8px;
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 780;
+  line-height: 1.14;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-insight-card p {
+  color: #c3d0d2;
+  font-size: 0.78rem;
+  font-weight: 520;
+  line-height: 1.52;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-insight-card strong {
+  width: fit-content;
+  min-height: 25px;
+  padding: 0.28rem 0.62rem;
+  border: 1px solid rgba(45, 212, 191, 0.16);
+  border-radius: 999px;
+  background: rgba(45, 212, 191, 0.08);
+  color: #99f6e4;
+  font-size: 0.68rem;
+  font-weight: 780;
+  line-height: 1;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-insight-card--red strong {
+  border-color: rgba(248, 113, 113, 0.18);
+  background: rgba(248, 113, 113, 0.09);
+  color: #fca5a5;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-insight-card--amber strong {
+  border-color: rgba(251, 191, 36, 0.18);
+  background: rgba(251, 191, 36, 0.09);
+  color: #fcd34d;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-insight-card--blue strong {
+  border-color: rgba(56, 189, 248, 0.18);
+  background: rgba(56, 189, 248, 0.09);
+  color: #7dd3fc;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-metric-grid {
+  display: grid !important;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-metric-card {
+  display: grid;
+  gap: 14px;
+  min-height: 134px;
+  padding: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 13px;
+  background: rgba(2, 6, 23, 0.2);
+}
+
+.rb-detail-v2--premium .rb-detail-v2-metric-card__header {
+  display: grid;
+  gap: 4px;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-metric-card h4 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 0.82rem;
+  font-weight: 780;
+  line-height: 1.16;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-metric-card__header span {
+  color: #8da0a3;
+  font-size: 0.64rem;
+  font-weight: 680;
+  line-height: 1.2;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-metric-card__values {
+  display: grid;
+  gap: 10px;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-metric-card__values p {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-metric-card__values small {
+  min-width: 0;
+  color: #93a4a7;
+  font-size: 0.62rem;
+  font-weight: 750;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-metric-card__values strong {
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 820;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-metric-card__values span {
+  grid-column: 1 / -1;
+  display: block;
+  height: 4px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.12);
+}
+
+.rb-detail-v2--premium .rb-detail-v2-metric-card__values p:first-child span::before,
+.rb-detail-v2--premium .rb-detail-v2-metric-card__values p:last-child span::before {
+  content: "";
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-metric-card__values p:first-child span::before {
+  width: var(--home-width);
+  background: #f05252;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-metric-card__values p:last-child span::before {
+  width: var(--away-width);
+  background: #2dd4bf;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-metric-card--neutral .rb-detail-v2-metric-card__values p:first-child span::before {
+  background: #94a3b8;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-recent-card {
+  padding-bottom: 18px;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-recent-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-recent-team {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-recent-team__heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-recent-team .rb-detail-v2-team-logo {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-recent-team .rb-detail-v2-team-logo img {
+  inset: 5px;
+  width: calc(100% - 10px);
+  height: calc(100% - 10px);
+}
+
+.rb-detail-v2--premium .rb-detail-v2-recent-team strong {
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 750;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-recent-team > div:last-child {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-recent-team > div:last-child span {
+  display: inline-flex;
+  min-height: 28px;
+  padding: 0.34rem 0.62rem;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.42);
+  color: #b4c5c8;
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-side-card {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-side-card h3 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 1.06rem;
+  font-weight: 780;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-info-list {
+  display: grid;
+  gap: 0;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-info-line {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 0.8fr) minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  min-height: 38px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.rb-detail-v2--premium .rb-detail-v2-info-line:last-child {
+  border-bottom: 0;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-info-line > span {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border: 1px solid rgba(45, 212, 191, 0.16);
+  border-radius: 999px;
+  background: rgba(45, 212, 191, 0.08);
+  color: #2dd4bf !important;
+  font-size: 0.64rem;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-info-line small {
+  color: #9aaeb1;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-info-line strong {
+  color: #e5e7eb;
+  font-size: 0.76rem;
+  font-weight: 750;
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-empty-mini {
+  display: grid;
+  gap: 10px;
+  min-height: 100px;
+  padding: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.11);
+  border-radius: 12px;
+  background: rgba(2, 6, 23, 0.2);
+}
+
+.rb-detail-v2--premium .rb-detail-v2-empty-mini span {
+  color: #2dd4bf !important;
+  font-size: 0.9rem;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-empty-mini p,
+.rb-detail-v2--premium .rb-detail-v2-pending-tab p:last-child {
+  color: #b4c5c8;
+  font-size: 0.76rem;
+  font-weight: 560;
+  line-height: 1.5;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-side-card button {
+  width: 100%;
+  min-height: 36px;
+  margin: 0;
+  padding: 0.52rem 0.72rem;
+  border: 1px solid rgba(45, 212, 191, 0.18);
+  border-radius: 10px;
+  background: rgba(45, 212, 191, 0.06);
+  color: #99f6e4;
+  font-size: 0.74rem;
+  font-weight: 780;
+  line-height: 1;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-context-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-context-list li {
+  position: relative;
+  padding: 0 0 0 18px;
+  border: 0;
+  background: transparent;
+  color: #c3d0d2;
+  font-size: 0.76rem;
+  font-weight: 560;
+  line-height: 1.48;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-context-list li::before {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 0.52rem;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: #2dd4bf;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-responsible-card {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+  padding: 18px;
+  border-color: rgba(45, 212, 191, 0.26);
+  background:
+    radial-gradient(circle at top left, rgba(45, 212, 191, 0.18), transparent 48%),
+    rgba(8, 47, 51, 0.3);
+}
+
+.rb-detail-v2--premium .rb-detail-v2-responsible-card > span {
+  display: inline-grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba(45, 212, 191, 0.26);
+  border-radius: 13px;
+  background: rgba(45, 212, 191, 0.1);
+  color: #2dd4bf !important;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-responsible-card strong {
+  color: #99f6e4;
+  font-size: 0.78rem;
+  font-weight: 760;
+  line-height: 1.35;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-responsible-card p {
+  margin-top: 4px;
+  color: #c3d0d2;
+  font-size: 0.76rem;
+  font-weight: 560;
+  line-height: 1.45;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-footer-note {
+  justify-self: center;
+  max-width: min(100%, 760px);
+  margin: 0;
+  padding: 0.48rem 0.82rem;
+  border: 1px solid rgba(45, 212, 191, 0.14);
+  border-radius: 999px;
+  background: rgba(2, 6, 23, 0.2);
+  color: #8fa8a9 !important;
+  font-size: 0.68rem;
+  font-weight: 650;
+  line-height: 1.35;
+  text-align: center;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-empty-state {
+  display: grid;
+  gap: 10px;
+  padding: 20px;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-empty-state > p:first-child {
+  color: #2dd4bf !important;
+  font-size: 0.68rem;
+  font-weight: 950;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-empty-state h2 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 1.3rem;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-empty-state p {
+  color: #b4c5c8;
+  font-size: 0.84rem;
+}
+
+.rb-detail-v2--premium .rb-detail-v2-empty-state button {
+  width: fit-content;
+  min-height: 36px;
+  padding: 0.52rem 0.82rem;
+  border: 1px solid rgba(45, 212, 191, 0.28);
+  border-radius: 999px;
+  background: rgba(45, 212, 191, 0.08);
+  color: #99f6e4;
+  font-size: 0.78rem;
+  font-weight: 780;
+}
+
+/* Responsive isolé de l'écran Détail match V3. */
+@media (max-width: 1220px) {
+  section.rb-screen-container:has(.rb-detail-v2--premium) {
+    width: min(1180px, calc(100% - 32px)) !important;
+  }
+
+  .rb-detail-v2--premium .rb-detail-v2-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rb-detail-v2--premium .rb-detail-v2-side-column {
+    position: static;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .rb-detail-v2--premium .rb-detail-v2-responsible-card {
+    grid-column: 1 / -1;
+  }
+
+  .rb-detail-v2--premium .rb-detail-v2-metric-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 980px) {
+  .rb-detail-v2--premium .rb-detail-v2-topbar {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rb-detail-v2--premium .rb-detail-v2-topbar button,
+  .rb-detail-v2--premium .rb-detail-v2-topbar button:last-child,
+  .rb-detail-v2--premium .rb-detail-v2-topbar > div {
+    justify-self: stretch;
+    justify-content: center;
+  }
+
+  .rb-detail-v2--premium .rb-detail-v2-hero {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 22px;
+    padding: 24px;
+  }
+
+  .rb-detail-v2--premium .rb-detail-v2-team,
+  .rb-detail-v2--premium .rb-detail-v2-team--home,
+  .rb-detail-v2--premium .rb-detail-v2-team--away {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    text-align: center;
+  }
+
+  .rb-detail-v2--premium .rb-detail-v2-team--home .rb-detail-v2-team-logo,
+  .rb-detail-v2--premium .rb-detail-v2-team--home > div {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  .rb-detail-v2--premium .rb-detail-v2-team--home .rb-detail-v2-team-logo {
+    order: -1;
+  }
+
+  .rb-detail-v2--premium .rb-detail-v2-insight-grid,
+  .rb-detail-v2--premium .rb-detail-v2-metric-grid,
+  .rb-detail-v2--premium .rb-detail-v2-recent-grid,
+  .rb-detail-v2--premium .rb-detail-v2-side-column {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 680px) {
+  section.rb-screen-container:has(.rb-detail-v2--premium) {
+    width: min(100% - 16px, 100%) !important;
+    padding-top: 16px !important;
+  }
+
+  .rb-detail-v2--premium {
+    gap: 12px;
+  }
+
+  .rb-detail-v2--premium .rb-detail-v2-hero,
+  .rb-detail-v2--premium .rb-detail-v2-card,
+  .rb-detail-v2--premium .rb-detail-v2-side-card,
+  .rb-detail-v2--premium .rb-detail-v2-responsible-card,
+  .rb-detail-v2--premium .rb-detail-v2-empty-state {
+    padding: 14px;
+    border-radius: 14px;
+  }
+
+  .rb-detail-v2--premium .rb-detail-v2-team-logo {
+    width: 72px;
+    height: 72px;
+    border-radius: 20px;
+  }
+
+  .rb-detail-v2--premium .rb-detail-v2-team h2 {
+    font-size: clamp(1.7rem, 10vw, 2.2rem);
+  }
+
+  .rb-detail-v2--premium .rb-detail-v2-hero-center strong {
+    font-size: clamp(2.4rem, 14vw, 3.2rem);
+  }
+
+  .rb-detail-v2--premium .rb-detail-v2-section-header,
+  .rb-detail-v2--premium .rb-detail-v2-insight-grid,
+  .rb-detail-v2--premium .rb-detail-v2-metric-grid,
+  .rb-detail-v2--premium .rb-detail-v2-recent-grid,
+  .rb-detail-v2--premium .rb-detail-v2-side-column {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rb-detail-v2--premium .rb-detail-v2-section-header button,
+  .rb-detail-v2--premium .rb-detail-v2-side-card button,
+  .rb-detail-v2--premium .rb-detail-v2-empty-state button {
+    width: 100%;
+  }
+
+  .rb-detail-v2--premium .rb-detail-v2-footer-note {
+    width: 100%;
+    border-radius: 14px;
+    text-align: left;
+  }
+}
+
+/*
+  Schéma de communication CSS du correctif Détail match V3 :
+  App.css
+  ├── surcharge uniquement l’écran MatchDetailsScreen.tsx via rb-detail-v2--premium
+  ├── n’utilise aucune classe rb-matches-* ni rb-match-row
+  ├── conserve les données reçues depuis App.tsx sans modifier API/backend/ML
+  └── rapproche la fiche détail de la maquette premium Obsidian Teal
+*/
+
