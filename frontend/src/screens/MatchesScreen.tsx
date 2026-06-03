@@ -1,6 +1,14 @@
-// Ce fichier affiche l’écran Matchs de RubyBets avec filtres, liste des rencontres et colonne d’aide.
+// Ce fichier affiche l’écran Matchs de RubyBets avec un rendu premium inspiré de la maquette Match Center.
 
 import { useMemo, useState } from "react";
+import {
+  CalendarDays,
+  Database,
+  RotateCcw,
+  Search,
+  ShieldCheck,
+  SlidersHorizontal,
+} from "lucide-react";
 import type { Competition, Match } from "../models/rubybets";
 import type { AppScreen } from "../types/navigation";
 import {
@@ -20,31 +28,95 @@ type MatchesScreenProps = {
   onNavigate: (screen: AppScreen) => void;
 };
 
-type DateFilter = "all" | "7d" | "30d";
+type DateFilter = "all" | "today" | "tomorrow" | "7d" | "30d";
+type StatusFilter = "all" | "upcoming" | "live" | "finished";
 type SortMode = "date_asc" | "date_desc" | "competition";
+
+// Cette fonction vérifie si un statut correspond à un match à venir.
+function isUpcomingStatus(statusValue: string | null | undefined) {
+  const status = statusValue?.toUpperCase();
+
+  return status === "SCHEDULED" || status === "TIMED";
+}
+
+// Cette fonction vérifie si un statut correspond à un match en cours.
+function isLiveStatus(statusValue: string | null | undefined) {
+  const status = statusValue?.toUpperCase();
+
+  return status === "IN_PLAY" || status === "LIVE" || status === "PAUSED";
+}
+
+// Cette fonction vérifie si un statut correspond à un match terminé.
+function isFinishedStatus(statusValue: string | null | undefined) {
+  return statusValue?.toUpperCase() === "FINISHED";
+}
 
 // Cette fonction vérifie si un match peut être affiché comme exploitable pour l’analyse.
 function isAnalysisAvailable(match: Match) {
-  const status = match.status?.toUpperCase();
-
-  return hasKnownTeams(match) && (status === "SCHEDULED" || status === "TIMED");
+  return hasKnownTeams(match) && isUpcomingStatus(match.status);
 }
 
-// Cette fonction filtre les matchs selon la période choisie.
+// Cette fonction construit une date locale sans heure pour comparer aujourd’hui et demain.
+function startOfLocalDay(date: Date) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
+}
+
+// Cette fonction vérifie si la date du match correspond exactement à un jour local donné.
+function isSameLocalDay(dateValue: string, targetDate: Date) {
+  const matchDate = new Date(dateValue);
+
+  if (Number.isNaN(matchDate.getTime())) {
+    return false;
+  }
+
+  return startOfLocalDay(matchDate) === startOfLocalDay(targetDate);
+}
+
+// Cette fonction filtre les matchs selon la période choisie dans la colonne de filtres.
 function filterMatchesByDate(matches: Match[], dateFilter: DateFilter) {
   if (dateFilter === "all") {
     return matches;
   }
 
-  const now = Date.now();
+  const now = new Date();
+
+  if (dateFilter === "today") {
+    return matches.filter((match) => isSameLocalDay(match.utc_date, now));
+  }
+
+  if (dateFilter === "tomorrow") {
+    const tomorrow = new Date(now);
+    tomorrow.setDate(now.getDate() + 1);
+
+    return matches.filter((match) => isSameLocalDay(match.utc_date, tomorrow));
+  }
+
+  const nowTime = now.getTime();
   const days = dateFilter === "7d" ? 7 : 30;
-  const limit = now + days * 24 * 60 * 60 * 1000;
+  const limit = nowTime + days * 24 * 60 * 60 * 1000;
 
   return matches.filter((match) => {
     const matchTime = new Date(match.utc_date).getTime();
 
-    return Number.isFinite(matchTime) && matchTime >= now && matchTime <= limit;
+    return Number.isFinite(matchTime) && matchTime >= nowTime && matchTime <= limit;
   });
+}
+
+// Cette fonction filtre les matchs selon leur statut sans modifier les données reçues de l’API.
+function filterMatchesByStatus(matches: Match[], statusFilter: StatusFilter) {
+  if (statusFilter === "all") {
+    return matches;
+  }
+
+  if (statusFilter === "upcoming") {
+    return matches.filter((match) => isUpcomingStatus(match.status));
+  }
+
+  if (statusFilter === "live") {
+    return matches.filter((match) => isLiveStatus(match.status));
+  }
+
+  return matches.filter((match) => isFinishedStatus(match.status));
 }
 
 // Cette fonction trie les matchs pour rendre la liste plus lisible.
@@ -76,14 +148,51 @@ function matchContainsTeamSearch(match: Match, searchValue: string) {
 
   const homeTeamSearchText = getTeamSearchText(match.home_team);
   const awayTeamSearchText = getTeamSearchText(match.away_team);
+  const competitionSearchText = match.competition.name.toLowerCase();
 
   return (
     homeTeamSearchText.includes(searchValue) ||
-    awayTeamSearchText.includes(searchValue)
+    awayTeamSearchText.includes(searchValue) ||
+    competitionSearchText.includes(searchValue)
   );
 }
 
-// Ce composant structure l’écran Matchs sans modifier les appels API existants.
+// Cette fonction récupère la date de mise à jour la plus récente disponible dans les matchs.
+function getLatestUpdateLabel(matches: Match[]) {
+  const timestamps = matches
+    .map((match) => match.last_updated)
+    .filter((value): value is string => Boolean(value))
+    .map((value) => new Date(value).getTime())
+    .filter(Number.isFinite);
+
+  if (timestamps.length === 0) {
+    return "mise à jour API";
+  }
+
+  const latestTimestamp = Math.max(...timestamps);
+
+  return new Intl.DateTimeFormat("fr-FR", {
+    day: "2-digit",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(latestTimestamp));
+}
+
+// Cette fonction retourne un libellé court pour le filtre date actif.
+function getDateFilterLabel(dateFilter: DateFilter) {
+  const labels: Record<DateFilter, string> = {
+    all: "Tous",
+    today: "Aujourd’hui",
+    tomorrow: "Demain",
+    "7d": "7 jours",
+    "30d": "30 jours",
+  };
+
+  return labels[dateFilter];
+}
+
+// Ce composant structure l’écran Matchs comme un Match Center visuel sans modifier les appels API existants.
 function MatchesScreen({
   competitions,
   matches,
@@ -91,9 +200,9 @@ function MatchesScreen({
   matchesStatus,
   onSelectCompetition,
   onSelectMatch,
-  onNavigate,
 }: MatchesScreenProps) {
   const [dateFilter, setDateFilter] = useState<DateFilter>("all");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [teamSearch, setTeamSearch] = useState("");
   const [sortMode, setSortMode] = useState<SortMode>("date_asc");
 
@@ -103,200 +212,241 @@ function MatchesScreen({
 
   const filteredMatches = useMemo(() => {
     const matchesFilteredByDate = filterMatchesByDate(matches, dateFilter);
+    const matchesFilteredByStatus = filterMatchesByStatus(
+      matchesFilteredByDate,
+      statusFilter,
+    );
     const searchValue = teamSearch.trim().toLowerCase();
 
-    const matchesFilteredByTeam = matchesFilteredByDate.filter((match) => {
+    const matchesFilteredByTeam = matchesFilteredByStatus.filter((match) => {
       return matchContainsTeamSearch(match, searchValue);
     });
 
     return sortMatches(matchesFilteredByTeam, sortMode);
-  }, [matches, dateFilter, teamSearch, sortMode]);
+  }, [matches, dateFilter, statusFilter, teamSearch, sortMode]);
 
   const availableMatchesCount = filteredMatches.filter(isAnalysisAvailable).length;
-  const pendingMatchesCount = Math.max(
+  const partialMatchesCount = Math.max(
     filteredMatches.length - availableMatchesCount,
     0,
   );
-
-  const dateFilterLabel =
-    dateFilter === "7d"
-      ? "Prochains 7 jours"
-      : dateFilter === "30d"
-        ? "Prochains 30 jours"
-        : "Tous les matchs";
+  const upcomingMatchesCount = matches.filter((match) =>
+    isUpcomingStatus(match.status),
+  ).length;
+  const latestUpdateLabel = getLatestUpdateLabel(matches);
 
   return (
-    <div className="rb-matches-screen rb-matches-screen--refined">
-      <header className="rb-matches-page-header">
-        <div>
-          <h2>Matchs à venir</h2>
-          <p>
-            Explorez les prochaines rencontres et accédez à nos analyses avant
-            chaque rencontre.
-          </p>
+    <div className="rb-matches-screen rb-matches-screen--clone">
+      <aside className="rb-matches-clone-filters" aria-label="Filtres des matchs">
+        <div className="rb-matches-clone-filters__header">
+          <div>
+            <span className="rb-matches-clone-label">Filtres</span>
+            <h3>Affiner la liste</h3>
+          </div>
+
+          <button
+            className="rb-matches-reset-button"
+            type="button"
+            onClick={() => {
+              setDateFilter("all");
+              setStatusFilter("all");
+              setTeamSearch("");
+              setSortMode("date_asc");
+            }}
+          >
+            <RotateCcw size={14} aria-hidden="true" />
+            Réinitialiser
+          </button>
         </div>
 
-        <div className="rb-matches-page-header__badge">
-          <span>Compétition active</span>
-          <strong>{activeCompetition?.name ?? selectedCompetition}</strong>
-          <small>{matchesStatus}</small>
+        <label className="rb-matches-clone-field">
+          <span>Compétition</span>
+          <select
+            value={selectedCompetition}
+            onChange={(event) => onSelectCompetition(event.target.value)}
+          >
+            {competitions.map((competition) => (
+              <option key={competition.id} value={competition.code}>
+                {competition.name}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <div className="rb-matches-filter-group">
+          <span className="rb-matches-filter-group__title">Date</span>
+          <div className="rb-matches-filter-options">
+            {[
+              ["all", "Tous"],
+              ["today", "Aujourd’hui"],
+              ["tomorrow", "Demain"],
+              ["7d", "Cette semaine"],
+              ["30d", "30 jours"],
+            ].map(([value, label]) => (
+              <button
+                key={value}
+                className={
+                  dateFilter === value
+                    ? "rb-matches-filter-option rb-matches-filter-option--active"
+                    : "rb-matches-filter-option"
+                }
+                type="button"
+                onClick={() => setDateFilter(value as DateFilter)}
+              >
+                <span className="rb-matches-filter-dot" />
+                {label}
+              </button>
+            ))}
+          </div>
         </div>
-      </header>
 
-      <div className="rb-matches-board">
-        <main className="rb-matches-board__main">
-          <section className="rb-matches-filter-panel">
-            <div className="rb-matches-filter-grid">
-              <label className="rb-matches-filter-field">
-                <span>Ligue</span>
-                <select
-                  value={selectedCompetition}
-                  onChange={(event) => onSelectCompetition(event.target.value)}
-                >
-                  {competitions.map((competition) => (
-                    <option key={competition.id} value={competition.code}>
-                      {competition.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
+        <div className="rb-matches-filter-group">
+          <span className="rb-matches-filter-group__title">Statut du match</span>
+          <div className="rb-matches-filter-options">
+            {[
+              ["all", "Tous"],
+              ["upcoming", "À venir"],
+              ["live", "En cours"],
+              ["finished", "Terminé"],
+            ].map(([value, label]) => (
+              <button
+                key={value}
+                className={
+                  statusFilter === value
+                    ? "rb-matches-filter-option rb-matches-filter-option--active"
+                    : "rb-matches-filter-option"
+                }
+                type="button"
+                onClick={() => setStatusFilter(value as StatusFilter)}
+              >
+                <span className="rb-matches-filter-square" />
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
 
-              <label className="rb-matches-filter-field">
-                <span>Date</span>
-                <select
-                  value={dateFilter}
-                  onChange={(event) =>
-                    setDateFilter(event.target.value as DateFilter)
-                  }
-                >
-                  <option value="all">Tous les matchs</option>
-                  <option value="7d">Prochains 7 jours</option>
-                  <option value="30d">Prochains 30 jours</option>
-                </select>
-              </label>
+        <article className="rb-matches-data-card">
+          <span className="rb-matches-clone-label">État des données</span>
 
-              <label className="rb-matches-filter-field">
-                <span>Équipe</span>
-                <input
-                  type="search"
-                  value={teamSearch}
-                  placeholder="Rechercher une équipe ou un match..."
-                  onChange={(event) => setTeamSearch(event.target.value)}
-                />
-              </label>
+          <div className="rb-matches-data-row">
+            <Database size={18} aria-hidden="true" />
+            <div>
+              <strong>Données réelles</strong>
+              <span>Source Football-Data.org</span>
             </div>
+          </div>
 
-            <CompetitionsSection
-              competitions={competitions}
-              selectedCompetition={selectedCompetition}
-              onSelectCompetition={onSelectCompetition}
-            />
-          </section>
-
-          <section className="rb-matches-table-panel">
-            <div className="rb-matches-table-panel__header">
-              <div>
-                <span className="rb-matches-panel-label">Rencontres</span>
-                <h3>{filteredMatches.length} matchs affichés</h3>
-              </div>
-
-              <label className="rb-matches-sort-field">
-                <span>Trier par</span>
-                <select
-                  value={sortMode}
-                  onChange={(event) =>
-                    setSortMode(event.target.value as SortMode)
-                  }
-                >
-                  <option value="date_asc">Date croissante</option>
-                  <option value="date_desc">Date décroissante</option>
-                  <option value="competition">Compétition</option>
-                </select>
-              </label>
+          <div className="rb-matches-data-row">
+            <CalendarDays size={18} aria-hidden="true" />
+            <div>
+              <strong>{upcomingMatchesCount} matchs à venir</strong>
+              <span>{matchesStatus}</span>
             </div>
+          </div>
 
-            <MatchesSection
-              selectedCompetition={selectedCompetition}
-              matches={filteredMatches}
-              onSelectMatch={onSelectMatch}
-            />
-          </section>
-        </main>
-
-        <aside className="rb-matches-board__aside">
-          <article className="rb-matches-side-card rb-matches-side-card--overview">
-            <div className="rb-matches-side-title">
-              <h3>Aperçu</h3>
-              <span>ⓘ</span>
+          <div className="rb-matches-data-row">
+            <ShieldCheck size={18} aria-hidden="true" />
+            <div>
+              <strong>Cadre responsable</strong>
+              <span>Analyse sans garantie sportive</span>
             </div>
+          </div>
+        </article>
+      </aside>
 
-            <strong>{filteredMatches.length}</strong>
-            <p>Matchs à venir</p>
+      <div className="rb-matches-clone-main">
+        <header className="rb-matches-clone-header">
+          <div className="rb-matches-clone-title">
+            <span className="rb-matches-clone-icon" aria-hidden="true">
+              <CalendarDays size={22} />
+            </span>
 
-            <div className="rb-matches-side-stat">
-              <span className="rb-dot rb-dot--success" />
-              <span>Analyses disponibles</span>
-              <strong>{availableMatchesCount}</strong>
+            <div>
+              <h2>Matchs à venir</h2>
+              <p>
+                Consultez tous les matchs programmés et filtrez selon vos
+                critères d’analyse avant-match.
+              </p>
             </div>
+          </div>
 
-            <div className="rb-matches-side-stat">
-              <span className="rb-dot rb-dot--warning" />
-              <span>Équipes à confirmer</span>
-              <strong>{pendingMatchesCount}</strong>
-            </div>
-
-            <div className="rb-matches-side-stat">
-              <span className="rb-dot rb-dot--muted" />
-              <span>{dateFilterLabel}</span>
-              <strong>{filteredMatches.length}</strong>
-            </div>
-          </article>
-
-          <article className="rb-matches-side-card">
-            <h3>Filtres rapides</h3>
-
-            <div className="rb-matches-quick-row">
-              <span>Analyses disponibles</span>
-              <strong>{availableMatchesCount}</strong>
-            </div>
-
-            <div className="rb-matches-quick-row">
-              <span>Équipes à confirmer</span>
-              <strong>{pendingMatchesCount}</strong>
-            </div>
-
-            <div className="rb-matches-quick-row">
-              <span>Recherche active</span>
-              <strong>{teamSearch.trim() ? "Oui" : "Non"}</strong>
-            </div>
-
-            <div className="rb-matches-quick-row">
-              <span>Compétition suivie</span>
-              <strong>{selectedCompetition}</strong>
-            </div>
-          </article>
-
-          <article className="rb-matches-side-card">
-            <h3>Astuces</h3>
-            <p>
-              Sélectionnez une rencontre pour consulter son détail. Les matchs
-              dont les équipes ne sont pas encore connues restent affichés comme
-              données partielles.
-            </p>
-
+          <div className="rb-matches-clone-header__meta">
+            <span>Dernière mise à jour</span>
+            <strong>{latestUpdateLabel}</strong>
             <button
               type="button"
-              onClick={() => onNavigate("recommendation")}
+              onClick={() => window.location.reload()}
+              aria-label="Actualiser l’application"
             >
-              Recommandation multi-matchs
+              Actualiser
             </button>
-          </article>
+          </div>
+        </header>
 
-          <p className="rb-matches-responsible-note">
-            Outil d’aide à la décision. Les analyses proposées ne constituent
-            pas un conseil d’investissement ou un pari.
-          </p>
-        </aside>
+        <section className="rb-matches-clone-competitions">
+          <div className="rb-matches-clone-section-title">
+            <span className="rb-matches-clone-label">Choisir une compétition</span>
+            <strong>{activeCompetition?.name ?? selectedCompetition}</strong>
+          </div>
+
+          <CompetitionsSection
+            competitions={competitions}
+            selectedCompetition={selectedCompetition}
+            onSelectCompetition={onSelectCompetition}
+          />
+        </section>
+
+        <section className="rb-matches-clone-toolbar">
+          <label className="rb-matches-search-field">
+            <Search size={18} aria-hidden="true" />
+            <input
+              type="search"
+              value={teamSearch}
+              placeholder="Rechercher un match, une équipe ou une compétition..."
+              onChange={(event) => setTeamSearch(event.target.value)}
+            />
+          </label>
+
+          <label className="rb-matches-sort-select">
+            <SlidersHorizontal size={16} aria-hidden="true" />
+            <span>Trier par</span>
+            <select
+              value={sortMode}
+              onChange={(event) => setSortMode(event.target.value as SortMode)}
+            >
+              <option value="date_asc">Date croissante</option>
+              <option value="date_desc">Date décroissante</option>
+              <option value="competition">Compétition</option>
+            </select>
+          </label>
+        </section>
+
+        <section className="rb-matches-clone-table-panel">
+          <div className="rb-matches-clone-table-header">
+            <div>
+              <span className="rb-matches-clone-label">Rencontres à analyser</span>
+              <h3>{filteredMatches.length} matchs affichés</h3>
+            </div>
+
+            <div className="rb-matches-clone-summary">
+              <span>{getDateFilterLabel(dateFilter)}</span>
+              <span>{availableMatchesCount} analyses disponibles</span>
+              <span>{partialMatchesCount} données partielles</span>
+            </div>
+          </div>
+
+          <MatchesSection
+            selectedCompetition={selectedCompetition}
+            matches={filteredMatches}
+            onSelectMatch={onSelectMatch}
+          />
+        </section>
+
+        <p className="rb-matches-clone-responsible-note">
+          RubyBets structure une analyse avant-match à partir de données réelles.
+          L’application ne propose aucun pari réel et ne garantit aucun résultat.
+        </p>
       </div>
     </div>
   );

@@ -14055,3 +14055,1006 @@ body:has(.rb-home-premium) .rb-status-footer {
   ├── retire l’indicateur backend visuel de la navbar
   └── ne modifie ni services/api.ts, ni backend, ni modèles ML, ni calculs
 */
+
+/*
+  Correctif écran Matchs Clone Visuel 24M.1
+  Ce bloc rapproche l’onglet Matchs de la maquette Match Center : filtres latéraux, header compact, chips de compétitions et table premium.
+*/
+.rb-matches-screen--clone,
+.rb-matches-screen--clone * {
+  box-sizing: border-box;
+}
+
+.rb-matches-screen--clone {
+  --rb-match-panel: rgba(9, 22, 26, 0.84);
+  --rb-match-panel-strong: rgba(12, 30, 35, 0.94);
+  --rb-match-line: rgba(148, 163, 184, 0.16);
+  --rb-match-line-strong: rgba(45, 212, 191, 0.34);
+  --rb-match-text: #f8ffff;
+  --rb-match-muted: #91a8aa;
+  --rb-match-soft: #c5d7d8;
+  --rb-match-accent: #2dd4bf;
+  display: grid;
+  grid-template-columns: 270px minmax(0, 1fr);
+  gap: 18px;
+  width: 100%;
+  min-width: 0;
+  color: var(--rb-match-text);
+}
+
+.rb-matches-screen--clone :is(h2, h3, p, span, strong, small, label, button, select, input) {
+  overflow-wrap: normal !important;
+  word-break: normal !important;
+}
+
+.rb-matches-screen--clone :is(section, article) {
+  margin: 0;
+  box-shadow: none;
+}
+
+.rb-matches-screen--clone button,
+.rb-matches-screen--clone select,
+.rb-matches-screen--clone input {
+  font-family: inherit;
+}
+
+.rb-matches-clone-filters,
+.rb-matches-clone-main,
+.rb-matches-clone-competitions,
+.rb-matches-clone-toolbar,
+.rb-matches-clone-table-panel,
+.rb-matches-data-card {
+  min-width: 0;
+}
+
+.rb-matches-clone-filters {
+  position: sticky;
+  top: 92px;
+  display: grid;
+  gap: 14px;
+  align-self: start;
+  padding: 16px;
+  border: 1px solid var(--rb-match-line);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 85% 0%, rgba(45, 212, 191, 0.12), transparent 30%),
+    linear-gradient(160deg, rgba(15, 23, 42, 0.9), rgba(8, 47, 51, 0.58)),
+    var(--rb-match-panel);
+}
+
+.rb-matches-clone-filters__header,
+.rb-matches-clone-header,
+.rb-matches-clone-table-header,
+.rb-matches-clone-section-title,
+.rb-matches-table-panel__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  min-width: 0;
+}
+
+.rb-matches-clone-label,
+.rb-matches-panel-label {
+  color: var(--rb-match-accent) !important;
+  font-size: 0.66rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+
+.rb-matches-clone-filters h3,
+.rb-matches-clone-table-header h3,
+.rb-matches-clone-section-title strong {
+  margin: 4px 0 0;
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 900;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+}
+
+.rb-matches-reset-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 30px;
+  width: auto;
+  margin: 0;
+  padding: 0.42rem 0.62rem;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 999px;
+  background: rgba(2, 6, 23, 0.28);
+  color: #c7dada;
+  font-size: 0.7rem;
+  font-weight: 800;
+  line-height: 1;
+  box-shadow: none;
+  white-space: nowrap !important;
+}
+
+.rb-matches-reset-button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(45, 212, 191, 0.48);
+  background: rgba(20, 184, 166, 0.1);
+  filter: none;
+}
+
+.rb-matches-clone-field,
+.rb-matches-filter-group {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+}
+
+.rb-matches-clone-field > span,
+.rb-matches-filter-group__title {
+  color: var(--rb-match-accent) !important;
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.rb-matches-clone-field select {
+  width: 100%;
+  min-width: 0;
+  height: 42px;
+  margin: 0;
+  padding: 0 12px;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 12px;
+  background: rgba(2, 6, 23, 0.32);
+  color: #f8ffff;
+  font-size: 0.78rem;
+  font-weight: 800;
+  outline: none;
+}
+
+.rb-matches-clone-field select:focus {
+  border-color: rgba(45, 212, 191, 0.7);
+  box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.1);
+}
+
+.rb-matches-filter-options {
+  display: grid;
+  gap: 6px;
+}
+
+.rb-matches-filter-option {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 9px;
+  align-items: center;
+  width: 100%;
+  min-height: 34px;
+  margin: 0;
+  padding: 0.42rem 0.55rem;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: #c2d5d6;
+  font-size: 0.78rem;
+  font-weight: 760;
+  line-height: 1.2;
+  text-align: left;
+  box-shadow: none;
+}
+
+.rb-matches-filter-option:hover {
+  transform: none;
+  border-color: rgba(45, 212, 191, 0.18);
+  background: rgba(20, 184, 166, 0.08);
+  filter: none;
+}
+
+.rb-matches-filter-option--active {
+  border-color: rgba(45, 212, 191, 0.24);
+  background: rgba(20, 184, 166, 0.12);
+  color: #ecfeff;
+}
+
+.rb-matches-filter-dot,
+.rb-matches-filter-square {
+  display: inline-grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 999px;
+  background: rgba(2, 6, 23, 0.34);
+}
+
+.rb-matches-filter-square {
+  border-radius: 4px;
+}
+
+.rb-matches-filter-option--active .rb-matches-filter-dot,
+.rb-matches-filter-option--active .rb-matches-filter-square {
+  border-color: var(--rb-match-accent);
+  background: var(--rb-match-accent);
+  box-shadow: 0 0 18px rgba(45, 212, 191, 0.34);
+}
+
+.rb-matches-data-card {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid rgba(45, 212, 191, 0.18);
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 88% 12%, rgba(45, 212, 191, 0.12), transparent 34%),
+    rgba(2, 6, 23, 0.22);
+}
+
+.rb-matches-data-row {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  min-width: 0;
+}
+
+.rb-matches-data-row svg {
+  color: var(--rb-match-accent);
+}
+
+.rb-matches-data-row div {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+
+.rb-matches-data-row strong {
+  color: #ffffff;
+  font-size: 0.78rem;
+  line-height: 1.25;
+}
+
+.rb-matches-data-row span {
+  color: var(--rb-match-muted);
+  font-size: 0.7rem;
+  line-height: 1.25;
+}
+
+.rb-matches-clone-main {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+
+.rb-matches-clone-header {
+  align-items: center;
+}
+
+.rb-matches-clone-title {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  min-width: 0;
+}
+
+.rb-matches-clone-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(45, 212, 191, 0.34);
+  border-radius: 12px;
+  background: rgba(20, 184, 166, 0.12);
+  color: var(--rb-match-accent) !important;
+}
+
+.rb-matches-clone-title h2 {
+  margin: 0;
+  color: #ffffff;
+  font-size: clamp(1.8rem, 2.8vw, 2.55rem);
+  font-weight: 900;
+  line-height: 0.98;
+  letter-spacing: -0.065em;
+}
+
+.rb-matches-clone-title p {
+  max-width: 700px;
+  margin: 8px 0 0;
+  color: #acc3c4;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.rb-matches-clone-header__meta {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 2px 12px;
+  align-items: center;
+  min-width: 250px;
+  padding-left: 18px;
+  border-left: 1px solid rgba(148, 163, 184, 0.14);
+  text-align: right;
+}
+
+.rb-matches-clone-header__meta span {
+  color: var(--rb-match-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.rb-matches-clone-header__meta strong {
+  color: #ffffff;
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+.rb-matches-clone-header__meta button {
+  grid-row: 1 / span 2;
+  grid-column: 2;
+  width: auto;
+  min-height: 38px;
+  margin: 0;
+  padding: 0.55rem 0.85rem;
+  border: 1px solid rgba(45, 212, 191, 0.42);
+  border-radius: 10px;
+  background: rgba(20, 184, 166, 0.1);
+  color: #ecfeff;
+  font-size: 0.76rem;
+  font-weight: 900;
+  box-shadow: none;
+  white-space: nowrap !important;
+}
+
+.rb-matches-clone-header__meta button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(45, 212, 191, 0.75);
+  background: rgba(20, 184, 166, 0.16);
+  filter: none;
+}
+
+.rb-matches-clone-competitions,
+.rb-matches-clone-toolbar,
+.rb-matches-clone-table-panel {
+  border: 1px solid var(--rb-match-line);
+  border-radius: 16px;
+  background:
+    linear-gradient(145deg, rgba(15, 23, 42, 0.86), rgba(8, 47, 51, 0.52)),
+    var(--rb-match-panel);
+  box-shadow: 0 20px 54px rgba(0, 0, 0, 0.22);
+}
+
+.rb-matches-clone-competitions {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+}
+
+.rb-matches-clone-section-title strong {
+  max-width: 320px;
+  overflow: hidden;
+  color: #ffffff;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rb-matches-screen--clone .rb-competitions-strip {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.rb-matches-screen--clone .rb-competitions-strip__header {
+  display: none;
+}
+
+.rb-matches-screen--clone .rb-competition-chip-row {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+
+.rb-matches-screen--clone .rb-competition-chip-row::-webkit-scrollbar {
+  display: none;
+}
+
+.rb-matches-screen--clone .rb-competition-chip {
+  flex: 0 0 auto;
+  min-height: 42px;
+  padding: 0.56rem 0.82rem;
+  border-color: rgba(148, 163, 184, 0.16);
+  border-radius: 12px;
+  background: rgba(2, 6, 23, 0.24);
+  color: #e7ffff;
+  font-size: 0.76rem;
+  box-shadow: none;
+}
+
+.rb-matches-screen--clone .rb-competition-chip--active {
+  border-color: rgba(45, 212, 191, 0.82);
+  background: rgba(20, 184, 166, 0.16);
+  box-shadow: inset 0 0 0 1px rgba(45, 212, 191, 0.08);
+}
+
+.rb-matches-screen--clone .rb-competition-chip__logo,
+.rb-matches-screen--clone .rb-competition-chip__fallback {
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+  background: rgba(2, 6, 23, 0.44);
+}
+
+.rb-matches-screen--clone .rb-competition-chip__logo img {
+  width: 19px;
+  height: 19px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.28));
+}
+
+.rb-matches-clone-toolbar {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) 230px;
+  gap: 12px;
+  padding: 14px;
+}
+
+.rb-matches-search-field,
+.rb-matches-sort-select {
+  display: grid;
+  align-items: center;
+  min-width: 0;
+  margin: 0;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 12px;
+  background: rgba(2, 6, 23, 0.28);
+}
+
+.rb-matches-search-field {
+  grid-template-columns: 42px minmax(0, 1fr);
+}
+
+.rb-matches-search-field svg,
+.rb-matches-sort-select svg {
+  color: #9fb5b6;
+  justify-self: center;
+}
+
+.rb-matches-search-field input {
+  width: 100%;
+  height: 42px;
+  min-width: 0;
+  margin: 0;
+  padding: 0 12px 0 0;
+  border: 0;
+  background: transparent;
+  color: #f8ffff;
+  font-size: 0.82rem;
+  outline: none;
+}
+
+.rb-matches-search-field input::placeholder {
+  color: #718889;
+}
+
+.rb-matches-sort-select {
+  grid-template-columns: 34px minmax(0, 0.8fr) minmax(0, 1.2fr);
+  gap: 4px;
+  padding: 0 8px;
+}
+
+.rb-matches-sort-select span {
+  color: #90a8aa;
+  font-size: 0.66rem;
+  font-weight: 800;
+}
+
+.rb-matches-sort-select select {
+  width: 100%;
+  min-width: 0;
+  height: 42px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #f8ffff;
+  font-size: 0.76rem;
+  font-weight: 800;
+  outline: none;
+}
+
+.rb-matches-clone-table-panel {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  overflow: hidden;
+}
+
+.rb-matches-clone-table-header {
+  align-items: center;
+}
+
+.rb-matches-clone-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+.rb-matches-clone-summary span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0.3rem 0.58rem;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 999px;
+  background: rgba(2, 6, 23, 0.22);
+  color: #a9c1c2;
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.rb-matches-screen--clone .rb-matches-section {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.rb-matches-screen--clone .rb-match-table {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+}
+
+.rb-match-table__head,
+.rb-matches-screen--clone .rb-match-row {
+  display: grid;
+  grid-template-columns: 120px 138px minmax(320px, 1fr) 132px 108px;
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+}
+
+.rb-match-table__head {
+  min-height: 34px;
+  padding: 0 12px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.rb-match-table__head span {
+  color: #90a8aa;
+  font-size: 0.66rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.rb-matches-screen--clone .rb-match-row {
+  min-height: 74px;
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 12px;
+  background:
+    linear-gradient(135deg, rgba(8, 47, 51, 0.52), rgba(15, 23, 42, 0.68)),
+    rgba(2, 6, 23, 0.24);
+  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+}
+
+.rb-matches-screen--clone .rb-match-row:hover {
+  transform: translateY(-1px);
+  border-color: rgba(45, 212, 191, 0.26);
+  background:
+    linear-gradient(135deg, rgba(8, 47, 51, 0.66), rgba(15, 23, 42, 0.72)),
+    rgba(2, 6, 23, 0.28);
+}
+
+.rb-matches-screen--clone .rb-match-row__date,
+.rb-matches-screen--clone .rb-match-row__competition,
+.rb-matches-screen--clone .rb-match-row__status {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.rb-matches-screen--clone .rb-match-row__date strong,
+.rb-matches-screen--clone .rb-match-row__competition strong {
+  min-width: 0;
+  overflow: hidden;
+  color: #ffffff;
+  font-size: 0.73rem;
+  font-weight: 900;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rb-matches-screen--clone .rb-match-row__date span,
+.rb-matches-screen--clone .rb-match-row__competition span,
+.rb-matches-screen--clone .rb-match-row__status small {
+  color: #87a0a1;
+  font-size: 0.66rem;
+  font-weight: 750;
+  line-height: 1.2;
+}
+
+.rb-matches-screen--clone .rb-match-row__fixture {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 34px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  min-width: 0;
+}
+
+.rb-matches-screen--clone .rb-match-team {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.rb-matches-screen--clone .rb-match-team--home {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.rb-matches-screen--clone .rb-match-team--away {
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.rb-matches-screen--clone .rb-match-team__name {
+  min-width: 0;
+  overflow: hidden;
+  color: #f8ffff !important;
+  font-size: 0.78rem;
+  font-weight: 900;
+  line-height: 1.18;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rb-matches-screen--clone .rb-match-team-logo {
+  position: relative;
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 50% 18%, rgba(45, 212, 191, 0.2), transparent 64%),
+    rgba(2, 6, 23, 0.56);
+}
+
+.rb-matches-screen--clone .rb-match-team-logo__fallback {
+  color: #99f6e4 !important;
+  font-size: 0.58rem;
+  font-weight: 900;
+  letter-spacing: 0.03em;
+}
+
+.rb-matches-screen--clone .rb-match-team-logo img {
+  position: absolute;
+  inset: 5px;
+  width: calc(100% - 10px);
+  height: calc(100% - 10px);
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.24));
+}
+
+.rb-matches-screen--clone .rb-match-versus {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  min-width: 34px;
+  height: 30px;
+  border: 1px solid rgba(45, 212, 191, 0.34);
+  border-radius: 999px;
+  background: rgba(20, 184, 166, 0.12);
+  color: #99f6e4 !important;
+  font-size: 0.6rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  line-height: 1;
+}
+
+.rb-matches-screen--clone .rb-match-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  min-height: 26px;
+  max-width: 100%;
+  padding: 0.22rem 0.52rem;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 999px;
+  background: rgba(2, 6, 23, 0.28);
+  color: #c7dada !important;
+  font-size: 0.66rem;
+  font-weight: 900;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.rb-matches-screen--clone .rb-match-status--available {
+  border-color: rgba(45, 212, 191, 0.26);
+  background: rgba(20, 184, 166, 0.12);
+  color: #a7f3d0 !important;
+}
+
+.rb-matches-screen--clone .rb-match-status--pending {
+  border-color: rgba(250, 204, 21, 0.24);
+  background: rgba(250, 204, 21, 0.08);
+  color: #fde68a !important;
+}
+
+.rb-matches-screen--clone .rb-match-row__info {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  min-width: 0;
+}
+
+.rb-matches-screen--clone .rb-match-row__info > span {
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 10px;
+  background: rgba(2, 6, 23, 0.28);
+  color: #a9c1c2 !important;
+}
+
+.rb-matches-screen--clone .rb-match-row__info button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: auto;
+  min-width: 0;
+  min-height: 32px;
+  margin: 0;
+  padding: 0.45rem 0.55rem;
+  border: 1px solid rgba(45, 212, 191, 0.32);
+  border-radius: 999px;
+  background: rgba(20, 184, 166, 0.1);
+  color: #ecfeff;
+  font-size: 0.68rem;
+  font-weight: 900;
+  line-height: 1;
+  box-shadow: none;
+  white-space: nowrap !important;
+}
+
+.rb-matches-screen--clone .rb-match-row__info button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(45, 212, 191, 0.72);
+  background: rgba(20, 184, 166, 0.16);
+  filter: none;
+}
+
+.rb-matches-screen--clone .rb-matches-empty-state {
+  display: grid;
+  gap: 6px;
+  padding: 22px;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 14px;
+  background: rgba(2, 6, 23, 0.22);
+}
+
+.rb-matches-screen--clone .rb-matches-empty-state h3 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 1rem;
+}
+
+.rb-matches-screen--clone .rb-matches-empty-state p {
+  max-width: 620px;
+  color: #a9c1c2;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.rb-matches-clone-responsible-note {
+  display: inline-flex;
+  justify-content: center;
+  width: fit-content;
+  max-width: min(100%, 760px);
+  margin: 0 auto;
+  padding: 0.44rem 0.72rem;
+  border: 1px solid rgba(45, 212, 191, 0.14);
+  border-radius: 999px;
+  background: rgba(2, 6, 23, 0.2);
+  color: #8fa8a9 !important;
+  font-size: 0.68rem;
+  font-weight: 650;
+  line-height: 1.35;
+  text-align: center;
+}
+
+@media (max-width: 1180px) {
+  .rb-matches-screen--clone {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rb-matches-clone-filters {
+    position: static;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .rb-matches-clone-filters__header,
+  .rb-matches-data-card {
+    grid-column: 1 / -1;
+  }
+
+  .rb-match-table__head,
+  .rb-matches-screen--clone .rb-match-row {
+    grid-template-columns: 112px 120px minmax(260px, 1fr) 126px 96px;
+  }
+}
+
+@media (max-width: 920px) {
+  .rb-matches-clone-header,
+  .rb-matches-clone-table-header,
+  .rb-matches-clone-toolbar {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rb-matches-clone-header {
+    display: grid;
+  }
+
+  .rb-matches-clone-header__meta {
+    grid-template-columns: minmax(0, 1fr) auto;
+    min-width: 0;
+    padding-left: 0;
+    padding-top: 12px;
+    border-left: 0;
+    border-top: 1px solid rgba(148, 163, 184, 0.14);
+    text-align: left;
+  }
+
+  .rb-matches-clone-toolbar {
+    display: grid;
+  }
+
+  .rb-matches-sort-select {
+    grid-template-columns: 34px 90px minmax(0, 1fr);
+  }
+
+  .rb-match-table__head {
+    display: none;
+  }
+
+  .rb-matches-screen--clone .rb-match-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+    min-height: auto;
+    padding: 12px;
+  }
+
+  .rb-matches-screen--clone .rb-match-row__date,
+  .rb-matches-screen--clone .rb-match-row__competition,
+  .rb-matches-screen--clone .rb-match-row__status {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+  }
+
+  .rb-matches-screen--clone .rb-match-row__info {
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 680px) {
+  .rb-matches-screen--clone {
+    gap: 12px;
+  }
+
+  .rb-matches-clone-filters,
+  .rb-matches-clone-competitions,
+  .rb-matches-clone-toolbar,
+  .rb-matches-clone-table-panel {
+    padding: 12px;
+    border-radius: 14px;
+  }
+
+  .rb-matches-clone-filters {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rb-matches-clone-filters__header,
+  .rb-matches-data-card {
+    grid-column: auto;
+  }
+
+  .rb-matches-clone-title {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rb-matches-clone-icon {
+    width: 38px;
+    height: 38px;
+  }
+
+  .rb-matches-clone-title h2 {
+    font-size: clamp(1.55rem, 8vw, 2.05rem);
+  }
+
+  .rb-matches-clone-header__meta {
+    grid-template-columns: minmax(0, 1fr);
+    text-align: left;
+  }
+
+  .rb-matches-clone-header__meta button {
+    grid-row: auto;
+    grid-column: auto;
+    width: 100%;
+  }
+
+  .rb-matches-clone-section-title,
+  .rb-matches-clone-table-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rb-matches-clone-summary {
+    justify-content: flex-start;
+  }
+
+  .rb-matches-screen--clone .rb-match-row__fixture {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: start;
+  }
+
+  .rb-matches-screen--clone .rb-match-team,
+  .rb-matches-screen--clone .rb-match-team--home,
+  .rb-matches-screen--clone .rb-match-team--away {
+    justify-content: flex-start;
+    text-align: left;
+  }
+
+  .rb-matches-screen--clone .rb-match-team--home .rb-match-team-logo {
+    order: -1;
+  }
+
+  .rb-matches-screen--clone .rb-match-versus {
+    width: 40px;
+    min-width: 40px;
+  }
+
+  .rb-matches-screen--clone .rb-match-row__info button {
+    min-width: 108px;
+  }
+
+  .rb-matches-clone-responsible-note {
+    width: 100%;
+    border-radius: 14px;
+    text-align: left;
+  }
+}
+
+/*
+  Schéma de communication CSS du correctif Matchs Clone Visuel 24M.1 :
+  App.css
+  ├── clone visuellement l’écran Matchs à partir de MatchesScreen.tsx
+  ├── stylise la table rendue par MatchesSection.tsx
+  ├── conserve les compétitions de CompetitionsSection.tsx et les données réelles venues de l’API
+  └── ne modifie ni backend, ni contrats API, ni logique ML
+*/
