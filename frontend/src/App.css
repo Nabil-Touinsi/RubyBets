@@ -13676,3 +13676,382 @@ body:has(.rb-home-premium) .rb-status-footer {
   ├── conserve les données existantes fournies par App.tsx
   └── ne modifie ni backend, ni API, ni modèles ML, ni calculs
 */
+/*
+  Patch navbar premium — Option A.
+  Ce bloc rend uniquement le header plus compact, horizontal et proche de la maquette Obsidian Teal sans modifier les données.
+*/
+.rb-app-header {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 50 !important;
+  min-height: 72px !important;
+  height: 72px !important;
+  padding: 0 var(--rb-page-gap) !important;
+  background: rgba(7, 17, 19, 0.86) !important;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12) !important;
+  backdrop-filter: blur(18px) saturate(130%) !important;
+}
+
+.rb-app-header__inner {
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) !important;
+  align-items: center !important;
+  gap: clamp(16px, 2vw, 28px) !important;
+  width: min(1280px, 100%) !important;
+  height: 100% !important;
+  margin: 0 auto !important;
+}
+
+.rb-brand {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.72rem !important;
+  min-width: max-content !important;
+}
+
+.rb-brand__mark {
+  display: grid !important;
+  place-items: center !important;
+  width: 2.25rem !important;
+  height: 2.25rem !important;
+  border-radius: 0.82rem !important;
+  background: rgba(45, 212, 191, 0.14) !important;
+  border: 1px solid rgba(45, 212, 191, 0.28) !important;
+  color: #99f6e4 !important;
+  box-shadow: none !important;
+  font-family: var(--rb-font-mono, "Geist Mono", monospace) !important;
+  font-size: 0.82rem !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.04em !important;
+}
+
+.rb-brand__text {
+  display: flex !important;
+  align-items: center !important;
+}
+
+.rb-brand h1 {
+  margin: 0 !important;
+  color: #f8ffff !important;
+  font-size: 1.14rem !important;
+  font-weight: 750 !important;
+  letter-spacing: -0.04em !important;
+  line-height: 1 !important;
+}
+
+.rb-brand p,
+.rb-brand .rb-eyebrow {
+  display: none !important;
+}
+
+.rb-app-header__right {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 0.85rem !important;
+  min-width: 0 !important;
+}
+
+.rb-top-navigation {
+  display: flex !important;
+  flex: 1 1 auto !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 0.38rem !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow-x: auto !important;
+  scrollbar-width: none !important;
+}
+
+.rb-top-navigation::-webkit-scrollbar {
+  display: none !important;
+}
+
+.rb-top-navigation__item {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.38rem !important;
+  flex: 0 0 auto !important;
+  height: 40px !important;
+  min-height: 40px !important;
+  min-width: 0 !important;
+  padding: 0 0.68rem !important;
+  border: 1px solid transparent !important;
+  border-radius: 10px !important;
+  background: transparent !important;
+  color: #9fb1b6 !important;
+  box-shadow: none !important;
+  font-size: 0.8rem !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+  letter-spacing: -0.012em !important;
+  white-space: nowrap !important;
+  transition:
+    background 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
+    opacity 180ms ease !important;
+}
+
+.rb-top-navigation__item:hover:not(:disabled) {
+  transform: none !important;
+  border-color: rgba(148, 163, 184, 0.16) !important;
+  background: rgba(255, 255, 255, 0.045) !important;
+  color: #e5f6f7 !important;
+}
+
+.rb-top-navigation__item--active,
+.rb-top-navigation__item[aria-current="page"] {
+  border-color: rgba(45, 212, 191, 0.3) !important;
+  background: rgba(45, 212, 191, 0.12) !important;
+  color: #5eead4 !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+}
+
+.rb-top-navigation__item:disabled,
+.rb-top-navigation__item[data-disabled="true"] {
+  opacity: 0.36 !important;
+  filter: saturate(0.65) !important;
+  cursor: not-allowed !important;
+}
+
+.rb-top-navigation__icon {
+  flex: 0 0 auto !important;
+  color: currentColor !important;
+}
+
+.rb-top-navigation__label {
+  color: inherit !important;
+  font-size: inherit !important;
+  line-height: inherit !important;
+  white-space: nowrap !important;
+}
+
+.rb-navbar-actions {
+  display: inline-flex !important;
+  flex: 0 0 auto !important;
+  align-items: center !important;
+  gap: 0.55rem !important;
+  min-width: max-content !important;
+}
+
+.rb-api-pill {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.42rem !important;
+  height: 40px !important;
+  padding: 0 0.72rem !important;
+  border-radius: 10px !important;
+  border: 1px solid rgba(148, 163, 184, 0.14) !important;
+  background: rgba(15, 23, 42, 0.38) !important;
+  color: #dbeafe !important;
+  font-size: 0.78rem !important;
+  font-weight: 650 !important;
+  letter-spacing: -0.01em !important;
+  white-space: nowrap !important;
+}
+
+.rb-api-pill[data-status="connected"] {
+  border-color: rgba(52, 211, 153, 0.18) !important;
+  background: rgba(16, 185, 129, 0.08) !important;
+  color: #ecfdf5 !important;
+}
+
+.rb-api-pill[data-status="error"] {
+  border-color: rgba(248, 113, 113, 0.24) !important;
+  background: rgba(248, 113, 113, 0.08) !important;
+  color: #fee2e2 !important;
+}
+
+.rb-api-pill[data-status="checking"] {
+  border-color: rgba(251, 191, 36, 0.22) !important;
+  background: rgba(251, 191, 36, 0.08) !important;
+  color: #fef3c7 !important;
+}
+
+.rb-api-pill__icon {
+  color: currentColor !important;
+  opacity: 0.86 !important;
+}
+
+.rb-api-pill__dot {
+  width: 0.42rem !important;
+  height: 0.42rem !important;
+  border-radius: 999px !important;
+  background: currentColor !important;
+  box-shadow: 0 0 12px currentColor !important;
+}
+
+.rb-theme-indicator {
+  display: inline-grid !important;
+  place-items: center !important;
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 10px !important;
+  border: 1px solid rgba(148, 163, 184, 0.14) !important;
+  background: rgba(15, 23, 42, 0.38) !important;
+  color: #cbd5e1 !important;
+}
+
+@media (max-width: 1180px) {
+  .rb-app-header__inner {
+    width: min(100%, 1280px) !important;
+    gap: 0.9rem !important;
+  }
+
+  .rb-top-navigation__item {
+    padding: 0 0.58rem !important;
+    font-size: 0.76rem !important;
+  }
+
+  .rb-api-pill {
+    padding: 0 0.62rem !important;
+    font-size: 0.74rem !important;
+  }
+}
+
+@media (max-width: 980px) {
+  .rb-app-header {
+    position: sticky !important;
+    height: auto !important;
+    min-height: 72px !important;
+    padding: 0.85rem 1rem !important;
+  }
+
+  .rb-app-header__inner {
+    grid-template-columns: 1fr !important;
+    align-items: stretch !important;
+    gap: 0.8rem !important;
+  }
+
+  .rb-app-header__right {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.75rem !important;
+  }
+
+  .rb-top-navigation {
+    justify-content: flex-start !important;
+    overflow-x: auto !important;
+    padding-bottom: 0.1rem !important;
+  }
+
+  .rb-navbar-actions {
+    justify-content: space-between !important;
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 620px) {
+  .rb-brand__mark {
+    width: 2.1rem !important;
+    height: 2.1rem !important;
+    border-radius: 0.75rem !important;
+  }
+
+  .rb-brand h1 {
+    font-size: 1.04rem !important;
+  }
+
+  .rb-top-navigation__item {
+    height: 38px !important;
+    min-height: 38px !important;
+    padding: 0 0.56rem !important;
+  }
+
+  .rb-api-pill {
+    max-width: calc(100vw - 96px) !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+}
+
+/*
+  Schéma de communication du patch navbar premium :
+  App.css
+  ├── stylise AppShell.tsx pour le header compact RB + RubyBets
+  ├── stylise TopNavigation.tsx pour les liens courts, icônes et états actifs
+  ├── affiche le statut API transmis par App.tsx sans modifier services/api.ts
+  └── conserve les écrans screens/ et les composants métier inchangés
+*/
+
+
+/*
+  Patch navbar premium — logo officiel RubyBets.
+  Ce bloc intègre le logo fourni dans assets et retire l’indicateur backend de la navbar sans modifier les appels API.
+*/
+.rb-brand {
+  display: inline-flex !important;
+  align-items: center !important;
+  min-width: max-content !important;
+  gap: 0 !important;
+}
+
+.rb-brand__logo {
+  display: block !important;
+  width: auto !important;
+  height: 42px !important;
+  max-width: 212px !important;
+  object-fit: contain !important;
+  object-position: left center !important;
+  filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.28)) !important;
+}
+
+.rb-brand__mark,
+.rb-brand__text,
+.rb-brand h1,
+.rb-brand p,
+.rb-brand .rb-eyebrow {
+  display: none !important;
+}
+
+.rb-navbar-actions {
+  display: inline-flex !important;
+  flex: 0 0 auto !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.55rem !important;
+  min-width: auto !important;
+}
+
+.rb-api-pill {
+  display: none !important;
+}
+
+.rb-theme-indicator {
+  display: inline-grid !important;
+  place-items: center !important;
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 10px !important;
+  border: 1px solid rgba(148, 163, 184, 0.14) !important;
+  background: rgba(15, 23, 42, 0.38) !important;
+  color: #cbd5e1 !important;
+}
+
+@media (max-width: 1180px) {
+  .rb-brand__logo {
+    height: 38px !important;
+    max-width: 188px !important;
+  }
+}
+
+@media (max-width: 620px) {
+  .rb-brand__logo {
+    height: 34px !important;
+    max-width: 168px !important;
+  }
+}
+
+/*
+  Schéma de communication du patch logo navbar :
+  App.css
+  ├── stylise le logo SVG chargé par AppShell.tsx
+  ├── garde TopNavigation.tsx sur une ligne compacte
+  ├── retire l’indicateur backend visuel de la navbar
+  └── ne modifie ni services/api.ts, ni backend, ni modèles ML, ni calculs
+*/

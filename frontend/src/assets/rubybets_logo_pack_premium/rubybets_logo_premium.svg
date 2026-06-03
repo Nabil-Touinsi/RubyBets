@@ -1,0 +1,47 @@
+<svg width="720" height="160" viewBox="0 0 720 160" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">RubyBets premium horizontal logo</title>
+  <desc id="desc">Premium RubyBets logo inspired by a dark SaaS sports analytics interface: turquoise R, white B and clean RubyBets wordmark.</desc>
+  <defs>
+    <linearGradient id="tealGradient" x1="18" y1="20" x2="132" y2="104" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#5FFFEF"/>
+      <stop offset="0.48" stop-color="#2DD4BF"/>
+      <stop offset="1" stop-color="#0EA5A4"/>
+    </linearGradient>
+    <linearGradient id="whiteGradient" x1="86" y1="8" x2="150" y2="112" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="0.62" stop-color="#E8EEF6"/>
+      <stop offset="1" stop-color="#BFC9D6"/>
+    </linearGradient>
+    <linearGradient id="wordGradient" x1="0" y1="0" x2="395" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="0.55" stop-color="#F8FAFC"/>
+      <stop offset="1" stop-color="#DDE5EE"/>
+    </linearGradient>
+    <filter id="tealGlow" x="-40%" y="-40%" width="180%" height="180%" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feColorMatrix in="blur" type="matrix" values="0 0 0 0 0.176  0 0 0 0 0.831  0 0 0 0 0.749  0 0 0 0.38 0" result="glow"/>
+      <feMerge>
+        <feMergeNode in="glow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="12" stdDeviation="14" flood-color="#000000" flood-opacity="0.28"/>
+    </filter>
+  </defs>
+
+  <g transform="translate(34 28)" filter="url(#softShadow)">
+    <!-- Stylized R -->
+    <path filter="url(#tealGlow)" fill="url(#tealGradient)" d="M4 10C4 6.68629 6.68629 4 10 4H47.8C64.8 4 76.6 15.2 76.6 30.9C76.6 42.95 69.55 52.05 58.55 55.85L80.5 92H58.95L39.55 59.2H24.2V92H4V10ZM24.2 21.35V42.9H46.25C52.75 42.9 56.8 38.75 56.8 32.25C56.8 25.55 52.65 21.35 46.25 21.35H24.2Z"/>
+    <!-- Precision cut to create the premium monogram feel -->
+    <path opacity="0.55" fill="#061116" d="M43.2 44.4H58.9L74.4 70.2L62.8 74.2L43.2 44.4Z"/>
+    <!-- Stylized B -->
+    <path fill="url(#whiteGradient)" d="M78.5 10C78.5 6.68629 81.1863 4 84.5 4H121.1C138.3 4 149.7 13.65 149.7 28.4C149.7 38.45 144.5 45.85 136.65 49.75C147.1 53.45 153.7 62.35 153.7 74.1C153.7 91.15 140.45 102 120.55 102H84.5C81.1863 102 78.5 99.3137 78.5 96V10ZM98.3 20.75V43.15H117.35C124.75 43.15 129.55 38.95 129.55 31.9C129.55 24.9 124.75 20.75 117.35 20.75H98.3ZM98.3 58.55V85.25H119.1C127.45 85.25 133.25 80.15 133.25 71.95C133.25 63.75 127.45 58.55 119.1 58.55H98.3Z"/>
+    <path opacity="0.18" fill="#FFFFFF" d="M98.3 20.75H117.35C124.75 20.75 129.55 24.9 129.55 31.9C129.55 34.1 129.1 36.02 128.24 37.62C126.58 30.6 121.98 26.8 114.9 26.8H98.3V20.75Z"/>
+  </g>
+
+  <g transform="translate(215 45)">
+    <text x="0" y="58" fill="url(#wordGradient)" font-family="Inter, Manrope, Geist, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="54" font-weight="760" letter-spacing="-1.8">RubyBets</text>
+    <path d="M2 76H199" stroke="#2DD4BF" stroke-opacity="0.22" stroke-width="2" stroke-linecap="round"/>
+  </g>
+</svg>

@@ -1,6 +1,9 @@
-// Ce composant définit la structure générale de l’application RubyBets : header, navigation, contenu et zone de statut.
+// Ce composant définit la structure générale de l’application RubyBets : header premium, logo officiel, navigation et contenu.
+// Il garde le statut backend hors de la navbar afin de conserver une interface plus sobre et moins technique.
 
+import { Moon } from "lucide-react";
 import type { ReactNode } from "react";
+import rubyBetsNavbarLogo from "../assets/rubybets_logo_pack_premium/rubybets_logo_navbar.svg";
 import type { AppScreen, NavigationItem } from "../types/navigation";
 import TopNavigation from "./TopNavigation";
 
@@ -26,13 +29,13 @@ function AppShell({
     <main className="rb-app-shell">
       <header className="rb-app-header">
         <div className="rb-app-header__inner">
-          <div className="rb-brand" aria-label="RubyBets MVP">
-            <span className="rb-brand__mark">◆</span>
-            <div className="rb-brand__text">
-              <p className="rb-eyebrow">RubyBets MVP</p>
-              <h1>RubyBets</h1>
-              <p>Application d’aide à la décision football avant-match.</p>
-            </div>
+          <div className="rb-brand" aria-label="RubyBets">
+            <img
+              className="rb-brand__logo"
+              src={rubyBetsNavbarLogo}
+              alt="RubyBets"
+              decoding="async"
+            />
           </div>
 
           <div className="rb-app-header__right">
@@ -43,7 +46,11 @@ function AppShell({
               onNavigate={onNavigate}
             />
 
-            <span className="rb-header-badge">Aide à la décision avant-match</span>
+            <div className="rb-navbar-actions" aria-label="Actions d’interface">
+              <span className="rb-theme-indicator" aria-label="Mode sombre actif" title="Mode sombre actif">
+                <Moon aria-hidden="true" size={16} strokeWidth={1.9} />
+              </span>
+            </div>
           </div>
         </div>
       </header>
@@ -59,6 +66,7 @@ export default AppShell;
 
 // Schéma de communication du fichier :
 // AppShell.tsx
+// ├── utilise rubybets_logo_navbar.svg pour afficher le logo premium dans la navbar
 // ├── utilise TopNavigation.tsx pour afficher le menu principal
-// ├── reçoit l’écran actif, le statut et les contenus depuis App.tsx
+// ├── reçoit l’écran actif et les contenus depuis App.tsx
 // └── encadre les écrans du dossier screens/ sans modifier les appels API
