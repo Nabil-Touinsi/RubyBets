@@ -481,7 +481,7 @@ function DashboardScreen({
             <h3>Glossaire</h3>
             <p>Comprendre les métriques, signaux et concepts utilisés.</p>
           </div>
-          <button type="button" onClick={() => onNavigate("glossary")} aria-label="Ouvrir le glossaire">
+          <button type="button" onClick={() => onNavigate("resources")} aria-label="Ouvrir le glossaire">
             {renderIcon(ChevronRight, 18)}
           </button>
         </article>
@@ -494,7 +494,7 @@ function DashboardScreen({
           </div>
           <button
             type="button"
-            onClick={() => onNavigate("responsible")}
+            onClick={() => onNavigate("resources")}
             aria-label="Voir les informations responsables"
           >
             {renderIcon(ChevronRight, 18)}

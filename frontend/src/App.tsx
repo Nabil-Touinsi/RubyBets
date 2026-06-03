@@ -35,8 +35,7 @@ import AnalysisScreen from "./screens/AnalysisScreen";
 import PredictionsScreen from "./screens/PredictionsScreen";
 import RecommendationScreen from "./screens/RecommendationScreen";
 import StatusPanel from "./components/StatusPanel";
-import GlossaryScreen from "./screens/GlossaryScreen";
-import ResponsibleInfoScreen from "./screens/ResponsibleInfoScreen";
+import ResourcesScreen from "./screens/ResourcesScreen";
 
 // Ce composant orchestre le chargement des données, la navigation et le rendu des écrans RubyBets.
 function App() {
@@ -374,18 +373,11 @@ function App() {
       );
     }
 
-    if (currentScreen === "glossary") {
+       if (currentScreen === "resources") {
       return (
-        <GlossaryScreen
+        <ResourcesScreen
           glossary={glossary}
           glossaryStatus={glossaryStatus}
-        />
-      );
-    }
-
-    if (currentScreen === "responsible") {
-      return (
-        <ResponsibleInfoScreen
           responsibleInfo={responsibleInfo}
           responsibleInfoStatus={responsibleInfoStatus}
         />

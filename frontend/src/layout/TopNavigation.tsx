@@ -8,7 +8,6 @@ import {
   CheckCircle2,
   FileText,
   Home,
-  ShieldCheck,
   TrendingUp,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -28,8 +27,7 @@ const NAVIGATION_ICONS: Record<AppScreen, LucideIcon> = {
   analysis: Activity,
   predictions: TrendingUp,
   recommendation: CheckCircle2,
-  glossary: BookOpen,
-  responsible: ShieldCheck,
+  resources: BookOpen,
 };
 
 // Ce composant affiche les boutons de navigation et désactive les écrans qui nécessitent un match sélectionné.
