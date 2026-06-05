@@ -305,7 +305,7 @@ function getAwayTeamName(matchDetails: MatchDetailsResponse | null): string {
   );
 }
 
-// Récupère le logo ou blason d’une équipe.
+// Récupère le logo ou blason d’une équipe depuis les différentes formes possibles du contrat API.
 function getTeamLogo(matchDetails: MatchDetailsResponse | null, side: "home" | "away"): string {
   const prefix = side === "home" ? "home" : "away";
 
@@ -318,6 +318,10 @@ function getTeamLogo(matchDetails: MatchDetailsResponse | null, side: "home" | "
       [`${prefix}Team`, "logo"],
       [`${prefix}_team_crest`],
       [`${prefix}TeamCrest`],
+      ["match", `${prefix}_team`, "crest"],
+      ["match", `${prefix}_team`, "logo"],
+      ["match", `${prefix}Team`, "crest"],
+      ["match", `${prefix}Team`, "logo"],
     ],
     ""
   );
@@ -666,33 +670,37 @@ function PredictionsScreen({
         </div>
       </header>
 
-      <section className="rb-pred-v3-match-card" aria-label="Résumé du match">
-        <div className="rb-pred-v3-match-card__team">
+      <section className="rb-pred-v3-detail-hero" aria-label="Résumé du match">
+        <span className="rb-pred-v3-detail-hero__glow" aria-hidden="true" />
+        <span className="rb-pred-v3-detail-hero__pitch" aria-hidden="true" />
+
+        <div className="rb-pred-v3-detail-team rb-pred-v3-detail-team--home">
           <TeamVisual logo={homeLogo} name={homeTeamName} />
           <div>
+            <p>Domicile</p>
             <h3>{homeTeamName}</h3>
-            <p>
-              {getTeamRank(matchDetails, "home")} <span>•</span> {getTeamPoints(matchDetails, "home")}
-            </p>
+            <span>
+              {getTeamRank(matchDetails, "home")} · {getTeamPoints(matchDetails, "home")}
+            </span>
           </div>
         </div>
 
-        <div className="rb-pred-v3-match-card__center">
-          <p>
-            {matchDate} <span>•</span> {matchTime}
-          </p>
-          <strong>VS</strong>
-          <small>{competitionName} • {matchRound} • Programmé</small>
+        <div className="rb-pred-v3-detail-hero-center">
+          <p>{matchDate}</p>
+          <strong>{matchTime}</strong>
+          <span>Programmé</span>
+          <small>{competitionName} · {matchRound}</small>
         </div>
 
-        <div className="rb-pred-v3-match-card__team rb-pred-v3-match-card__team--away">
-          <div>
-            <h3>{awayTeamName}</h3>
-            <p>
-              {getTeamRank(matchDetails, "away")} <span>•</span> {getTeamPoints(matchDetails, "away")}
-            </p>
-          </div>
+        <div className="rb-pred-v3-detail-team rb-pred-v3-detail-team--away">
           <TeamVisual logo={awayLogo} name={awayTeamName} />
+          <div>
+            <p>Extérieur</p>
+            <h3>{awayTeamName}</h3>
+            <span>
+              {getTeamRank(matchDetails, "away")} · {getTeamPoints(matchDetails, "away")}
+            </span>
+          </div>
         </div>
       </section>
 
@@ -892,5 +900,5 @@ export default PredictionsScreen;
 // PredictionsScreen.tsx
 // ├── reçoit matchPredictions, matchDetails et matchContext depuis App.tsx
 // ├── affiche les tendances 1X2, buts, BTTS et signal complémentaire
-// ├── garde la navigation interne vers Matchs et Analyse via onNavigate
+// ├── utilise une variante du panneau Détail match pour le résumé de rencontre
 // └── utilise App.css avec les classes rb-pred-v3-* sans modifier le backend ni les contrats API
