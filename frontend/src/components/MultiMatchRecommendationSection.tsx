@@ -1,5 +1,6 @@
-// Ce composant affiche le générateur de recommandation multi-matchs avec contrôles segmentés et tableau compact.
+// Ce composant affiche le générateur de sélection multi-matchs avec contrôles segmentés et tableau premium lisible.
 
+import type { CSSProperties } from "react";
 import type { MultiMatchRecommendationResponse } from "../models/rubybets";
 import {
   cleanTextItems,
@@ -81,15 +82,28 @@ function getGlobalConfidence(
   return `${Math.round(total / recommendations.length)}%`;
 }
 
-// Cette fonction retourne un libellé marché plus lisible.
+// Cette fonction retourne un libellé de marché court et stable.
 function formatMarketLabel(market: string) {
   const labels: Record<string, string> = {
-    one_x_two: "Résultat du match",
-    goals: "Nombre de buts",
-    btts: "Les deux équipes marquent",
+    one_x_two: "1X2",
+    goals: "Buts",
+    btts: "BTTS",
   };
 
   return labels[market] ?? market;
+}
+
+// Cette fonction retourne une lecture courte pour la mini-card de recommandation.
+function formatSelectionSummary(item: RecommendationItem) {
+  if (item.selected_prediction.risk === "high") {
+    return "Tendance prudente / match à surveiller";
+  }
+
+  if (item.selected_prediction.confidence === "high") {
+    return "Signal principal / lecture encadrée";
+  }
+
+  return "Lecture prudente / à confirmer";
 }
 
 // Ce composant affiche un logo d’équipe avec fallback.
@@ -182,7 +196,7 @@ function RiskLevelSegments({
   );
 }
 
-// Ce composant affiche une ligne de recommandation dans le tableau compact.
+// Ce composant affiche une ligne de recommandation dans le tableau premium.
 function RecommendationRow({ item }: { item: RecommendationItem }) {
   const confidencePercent = getConfidencePercent(
     item.selected_prediction.confidence,
@@ -197,29 +211,39 @@ function RecommendationRow({ item }: { item: RecommendationItem }) {
         </div>
 
         <div className="rb-reco-fixture">
-          <TeamLogo team={item.match.home_team} />
-          <span className="rb-reco-team-name">
-            {getTeamLabel(item.match.home_team)}
+          <span className="rb-reco-fixture-team rb-reco-fixture-team--home">
+            <TeamLogo team={item.match.home_team} />
+            <span className="rb-reco-team-name">
+              {getTeamLabel(item.match.home_team)}
+            </span>
           </span>
+
           <span className="rb-reco-vs">VS</span>
-          <TeamLogo team={item.match.away_team} />
-          <span className="rb-reco-team-name">
-            {getTeamLabel(item.match.away_team)}
+
+          <span className="rb-reco-fixture-team rb-reco-fixture-team--away">
+            <TeamLogo team={item.match.away_team} />
+            <span className="rb-reco-team-name">
+              {getTeamLabel(item.match.away_team)}
+            </span>
           </span>
         </div>
       </div>
 
-      <div className="rb-reco-table-cell">
-        <span className="rb-reco-market-badge">
-          {formatMarketLabel(item.selected_prediction.market)}
-        </span>
-        <strong>{item.selected_prediction.label}</strong>
+      <div className="rb-reco-table-cell rb-reco-selection-cell">
+        <div className="rb-reco-selection-card">
+          <span className="rb-reco-market-badge rb-reco-market-badge--solo">
+            {formatMarketLabel(item.selected_prediction.market)}
+          </span>
+          <p>{formatSelectionSummary(item)}</p>
+        </div>
       </div>
 
       <div className="rb-reco-table-cell rb-reco-confidence-cell">
         <span
           className="rb-reco-confidence-ring"
-          style={{ "--rb-reco-confidence": `${confidencePercent}%` } as React.CSSProperties}
+          style={
+            { "--rb-reco-confidence": `${confidencePercent}%` } as CSSProperties
+          }
         >
           {confidencePercent}%
         </span>
@@ -356,7 +380,7 @@ function MultiMatchRecommendationSection({
             <div className="rb-reco-table">
               <div className="rb-reco-table-head">
                 <span>Match</span>
-                <span>Marché & sélection</span>
+                <span>Recommandation</span>
                 <span>Confiance</span>
                 <span>Risque</span>
                 <span>Analyse clé</span>
@@ -381,6 +405,6 @@ export default MultiMatchRecommendationSection;
 // MultiMatchRecommendationSection.tsx
 // ├── reçoit les paramètres et résultats depuis RecommendationScreen.tsx
 // ├── conserve les callbacks onChangeMatchCount, onChangeRiskLevel et onGenerateRecommendation
-// ├── affiche les sélections reçues du backend sous forme de tableau compact
-// ├── sécurise les libellés des équipes si une source retourne une valeur incomplète
+// ├── affiche les sélections reçues du backend sous forme de tableau premium
+// ├── sépare clairement Match, Recommandation, Confiance, Risque et Analyse clé
 // └── ne modifie ni API, ni backend, ni modèle de données

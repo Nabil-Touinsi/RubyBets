@@ -29,7 +29,7 @@ function RecommendationScreen({
     <div className="rb-recommendation-screen rb-recommendation-screen--mockup">
       <section className="rb-reco-hero">
         <div className="rb-reco-hero__copy">
-          <p className="rb-reco-kicker">Recommandation multi-matchs</p>
+          <p className="rb-reco-kicker">Sélection intelligente</p>
           <h2>Générateur de sélection</h2>
           <p>
             Construisez une recommandation analytique à partir des matchs
