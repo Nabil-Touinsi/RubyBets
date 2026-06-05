@@ -17312,3 +17312,2106 @@ section.rb-screen-container:has(.rb-detail-v2--premium) {
 .rb-resources-panel {
   min-width: 0;
 }
+/* Écran Prédictions V3 : interface premium compacte inspirée de la maquette validée. */
+.rb-pred-v3-screen {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.rb-pred-v3-header {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.rb-pred-v3-back {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  background: transparent;
+  color: #cbd5e1;
+  font: inherit;
+  cursor: pointer;
+  transition: color 160ms ease, transform 160ms ease;
+}
+
+.rb-pred-v3-back:hover {
+  color: #2dd4bf;
+  transform: translateX(-2px);
+}
+
+.rb-pred-v3-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.rb-pred-v3-title {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.rb-pred-v3-title__icon {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  border: 1px solid rgba(45, 212, 191, 0.22);
+  border-radius: 999px;
+  color: #2dd4bf;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(45, 212, 191, 0.2), transparent 48%),
+    rgba(17, 24, 39, 0.82);
+  box-shadow: 0 18px 40px rgba(45, 212, 191, 0.08);
+}
+
+.rb-pred-v3-title h2 {
+  margin: 0;
+  color: #f8fafc;
+  font-size: clamp(2rem, 3vw, 2.65rem);
+  letter-spacing: -0.05em;
+}
+
+.rb-pred-v3-title p {
+  margin: 4px 0 0;
+  color: #9ca3af;
+}
+
+.rb-pred-v3-secondary-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 18px;
+  border: 1px solid rgba(45, 212, 191, 0.45);
+  border-radius: 10px;
+  background: rgba(10, 15, 20, 0.48);
+  color: #e5e7eb;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color 160ms ease, color 160ms ease, background 160ms ease;
+}
+
+.rb-pred-v3-secondary-action:hover {
+  border-color: rgba(45, 212, 191, 0.8);
+  color: #2dd4bf;
+  background: rgba(45, 212, 191, 0.08);
+}
+
+.rb-pred-v3-match-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 28px;
+  min-height: 118px;
+  padding: 22px 30px;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 50% 10%, rgba(45, 212, 191, 0.16), transparent 32%),
+    linear-gradient(135deg, rgba(17, 24, 39, 0.92), rgba(10, 15, 20, 0.98));
+  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.24);
+  overflow: hidden;
+}
+
+.rb-pred-v3-match-card__team {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  min-width: 0;
+}
+
+.rb-pred-v3-match-card__team--away {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.rb-pred-v3-match-card__crest,
+.rb-pred-v3-match-card__fallback {
+  width: 64px;
+  height: 64px;
+  flex: 0 0 auto;
+  border-radius: 14px;
+}
+
+.rb-pred-v3-match-card__crest {
+  object-fit: contain;
+  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.34));
+}
+
+.rb-pred-v3-match-card__fallback {
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(45, 212, 191, 0.24);
+  color: #2dd4bf;
+  font-weight: 900;
+  background: rgba(45, 212, 191, 0.1);
+}
+
+.rb-pred-v3-match-card h3 {
+  margin: 0;
+  color: #f8fafc;
+  font-size: clamp(1.25rem, 2vw, 1.65rem);
+  letter-spacing: -0.03em;
+}
+
+.rb-pred-v3-match-card p {
+  margin: 6px 0 0;
+  color: #cbd5e1;
+}
+
+.rb-pred-v3-match-card p span,
+.rb-pred-v3-match-card__center span {
+  color: #2dd4bf;
+}
+
+.rb-pred-v3-match-card__center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-width: 210px;
+  text-align: center;
+}
+
+.rb-pred-v3-match-card__center p {
+  margin: 0;
+  color: #e5e7eb;
+}
+
+.rb-pred-v3-match-card__center strong {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border: 1px solid rgba(45, 212, 191, 0.42);
+  border-radius: 999px;
+  color: #2dd4bf;
+  font-size: 1.25rem;
+  background: rgba(45, 212, 191, 0.12);
+  box-shadow: 0 0 32px rgba(45, 212, 191, 0.14);
+}
+
+.rb-pred-v3-match-card__center small {
+  color: #d1d5db;
+}
+
+.rb-pred-v3-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(310px, 360px);
+  gap: 28px;
+  align-items: start;
+}
+
+.rb-pred-v3-main,
+.rb-pred-v3-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.rb-pred-v3-panel,
+.rb-pred-v3-side-card {
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 16px;
+  background:
+    linear-gradient(145deg, rgba(17, 24, 39, 0.9), rgba(10, 15, 20, 0.96)),
+    rgba(17, 24, 39, 0.78);
+  box-shadow: 0 20px 55px rgba(0, 0, 0, 0.22);
+}
+
+.rb-pred-v3-panel {
+  padding: 20px;
+}
+
+.rb-pred-v3-panel__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 16px;
+}
+
+.rb-pred-v3-eyebrow {
+  margin: 0 0 8px;
+  color: #2dd4bf;
+  font-size: 0.74rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.rb-pred-v3-panel h3,
+.rb-pred-v3-side-card h3 {
+  margin: 0;
+  color: #e5e7eb;
+  font-size: 1rem;
+  letter-spacing: -0.02em;
+}
+
+.rb-pred-v3-panel__header span,
+.rb-pred-v3-global-reading p,
+.rb-pred-v3-side-card__text {
+  color: #9ca3af;
+  line-height: 1.55;
+}
+
+.rb-pred-v3-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: max-content;
+  padding: 8px 12px;
+  border: 1px solid rgba(45, 212, 191, 0.14);
+  border-radius: 999px;
+  color: #d1fae5;
+  font-size: 0.8rem;
+  background: rgba(45, 212, 191, 0.08);
+}
+
+.rb-pred-v3-status i {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #2dd4bf;
+  box-shadow: 0 0 18px rgba(45, 212, 191, 0.72);
+}
+
+.rb-pred-v3-predictions-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.rb-pred-v3-prediction-card {
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 12px;
+  background:
+    radial-gradient(circle at 10% 0%, rgba(45, 212, 191, 0.1), transparent 35%),
+    rgba(15, 23, 42, 0.58);
+}
+
+.rb-pred-v3-prediction-card--muted {
+  background: rgba(15, 23, 42, 0.46);
+}
+
+.rb-pred-v3-prediction-card__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.rb-pred-v3-icon-chip {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  color: #2dd4bf;
+  background: rgba(45, 212, 191, 0.1);
+}
+
+.rb-pred-v3-prediction-card strong {
+  display: block;
+  color: #f8fafc;
+}
+
+.rb-pred-v3-prediction-card small {
+  display: block;
+  margin-top: 2px;
+  color: #9ca3af;
+}
+
+.rb-pred-v3-prediction-card__body {
+  min-height: 82px;
+  padding: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  border-radius: 10px;
+  background: rgba(10, 15, 20, 0.44);
+}
+
+.rb-pred-v3-prediction-card__body p {
+  margin: 6px 0 0;
+  color: #cbd5e1;
+  line-height: 1.45;
+}
+
+.rb-pred-v3-prediction-card__meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.rb-pred-v3-prediction-card__meta span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-width: 0;
+  padding: 9px;
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  border-radius: 9px;
+  color: #e5e7eb;
+  font-size: 0.82rem;
+  background: rgba(10, 15, 20, 0.38);
+}
+
+.rb-pred-v3-signal-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(120px, 0.45fr) minmax(180px, 0.6fr);
+  gap: 20px;
+  align-items: center;
+  margin-top: 14px;
+  padding: 16px;
+  border: 1px solid rgba(45, 212, 191, 0.18);
+  border-radius: 12px;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(45, 212, 191, 0.13), transparent 36%),
+    rgba(15, 23, 42, 0.6);
+}
+
+.rb-pred-v3-signal-card__title {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  color: #2dd4bf;
+}
+
+.rb-pred-v3-signal-card__title p,
+.rb-pred-v3-signal-card__confidence span {
+  margin: 0 0 6px;
+  color: #2dd4bf;
+  font-size: 0.77rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.rb-pred-v3-signal-card__title h4 {
+  margin: 0;
+  color: #f8fafc;
+  font-size: 1.18rem;
+  letter-spacing: -0.02em;
+}
+
+.rb-pred-v3-signal-card__confidence {
+  padding-left: 20px;
+  border-left: 1px solid rgba(148, 163, 184, 0.14);
+}
+
+.rb-pred-v3-signal-card__confidence strong {
+  color: #2dd4bf;
+  font-size: 1.75rem;
+  letter-spacing: -0.04em;
+}
+
+.rb-pred-v3-signal-card__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.rb-pred-v3-signal-card__badges span {
+  padding: 8px 11px;
+  border-radius: 8px;
+  color: #2dd4bf;
+  font-size: 0.78rem;
+  background: rgba(45, 212, 191, 0.1);
+}
+
+.rb-pred-v3-signal-card__badges span:last-child {
+  color: #fbbf24;
+  background: rgba(251, 191, 36, 0.1);
+}
+
+.rb-pred-v3-signal-card > p {
+  grid-column: 2 / -1;
+  margin: -4px 0 0;
+  color: #9ca3af;
+  line-height: 1.5;
+}
+
+.rb-pred-v3-global-reading {
+  padding: 20px;
+}
+
+.rb-pred-v3-global-reading > p:not(.rb-pred-v3-eyebrow) {
+  max-width: 920px;
+  margin: 8px 0 16px;
+}
+
+.rb-pred-v3-reading-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.rb-pred-v3-reading-grid article {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 8px 14px;
+  align-items: center;
+  padding: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.48);
+}
+
+.rb-pred-v3-reading-grid svg {
+  grid-row: span 2;
+  color: #2dd4bf;
+}
+
+.rb-pred-v3-reading-grid strong {
+  color: #f8fafc;
+}
+
+.rb-pred-v3-reading-grid span {
+  color: #9ca3af;
+  line-height: 1.45;
+}
+
+.rb-pred-v3-footer-note {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 2px 0 0;
+  padding: 14px 18px;
+  border: 1px solid rgba(45, 212, 191, 0.32);
+  border-radius: 10px;
+  color: #cbd5e1;
+  background: rgba(45, 212, 191, 0.05);
+}
+
+.rb-pred-v3-footer-note svg {
+  color: #2dd4bf;
+  flex: 0 0 auto;
+}
+
+.rb-pred-v3-side-card {
+  padding: 18px;
+}
+
+.rb-pred-v3-side-card--summary {
+  min-height: 210px;
+}
+
+.rb-pred-v3-gauge-row {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr);
+  gap: 20px;
+  align-items: center;
+}
+
+.rb-pred-v3-gauge {
+  width: 112px;
+  height: 112px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at center, #0a0f14 0 55%, transparent 56%),
+    conic-gradient(#2dd4bf var(--rb-pred-v3-gauge), rgba(51, 65, 85, 0.74) 0);
+  box-shadow: inset 0 0 0 10px rgba(148, 163, 184, 0.1);
+}
+
+.rb-pred-v3-gauge span {
+  color: #2dd4bf;
+  font-size: 1.95rem;
+  font-weight: 900;
+  letter-spacing: -0.05em;
+}
+
+.rb-pred-v3-gauge-row div:last-child > span {
+  color: #cbd5e1;
+}
+
+.rb-pred-v3-gauge-row strong {
+  display: block;
+  margin-top: 4px;
+  color: #2dd4bf;
+  font-size: 1.14rem;
+}
+
+.rb-pred-v3-gauge-row p {
+  margin: 12px 0 8px;
+  color: #e5e7eb;
+  line-height: 1.45;
+}
+
+.rb-pred-v3-gauge-row small {
+  color: #9ca3af;
+  line-height: 1.45;
+}
+
+.rb-pred-v3-sidebar-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rb-pred-v3-sidebar-line {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.rb-pred-v3-sidebar-line span {
+  color: #e5e7eb;
+}
+
+.rb-pred-v3-sidebar-line p {
+  margin: 0;
+  color: #cbd5e1;
+  line-height: 1.55;
+}
+
+.rb-pred-v3-side-card__text {
+  margin: 10px 0 0;
+}
+
+.rb-pred-v3-side-card--responsible {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 16px;
+  border-color: rgba(45, 212, 191, 0.28);
+  background:
+    radial-gradient(circle at 0% 0%, rgba(45, 212, 191, 0.12), transparent 38%),
+    rgba(17, 24, 39, 0.88);
+}
+
+.rb-pred-v3-side-card--responsible svg {
+  color: #2dd4bf;
+}
+
+.rb-pred-v3-side-card--responsible p:not(.rb-pred-v3-eyebrow) {
+  margin: 0 0 10px;
+  color: #2dd4bf;
+  line-height: 1.55;
+}
+
+.rb-pred-v3-side-card--responsible strong {
+  color: #67e8f9;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 1180px) {
+  .rb-pred-v3-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .rb-pred-v3-sidebar {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 860px) {
+  .rb-pred-v3-title-row,
+  .rb-pred-v3-panel__header,
+  .rb-pred-v3-signal-card {
+    grid-template-columns: 1fr;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .rb-pred-v3-match-card,
+  .rb-pred-v3-predictions-grid,
+  .rb-pred-v3-reading-grid,
+  .rb-pred-v3-sidebar {
+    grid-template-columns: 1fr;
+  }
+
+  .rb-pred-v3-match-card__team--away {
+    justify-content: flex-start;
+    text-align: left;
+  }
+
+  .rb-pred-v3-match-card__center {
+    min-width: 0;
+  }
+
+  .rb-pred-v3-signal-card__confidence {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .rb-pred-v3-signal-card > p {
+    grid-column: auto;
+  }
+}
+/* Prédictions V4 : correction premium compacte pour rapprocher l’écran de la maquette validée. */
+.rb-app-main:has(.rb-pred-v3-screen),
+.rb-main-content:has(.rb-pred-v3-screen),
+.rb-page-content:has(.rb-pred-v3-screen) {
+  padding-top: 22px;
+}
+
+.rb-pred-v3-screen {
+  max-width: 1480px;
+  margin: 0 auto;
+  gap: 14px;
+}
+
+.rb-pred-v3-header {
+  gap: 12px;
+}
+
+.rb-pred-v3-title-row {
+  min-height: 72px;
+}
+
+.rb-pred-v3-title__icon {
+  width: 50px;
+  height: 50px;
+}
+
+.rb-pred-v3-title h2 {
+  font-size: clamp(1.85rem, 2.5vw, 2.35rem);
+}
+
+.rb-pred-v3-title p {
+  font-size: 0.94rem;
+}
+
+.rb-pred-v3-secondary-action {
+  min-height: 42px;
+  padding: 0 16px;
+  border-radius: 9px;
+  font-size: 0.92rem;
+}
+
+.rb-pred-v3-match-card {
+  min-height: 96px;
+  padding: 16px 28px;
+  border-radius: 14px;
+  background:
+    linear-gradient(rgba(10, 15, 20, 0.54), rgba(10, 15, 20, 0.86)),
+    radial-gradient(circle at 50% 0%, rgba(45, 212, 191, 0.22), transparent 36%),
+    linear-gradient(135deg, rgba(17, 24, 39, 0.98), rgba(5, 11, 18, 0.98));
+}
+
+.rb-pred-v3-match-card__crest,
+.rb-pred-v3-match-card__fallback,
+.rb-pred-v3-match-card__flag {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+}
+
+.rb-pred-v3-match-card h3 {
+  font-size: clamp(1.18rem, 1.8vw, 1.45rem);
+}
+
+.rb-pred-v3-match-card p,
+.rb-pred-v3-match-card__center p,
+.rb-pred-v3-match-card__center small {
+  font-size: 0.9rem;
+}
+
+.rb-pred-v3-match-card__center {
+  gap: 6px;
+}
+
+.rb-pred-v3-match-card__center strong {
+  width: 46px;
+  height: 46px;
+  font-size: 1.05rem;
+}
+
+.rb-pred-v3-match-card__flag {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border: 1px solid rgba(226, 232, 240, 0.22);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.3);
+}
+
+.rb-pred-v3-match-card__flag--mexico {
+  background: linear-gradient(90deg, #006847 0 33%, #ffffff 33% 66%, #ce1126 66% 100%);
+}
+
+.rb-pred-v3-match-card__flag--mexico i {
+  position: absolute;
+  inset: 21px 24px;
+  border-radius: 999px;
+  background: #a67c2d;
+}
+
+.rb-pred-v3-match-card__flag--south-africa {
+  background:
+    linear-gradient(150deg, transparent 0 34%, #ffb612 34% 42%, #007a4d 42% 58%, #ffffff 58% 66%, transparent 66%),
+    linear-gradient(90deg, #000000 0 38%, transparent 38%),
+    linear-gradient(180deg, #de3831 0 50%, #002395 50% 100%);
+}
+
+.rb-pred-v3-layout {
+  grid-template-columns: minmax(0, 1fr) 354px;
+  gap: 24px;
+}
+
+.rb-pred-v3-main,
+.rb-pred-v3-sidebar {
+  gap: 14px;
+}
+
+.rb-pred-v3-panel,
+.rb-pred-v3-side-card {
+  border-color: rgba(148, 163, 184, 0.13);
+  background:
+    radial-gradient(circle at 0% 0%, rgba(45, 212, 191, 0.055), transparent 34%),
+    linear-gradient(145deg, rgba(17, 24, 39, 0.88), rgba(8, 13, 19, 0.96));
+}
+
+.rb-pred-v3-panel {
+  padding: 18px;
+}
+
+.rb-pred-v3-panel__header {
+  margin-bottom: 14px;
+}
+
+.rb-pred-v3-eyebrow {
+  margin-bottom: 6px;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+}
+
+.rb-pred-v3-predictions-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.rb-pred-v3-prediction-card {
+  padding: 14px;
+  border-radius: 12px;
+}
+
+.rb-pred-v3-prediction-card__head {
+  margin-bottom: 10px;
+}
+
+.rb-pred-v3-icon-chip {
+  width: 30px;
+  height: 30px;
+}
+
+.rb-pred-v3-prediction-card__body {
+  min-height: 76px;
+  padding: 12px;
+}
+
+.rb-pred-v3-prediction-card__body p {
+  font-size: 0.9rem;
+}
+
+.rb-pred-v3-prediction-card__meta {
+  gap: 7px;
+}
+
+.rb-pred-v3-prediction-card__meta span {
+  padding: 8px 6px;
+  font-size: 0.78rem;
+}
+
+.rb-pred-v3-signal-card {
+  grid-template-columns: minmax(0, 1.35fr) 150px minmax(190px, 0.75fr);
+  min-height: 112px;
+  margin-top: 14px;
+  padding: 14px;
+}
+
+.rb-pred-v3-signal-card__title h4 {
+  font-size: 1.08rem;
+}
+
+.rb-pred-v3-signal-card__confidence strong {
+  font-size: 1.28rem;
+  line-height: 1;
+}
+
+.rb-pred-v3-signal-card__badges span {
+  padding: 7px 10px;
+  font-size: 0.72rem;
+}
+
+.rb-pred-v3-signal-card > p {
+  font-size: 0.9rem;
+}
+
+.rb-pred-v3-global-reading {
+  padding: 18px;
+}
+
+.rb-pred-v3-reading-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.rb-pred-v3-reading-grid article {
+  min-height: 78px;
+  padding: 14px;
+}
+
+.rb-pred-v3-reading-grid svg {
+  width: 26px;
+  height: 26px;
+}
+
+.rb-pred-v3-reading-grid span {
+  font-size: 0.9rem;
+}
+
+.rb-pred-v3-footer-note {
+  max-width: 100%;
+  padding: 12px 16px;
+  font-size: 0.9rem;
+}
+
+.rb-pred-v3-side-card {
+  padding: 16px;
+  border-radius: 14px;
+}
+
+.rb-pred-v3-side-card--summary {
+  min-height: 178px;
+}
+
+.rb-pred-v3-gauge-row {
+  grid-template-columns: 104px minmax(0, 1fr);
+  gap: 16px;
+}
+
+.rb-pred-v3-gauge {
+  width: 98px;
+  height: 98px;
+}
+
+.rb-pred-v3-gauge span {
+  font-size: 1.55rem;
+}
+
+.rb-pred-v3-gauge-row strong {
+  font-size: 1.06rem;
+}
+
+.rb-pred-v3-gauge-row p {
+  margin: 9px 0 6px;
+  font-size: 0.9rem;
+}
+
+.rb-pred-v3-gauge-row small {
+  font-size: 0.82rem;
+}
+
+.rb-pred-v3-sidebar-list {
+  gap: 11px;
+}
+
+.rb-pred-v3-sidebar-line {
+  grid-template-columns: 22px minmax(0, 1fr);
+  gap: 10px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.rb-pred-v3-sidebar-line p {
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.rb-pred-v3-side-card--responsible {
+  gap: 12px;
+}
+
+.rb-pred-v3-side-card--responsible p:not(.rb-pred-v3-eyebrow) {
+  font-size: 0.9rem;
+}
+
+.rb-pred-v3-side-card--responsible strong {
+  font-size: 0.82rem;
+}
+
+@media (min-width: 1181px) {
+  .rb-pred-v3-predictions-grid {
+    grid-template-columns: repeat(3, minmax(220px, 1fr));
+  }
+}
+
+@media (max-width: 1280px) {
+  .rb-pred-v3-layout {
+    grid-template-columns: minmax(0, 1fr) 320px;
+  }
+
+  .rb-pred-v3-predictions-grid {
+    grid-template-columns: repeat(3, minmax(190px, 1fr));
+  }
+}
+
+@media (max-width: 1080px) {
+  .rb-pred-v3-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .rb-pred-v3-sidebar {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+/*
+  Correctif final écran Prédictions V5
+  Ce bloc compacte l’écran Prédictions et rapproche le rendu de la maquette validée sans modifier l’API.
+*/
+section.rb-screen-container:has(.rb-pred-v3-screen) {
+  width: min(1320px, calc(100% - 24px)) !important;
+  max-width: 1320px !important;
+  padding-top: 14px !important;
+  padding-bottom: 18px !important;
+}
+
+.rb-pred-v3-screen {
+  max-width: 1320px !important;
+  gap: 10px !important;
+}
+
+.rb-pred-v3-screen :is(h2, h3, h4, p, span, strong, small, button) {
+  overflow-wrap: normal !important;
+  word-break: normal !important;
+}
+
+.rb-pred-v3-header {
+  gap: 8px !important;
+}
+
+.rb-pred-v3-back {
+  min-height: 26px;
+  padding: 0;
+  font-size: 0.78rem;
+}
+
+.rb-pred-v3-title-row {
+  min-height: 58px !important;
+  gap: 18px !important;
+}
+
+.rb-pred-v3-title {
+  gap: 12px !important;
+}
+
+.rb-pred-v3-title__icon {
+  width: 46px !important;
+  height: 46px !important;
+}
+
+.rb-pred-v3-title h2 {
+  font-size: clamp(1.7rem, 2.35vw, 2.18rem) !important;
+  line-height: 1.02;
+}
+
+.rb-pred-v3-title p {
+  margin-top: 2px;
+  font-size: 0.86rem !important;
+}
+
+.rb-pred-v3-secondary-action {
+  min-height: 38px !important;
+  padding: 0 14px !important;
+  border-radius: 9px !important;
+  font-size: 0.82rem !important;
+}
+
+/* Carte résumé match plus compacte et plus premium */
+.rb-pred-v3-match-card {
+  position: relative;
+  isolation: isolate;
+  grid-template-columns: minmax(0, 1fr) minmax(190px, 230px) minmax(0, 1fr) !important;
+  min-height: 88px !important;
+  padding: 13px 22px !important;
+  gap: 18px !important;
+  border-radius: 14px !important;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(45, 212, 191, 0.2), transparent 38%),
+    linear-gradient(145deg, rgba(15, 23, 42, 0.92), rgba(5, 11, 18, 0.98)) !important;
+}
+
+.rb-pred-v3-match-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: 0.18;
+  background:
+    linear-gradient(90deg, transparent 0 8%, rgba(45, 212, 191, 0.08) 8.5% 9%, transparent 9.5% 91%, rgba(45, 212, 191, 0.08) 91.5% 92%, transparent 92.5%),
+    linear-gradient(rgba(45, 212, 191, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(45, 212, 191, 0.08) 1px, transparent 1px);
+  background-size: 100% 100%, 42px 42px, 42px 42px;
+}
+
+.rb-pred-v3-match-card__team {
+  gap: 14px !important;
+}
+
+.rb-pred-v3-match-card__crest,
+.rb-pred-v3-match-card__fallback,
+.rb-pred-v3-match-card__flag {
+  width: 52px !important;
+  height: 52px !important;
+  border-radius: 12px !important;
+}
+
+.rb-pred-v3-match-card h3 {
+  font-size: clamp(1.08rem, 1.55vw, 1.34rem) !important;
+  line-height: 1.05;
+}
+
+.rb-pred-v3-match-card p,
+.rb-pred-v3-match-card__center p,
+.rb-pred-v3-match-card__center small {
+  font-size: 0.78rem !important;
+  line-height: 1.25;
+}
+
+.rb-pred-v3-match-card__center {
+  gap: 4px !important;
+  min-width: 0 !important;
+}
+
+.rb-pred-v3-match-card__center strong {
+  width: 42px !important;
+  height: 42px !important;
+  font-size: 0.98rem !important;
+}
+
+/* Layout principal plus proche de la maquette */
+.rb-pred-v3-layout {
+  grid-template-columns: minmax(0, 1fr) 330px !important;
+  gap: 20px !important;
+  align-items: start;
+}
+
+.rb-pred-v3-main,
+.rb-pred-v3-sidebar {
+  gap: 12px !important;
+}
+
+.rb-pred-v3-panel {
+  padding: 16px !important;
+  border-radius: 14px !important;
+}
+
+.rb-pred-v3-panel__header {
+  margin-bottom: 12px !important;
+}
+
+.rb-pred-v3-eyebrow {
+  margin-bottom: 5px !important;
+  font-size: 0.68rem !important;
+  letter-spacing: 0.12em !important;
+}
+
+.rb-pred-v3-panel h3,
+.rb-pred-v3-side-card h3 {
+  font-size: 0.94rem !important;
+}
+
+.rb-pred-v3-panel__header span {
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.rb-pred-v3-status {
+  padding: 6px 10px !important;
+  font-size: 0.72rem !important;
+}
+
+/* Force les 3 cartes de prédiction sur une seule ligne desktop */
+.rb-pred-v3-predictions-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 12px !important;
+}
+
+.rb-pred-v3-prediction-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 156px;
+  padding: 12px !important;
+  border-radius: 12px !important;
+}
+
+.rb-pred-v3-prediction-card--muted {
+  opacity: 0.86;
+}
+
+.rb-pred-v3-prediction-card__head {
+  margin-bottom: 9px !important;
+}
+
+.rb-pred-v3-icon-chip {
+  width: 28px !important;
+  height: 28px !important;
+}
+
+.rb-pred-v3-prediction-card strong {
+  font-size: 0.86rem;
+  line-height: 1.18;
+}
+
+.rb-pred-v3-prediction-card small {
+  font-size: 0.72rem;
+  line-height: 1.2;
+}
+
+.rb-pred-v3-prediction-card__body {
+  flex: 1;
+  min-height: 68px !important;
+  padding: 11px !important;
+  border-radius: 10px !important;
+}
+
+.rb-pred-v3-prediction-card__body p {
+  font-size: 0.8rem !important;
+  line-height: 1.38 !important;
+}
+
+.rb-pred-v3-prediction-card__meta {
+  gap: 6px !important;
+  margin-top: 8px !important;
+}
+
+.rb-pred-v3-prediction-card__meta span {
+  min-height: 30px;
+  padding: 6px 7px !important;
+  font-size: 0.7rem !important;
+  line-height: 1.1;
+}
+
+/* Signal complémentaire final : plus lisible, compact et équilibré */
+.rb-pred-v3-signal-card--final {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 300px) !important;
+  gap: 10px 18px !important;
+  align-items: center !important;
+  min-height: 106px !important;
+  margin-top: 12px !important;
+  padding: 13px 15px !important;
+  border-radius: 12px !important;
+}
+
+.rb-pred-v3-signal-card--final .rb-pred-v3-signal-card__title {
+  gap: 12px !important;
+}
+
+.rb-pred-v3-signal-card--final .rb-pred-v3-signal-card__title h4 {
+  font-size: 1.02rem !important;
+  line-height: 1.2;
+}
+
+.rb-pred-v3-signal-card__side {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.rb-pred-v3-signal-card--final .rb-pred-v3-signal-card__confidence {
+  padding-left: 0 !important;
+  border-left: 0 !important;
+}
+
+.rb-pred-v3-signal-card--final .rb-pred-v3-signal-card__confidence span {
+  display: block;
+  margin-bottom: 3px !important;
+  font-size: 0.68rem !important;
+  line-height: 1.1 !important;
+}
+
+.rb-pred-v3-signal-card--final .rb-pred-v3-signal-card__confidence strong {
+  display: block;
+  color: #2dd4bf;
+  font-size: 1.38rem !important;
+  line-height: 1 !important;
+  letter-spacing: -0.04em;
+}
+
+.rb-pred-v3-signal-card--final .rb-pred-v3-signal-card__badges {
+  gap: 7px !important;
+}
+
+.rb-pred-v3-signal-card--final .rb-pred-v3-signal-card__badges span {
+  padding: 6px 9px !important;
+  font-size: 0.68rem !important;
+  line-height: 1.1;
+}
+
+.rb-pred-v3-signal-card__description {
+  grid-column: 1 / -1 !important;
+  max-width: 850px;
+  margin: 0 !important;
+  color: #9ca3af !important;
+  font-size: 0.82rem !important;
+  line-height: 1.42 !important;
+}
+
+/* Lecture globale plus compacte */
+.rb-pred-v3-global-reading {
+  padding: 16px !important;
+  border-radius: 14px !important;
+}
+
+.rb-pred-v3-global-reading > p:not(.rb-pred-v3-eyebrow) {
+  margin: 7px 0 13px !important;
+  font-size: 0.84rem !important;
+  line-height: 1.45 !important;
+}
+
+.rb-pred-v3-reading-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 11px !important;
+}
+
+.rb-pred-v3-reading-grid article {
+  min-height: 72px !important;
+  padding: 12px !important;
+  border-radius: 11px !important;
+}
+
+.rb-pred-v3-reading-grid svg {
+  width: 24px !important;
+  height: 24px !important;
+}
+
+.rb-pred-v3-reading-grid span {
+  font-size: 0.78rem !important;
+  line-height: 1.35 !important;
+}
+
+/* Sidebar plus dense */
+.rb-pred-v3-side-card {
+  padding: 14px !important;
+  border-radius: 14px !important;
+}
+
+.rb-pred-v3-side-card--summary {
+  min-height: 162px !important;
+}
+
+.rb-pred-v3-gauge-row {
+  grid-template-columns: 92px minmax(0, 1fr) !important;
+  gap: 15px !important;
+}
+
+.rb-pred-v3-gauge {
+  width: 90px !important;
+  height: 90px !important;
+}
+
+.rb-pred-v3-gauge span {
+  font-size: 1.44rem !important;
+}
+
+.rb-pred-v3-gauge-row strong {
+  font-size: 1rem !important;
+}
+
+.rb-pred-v3-gauge-row p {
+  margin: 7px 0 4px !important;
+  font-size: 0.82rem !important;
+  line-height: 1.35 !important;
+}
+
+.rb-pred-v3-gauge-row small {
+  font-size: 0.72rem !important;
+  line-height: 1.35 !important;
+}
+
+.rb-pred-v3-sidebar-list {
+  gap: 10px !important;
+}
+
+.rb-pred-v3-sidebar-line {
+  grid-template-columns: 20px minmax(0, 1fr) !important;
+  gap: 9px !important;
+}
+
+.rb-pred-v3-sidebar-line p {
+  font-size: 0.8rem !important;
+  line-height: 1.42 !important;
+}
+
+.rb-pred-v3-side-card__text {
+  font-size: 0.8rem !important;
+  line-height: 1.45 !important;
+}
+
+.rb-pred-v3-side-card--responsible {
+  gap: 11px !important;
+}
+
+.rb-pred-v3-side-card--responsible svg {
+  width: 26px !important;
+  height: 26px !important;
+}
+
+.rb-pred-v3-side-card--responsible p:not(.rb-pred-v3-eyebrow) {
+  font-size: 0.78rem !important;
+  line-height: 1.42 !important;
+}
+
+.rb-pred-v3-side-card--responsible strong {
+  font-size: 0.76rem !important;
+}
+
+/* Footer responsable plus discret */
+.rb-pred-v3-footer-note {
+  width: fit-content;
+  max-width: 100%;
+  padding: 10px 14px !important;
+  border-radius: 10px !important;
+  font-size: 0.8rem !important;
+  line-height: 1.35 !important;
+}
+
+/* Responsive ciblé Prédictions */
+@media (max-width: 1180px) {
+  .rb-pred-v3-layout {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .rb-pred-v3-sidebar {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 980px) {
+  .rb-pred-v3-predictions-grid,
+  .rb-pred-v3-reading-grid,
+  .rb-pred-v3-signal-card--final {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .rb-pred-v3-sidebar {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .rb-pred-v3-signal-card__description {
+    grid-column: auto !important;
+  }
+}
+
+@media (max-width: 720px) {
+  section.rb-screen-container:has(.rb-pred-v3-screen) {
+    width: min(100% - 14px, 100%) !important;
+    padding-top: 12px !important;
+  }
+
+  .rb-pred-v3-title-row,
+  .rb-pred-v3-match-card {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .rb-pred-v3-title-row {
+    align-items: stretch !important;
+  }
+
+  .rb-pred-v3-secondary-action {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .rb-pred-v3-match-card__team,
+  .rb-pred-v3-match-card__team--away {
+    justify-content: center !important;
+    text-align: center !important;
+  }
+
+  .rb-pred-v3-footer-note {
+    width: 100%;
+  }
+}
+
+/*
+  Schéma de communication CSS du correctif final :
+  App.css
+  ├── affine uniquement l’écran PredictionsScreen.tsx
+  ├── force les cartes 1X2 / buts / BTTS sur une ligne desktop
+  ├── compacte la carte match, le signal complémentaire, la lecture globale et la sidebar
+  └── ne modifie ni backend, ni contrats API, ni modèles ML
+*/
+/*
+  Polish final écran Prédictions RubyBets
+  Ce bloc densifie l’écran, améliore la carte match, le signal complémentaire et la hiérarchie visuelle sans toucher à la navbar.
+*/
+section.rb-screen-container:has(.rb-pred-v3-screen) {
+  width: min(1360px, calc(100% - 28px)) !important;
+  max-width: 1360px !important;
+  padding-top: 10px !important;
+  padding-bottom: 18px !important;
+}
+
+.rb-pred-v3-screen {
+  max-width: 1360px !important;
+  gap: 9px !important;
+}
+
+.rb-pred-v3-screen :is(h2, h3, h4, p, span, strong, small, button) {
+  overflow-wrap: normal !important;
+  word-break: normal !important;
+}
+
+.rb-pred-v3-header {
+  gap: 6px !important;
+}
+
+.rb-pred-v3-back {
+  min-height: 24px !important;
+  padding: 0 !important;
+  color: #9ca3af !important;
+  font-size: 0.78rem !important;
+  font-weight: 500 !important;
+}
+
+.rb-pred-v3-back:hover {
+  color: #2dd4bf !important;
+}
+
+.rb-pred-v3-title-row {
+  min-height: 52px !important;
+  gap: 16px !important;
+}
+
+.rb-pred-v3-title {
+  gap: 12px !important;
+}
+
+.rb-pred-v3-title__icon {
+  width: 46px !important;
+  height: 46px !important;
+  border-color: rgba(45, 212, 191, 0.24) !important;
+  background:
+    radial-gradient(circle at 30% 18%, rgba(45, 212, 191, 0.22), transparent 52%),
+    rgba(17, 24, 39, 0.74) !important;
+  box-shadow:
+    0 16px 38px rgba(0, 0, 0, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.045) !important;
+}
+
+.rb-pred-v3-title h2 {
+  margin: 0 !important;
+  color: #f8fafc !important;
+  font-size: 36px !important;
+  font-weight: 750 !important;
+  line-height: 40px !important;
+  letter-spacing: -0.055em !important;
+}
+
+.rb-pred-v3-title p {
+  margin-top: 1px !important;
+  color: #9ca3af !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  line-height: 20px !important;
+}
+
+.rb-pred-v3-secondary-action {
+  min-height: 38px !important;
+  padding: 0 15px !important;
+  border-color: rgba(45, 212, 191, 0.46) !important;
+  border-radius: 10px !important;
+  background: rgba(10, 15, 20, 0.54) !important;
+  color: #e5e7eb !important;
+  font-size: 13px !important;
+  font-weight: 650 !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+}
+
+.rb-pred-v3-secondary-action:hover {
+  background: rgba(45, 212, 191, 0.08) !important;
+  color: #2dd4bf !important;
+}
+
+/* Mini-hero match premium */
+.rb-pred-v3-match-card {
+  position: relative !important;
+  isolation: isolate !important;
+  grid-template-columns: minmax(0, 1fr) minmax(210px, 260px) minmax(0, 1fr) !important;
+  min-height: 124px !important;
+  margin-top: 2px !important;
+  padding: 18px 28px !important;
+  gap: 22px !important;
+  border: 1px solid rgba(148, 163, 184, 0.14) !important;
+  border-radius: 18px !important;
+  overflow: hidden !important;
+  background:
+    radial-gradient(circle at 50% -12%, rgba(45, 212, 191, 0.24), transparent 34%),
+    radial-gradient(circle at 8% 100%, rgba(45, 212, 191, 0.1), transparent 28%),
+    linear-gradient(145deg, rgba(17, 24, 39, 0.95), rgba(5, 11, 18, 0.98)) !important;
+  box-shadow:
+    0 22px 58px rgba(0, 0, 0, 0.26),
+    inset 0 1px 0 rgba(255, 255, 255, 0.045) !important;
+}
+
+.rb-pred-v3-match-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  opacity: 0.18;
+  background:
+    linear-gradient(rgba(45, 212, 191, 0.075) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(45, 212, 191, 0.075) 1px, transparent 1px),
+    radial-gradient(ellipse at 50% 100%, rgba(45, 212, 191, 0.16), transparent 56%);
+  background-size: 44px 44px, 44px 44px, 100% 100%;
+}
+
+.rb-pred-v3-match-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(90deg, rgba(10, 15, 20, 0.78), transparent 34%, transparent 66%, rgba(10, 15, 20, 0.78)),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent 42%);
+  pointer-events: none;
+}
+
+.rb-pred-v3-match-card__team {
+  gap: 16px !important;
+}
+
+.rb-pred-v3-match-card__crest,
+.rb-pred-v3-match-card__fallback,
+.rb-pred-v3-match-card__flag {
+  width: 60px !important;
+  height: 60px !important;
+  border-radius: 14px !important;
+  box-shadow:
+    0 16px 32px rgba(0, 0, 0, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
+.rb-pred-v3-match-card h3 {
+  color: #f8fafc !important;
+  font-size: 22px !important;
+  font-weight: 700 !important;
+  line-height: 26px !important;
+  letter-spacing: -0.04em !important;
+}
+
+.rb-pred-v3-match-card p,
+.rb-pred-v3-match-card__center p,
+.rb-pred-v3-match-card__center small {
+  color: #cbd5e1 !important;
+  font-size: 13px !important;
+  font-weight: 450 !important;
+  line-height: 18px !important;
+}
+
+.rb-pred-v3-match-card__center {
+  gap: 6px !important;
+  min-width: 0 !important;
+}
+
+.rb-pred-v3-match-card__center strong {
+  width: 48px !important;
+  height: 48px !important;
+  border-color: rgba(45, 212, 191, 0.54) !important;
+  background:
+    radial-gradient(circle at center, rgba(45, 212, 191, 0.18), rgba(45, 212, 191, 0.08)) !important;
+  color: #2dd4bf !important;
+  font-size: 15px !important;
+  font-weight: 800 !important;
+  box-shadow:
+    0 0 28px rgba(45, 212, 191, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+}
+
+.rb-pred-v3-match-card__center small {
+  color: #e5e7eb !important;
+}
+
+/* Layout principal premium */
+.rb-pred-v3-layout {
+  grid-template-columns: minmax(0, 1fr) 334px !important;
+  gap: 20px !important;
+  align-items: start !important;
+}
+
+.rb-pred-v3-main,
+.rb-pred-v3-sidebar {
+  gap: 11px !important;
+}
+
+.rb-pred-v3-sidebar {
+  position: sticky !important;
+  top: 24px !important;
+}
+
+.rb-pred-v3-panel,
+.rb-pred-v3-side-card {
+  border: 1px solid rgba(148, 163, 184, 0.13) !important;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(45, 212, 191, 0.065), transparent 32%),
+    linear-gradient(145deg, rgba(17, 24, 39, 0.9), rgba(8, 13, 19, 0.97)) !important;
+  box-shadow:
+    0 18px 48px rgba(0, 0, 0, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.035) !important;
+}
+
+.rb-pred-v3-panel {
+  padding: 16px !important;
+  border-radius: 18px !important;
+}
+
+.rb-pred-v3-panel__header {
+  margin-bottom: 13px !important;
+}
+
+.rb-pred-v3-eyebrow {
+  margin-bottom: 5px !important;
+  color: #2dd4bf !important;
+  font-size: 12px !important;
+  font-weight: 760 !important;
+  letter-spacing: 0.14em !important;
+  line-height: 16px !important;
+}
+
+.rb-pred-v3-panel h3,
+.rb-pred-v3-side-card h3 {
+  color: #e5e7eb !important;
+  font-size: 16px !important;
+  font-weight: 650 !important;
+  line-height: 20px !important;
+}
+
+.rb-pred-v3-panel__header span {
+  color: #9ca3af !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  line-height: 20px !important;
+}
+
+.rb-pred-v3-status {
+  min-width: max-content !important;
+  padding: 6px 10px !important;
+  border-color: rgba(45, 212, 191, 0.18) !important;
+  color: #c7f9f4 !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  background: rgba(45, 212, 191, 0.075) !important;
+}
+
+/* Trois cartes sur une ligne, avec hiérarchie visuelle */
+.rb-pred-v3-predictions-grid {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.96fr) minmax(0, 0.96fr) !important;
+  gap: 12px !important;
+}
+
+.rb-pred-v3-prediction-card {
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 156px !important;
+  margin: 0 !important;
+  padding: 12px !important;
+  border-radius: 14px !important;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(45, 212, 191, 0.1), transparent 34%),
+    rgba(15, 23, 42, 0.58) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.025) !important;
+}
+
+.rb-pred-v3-prediction-card:first-child {
+  border-color: rgba(45, 212, 191, 0.25) !important;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(45, 212, 191, 0.15), transparent 38%),
+    linear-gradient(145deg, rgba(15, 23, 42, 0.72), rgba(8, 47, 51, 0.34)) !important;
+}
+
+.rb-pred-v3-prediction-card--muted {
+  opacity: 0.78 !important;
+  filter: saturate(0.86) !important;
+}
+
+.rb-pred-v3-prediction-card__head {
+  margin-bottom: 9px !important;
+}
+
+.rb-pred-v3-icon-chip {
+  width: 28px !important;
+  height: 28px !important;
+  background: rgba(45, 212, 191, 0.095) !important;
+}
+
+.rb-pred-v3-prediction-card strong {
+  color: #f8fafc !important;
+  font-size: 14px !important;
+  font-weight: 650 !important;
+  line-height: 18px !important;
+}
+
+.rb-pred-v3-prediction-card small {
+  color: #9ca3af !important;
+  font-size: 12px !important;
+  font-weight: 400 !important;
+  line-height: 16px !important;
+}
+
+.rb-pred-v3-prediction-card__body {
+  flex: 1 !important;
+  min-height: 68px !important;
+  padding: 11px !important;
+  border-radius: 12px !important;
+  background: rgba(10, 15, 20, 0.48) !important;
+}
+
+.rb-pred-v3-prediction-card__body p {
+  color: #cbd5e1 !important;
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  line-height: 18px !important;
+}
+
+.rb-pred-v3-prediction-card:first-child .rb-pred-v3-prediction-card__body p {
+  color: #2dd4bf !important;
+}
+
+.rb-pred-v3-prediction-card__meta {
+  gap: 6px !important;
+  margin-top: 8px !important;
+}
+
+.rb-pred-v3-prediction-card__meta span {
+  min-height: 28px !important;
+  padding: 5px 7px !important;
+  border-color: rgba(148, 163, 184, 0.09) !important;
+  color: #cbd5e1 !important;
+  font-size: 12px !important;
+  font-weight: 520 !important;
+  line-height: 14px !important;
+  background: rgba(10, 15, 20, 0.34) !important;
+}
+
+/* Signal complémentaire recomposé */
+.rb-pred-v3-signal-card--premium-final {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 260px) !important;
+  gap: 18px !important;
+  align-items: center !important;
+  min-height: 116px !important;
+  margin-top: 12px !important;
+  padding: 16px 18px !important;
+  border: 1px solid rgba(45, 212, 191, 0.24) !important;
+  border-radius: 16px !important;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(45, 212, 191, 0.16), transparent 38%),
+    linear-gradient(145deg, rgba(8, 47, 51, 0.48), rgba(15, 23, 42, 0.74)) !important;
+  box-shadow:
+    0 18px 46px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+}
+
+.rb-pred-v3-signal-card--premium-final .rb-pred-v3-signal-card__title {
+  gap: 14px !important;
+}
+
+.rb-pred-v3-signal-card--premium-final .rb-pred-v3-signal-card__title p {
+  margin: 0 0 6px !important;
+  color: #2dd4bf !important;
+  font-size: 12px !important;
+  font-weight: 760 !important;
+  letter-spacing: 0.14em !important;
+  line-height: 16px !important;
+}
+
+.rb-pred-v3-signal-card--premium-final .rb-pred-v3-signal-card__title h4 {
+  margin: 0 !important;
+  color: #f8fafc !important;
+  font-size: 18px !important;
+  font-weight: 680 !important;
+  line-height: 22px !important;
+  letter-spacing: -0.03em !important;
+}
+
+.rb-pred-v3-signal-card--premium-final .rb-pred-v3-signal-card__title span {
+  display: block;
+  max-width: 620px;
+  margin-top: 9px;
+  color: #9ca3af !important;
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  line-height: 18px !important;
+}
+
+.rb-pred-v3-signal-card__premium-side {
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+  min-width: 0;
+  padding-left: 18px;
+  border-left: 1px solid rgba(148, 163, 184, 0.13);
+}
+
+.rb-pred-v3-signal-card__premium-side > strong {
+  color: #2dd4bf !important;
+  font-size: 34px !important;
+  font-weight: 760 !important;
+  line-height: 34px !important;
+  letter-spacing: -0.055em !important;
+  white-space: nowrap !important;
+}
+
+.rb-pred-v3-signal-card__premium-side > span {
+  color: #cbd5e1 !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  line-height: 16px !important;
+  white-space: nowrap !important;
+}
+
+.rb-pred-v3-signal-card--premium-final .rb-pred-v3-signal-card__badges {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 7px !important;
+}
+
+.rb-pred-v3-signal-card--premium-final .rb-pred-v3-signal-card__badges span {
+  padding: 6px 9px !important;
+  border-radius: 8px !important;
+  color: #2dd4bf !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  line-height: 14px !important;
+  background: rgba(45, 212, 191, 0.09) !important;
+  white-space: nowrap !important;
+}
+
+.rb-pred-v3-signal-card--premium-final .rb-pred-v3-signal-card__badges span:last-child {
+  color: #fbbf24 !important;
+  background: rgba(251, 191, 36, 0.09) !important;
+}
+
+/* Lecture globale compacte */
+.rb-pred-v3-global-reading {
+  padding: 15px !important;
+  border-radius: 18px !important;
+}
+
+.rb-pred-v3-global-reading > p:not(.rb-pred-v3-eyebrow) {
+  max-width: 850px;
+  margin: 6px 0 12px !important;
+  color: #9ca3af !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  line-height: 20px !important;
+}
+
+.rb-pred-v3-reading-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 11px !important;
+}
+
+.rb-pred-v3-reading-grid article {
+  min-height: 68px !important;
+  padding: 12px !important;
+  border-radius: 14px !important;
+  background: rgba(15, 23, 42, 0.46) !important;
+}
+
+.rb-pred-v3-reading-grid svg {
+  width: 25px !important;
+  height: 25px !important;
+}
+
+.rb-pred-v3-reading-grid strong {
+  font-size: 14px !important;
+  font-weight: 650 !important;
+  line-height: 18px !important;
+}
+
+.rb-pred-v3-reading-grid span {
+  color: #9ca3af !important;
+  font-size: 13px !important;
+  line-height: 18px !important;
+}
+
+/* Sidebar premium compacte */
+.rb-pred-v3-side-card {
+  padding: 15px !important;
+  border-radius: 18px !important;
+}
+
+.rb-pred-v3-side-card--summary {
+  min-height: 166px !important;
+}
+
+.rb-pred-v3-gauge-row {
+  grid-template-columns: 92px minmax(0, 1fr) !important;
+  gap: 15px !important;
+}
+
+.rb-pred-v3-gauge {
+  width: 90px !important;
+  height: 90px !important;
+}
+
+.rb-pred-v3-gauge span {
+  color: #2dd4bf !important;
+  font-size: 26px !important;
+  font-weight: 760 !important;
+}
+
+.rb-pred-v3-gauge-row strong {
+  font-size: 17px !important;
+  font-weight: 680 !important;
+  line-height: 21px !important;
+}
+
+.rb-pred-v3-gauge-row p {
+  margin: 7px 0 4px !important;
+  font-size: 13px !important;
+  line-height: 18px !important;
+}
+
+.rb-pred-v3-gauge-row small {
+  font-size: 12px !important;
+  line-height: 16px !important;
+}
+
+.rb-pred-v3-sidebar-list {
+  gap: 10px !important;
+}
+
+.rb-pred-v3-sidebar-line {
+  grid-template-columns: 20px minmax(0, 1fr) !important;
+  gap: 10px !important;
+}
+
+.rb-pred-v3-sidebar-line p,
+.rb-pred-v3-side-card__text {
+  color: #cbd5e1 !important;
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  line-height: 18px !important;
+}
+
+.rb-pred-v3-side-card--responsible {
+  gap: 12px !important;
+  border-color: rgba(45, 212, 191, 0.22) !important;
+}
+
+.rb-pred-v3-side-card--responsible svg {
+  width: 27px !important;
+  height: 27px !important;
+}
+
+.rb-pred-v3-side-card--responsible p:not(.rb-pred-v3-eyebrow) {
+  color: #2dd4bf !important;
+  font-size: 13px !important;
+  line-height: 18px !important;
+}
+
+.rb-pred-v3-side-card--responsible strong {
+  color: #67e8f9 !important;
+  font-size: 12px !important;
+  font-weight: 650 !important;
+}
+
+/* Footer responsable discret */
+.rb-pred-v3-footer-note {
+  width: fit-content !important;
+  max-width: 100% !important;
+  padding: 10px 14px !important;
+  border-color: rgba(45, 212, 191, 0.24) !important;
+  border-radius: 12px !important;
+  color: #cbd5e1 !important;
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  line-height: 18px !important;
+  background: rgba(45, 212, 191, 0.045) !important;
+}
+
+/* Responsive ciblé */
+@media (max-width: 1180px) {
+  .rb-pred-v3-layout {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .rb-pred-v3-sidebar {
+    position: static !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 980px) {
+  .rb-pred-v3-predictions-grid,
+  .rb-pred-v3-reading-grid,
+  .rb-pred-v3-signal-card--premium-final {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .rb-pred-v3-sidebar {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .rb-pred-v3-signal-card__premium-side {
+    padding-left: 0;
+    border-left: 0;
+  }
+}
+
+@media (max-width: 720px) {
+  section.rb-screen-container:has(.rb-pred-v3-screen) {
+    width: min(100% - 14px, 100%) !important;
+    padding-top: 10px !important;
+  }
+
+  .rb-pred-v3-title-row,
+  .rb-pred-v3-match-card {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .rb-pred-v3-title-row {
+    align-items: stretch !important;
+  }
+
+  .rb-pred-v3-secondary-action {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .rb-pred-v3-match-card__team,
+  .rb-pred-v3-match-card__team--away {
+    justify-content: center !important;
+    text-align: center !important;
+  }
+
+  .rb-pred-v3-footer-note {
+    width: 100% !important;
+  }
+}
+
+/*
+  Schéma de communication CSS du polish final :
+  App.css
+  ├── affine uniquement PredictionsScreen.tsx
+  ├── améliore le mini-hero match, la grille prédictions, le signal complémentaire et la sidebar
+  ├── conserve la navbar indépendante
+  └── ne modifie ni backend, ni API, ni modèles ML
+*/
