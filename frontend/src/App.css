@@ -21352,3 +21352,2237 @@ section.rb-screen-container:has(.rb-recommendation-screen--mockup) {
   ├── conserve le hero validé dans RecommendationScreen.tsx
   └── ne modifie ni navbar, ni backend, ni API, ni modèles ML
 */
+/*
+  Correctif écran Ressources Phase 27R.1
+  Ce bloc transforme l’écran Ressources en page premium homogène avec les écrans précédents.
+*/
+section.rb-screen-container:has(.rb-resources-screen--premium) {
+  width: min(1380px, calc(100% - 32px)) !important;
+  max-width: 1380px !important;
+  padding-top: 22px !important;
+  padding-bottom: 28px !important;
+}
+
+.rb-resources-screen--premium,
+.rb-resources-screen--premium * {
+  box-sizing: border-box;
+}
+
+.rb-resources-screen--premium {
+  display: grid !important;
+  gap: 14px !important;
+  width: 100%;
+  min-width: 0;
+  color: #f8ffff;
+}
+
+.rb-resources-screen--premium :is(h2, h3, h4, p, span, strong, small, button, input, li) {
+  overflow-wrap: normal !important;
+  word-break: normal !important;
+}
+
+.rb-resources-screen--premium section,
+.rb-resources-screen--premium article,
+.rb-resources-screen--premium ul,
+.rb-resources-screen--premium li {
+  box-shadow: none;
+}
+
+.rb-resources-screen--premium section:has(h2) h2::after,
+.rb-resources-screen--premium section:has(h3) h3::after,
+.rb-resources-screen--premium h2::after,
+.rb-resources-screen--premium h3::after {
+  content: none !important;
+}
+
+/* Hero premium */
+.rb-resources-hero--premium {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 390px;
+  gap: 28px;
+  align-items: center;
+  min-height: 168px;
+  margin: 0 !important;
+  padding: 28px 34px !important;
+  overflow: hidden;
+  border: 1px solid rgba(45, 212, 191, 0.22) !important;
+  border-radius: 20px !important;
+  background:
+    radial-gradient(circle at 78% 50%, rgba(45, 212, 191, 0.16), transparent 32%),
+    linear-gradient(115deg, rgba(8, 47, 51, 0.72) 0%, rgba(15, 23, 42, 0.9) 42%, rgba(2, 6, 23, 0.96) 100%),
+    rgba(2, 6, 23, 0.86) !important;
+  box-shadow:
+    0 24px 70px rgba(0, 0, 0, 0.26),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.018);
+}
+
+.rb-resources-hero--premium::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(45, 212, 191, 0.08), transparent 34%),
+    linear-gradient(135deg, transparent 0 58%, rgba(45, 212, 191, 0.08) 58% 59%, transparent 59% 100%);
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+.rb-resources-hero__content {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+
+.rb-resources-hero--premium .rb-resources-hero__eyebrow {
+  margin: 0 !important;
+  color: #2dd4bf !important;
+  font-size: 0.68rem !important;
+  font-weight: 950 !important;
+  letter-spacing: 0.18em !important;
+  line-height: 1 !important;
+  text-transform: uppercase;
+}
+
+.rb-resources-hero--premium h2 {
+  max-width: 760px;
+  margin: 0 !important;
+  color: #ffffff !important;
+  font-size: clamp(2rem, 3.2vw, 3rem) !important;
+  font-weight: 950 !important;
+  line-height: 1.02 !important;
+  letter-spacing: -0.06em !important;
+}
+
+.rb-resources-hero--premium h2::after {
+  content: "" !important;
+  display: block !important;
+  width: 54px !important;
+  height: 3px !important;
+  margin-top: 14px !important;
+  border-radius: 999px !important;
+  background: #2dd4bf !important;
+}
+
+.rb-resources-hero--premium p:last-child {
+  max-width: 720px;
+  margin: 0 !important;
+  color: #b8cdce !important;
+  font-size: 0.86rem !important;
+  font-weight: 600 !important;
+  line-height: 1.58 !important;
+}
+
+.rb-resources-hero__visual {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  min-width: 0;
+}
+
+/* Visuel livre data/responsable */
+.rb-resources-book-visual {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 350px;
+  height: 142px;
+}
+
+.rb-resources-book-visual__halo {
+  position: absolute;
+  inset: -26px 0;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle, rgba(45, 212, 191, 0.18), transparent 58%),
+    repeating-radial-gradient(circle, rgba(45, 212, 191, 0.12) 0 1px, transparent 1px 18px);
+  opacity: 0.72;
+}
+
+.rb-resources-book-visual__halo::before,
+.rb-resources-book-visual__halo::after {
+  content: "";
+  position: absolute;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(45, 212, 191, 0.42), transparent);
+}
+
+.rb-resources-book-visual__halo::before {
+  left: 4px;
+  right: 18px;
+  top: 48px;
+}
+
+.rb-resources-book-visual__halo::after {
+  left: 24px;
+  right: 2px;
+  bottom: 42px;
+}
+
+.rb-resources-book-visual__book {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 168px;
+  height: 78px;
+  border: 1px solid rgba(45, 212, 191, 0.42);
+  border-radius: 10px 10px 12px 12px;
+  background: rgba(2, 6, 23, 0.46);
+  box-shadow:
+    0 0 34px rgba(45, 212, 191, 0.34),
+    inset 0 0 28px rgba(45, 212, 191, 0.08);
+  transform: perspective(440px) rotateX(13deg);
+}
+
+.rb-resources-book-visual__page {
+  position: relative;
+  display: block;
+  margin: 12px 9px 10px;
+  border-top: 2px solid rgba(45, 212, 191, 0.7);
+  border-bottom: 2px solid rgba(45, 212, 191, 0.18);
+}
+
+.rb-resources-book-visual__page::before,
+.rb-resources-book-visual__page::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  border-radius: 999px;
+  background: rgba(45, 212, 191, 0.42);
+}
+
+.rb-resources-book-visual__page::before {
+  top: 16px;
+}
+
+.rb-resources-book-visual__page::after {
+  top: 32px;
+}
+
+.rb-resources-book-visual__page--left {
+  border-radius: 8px 0 0 8px;
+  transform: skewY(5deg);
+}
+
+.rb-resources-book-visual__page--right {
+  border-radius: 0 8px 8px 0;
+  transform: skewY(-5deg);
+}
+
+.rb-resources-book-visual__spine {
+  position: absolute;
+  top: 10px;
+  bottom: 8px;
+  left: 50%;
+  width: 2px;
+  border-radius: 999px;
+  background: rgba(45, 212, 191, 0.46);
+  box-shadow: 0 0 16px rgba(45, 212, 191, 0.5);
+}
+
+.rb-resources-book-visual__tag {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 26px;
+  padding: 0.28rem 0.66rem;
+  border: 1px solid rgba(45, 212, 191, 0.32);
+  border-radius: 999px;
+  background: rgba(2, 6, 23, 0.56);
+  color: #bffcf4 !important;
+  font-size: 0.58rem;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.rb-resources-book-visual__tag--analysis {
+  left: 34px;
+  top: 2px;
+}
+
+.rb-resources-book-visual__tag--data {
+  right: 24px;
+  top: 16px;
+}
+
+.rb-resources-book-visual__tag--safe {
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Conteneurs principaux */
+.rb-resources-glossary-shell,
+.rb-resources-responsible-shell {
+  min-width: 0;
+  margin: 0 !important;
+  padding: 20px !important;
+  overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, 0.15) !important;
+  border-radius: 18px !important;
+  background:
+    radial-gradient(circle at 8% 0%, rgba(45, 212, 191, 0.08), transparent 28%),
+    linear-gradient(145deg, rgba(15, 23, 42, 0.84), rgba(8, 47, 51, 0.46)),
+    rgba(2, 6, 23, 0.62) !important;
+  box-shadow:
+    0 22px 62px rgba(0, 0, 0, 0.22),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.015) !important;
+}
+
+.rb-resources-glossary-shell > *,
+.rb-resources-responsible-shell > * {
+  width: 100%;
+  min-width: 0;
+  margin: 0 !important;
+}
+
+/* Glossaire intégré : plus compact, plus premium */
+.rb-resources-glossary-shell .rb-glossary-v2 {
+  gap: 14px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.rb-resources-glossary-shell .rb-glossary-v2__header {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 0.42fr) !important;
+  gap: 18px !important;
+  align-items: center !important;
+  margin: 0 !important;
+}
+
+.rb-resources-glossary-shell .rb-glossary-v2__title {
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+.rb-resources-glossary-shell .rb-glossary-v2__title-icon {
+  width: 34px !important;
+  height: 34px !important;
+  border-radius: 10px !important;
+}
+
+.rb-resources-glossary-shell .rb-glossary-v2__title h2 {
+  margin: 0 !important;
+  color: #ffffff !important;
+  font-size: 1.15rem !important;
+  font-weight: 950 !important;
+  line-height: 1.1 !important;
+  letter-spacing: -0.035em !important;
+}
+
+.rb-resources-glossary-shell .rb-glossary-v2__title p {
+  margin: 2px 0 0 !important;
+  color: #a9c1c2 !important;
+  font-size: 0.72rem !important;
+  font-weight: 650 !important;
+  line-height: 1.25 !important;
+}
+
+.rb-resources-glossary-shell .rb-glossary-v2__search {
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+.rb-resources-glossary-shell .rb-glossary-v2__search input {
+  height: 42px !important;
+  border-radius: 10px !important;
+  background: rgba(2, 6, 23, 0.28) !important;
+}
+
+.rb-resources-glossary-shell .rb-glossary-v2__board {
+  display: grid !important;
+  grid-template-columns: minmax(260px, 0.78fr) minmax(0, 1.42fr) minmax(270px, 0.74fr) !important;
+  gap: 14px !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+.rb-resources-glossary-shell .rb-glossary-v2__index,
+.rb-resources-glossary-shell .rb-glossary-v2__detail,
+.rb-resources-glossary-shell .rb-glossary-v2__help-card,
+.rb-resources-glossary-shell .rb-glossary-v2__empty-state {
+  border-color: rgba(148, 163, 184, 0.14) !important;
+  border-radius: 13px !important;
+  background:
+    linear-gradient(145deg, rgba(15, 23, 42, 0.78), rgba(8, 47, 51, 0.38)),
+    rgba(2, 6, 23, 0.24) !important;
+  box-shadow: none !important;
+}
+
+.rb-resources-glossary-shell .rb-glossary-v2__index {
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+.rb-resources-glossary-shell .rb-glossary-v2__index-header {
+  padding: 12px 14px !important;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1) !important;
+}
+
+.rb-resources-glossary-shell .rb-glossary-v2__list {
+  max-height: 330px !important;
+  overflow-y: auto !important;
+}
+
+.rb-resources-glossary-shell .rb-glossary-v2__term {
+  min-height: 42px !important;
+  padding: 8px 12px !important;
+}
+
+.rb-resources-glossary-shell .rb-glossary-v2__term-content strong {
+  font-size: 0.78rem !important;
+  font-weight: 850 !important;
+}
+
+.rb-resources-glossary-shell .rb-glossary-v2__term-content small {
+  font-size: 0.62rem !important;
+}
+
+.rb-resources-glossary-shell .rb-glossary-v2__detail {
+  padding: 18px !important;
+}
+
+.rb-resources-glossary-shell .rb-glossary-v2__detail-top {
+  gap: 16px !important;
+  padding-bottom: 16px !important;
+}
+
+.rb-resources-glossary-shell .rb-glossary-v2__detail-marker {
+  width: 58px !important;
+  height: 58px !important;
+  border-radius: 12px !important;
+  font-size: 1.15rem !important;
+}
+
+.rb-resources-glossary-shell .rb-glossary-v2__detail h3 {
+  font-size: 1.75rem !important;
+  line-height: 1 !important;
+}
+
+.rb-resources-glossary-shell .rb-glossary-v2__definition h4,
+.rb-resources-glossary-shell .rb-glossary-v2__example h4,
+.rb-resources-glossary-shell .rb-glossary-v2__help-card h3 {
+  font-size: 0.88rem !important;
+  line-height: 1.15 !important;
+}
+
+.rb-resources-glossary-shell .rb-glossary-v2__definition p,
+.rb-resources-glossary-shell .rb-glossary-v2__example > p,
+.rb-resources-glossary-shell .rb-glossary-v2__help-card p {
+  color: #b8cdce !important;
+  font-size: 0.74rem !important;
+  font-weight: 650 !important;
+  line-height: 1.45 !important;
+}
+
+.rb-resources-glossary-shell .rb-glossary-v2__chips {
+  gap: 7px !important;
+}
+
+.rb-resources-glossary-shell .rb-glossary-v2__chips span {
+  min-height: 26px !important;
+  padding: 0.28rem 0.56rem !important;
+  font-size: 0.62rem !important;
+}
+
+.rb-resources-glossary-shell .rb-glossary-v2__example-card {
+  border-radius: 10px !important;
+}
+
+.rb-resources-glossary-shell .rb-glossary-v2__help {
+  display: grid !important;
+  gap: 12px !important;
+}
+
+.rb-resources-glossary-shell .rb-glossary-v2__popular-list {
+  gap: 0 !important;
+}
+
+.rb-resources-glossary-shell .rb-glossary-v2__popular-list button {
+  min-height: 32px !important;
+  padding: 7px 0 !important;
+}
+
+.rb-resources-glossary-shell .rb-glossary-v2__footer-note {
+  display: none !important;
+}
+
+/* Cadre responsable intégré : format bandeau + 4 cartes plus premium */
+.rb-resources-responsible-shell {
+  padding: 18px 20px 20px !important;
+}
+
+.rb-resources-responsible-shell .rb-responsible-info--mockup {
+  display: grid !important;
+  gap: 14px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+.rb-resources-responsible-shell .rb-responsible-info--mockup > header,
+.rb-resources-responsible-shell .rb-responsible-info--mockup > div:first-child {
+  min-width: 0;
+}
+
+.rb-resources-responsible-shell .rb-responsible-card-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 12px !important;
+}
+
+.rb-resources-responsible-shell .rb-responsible-card {
+  grid-template-columns: 48px minmax(0, 1fr) !important;
+  gap: 12px !important;
+  min-height: 116px !important;
+  padding: 14px !important;
+  border-color: rgba(148, 163, 184, 0.14) !important;
+  border-radius: 12px !important;
+  background:
+    linear-gradient(145deg, rgba(15, 23, 42, 0.76), rgba(8, 47, 51, 0.36)),
+    rgba(2, 6, 23, 0.2) !important;
+}
+
+.rb-resources-responsible-shell .rb-responsible-card--warning {
+  background:
+    linear-gradient(145deg, rgba(15, 23, 42, 0.78), rgba(57, 42, 8, 0.18)),
+    rgba(2, 6, 23, 0.2) !important;
+}
+
+.rb-resources-responsible-shell .rb-responsible-card__icon {
+  width: 42px !important;
+  height: 42px !important;
+  font-size: 1.15rem !important;
+}
+
+.rb-resources-responsible-shell .rb-responsible-card__body {
+  gap: 8px !important;
+}
+
+.rb-resources-responsible-shell .rb-responsible-card__body h3 {
+  font-size: 0.86rem !important;
+  line-height: 1.14 !important;
+}
+
+.rb-resources-responsible-shell .rb-responsible-card__body p {
+  font-size: 0.66rem !important;
+  line-height: 1.36 !important;
+}
+
+.rb-resources-responsible-shell .rb-responsible-card__body ul {
+  display: none !important;
+}
+
+.rb-resources-responsible-shell .rb-responsible-reminder {
+  padding: 10px 14px !important;
+  border-radius: 10px !important;
+}
+
+.rb-resources-responsible-shell .rb-responsible-reminder p,
+.rb-resources-responsible-shell .rb-responsible-footer-note {
+  font-size: 0.68rem !important;
+}
+
+.rb-resources-responsible-shell .rb-responsible-footer-note {
+  justify-self: stretch !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  border-radius: 10px !important;
+  text-align: left !important;
+}
+
+/* Responsive Ressources */
+@media (max-width: 1180px) {
+  section.rb-screen-container:has(.rb-resources-screen--premium) {
+    width: min(100% - 24px, 1100px) !important;
+  }
+
+  .rb-resources-hero--premium {
+    grid-template-columns: minmax(0, 1fr) 300px;
+  }
+
+  .rb-resources-book-visual {
+    width: 300px;
+  }
+
+  .rb-resources-glossary-shell .rb-glossary-v2__board {
+    grid-template-columns: minmax(240px, 0.78fr) minmax(0, 1.22fr) !important;
+  }
+
+  .rb-resources-glossary-shell .rb-glossary-v2__help {
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .rb-resources-responsible-shell .rb-responsible-card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 860px) {
+  .rb-resources-hero--premium,
+  .rb-resources-glossary-shell .rb-glossary-v2__header,
+  .rb-resources-glossary-shell .rb-glossary-v2__board,
+  .rb-resources-glossary-shell .rb-glossary-v2__help {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .rb-resources-hero__visual {
+    display: none;
+  }
+
+  .rb-resources-glossary-shell,
+  .rb-resources-responsible-shell {
+    padding: 14px !important;
+    border-radius: 16px !important;
+  }
+
+  .rb-resources-glossary-shell .rb-glossary-v2__list {
+    max-height: 260px !important;
+  }
+}
+
+@media (max-width: 640px) {
+  section.rb-screen-container:has(.rb-resources-screen--premium) {
+    width: min(100% - 14px, 100%) !important;
+    padding-top: 16px !important;
+  }
+
+  .rb-resources-screen--premium {
+    gap: 12px !important;
+  }
+
+  .rb-resources-hero--premium {
+    padding: 18px !important;
+    border-radius: 16px !important;
+  }
+
+  .rb-resources-hero--premium h2 {
+    font-size: clamp(1.75rem, 10vw, 2.25rem) !important;
+  }
+
+  .rb-resources-responsible-shell .rb-responsible-card-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .rb-resources-responsible-shell .rb-responsible-card {
+    grid-template-columns: 42px minmax(0, 1fr) !important;
+  }
+}
+
+/*
+  Schéma de communication du patch 27R.1 :
+  App.css
+  ├── stylise ResourcesScreen.tsx via rb-resources-screen--premium
+  ├── garde GlossarySection.tsx et ResponsibleInfoSection.tsx comme sources d’affichage
+  ├── ajoute un hero visuel cohérent avec Obsidian Teal sans image externe
+  └── ne modifie ni backend, ni API, ni modèles ML, ni contrats TypeScript
+*/
+/*
+  Patch Ressources 27R.3 — correction premium stable.
+  Ce bloc stylise uniquement l’écran Ressources déjà rendu par ResourcesScreen.tsx,
+  GlossarySection.tsx et ResponsibleInfoSection.tsx.
+  Il ne modifie ni navbar, ni backend, ni API, ni modèles ML.
+*/
+
+.rb-resources-screen--premium,
+.rb-resources-screen--premium * {
+  box-sizing: border-box;
+}
+
+.rb-resources-screen--premium {
+  display: grid;
+  gap: 18px;
+  width: min(1240px, 100%);
+  margin: 0 auto;
+  color: #e5e7eb;
+}
+
+.rb-resources-screen--premium :is(h2, h3, h4, p, span, strong, small, button, input, li) {
+  font-family: var(--rb-font-sans, Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+  overflow-wrap: normal !important;
+  word-break: normal !important;
+}
+
+.rb-resources-screen--premium section,
+.rb-resources-screen--premium article,
+.rb-resources-screen--premium ul,
+.rb-resources-screen--premium li {
+  margin: 0;
+  box-shadow: none;
+}
+
+/* HERO */
+.rb-resources-hero--premium {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 380px;
+  gap: 28px;
+  align-items: center;
+  min-height: 170px;
+  padding: 30px 36px;
+  overflow: hidden;
+  border: 1px solid rgba(45, 212, 191, 0.24);
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at 82% 48%, rgba(45, 212, 191, 0.18), transparent 28%),
+    linear-gradient(118deg, rgba(8, 47, 51, 0.72), rgba(15, 23, 42, 0.88) 48%, rgba(2, 6, 23, 0.96));
+  box-shadow:
+    0 24px 70px rgba(0, 0, 0, 0.28),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+}
+
+.rb-resources-hero--premium::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(135deg, transparent 0 56%, rgba(45, 212, 191, 0.08) 56% 57%, transparent 57%),
+    linear-gradient(90deg, rgba(45, 212, 191, 0.08), transparent 34%);
+  pointer-events: none;
+}
+
+.rb-resources-hero__content,
+.rb-resources-hero__visual {
+  position: relative;
+  z-index: 1;
+}
+
+.rb-resources-hero__content {
+  display: grid;
+  gap: 14px;
+}
+
+.rb-resources-hero__eyebrow {
+  margin: 0;
+  color: #2dd4bf !important;
+  font-size: 0.72rem !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.18em !important;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.rb-resources-hero--premium h2 {
+  max-width: 760px;
+  margin: 0;
+  color: #ffffff !important;
+  font-size: clamp(2.1rem, 3.2vw, 3rem) !important;
+  font-weight: 900 !important;
+  line-height: 1.02 !important;
+  letter-spacing: -0.06em !important;
+}
+
+.rb-resources-hero--premium h2::after {
+  content: "";
+  display: block;
+  width: 56px;
+  height: 3px;
+  margin-top: 14px;
+  border-radius: 999px;
+  background: #2dd4bf;
+}
+
+.rb-resources-hero--premium p:last-child {
+  max-width: 700px;
+  margin: 0;
+  color: #9ca3af !important;
+  font-size: 0.92rem !important;
+  font-weight: 500 !important;
+  line-height: 1.6 !important;
+}
+
+/* VISUEL LIVRE */
+.rb-resources-hero__visual {
+  display: grid;
+  place-items: center;
+}
+
+.rb-resources-book-visual {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 340px;
+  height: 130px;
+}
+
+.rb-resources-book-visual__halo {
+  position: absolute;
+  inset: -18px 0;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle, rgba(45, 212, 191, 0.22), transparent 58%),
+    repeating-radial-gradient(circle, rgba(45, 212, 191, 0.11) 0 1px, transparent 1px 18px);
+  opacity: 0.72;
+}
+
+.rb-resources-book-visual__book {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 170px;
+  height: 78px;
+  border: 1px solid rgba(45, 212, 191, 0.5);
+  border-radius: 12px;
+  background: rgba(2, 6, 23, 0.5);
+  box-shadow:
+    0 0 36px rgba(45, 212, 191, 0.34),
+    inset 0 0 24px rgba(45, 212, 191, 0.1);
+  transform: perspective(420px) rotateX(14deg);
+}
+
+.rb-resources-book-visual__page {
+  position: relative;
+  margin: 12px 10px;
+  border-top: 2px solid rgba(45, 212, 191, 0.68);
+}
+
+.rb-resources-book-visual__page::before,
+.rb-resources-book-visual__page::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  border-radius: 999px;
+  background: rgba(45, 212, 191, 0.42);
+}
+
+.rb-resources-book-visual__page::before {
+  top: 17px;
+}
+
+.rb-resources-book-visual__page::after {
+  top: 34px;
+}
+
+.rb-resources-book-visual__spine {
+  position: absolute;
+  top: 10px;
+  bottom: 9px;
+  left: 50%;
+  width: 2px;
+  border-radius: 999px;
+  background: rgba(45, 212, 191, 0.5);
+}
+
+.rb-resources-book-visual__tag {
+  position: absolute;
+  min-height: 25px;
+  padding: 0.28rem 0.68rem;
+  border: 1px solid rgba(45, 212, 191, 0.34);
+  border-radius: 999px;
+  background: rgba(2, 6, 23, 0.62);
+  color: #bffcf4 !important;
+  font-size: 0.58rem !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.rb-resources-book-visual__tag--analysis {
+  top: 0;
+  left: 24px;
+}
+
+.rb-resources-book-visual__tag--data {
+  top: 14px;
+  right: 18px;
+}
+
+.rb-resources-book-visual__tag--safe {
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* SHELLS */
+.rb-resources-glossary-shell,
+.rb-resources-responsible-shell {
+  padding: 20px;
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at 8% 0%, rgba(45, 212, 191, 0.08), transparent 28%),
+    linear-gradient(145deg, rgba(15, 23, 42, 0.86), rgba(8, 47, 51, 0.44)),
+    rgba(2, 6, 23, 0.62);
+  box-shadow:
+    0 24px 70px rgba(0, 0, 0, 0.24),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.015);
+}
+
+.rb-resources-glossary-shell > *,
+.rb-resources-responsible-shell > * {
+  width: 100%;
+  margin: 0;
+}
+
+/* GLOSSAIRE */
+.rb-glossary-v2 {
+  display: grid;
+  gap: 16px;
+}
+
+.rb-glossary-v2__header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 430px);
+  gap: 18px;
+  align-items: center;
+}
+
+.rb-glossary-v2__title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.rb-glossary-v2__title-icon {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba(45, 212, 191, 0.28);
+  border-radius: 12px;
+  background: rgba(20, 184, 166, 0.12);
+  color: #2dd4bf !important;
+}
+
+.rb-glossary-v2__title h2 {
+  margin: 0;
+  color: #ffffff !important;
+  font-size: 1.22rem !important;
+  font-weight: 850 !important;
+  line-height: 1.1;
+  letter-spacing: -0.035em;
+}
+
+.rb-glossary-v2__title p {
+  margin-top: 3px;
+  color: #9ca3af !important;
+  font-size: 0.74rem !important;
+  font-weight: 500 !important;
+  line-height: 1.35;
+}
+
+.rb-glossary-v2__search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 44px;
+  margin: 0 !important;
+  padding: 0 14px;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 12px;
+  background: rgba(2, 6, 23, 0.34);
+}
+
+.rb-glossary-v2__search span {
+  color: #9ca3af !important;
+  font-size: 0.8rem !important;
+}
+
+.rb-glossary-v2__search input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #e5e7eb;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.rb-glossary-v2__board {
+  display: grid !important;
+  grid-template-columns: 300px minmax(0, 1fr) 300px !important;
+  gap: 14px;
+  align-items: stretch;
+}
+
+.rb-glossary-v2__index,
+.rb-glossary-v2__detail,
+.rb-glossary-v2__help-card,
+.rb-glossary-v2__empty-state {
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 16px;
+  background:
+    linear-gradient(145deg, rgba(15, 23, 42, 0.78), rgba(8, 47, 51, 0.36)),
+    rgba(2, 6, 23, 0.28);
+}
+
+.rb-glossary-v2__index {
+  overflow: hidden;
+}
+
+.rb-glossary-v2__index-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  padding: 13px 15px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.rb-glossary-v2__index-header strong {
+  color: #ffffff !important;
+  font-size: 0.78rem !important;
+  font-weight: 780 !important;
+}
+
+.rb-glossary-v2__index-header span {
+  display: grid;
+  place-items: center;
+  min-width: 24px;
+  height: 22px;
+  border-radius: 999px;
+  background: rgba(20, 184, 166, 0.16);
+  color: #99f6e4 !important;
+  font-size: 0.62rem !important;
+  font-weight: 800 !important;
+}
+
+.rb-glossary-v2__list {
+  display: grid;
+  max-height: 342px;
+  overflow: hidden;
+}
+
+.rb-glossary-v2__term {
+  display: grid !important;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 9px;
+  align-items: center;
+  width: 100%;
+  min-height: 42px;
+  margin: 0;
+  padding: 7px 14px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  text-align: left;
+}
+
+.rb-glossary-v2__term:hover {
+  transform: none;
+  background: rgba(20, 184, 166, 0.08);
+}
+
+.rb-glossary-v2__term--active {
+  background:
+    linear-gradient(90deg, rgba(45, 212, 191, 0.23), rgba(20, 184, 166, 0.08)),
+    rgba(20, 184, 166, 0.08);
+}
+
+.rb-glossary-v2__term-marker {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 24px;
+  border: 1px solid rgba(45, 212, 191, 0.24);
+  border-radius: 8px;
+  background: rgba(20, 184, 166, 0.11);
+  color: #2dd4bf !important;
+  font-size: 0.54rem !important;
+  font-weight: 900 !important;
+}
+
+.rb-glossary-v2__term-content {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+
+.rb-glossary-v2__term-content strong {
+  color: #f8fafc !important;
+  font-size: 0.76rem !important;
+  font-weight: 720 !important;
+  line-height: 1.12;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rb-glossary-v2__term-content small {
+  color: #9ca3af !important;
+  font-size: 0.58rem !important;
+  font-weight: 500 !important;
+  line-height: 1.1;
+}
+
+.rb-glossary-v2__show-more {
+  display: flex !important;
+  justify-content: space-between;
+  align-items: center;
+  width: calc(100% - 20px);
+  min-height: 34px;
+  margin: 8px 10px 10px;
+  padding: 0.46rem 0.7rem;
+  border: 1px solid rgba(45, 212, 191, 0.18);
+  border-radius: 10px;
+  background: rgba(20, 184, 166, 0.08);
+  color: #d7fffb;
+  font-size: 0.68rem;
+  font-weight: 760;
+  box-shadow: none;
+}
+
+.rb-glossary-v2__detail {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+}
+
+.rb-glossary-v2__detail-top {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.rb-glossary-v2__detail-marker {
+  display: grid;
+  place-items: center;
+  width: 60px;
+  height: 60px;
+  border: 1px solid rgba(45, 212, 191, 0.28);
+  border-radius: 14px;
+  background:
+    radial-gradient(circle at 50% 15%, rgba(45, 212, 191, 0.24), transparent 65%),
+    rgba(20, 184, 166, 0.1);
+  color: #2dd4bf !important;
+  font-size: 1.25rem !important;
+  font-weight: 900 !important;
+}
+
+.rb-glossary-v2__detail h3 {
+  margin: 0;
+  color: #ffffff !important;
+  font-size: 1.85rem !important;
+  font-weight: 900 !important;
+  line-height: 1;
+  letter-spacing: -0.05em;
+}
+
+.rb-glossary-v2__detail-top p {
+  margin-top: 4px;
+  color: #9ca3af !important;
+  font-size: 0.72rem !important;
+  font-weight: 600 !important;
+}
+
+.rb-glossary-v2__featured-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  padding: 0.3rem 0.68rem;
+  border: 1px solid rgba(45, 212, 191, 0.22);
+  border-radius: 999px;
+  background: rgba(20, 184, 166, 0.1);
+  color: #99f6e4 !important;
+  font-size: 0.6rem !important;
+  font-weight: 800 !important;
+  white-space: nowrap;
+}
+
+.rb-glossary-v2__definition,
+.rb-glossary-v2__example {
+  display: grid;
+  gap: 8px;
+}
+
+.rb-glossary-v2__definition h4,
+.rb-glossary-v2__example h4,
+.rb-glossary-v2__help-card h3 {
+  margin: 0;
+  color: #ffffff !important;
+  font-size: 0.9rem !important;
+  font-weight: 800 !important;
+  line-height: 1.2;
+}
+
+.rb-glossary-v2__definition p,
+.rb-glossary-v2__example > p,
+.rb-glossary-v2__note,
+.rb-glossary-v2__help-card p {
+  color: #b8c7c8 !important;
+  font-size: 0.74rem !important;
+  font-weight: 500 !important;
+  line-height: 1.5 !important;
+}
+
+.rb-glossary-v2__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.rb-glossary-v2__chips span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 28px;
+  padding: 0.3rem 0.64rem;
+  border: 1px solid rgba(45, 212, 191, 0.16);
+  border-radius: 999px;
+  background: rgba(20, 184, 166, 0.08);
+  color: #cfeeed !important;
+  font-size: 0.62rem !important;
+  font-weight: 650 !important;
+}
+
+.rb-glossary-v2__chips strong {
+  color: #2dd4bf !important;
+}
+
+.rb-glossary-v2__example-card {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 12px;
+  background: rgba(2, 6, 23, 0.22);
+}
+
+.rb-glossary-v2__example-card div {
+  display: grid;
+  gap: 4px;
+  padding: 10px 12px;
+  border-right: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.rb-glossary-v2__example-card div:last-child {
+  border-right: 0;
+}
+
+.rb-glossary-v2__example-card span {
+  color: #2dd4bf !important;
+  font-size: 0.58rem !important;
+  font-weight: 850 !important;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.rb-glossary-v2__example-card strong {
+  color: #ffffff !important;
+  font-size: 0.74rem !important;
+  font-weight: 760 !important;
+}
+
+.rb-glossary-v2__note {
+  margin-top: 2px;
+  padding: 10px 12px;
+  border: 1px solid rgba(45, 212, 191, 0.14);
+  border-radius: 12px;
+  background: rgba(20, 184, 166, 0.06);
+}
+
+.rb-glossary-v2__help {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+}
+
+.rb-glossary-v2__help-card {
+  display: grid;
+  gap: 10px;
+  padding: 15px;
+}
+
+.rb-glossary-v2__popular-list {
+  display: grid;
+}
+
+.rb-glossary-v2__popular-list button {
+  display: grid !important;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 9px;
+  align-items: center;
+  min-height: 34px;
+  padding: 7px 0;
+  border: 0;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.09);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  text-align: left;
+}
+
+.rb-glossary-v2__popular-list button:hover {
+  transform: none;
+  background: transparent;
+}
+
+.rb-glossary-v2__popular-list span {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: rgba(20, 184, 166, 0.14);
+  color: #2dd4bf !important;
+  font-size: 0.62rem !important;
+  font-weight: 800 !important;
+}
+
+.rb-glossary-v2__popular-list strong {
+  color: #dbeafe !important;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+}
+
+.rb-glossary-v2__footer-note {
+  display: none;
+}
+
+/* RESPONSABLE */
+.rb-responsible-info--mockup {
+  display: grid;
+  gap: 14px;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.rb-responsible-card-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.rb-responsible-card {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  gap: 12px;
+  min-height: 112px;
+  padding: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 14px;
+  background:
+    linear-gradient(145deg, rgba(15, 23, 42, 0.78), rgba(8, 47, 51, 0.34)),
+    rgba(2, 6, 23, 0.22);
+}
+
+.rb-responsible-card--warning {
+  background:
+    linear-gradient(145deg, rgba(15, 23, 42, 0.82), rgba(57, 42, 8, 0.18)),
+    rgba(2, 6, 23, 0.22);
+}
+
+.rb-responsible-card__icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(45, 212, 191, 0.22);
+  border-radius: 999px;
+  background: rgba(20, 184, 166, 0.11);
+  color: #2dd4bf !important;
+  font-size: 1.1rem !important;
+}
+
+.rb-responsible-card--warning .rb-responsible-card__icon {
+  border-color: rgba(245, 158, 11, 0.28);
+  background: rgba(245, 158, 11, 0.08);
+  color: #f59e0b !important;
+}
+
+.rb-responsible-card__body {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.rb-responsible-card__body h3 {
+  margin: 0;
+  color: #ffffff !important;
+  font-size: 0.86rem !important;
+  font-weight: 800 !important;
+  line-height: 1.16;
+  letter-spacing: -0.02em;
+}
+
+.rb-responsible-card__body h3 span {
+  color: #ffffff !important;
+  font-size: inherit !important;
+  font-weight: inherit !important;
+}
+
+.rb-responsible-card__body p {
+  color: #b8c7c8 !important;
+  font-size: 0.66rem !important;
+  font-weight: 500 !important;
+  line-height: 1.4 !important;
+}
+
+.rb-responsible-card__body ul {
+  display: none !important;
+}
+
+.rb-responsible-reminder {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 42px;
+  padding: 10px 14px;
+  border: 1px solid rgba(45, 212, 191, 0.14);
+  border-radius: 12px;
+  background: rgba(20, 184, 166, 0.06);
+}
+
+.rb-responsible-reminder span {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid rgba(45, 212, 191, 0.22);
+  border-radius: 999px;
+  color: #2dd4bf !important;
+  font-size: 0.76rem !important;
+}
+
+.rb-responsible-reminder p {
+  color: #b8c7c8 !important;
+  font-size: 0.72rem !important;
+  font-weight: 560 !important;
+  line-height: 1.4 !important;
+}
+
+/* Responsive */
+@media (max-width: 1180px) {
+  .rb-resources-hero--premium {
+    grid-template-columns: minmax(0, 1fr) 300px;
+  }
+
+  .rb-resources-book-visual {
+    width: 280px;
+  }
+
+  .rb-glossary-v2__board {
+    grid-template-columns: 280px minmax(0, 1fr) !important;
+  }
+
+  .rb-glossary-v2__help {
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .rb-responsible-card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 860px) {
+  .rb-resources-hero--premium,
+  .rb-glossary-v2__header,
+  .rb-glossary-v2__board,
+  .rb-glossary-v2__help,
+  .rb-responsible-card-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .rb-resources-hero__visual {
+    display: none;
+  }
+
+  .rb-glossary-v2__detail-top {
+    grid-template-columns: 58px minmax(0, 1fr);
+  }
+
+  .rb-glossary-v2__featured-badge {
+    grid-column: 1 / -1;
+    width: fit-content;
+  }
+
+  .rb-glossary-v2__example-card {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rb-glossary-v2__example-card div {
+    border-right: 0;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+  }
+}
+
+/*
+  Schéma de communication du patch 27R.3 :
+  App.css
+  ├── stylise ResourcesScreen.tsx avec .rb-resources-screen--premium
+  ├── stylise GlossarySection.tsx avec .rb-glossary-v2-*
+  ├── stylise ResponsibleInfoSection.tsx avec .rb-responsible-*
+  └── ne touche ni navbar, ni backend, ni API, ni modèles ML
+*/
+/*
+  Patch Ressources V2
+  Ce bloc crée le rendu premium de l’écran Ressources RubyBets :
+  hero compact, recherche, catégories, fiche centrale, sidebar responsable.
+  Il ne modifie ni navbar, ni backend, ni API, ni modèles ML.
+*/
+
+main.rb-app-shell:has(.rb-resources-v2-screen) .rb-status-footer {
+  display: none !important;
+}
+
+section.rb-screen-container:has(.rb-resources-v2-screen) {
+  width: min(1510px, calc(100% - 56px)) !important;
+  max-width: 1510px !important;
+  padding-top: 22px !important;
+  padding-bottom: 28px !important;
+}
+
+.rb-resources-v2-screen {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  color: #e5e7eb;
+  font-family: var(--rb-font-sans, "Geist Sans", Inter, system-ui, sans-serif);
+}
+
+/* HERO */
+.rb-resources-v2-hero {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(420px, 0.78fr);
+  min-height: 235px;
+  overflow: hidden;
+  padding: 34px 38px;
+  border: 1px solid rgba(45, 212, 191, 0.24);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 83% 45%, rgba(45, 212, 191, 0.18), transparent 30%),
+    radial-gradient(circle at 8% 20%, rgba(45, 212, 191, 0.14), transparent 34%),
+    linear-gradient(135deg, rgba(7, 27, 32, 0.98), rgba(10, 22, 34, 0.96) 48%, rgba(2, 8, 13, 0.98)),
+    rgba(2, 6, 23, 0.96);
+  box-shadow:
+    0 30px 86px rgba(0, 0, 0, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    inset 0 0 0 1px rgba(45, 212, 191, 0.035);
+}
+
+.rb-resources-v2-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(45, 212, 191, 0.13) 0 1px, transparent 1px) 6% 27% / 520px 1px no-repeat,
+    linear-gradient(90deg, rgba(45, 212, 191, 0.1) 0 1px, transparent 1px) 20% 59% / 620px 1px no-repeat,
+    linear-gradient(135deg, transparent 0 55%, rgba(45, 212, 191, 0.11) 55% 56%, transparent 56%),
+    radial-gradient(circle at 64% 27%, rgba(45, 212, 191, 0.75) 0 2px, transparent 3px),
+    radial-gradient(circle at 71% 45%, rgba(45, 212, 191, 0.55) 0 2px, transparent 3px),
+    radial-gradient(circle at 4% 25%, rgba(45, 212, 191, 0.55) 0 1px, transparent 2px);
+  opacity: 0.76;
+}
+
+.rb-resources-v2-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(7, 27, 32, 0.96) 0%, rgba(7, 27, 32, 0.72) 40%, rgba(2, 6, 23, 0.28) 100%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent 45%, rgba(0, 0, 0, 0.22));
+}
+
+.rb-resources-v2-hero__copy {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  align-content: center;
+  gap: 16px;
+}
+
+.rb-resources-v2-kicker {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  min-height: 26px;
+  margin: 0;
+  padding: 0.32rem 0.78rem;
+  border-radius: 999px;
+  background: rgba(20, 184, 166, 0.1);
+  color: #67e8f9;
+  font-family: var(--rb-font-mono, "Geist Mono", monospace);
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.18em;
+  line-height: 1;
+  text-transform: uppercase;
+  box-shadow:
+    inset 0 0 0 1px rgba(45, 212, 191, 0.16),
+    0 0 24px rgba(45, 212, 191, 0.08);
+}
+
+.rb-resources-v2-hero h2 {
+  max-width: 760px;
+  margin: 0;
+  color: #ffffff;
+  font-size: clamp(2.7rem, 4.2vw, 4rem);
+  font-weight: 850;
+  line-height: 1;
+  letter-spacing: -0.075em;
+  text-shadow: 0 18px 48px rgba(0, 0, 0, 0.42);
+}
+
+.rb-resources-v2-hero__copy > p:not(.rb-resources-v2-kicker) {
+  max-width: 760px;
+  margin: 0;
+  color: #c9d7d8;
+  font-size: 0.98rem;
+  font-weight: 430;
+  line-height: 1.7;
+}
+
+.rb-resources-v2-hero__visual {
+  position: relative;
+  min-height: 190px;
+  display: grid;
+  place-items: center;
+}
+
+.rb-resources-v2-hero__visual::before {
+  content: "";
+  position: absolute;
+  width: 360px;
+  height: 360px;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle, rgba(45, 212, 191, 0.18), transparent 58%),
+    repeating-radial-gradient(circle, rgba(45, 212, 191, 0.12) 0 1px, transparent 1px 22px);
+  filter: drop-shadow(0 0 42px rgba(45, 212, 191, 0.18));
+}
+
+.rb-resources-v2-visual__document {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  gap: 10px;
+  width: 120px;
+  height: 120px;
+  padding: 24px 22px;
+  border: 1px solid rgba(45, 212, 191, 0.38);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 40% 0%, rgba(45, 212, 191, 0.26), transparent 48%),
+    linear-gradient(145deg, rgba(8, 47, 51, 0.92), rgba(2, 6, 23, 0.84));
+  box-shadow:
+    0 0 50px rgba(45, 212, 191, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.rb-resources-v2-visual__document span {
+  display: block;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(94, 234, 212, 0.62);
+}
+
+.rb-resources-v2-visual__document span:first-child {
+  width: 64%;
+  background: #2dd4bf;
+  box-shadow: 0 0 18px rgba(45, 212, 191, 0.34);
+}
+
+.rb-resources-v2-visual__document span:nth-child(2) {
+  width: 86%;
+}
+
+.rb-resources-v2-visual__document span:nth-child(3) {
+  width: 78%;
+}
+
+.rb-resources-v2-visual__document span:nth-child(4) {
+  width: 92%;
+}
+
+.rb-resources-v2-visual__document span:nth-child(5) {
+  width: 52%;
+}
+
+.rb-resources-v2-visual__tag {
+  position: absolute;
+  z-index: 3;
+  min-height: 28px;
+  padding: 0.36rem 0.86rem;
+  border: 1px solid rgba(45, 212, 191, 0.24);
+  border-radius: 999px;
+  background: rgba(2, 6, 23, 0.55);
+  color: #e5e7eb;
+  font-family: var(--rb-font-mono, "Geist Mono", monospace);
+  font-size: 0.62rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  box-shadow: 0 0 22px rgba(45, 212, 191, 0.08);
+}
+
+.rb-resources-v2-visual__tag--analysis {
+  left: 11%;
+  top: 40%;
+}
+
+.rb-resources-v2-visual__tag--data {
+  right: 7%;
+  top: 39%;
+}
+
+.rb-resources-v2-visual__tag--safe {
+  bottom: 18%;
+  left: 45%;
+  transform: translateX(-50%);
+}
+
+/* BODY */
+.rb-resources-v2-body {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.rb-resources-v2-toolbar {
+  display: grid;
+  grid-template-columns: minmax(420px, 1fr) auto;
+  gap: 22px;
+  align-items: center;
+}
+
+.rb-resources-v2-search {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 54px;
+  padding: 0 18px;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 13px;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(45, 212, 191, 0.08), transparent 34%),
+    rgba(15, 23, 42, 0.72);
+  color: #9ca3af;
+}
+
+.rb-resources-v2-search input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #e5e7eb;
+  font: inherit;
+  font-size: 0.9rem;
+}
+
+.rb-resources-v2-search input::placeholder {
+  color: #9ca3af;
+}
+
+.rb-resources-v2-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.rb-resources-v2-filter {
+  min-height: 48px;
+  padding: 0 1.28rem;
+  border: 1px solid rgba(148, 163, 184, 0.13);
+  border-radius: 11px;
+  background: rgba(15, 23, 42, 0.68);
+  color: #cbd5e1;
+  font: inherit;
+  font-size: 0.86rem;
+  cursor: pointer;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease,
+    color 160ms ease;
+}
+
+.rb-resources-v2-filter:hover,
+.rb-resources-v2-filter--active {
+  border-color: rgba(45, 212, 191, 0.42);
+  background: rgba(20, 184, 166, 0.13);
+  color: #5eead4;
+}
+
+.rb-resources-v2-grid {
+  display: grid;
+  grid-template-columns: 350px minmax(0, 1fr) 420px;
+  gap: 20px;
+  align-items: stretch;
+}
+
+.rb-resources-v2-categories,
+.rb-resources-v2-detail,
+.rb-resources-v2-side-card,
+.rb-resources-v2-empty {
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  background:
+    radial-gradient(circle at 5% 0%, rgba(45, 212, 191, 0.08), transparent 34%),
+    linear-gradient(145deg, rgba(15, 23, 42, 0.9), rgba(8, 47, 51, 0.46)),
+    rgba(15, 23, 42, 0.78);
+  box-shadow:
+    0 22px 66px rgba(0, 0, 0, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.035);
+}
+
+.rb-resources-v2-categories {
+  padding: 24px;
+  border-radius: 18px;
+}
+
+.rb-resources-v2-panel-label {
+  margin: 0 0 18px;
+  color: #67e8f9;
+  font-family: var(--rb-font-mono, "Geist Mono", monospace);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.rb-resources-v2-category-list {
+  display: grid;
+  gap: 9px;
+}
+
+.rb-resources-v2-category {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  min-height: 48px;
+  padding: 0 11px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: transparent;
+  color: #d1d5db;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.rb-resources-v2-category--active,
+.rb-resources-v2-category:hover {
+  border-color: rgba(45, 212, 191, 0.2);
+  background:
+    linear-gradient(90deg, rgba(20, 184, 166, 0.2), rgba(20, 184, 166, 0.06)),
+    rgba(2, 6, 23, 0.15);
+}
+
+.rb-resources-v2-category__icon,
+.rb-resources-v2-category__count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(45, 212, 191, 0.22);
+  border-radius: 999px;
+  background: rgba(20, 184, 166, 0.1);
+  color: #2dd4bf;
+}
+
+.rb-resources-v2-category__icon {
+  width: 28px;
+  height: 28px;
+}
+
+.rb-resources-v2-category strong {
+  overflow: hidden;
+  color: #e5e7eb;
+  font-size: 0.94rem;
+  font-weight: 560;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rb-resources-v2-category__count {
+  min-width: 28px;
+  height: 28px;
+  padding: 0 8px;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.rb-resources-v2-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-height: 470px;
+  padding: 28px;
+  border-radius: 18px;
+}
+
+.rb-resources-v2-detail__top {
+  display: grid;
+  grid-template-columns: 68px minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: center;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.rb-resources-v2-detail__marker {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border: 1px solid rgba(45, 212, 191, 0.28);
+  border-radius: 14px;
+  background:
+    radial-gradient(circle at 40% 20%, rgba(45, 212, 191, 0.2), transparent 60%),
+    rgba(20, 184, 166, 0.12);
+  color: #2dd4bf;
+  font-size: 1.35rem;
+  font-weight: 850;
+}
+
+.rb-resources-v2-detail h3 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 1.95rem;
+  font-weight: 820;
+  letter-spacing: -0.055em;
+}
+
+.rb-resources-v2-detail__top p {
+  margin: 4px 0 0;
+  color: #9ca3af;
+  font-size: 0.92rem;
+}
+
+.rb-resources-v2-featured {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 0 0.85rem;
+  border: 1px solid rgba(45, 212, 191, 0.22);
+  border-radius: 999px;
+  background: rgba(20, 184, 166, 0.1);
+  color: #5eead4;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.rb-resources-v2-definition,
+.rb-resources-v2-example {
+  display: grid;
+  gap: 12px;
+}
+
+.rb-resources-v2-definition h4,
+.rb-resources-v2-example h4,
+.rb-resources-v2-side-card h3 {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  color: #67e8f9;
+  font-family: var(--rb-font-mono, "Geist Mono", monospace);
+  font-size: 0.74rem;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.rb-resources-v2-definition p,
+.rb-resources-v2-example p,
+.rb-resources-v2-side-card p {
+  margin: 0;
+  color: #cbd5e1;
+  font-size: 0.94rem;
+  font-weight: 430;
+  line-height: 1.62;
+}
+
+.rb-resources-v2-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.rb-resources-v2-chips span {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 42px;
+  padding: 0 1rem;
+  border: 1px solid rgba(45, 212, 191, 0.14);
+  border-radius: 999px;
+  background: rgba(20, 184, 166, 0.07);
+  color: #d1d5db;
+  font-size: 0.82rem;
+  font-weight: 620;
+}
+
+.rb-resources-v2-example-card {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 12px;
+  background: rgba(2, 6, 23, 0.2);
+}
+
+.rb-resources-v2-example-card div {
+  padding: 14px 16px;
+  border-right: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.rb-resources-v2-example-card div:last-child {
+  border-right: 0;
+}
+
+.rb-resources-v2-example-card span {
+  display: block;
+  margin-bottom: 7px;
+  color: #2dd4bf;
+  font-family: var(--rb-font-mono, "Geist Mono", monospace);
+  font-size: 0.66rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.rb-resources-v2-example-card strong {
+  color: #f8fafc;
+  font-size: 0.9rem;
+  font-weight: 720;
+}
+
+.rb-resources-v2-note,
+.rb-resources-v2-footer-note {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  border: 1px solid rgba(45, 212, 191, 0.16);
+  border-radius: 12px;
+  background: rgba(20, 184, 166, 0.07);
+  color: #cbd5e1;
+}
+
+.rb-resources-v2-note {
+  padding: 13px 16px;
+  font-size: 0.84rem;
+}
+
+.rb-resources-v2-side {
+  display: grid;
+  gap: 16px;
+}
+
+.rb-resources-v2-side-card {
+  display: grid;
+  gap: 16px;
+  padding: 24px;
+  border-radius: 18px;
+}
+
+.rb-resources-v2-popular-list {
+  display: grid;
+}
+
+.rb-resources-v2-popular-list button {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  min-height: 34px;
+  border: 0;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.09);
+  background: transparent;
+  color: #e5e7eb;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.rb-resources-v2-popular-list button:last-child {
+  border-bottom: 0;
+}
+
+.rb-resources-v2-popular-list span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: rgba(20, 184, 166, 0.16);
+  color: #2dd4bf;
+  font-size: 0.7rem;
+  font-weight: 850;
+}
+
+.rb-resources-v2-popular-list strong {
+  overflow: hidden;
+  color: #e5e7eb;
+  font-size: 0.86rem;
+  font-weight: 640;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rb-resources-v2-side-card--responsible {
+  border-color: rgba(45, 212, 191, 0.18);
+}
+
+.rb-resources-v2-empty {
+  padding: 28px;
+  border-radius: 18px;
+}
+
+.rb-resources-v2-empty h3 {
+  margin: 0 0 8px;
+  color: #ffffff;
+}
+
+.rb-resources-v2-empty p {
+  margin: 0;
+  color: #9ca3af;
+}
+
+.rb-resources-v2-footer-note {
+  padding: 15px 20px;
+  border-radius: 14px;
+}
+
+.rb-resources-v2-footer-note strong {
+  color: #ffffff;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.rb-resources-v2-footer-note span {
+  color: #cbd5e1;
+  font-size: 0.88rem;
+}
+
+/* RESPONSIVE */
+@media (max-width: 1280px) {
+  section.rb-screen-container:has(.rb-resources-v2-screen) {
+    width: min(1180px, calc(100% - 28px)) !important;
+  }
+
+  .rb-resources-v2-grid {
+    grid-template-columns: 300px minmax(0, 1fr);
+  }
+
+  .rb-resources-v2-side {
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 980px) {
+  .rb-resources-v2-hero,
+  .rb-resources-v2-toolbar,
+  .rb-resources-v2-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rb-resources-v2-hero {
+    min-height: auto;
+  }
+
+  .rb-resources-v2-hero__visual {
+    min-height: 210px;
+  }
+
+  .rb-resources-v2-filter-row {
+    justify-content: flex-start;
+  }
+
+  .rb-resources-v2-side {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rb-resources-v2-detail__top {
+    grid-template-columns: 64px minmax(0, 1fr);
+  }
+
+  .rb-resources-v2-featured {
+    grid-column: 1 / -1;
+    width: fit-content;
+  }
+}
+
+@media (max-width: 640px) {
+  section.rb-screen-container:has(.rb-resources-v2-screen) {
+    width: min(100% - 14px, 100%) !important;
+  }
+
+  .rb-resources-v2-hero,
+  .rb-resources-v2-categories,
+  .rb-resources-v2-detail,
+  .rb-resources-v2-side-card {
+    padding: 18px;
+    border-radius: 14px;
+  }
+
+  .rb-resources-v2-hero h2 {
+    font-size: clamp(2.1rem, 12vw, 2.8rem);
+  }
+
+  .rb-resources-v2-filter-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .rb-resources-v2-filter {
+    padding: 0 0.9rem;
+  }
+
+  .rb-resources-v2-example-card {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rb-resources-v2-example-card div {
+    border-right: 0;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+  }
+
+  .rb-resources-v2-example-card div:last-child {
+    border-bottom: 0;
+  }
+
+  .rb-resources-v2-footer-note {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+/*
+  Schéma de communication du patch Ressources V2 :
+  App.css
+  ├── stylise ResourcesScreen.tsx avec les classes rb-resources-v2-*
+  ├── stylise GlossarySection.tsx avec recherche, catégories, fiche et sidebar
+  ├── masque les statuts techniques sur l’écran Ressources
+  └── ne modifie ni navbar, ni backend, ni API, ni modèles ML
+*/
