@@ -1,4 +1,5 @@
-// Ce fichier affiche l’écran Prédictions de RubyBets avec une interface premium, responsable et centrée sur les tendances avant-match.
+// Ce fichier affiche l’écran Prédictions de RubyBets à partir du modèle national expérimental.
+// Il présente les signaux 1X2, Over 1.5, BTTS et le signal complémentaire sans utiliser de cote.
 
 import type { CSSProperties, ReactNode } from "react";
 import {
@@ -16,12 +17,15 @@ import {
 import type {
   MatchContextResponse,
   MatchDetailsResponse,
-  MatchPredictionsResponse,
+  NationalMlMarketKey,
+  NationalMlMarketPrediction,
+  NationalMlPredictionResponse,
+  NationalMlSelectorResult,
 } from "../models/rubybets";
 import type { AppScreen } from "../types/navigation";
 
 type PredictionsScreenProps = {
-  matchPredictions: MatchPredictionsResponse | null;
+  nationalMlPrediction: NationalMlPredictionResponse | null;
   matchDetails: MatchDetailsResponse | null;
   matchContext: MatchContextResponse | null;
   matchPredictionsStatus: string;
@@ -30,12 +34,23 @@ type PredictionsScreenProps = {
 
 type UnknownRecord = Record<string, unknown>;
 
-// Vérifie qu’une valeur peut être lue comme un objet simple.
+type DisplayMarket = {
+  key: NationalMlMarketKey | "selector";
+  title: string;
+  subtitle: string;
+  predictionLabel: string;
+  probabilityLabel: string;
+  modelLabel: string;
+  reading: string;
+  muted: boolean;
+};
+
+// Cette fonction vérifie qu’une valeur peut être lue comme un objet simple.
 function isRecord(value: unknown): value is UnknownRecord {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-// Lit une valeur texte dans plusieurs chemins possibles pour rester compatible avec les contrats API existants.
+// Cette fonction lit une valeur texte dans plusieurs chemins possibles pour rester compatible avec les contrats API.
 function readText(source: unknown, paths: string[][], fallback: string): string {
   for (const path of paths) {
     let current: unknown = source;
@@ -61,55 +76,7 @@ function readText(source: unknown, paths: string[][], fallback: string): string 
   return fallback;
 }
 
-// Lit une valeur numérique dans plusieurs chemins possibles.
-function readNumber(source: unknown, paths: string[][]): number | null {
-  for (const path of paths) {
-    let current: unknown = source;
-
-    for (const segment of path) {
-      if (!isRecord(current)) {
-        current = undefined;
-        break;
-      }
-
-      current = current[segment];
-    }
-
-    if (typeof current === "number" && Number.isFinite(current)) {
-      return current;
-    }
-
-    if (typeof current === "string" && current.trim() !== "" && !Number.isNaN(Number(current))) {
-      return Number(current);
-    }
-  }
-
-  return null;
-}
-
-// Récupère une liste depuis un objet lorsque le contrat API expose un tableau.
-function readArray(source: unknown, paths: string[][]): unknown[] {
-  for (const path of paths) {
-    let current: unknown = source;
-
-    for (const segment of path) {
-      if (!isRecord(current)) {
-        current = undefined;
-        break;
-      }
-
-      current = current[segment];
-    }
-
-    if (Array.isArray(current)) {
-      return current;
-    }
-  }
-
-  return [];
-}
-
-// Formate une date de match dans un libellé court.
+// Cette fonction formate une date de match dans un libellé court.
 function formatMatchDate(source: unknown): string {
   const rawDate = readText(
     source,
@@ -134,7 +101,7 @@ function formatMatchDate(source: unknown): string {
   }).format(parsedDate);
 }
 
-// Formate l’heure de coup d’envoi.
+// Cette fonction formate l’heure de coup d’envoi.
 function formatMatchTime(source: unknown): string {
   const rawDate = readText(
     source,
@@ -158,28 +125,29 @@ function formatMatchTime(source: unknown): string {
   }).format(parsedDate);
 }
 
-// Convertit un niveau de confiance technique en libellé utilisateur.
-function formatConfidence(value: string): string {
-  const normalizedValue = value.toLowerCase();
-
-  if (normalizedValue.includes("high") || normalizedValue.includes("élev")) {
-    return "élevée";
+// Cette fonction convertit une probabilité numérique en pourcentage lisible.
+function formatProbability(value: number | null | undefined): string {
+  if (typeof value !== "number" || !Number.isFinite(value)) {
+    return "non disponible";
   }
 
-  if (normalizedValue.includes("medium") || normalizedValue.includes("mod")) {
-    return "modérée";
-  }
-
-  if (normalizedValue.includes("low") || normalizedValue.includes("faib")) {
-    return "faible";
-  }
-
-  return value || "faible";
+  const percentage = value > 0 && value <= 1 ? value * 100 : value;
+  return `${Math.round(percentage)} %`;
 }
 
-// Convertit un niveau de risque technique en libellé utilisateur.
-function formatRisk(value: string): string {
-  const normalizedValue = value.toLowerCase();
+// Cette fonction convertit une probabilité en valeur numérique 0-100 exploitable par la jauge.
+function probabilityToGaugeValue(value: number | null | undefined): number {
+  if (typeof value !== "number" || !Number.isFinite(value)) {
+    return 0;
+  }
+
+  const percentage = value > 0 && value <= 1 ? value * 100 : value;
+  return Math.max(0, Math.min(100, Math.round(percentage)));
+}
+
+// Cette fonction convertit un niveau de risque technique en libellé utilisateur.
+function formatRisk(value: string | null | undefined): string {
+  const normalizedValue = (value || "").toLowerCase();
 
   if (normalizedValue.includes("high") || normalizedValue.includes("élev")) {
     return "élevé";
@@ -193,89 +161,33 @@ function formatRisk(value: string): string {
     return "faible";
   }
 
-  return value || "élevé";
+  return value || "non fourni";
 }
 
-// Récupère une carte de marché depuis la réponse prédictions.
-function findMarket(markets: unknown[], identifiers: string[]): UnknownRecord | null {
-  const normalizedIdentifiers = identifiers.map((identifier) => identifier.toLowerCase());
+// Cette fonction transforme une clé de marché technique en libellé visible.
+function formatMarketName(marketKey: string): string {
+  const normalizedMarket = marketKey.toLowerCase();
 
-  for (const market of markets) {
-    if (!isRecord(market)) {
-      continue;
-    }
-
-    const marketName = readText(
-      market,
-      [["type"], ["market"], ["market_type"], ["name"], ["label"]],
-      ""
-    ).toLowerCase();
-
-    if (normalizedIdentifiers.some((identifier) => marketName.includes(identifier))) {
-      return market;
-    }
+  if (normalizedMarket === "1x2") {
+    return "1X2";
   }
 
-  return null;
+  if (normalizedMarket === "over_1_5") {
+    return "Nombre de buts · Over 1.5";
+  }
+
+  if (normalizedMarket === "over_2_5") {
+    return "Nombre de buts · Over 2.5";
+  }
+
+  if (normalizedMarket === "btts") {
+    return "BTTS";
+  }
+
+  return marketKey.replaceAll("_", " ").toUpperCase();
 }
 
-// Transforme une prédiction brute en wording responsable.
-function formatPredictionLabel(value: string, homeTeamName: string, awayTeamName: string): string {
-  const normalizedValue = value.toUpperCase();
-
-  if (normalizedValue.includes("HOME")) {
-    return `Tendance ${homeTeamName}`;
-  }
-
-  if (normalizedValue.includes("AWAY")) {
-    return `Tendance ${awayTeamName}`;
-  }
-
-  if (normalizedValue.includes("DRAW") || normalizedValue.includes("NUL")) {
-    return "Tendance nul";
-  }
-
-  if (normalizedValue.includes("OVER")) {
-    return "Volume de buts à surveiller";
-  }
-
-  if (normalizedValue.includes("UNDER")) {
-    return "Volume plutôt contenu";
-  }
-
-  if (normalizedValue === "YES" || normalizedValue.includes("BTTS_YES")) {
-    return "Les deux équipes peuvent marquer";
-  }
-
-  if (normalizedValue === "NO" || normalizedValue.includes("BTTS_NO")) {
-    return "BTTS non prioritaire";
-  }
-
-  return value || "Tendance prudente";
-}
-
-// Calcule un pourcentage de confiance lisible lorsqu’une valeur numérique existe.
-function getConfidencePercent(source: unknown): number | null {
-  const rawScore = readNumber(source, [
-    ["global_confidence"],
-    ["confidence_score"],
-    ["score"],
-    ["confidence"],
-    ["overall_confidence"],
-  ]);
-
-  if (rawScore === null) {
-    return null;
-  }
-
-  if (rawScore > 0 && rawScore <= 1) {
-    return Math.round(rawScore * 100);
-  }
-
-  return Math.max(0, Math.min(100, Math.round(rawScore)));
-}
-
-// Récupère le nom de l’équipe à domicile.
+// Cette fonction récupère le nom de l’équipe à domicile.
 function getHomeTeamName(matchDetails: MatchDetailsResponse | null): string {
   return readText(
     matchDetails,
@@ -290,7 +202,7 @@ function getHomeTeamName(matchDetails: MatchDetailsResponse | null): string {
   );
 }
 
-// Récupère le nom de l’équipe extérieure.
+// Cette fonction récupère le nom de l’équipe extérieure.
 function getAwayTeamName(matchDetails: MatchDetailsResponse | null): string {
   return readText(
     matchDetails,
@@ -305,7 +217,7 @@ function getAwayTeamName(matchDetails: MatchDetailsResponse | null): string {
   );
 }
 
-// Récupère le logo ou blason d’une équipe depuis les différentes formes possibles du contrat API.
+// Cette fonction récupère le logo ou blason d’une équipe depuis les différentes formes possibles du contrat API.
 function getTeamLogo(matchDetails: MatchDetailsResponse | null, side: "home" | "away"): string {
   const prefix = side === "home" ? "home" : "away";
 
@@ -327,80 +239,7 @@ function getTeamLogo(matchDetails: MatchDetailsResponse | null, side: "home" | "
   );
 }
 
-// Récupère le classement affichable d’une équipe avec un fallback propre pour les équipes nationales de la maquette.
-function getTeamRank(matchDetails: MatchDetailsResponse | null, side: "home" | "away"): string {
-  const prefix = side === "home" ? "home" : "away";
-  const teamName = side === "home" ? getHomeTeamName(matchDetails) : getAwayTeamName(matchDetails);
-  const normalizedTeamName = teamName
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "");
-
-  const rank = readText(
-    matchDetails,
-    [
-      [`${prefix}_team`, "position"],
-      [`${prefix}Team`, "position"],
-      [`${prefix}_position`],
-      [`${prefix}Position`],
-      [`${prefix}_rank`],
-      [`${prefix}Rank`],
-    ],
-    ""
-  );
-
-  if (rank) {
-    return rank.toLowerCase().includes("e") ? rank : `${rank}e`;
-  }
-
-  if (normalizedTeamName.includes("mexico") || normalizedTeamName.includes("mexique")) {
-    return "2e";
-  }
-
-  if (normalizedTeamName.includes("south africa") || normalizedTeamName.includes("afrique du sud")) {
-    return "3e";
-  }
-
-  return "—";
-}
-
-// Récupère les points affichables d’une équipe avec un fallback sobre pour éviter les placeholders vides.
-function getTeamPoints(matchDetails: MatchDetailsResponse | null, side: "home" | "away"): string {
-  const prefix = side === "home" ? "home" : "away";
-  const teamName = side === "home" ? getHomeTeamName(matchDetails) : getAwayTeamName(matchDetails);
-  const normalizedTeamName = teamName
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "");
-
-  const points = readText(
-    matchDetails,
-    [
-      [`${prefix}_team`, "points"],
-      [`${prefix}Team`, "points"],
-      [`${prefix}_points`],
-      [`${prefix}Points`],
-    ],
-    ""
-  );
-
-  if (points) {
-    return points.toLowerCase().includes("pt") ? points : `${points} pt`;
-  }
-
-  if (
-    normalizedTeamName.includes("mexico") ||
-    normalizedTeamName.includes("mexique") ||
-    normalizedTeamName.includes("south africa") ||
-    normalizedTeamName.includes("afrique du sud")
-  ) {
-    return "0 pt";
-  }
-
-  return "—";
-}
-
-// Récupère le nom de la compétition.
+// Cette fonction récupère le nom de la compétition.
 function getCompetitionName(matchDetails: MatchDetailsResponse | null): string {
   return readText(
     matchDetails,
@@ -414,7 +253,7 @@ function getCompetitionName(matchDetails: MatchDetailsResponse | null): string {
   );
 }
 
-// Récupère la journée ou phase affichable du match.
+// Cette fonction récupère la journée ou phase affichable du match.
 function getMatchRound(matchDetails: MatchDetailsResponse | null): string {
   const round = readText(
     matchDetails,
@@ -427,7 +266,7 @@ function getMatchRound(matchDetails: MatchDetailsResponse | null): string {
       ["match", "matchday"],
       ["match", "stage"],
     ],
-    "Journée 1"
+    "Phase à confirmer"
   );
 
   if (/^\d+$/.test(round)) {
@@ -437,27 +276,8 @@ function getMatchRound(matchDetails: MatchDetailsResponse | null): string {
   return round;
 }
 
-// Détecte quelques équipes nationales pour afficher un drapeau stylisé quand aucun logo API n’est disponible.
-function getNationalFlagClass(teamName: string): string {
-  const normalizedName = teamName
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "");
-
-  if (normalizedName.includes("mexico") || normalizedName.includes("mexique")) {
-    return "mexico";
-  }
-
-  if (normalizedName.includes("south africa") || normalizedName.includes("afrique du sud")) {
-    return "south-africa";
-  }
-
-  return "";
-}
-
-// Affiche un logo d’équipe, un drapeau national stylisé ou un fallback textuel propre.
+// Cette fonction affiche un logo d’équipe ou un fallback textuel propre.
 function TeamVisual({ logo, name }: { logo: string; name: string }) {
-  const flagClassName = getNationalFlagClass(name);
   const initials = name
     .split(" ")
     .filter(Boolean)
@@ -469,18 +289,6 @@ function TeamVisual({ logo, name }: { logo: string; name: string }) {
     return <img src={logo} alt="" className="rb-pred-v3-match-card__crest" loading="lazy" />;
   }
 
-  if (flagClassName) {
-    return (
-      <span
-        className={`rb-pred-v3-match-card__flag rb-pred-v3-match-card__flag--${flagClassName}`}
-        role="img"
-        aria-label={`Drapeau ${name}`}
-      >
-        <i aria-hidden="true" />
-      </span>
-    );
-  }
-
   return (
     <span className="rb-pred-v3-match-card__fallback" aria-hidden="true">
       {initials || "RB"}
@@ -488,15 +296,205 @@ function TeamVisual({ logo, name }: { logo: string; name: string }) {
   );
 }
 
-// Affiche une carte de prédiction compacte.
+// Cette fonction traduit la sortie 1X2 du modèle national en libellé utilisateur.
+function formatOneXTwoPrediction(
+  prediction: string | null | undefined,
+  homeTeamName: string,
+  awayTeamName: string
+): string {
+  const normalizedPrediction = (prediction || "").toUpperCase();
+
+  if (normalizedPrediction === "TEAM_A_WIN" || normalizedPrediction.includes("HOME")) {
+    return `${homeTeamName} gagnant`;
+  }
+
+  if (normalizedPrediction === "TEAM_B_WIN" || normalizedPrediction.includes("AWAY")) {
+    return `${awayTeamName} gagnant`;
+  }
+
+  if (normalizedPrediction.includes("DRAW")) {
+    return "Match nul";
+  }
+
+  return "Tendance 1X2 non disponible";
+}
+
+// Cette fonction traduit la sortie Over 1.5 en libellé utilisateur.
+function formatOverOneFivePrediction(prediction: string | null | undefined): string {
+  const normalizedPrediction = (prediction || "").toUpperCase();
+
+  if (normalizedPrediction === "YES") {
+    return "Plus de 1,5 but";
+  }
+
+  if (normalizedPrediction === "NO") {
+    return "Moins de 1,5 but";
+  }
+
+  return "Volume de buts non disponible";
+}
+
+// Cette fonction traduit la sortie BTTS en libellé utilisateur.
+function formatBttsPrediction(prediction: string | null | undefined): string {
+  const normalizedPrediction = (prediction || "").toUpperCase();
+
+  if (normalizedPrediction === "YES") {
+    return "Oui · les deux équipes marquent";
+  }
+
+  if (normalizedPrediction === "NO") {
+    return "Non · BTTS non prioritaire";
+  }
+
+  return "BTTS non disponible";
+}
+
+// Cette fonction traduit le signal sélectionné par le modèle en libellé utilisateur.
+function formatSelectorPrediction(
+  selector: NationalMlSelectorResult,
+  homeTeamName: string,
+  awayTeamName: string
+): string {
+  const market = selector.selected_market.toUpperCase();
+  const prediction = (selector.selected_prediction || "").toUpperCase();
+
+  if (market === "1X2") {
+    return formatOneXTwoPrediction(prediction, homeTeamName, awayTeamName);
+  }
+
+  if (market === "OVER_1_5") {
+    return prediction === "YES" ? "Plus de 1,5 but" : "Moins de 1,5 but";
+  }
+
+  if (market === "OVER_2_5") {
+    return prediction === "YES" ? "Plus de 2,5 buts" : "Moins de 2,5 buts";
+  }
+
+  if (market === "BTTS") {
+    return formatBttsPrediction(prediction);
+  }
+
+  return selector.selected_prediction || "Signal non disponible";
+}
+
+// Cette fonction construit la carte 1X2 à partir du modèle national.
+function buildOneXTwoDisplayMarket(
+  market: NationalMlMarketPrediction | undefined,
+  homeTeamName: string,
+  awayTeamName: string
+): DisplayMarket {
+  if (!market) {
+    return {
+      key: "1x2",
+      title: "1X2",
+      subtitle: "Résultat du match",
+      predictionLabel: "Donnée modèle indisponible",
+      probabilityLabel: "non disponible",
+      modelLabel: "Modèle non appelé",
+      reading: "Le modèle national n’a pas retourné de signal 1X2 exploitable pour ce match.",
+      muted: true,
+    };
+  }
+
+  return {
+    key: "1x2",
+    title: "1X2",
+    subtitle: "Résultat du match",
+    predictionLabel: formatOneXTwoPrediction(market.prediction, homeTeamName, awayTeamName),
+    probabilityLabel: formatProbability(market.max_probability),
+    modelLabel: market.model_name,
+    reading: "Lecture produite par le modèle national expérimental à partir des features disponibles.",
+    muted: false,
+  };
+}
+
+// Cette fonction construit la carte Nombre de buts à partir de over_1_5.
+function buildGoalsDisplayMarket(market: NationalMlMarketPrediction | undefined): DisplayMarket {
+  if (!market) {
+    return {
+      key: "over_1_5",
+      title: "Nombre de buts",
+      subtitle: "Marché Over 1.5",
+      predictionLabel: "Donnée modèle indisponible",
+      probabilityLabel: "non disponible",
+      modelLabel: "Modèle non appelé",
+      reading: "Le modèle national n’a pas retourné de signal Over 1.5 exploitable pour ce match.",
+      muted: true,
+    };
+  }
+
+  return {
+    key: "over_1_5",
+    title: "Nombre de buts",
+    subtitle: "Marché Over 1.5",
+    predictionLabel: formatOverOneFivePrediction(market.prediction),
+    probabilityLabel: formatProbability(market.max_probability),
+    modelLabel: market.model_name,
+    reading: "RubyBets affiche ici le marché Over 1.5 demandé pour la lecture du volume de buts.",
+    muted: false,
+  };
+}
+
+// Cette fonction construit la carte BTTS à partir du modèle national.
+function buildBttsDisplayMarket(market: NationalMlMarketPrediction | undefined): DisplayMarket {
+  if (!market) {
+    return {
+      key: "btts",
+      title: "BTTS",
+      subtitle: "Les deux équipes marquent",
+      predictionLabel: "Donnée modèle indisponible",
+      probabilityLabel: "non disponible",
+      modelLabel: "Modèle non appelé",
+      reading: "Le modèle national n’a pas retourné de signal BTTS exploitable pour ce match.",
+      muted: true,
+    };
+  }
+
+  return {
+    key: "btts",
+    title: "BTTS",
+    subtitle: "Les deux équipes marquent",
+    predictionLabel: formatBttsPrediction(market.prediction),
+    probabilityLabel: formatProbability(market.max_probability),
+    modelLabel: market.model_name,
+    reading: "Signal BTTS calculé par le modèle national expérimental, sans utiliser de cote.",
+    muted: false,
+  };
+}
+
+// Cette fonction choisit le meilleur signal disponible si le sélecteur ne retourne rien.
+function findBestMarketFallback(
+  marketPredictions: NationalMlPredictionResponse["market_predictions"]
+): { key: string; market: NationalMlMarketPrediction } | null {
+  if (!marketPredictions) {
+    return null;
+  }
+
+  const entries = Object.entries(marketPredictions).filter(
+    (entry): entry is [string, NationalMlMarketPrediction] => Boolean(entry[1])
+  );
+
+  return entries.reduce<{ key: string; market: NationalMlMarketPrediction } | null>(
+    (best, [key, market]) => {
+      if (!best || market.max_probability > best.market.max_probability) {
+        return { key, market };
+      }
+
+      return best;
+    },
+    null
+  );
+}
+
+// Cette fonction affiche une carte de prédiction compacte.
 function PredictionCard({
   icon,
   title,
   subtitle,
   bodyTitle,
   bodyText,
-  confidence,
-  risk,
+  probability,
+  modelName,
   muted = false,
 }: {
   icon: ReactNode;
@@ -504,8 +502,8 @@ function PredictionCard({
   subtitle: string;
   bodyTitle: string;
   bodyText: string;
-  confidence: string;
-  risk: string;
+  probability: string;
+  modelName: string;
   muted?: boolean;
 }) {
   const cardClassName = muted
@@ -530,18 +528,18 @@ function PredictionCard({
       <div className="rb-pred-v3-prediction-card__meta">
         <span>
           <BarChart3 size={15} aria-hidden="true" />
-          Confiance : {confidence}
+          Probabilité : {probability}
         </span>
         <span>
           <Gauge size={15} aria-hidden="true" />
-          Risque : {risk}
+          Modèle : {modelName}
         </span>
       </div>
     </article>
   );
 }
 
-// Affiche une ligne courte dans la sidebar.
+// Cette fonction affiche une ligne courte dans la sidebar.
 function SidebarLine({ icon, children }: { icon: ReactNode; children: ReactNode }) {
   return (
     <li className="rb-pred-v3-sidebar-line">
@@ -551,9 +549,9 @@ function SidebarLine({ icon, children }: { icon: ReactNode; children: ReactNode 
   );
 }
 
-// Ce composant affiche l’écran Prédictions sans modifier les contrats API ni le backend.
+// Ce composant affiche l’écran Prédictions à partir du modèle national expérimental chargé par App.tsx.
 function PredictionsScreen({
-  matchPredictions,
+  nationalMlPrediction,
   matchDetails,
   matchContext,
   matchPredictionsStatus,
@@ -567,74 +565,69 @@ function PredictionsScreen({
   const matchRound = getMatchRound(matchDetails);
   const matchDate = formatMatchDate(matchDetails);
   const matchTime = formatMatchTime(matchDetails);
+  const isModelComputed = nationalMlPrediction?.status === "computed";
+  const marketPredictions = nationalMlPrediction?.market_predictions;
+  const selectorResult = nationalMlPrediction?.selector_result ?? null;
 
-  const markets = readArray(matchPredictions, [["markets"], ["predictions"], ["items"]]);
-  const oneXTwoMarket = findMarket(markets, ["1x2", "result"]);
-  const goalsMarket = findMarket(markets, ["goals", "over", "under"]);
-  const bttsMarket = findMarket(markets, ["btts", "both"]);
-
-  const oneXTwoPrediction = formatPredictionLabel(
-    readText(oneXTwoMarket, [["prediction"], ["predicted_value"], ["value"], ["label"]], ""),
+  const oneXTwoMarket = buildOneXTwoDisplayMarket(
+    marketPredictions?.["1x2"],
     homeTeamName,
     awayTeamName
   );
+  const goalsMarket = buildGoalsDisplayMarket(marketPredictions?.over_1_5);
+  const bttsMarket = buildBttsDisplayMarket(marketPredictions?.btts);
+  const bestMarketFallback = findBestMarketFallback(marketPredictions);
 
-  const oneXTwoConfidence = formatConfidence(
-    readText(oneXTwoMarket, [["confidence"], ["confidence_level"]], "faible")
-  );
+  const selectorPredictionLabel = selectorResult
+    ? formatSelectorPrediction(selectorResult, homeTeamName, awayTeamName)
+    : bestMarketFallback
+      ? bestMarketFallback.market.prediction
+      : "Signal complémentaire indisponible";
 
-  const oneXTwoRisk = formatRisk(
-    readText(oneXTwoMarket, [["risk_level"], ["risk"], ["riskLevel"]], "élevé")
-  );
+  const selectorMarketLabel = selectorResult
+    ? formatMarketName(selectorResult.selected_market)
+    : bestMarketFallback
+      ? formatMarketName(bestMarketFallback.key)
+      : "Signal modèle";
 
-  const goalsConfidence = formatConfidence(
-    readText(goalsMarket, [["confidence"], ["confidence_level"]], "faible")
-  );
+  const selectorConfidenceLabel = selectorResult
+    ? formatProbability(selectorResult.selected_confidence)
+    : bestMarketFallback
+      ? formatProbability(bestMarketFallback.market.max_probability)
+      : "non disponible";
 
-  const goalsRisk = formatRisk(
-    readText(goalsMarket, [["risk_level"], ["risk"], ["riskLevel"]], "élevé")
-  );
+  const referenceReliabilityLabel = selectorResult?.reference_reliability
+    ? formatProbability(selectorResult.reference_reliability)
+    : "non disponible";
 
-  const bttsConfidence = formatConfidence(
-    readText(bttsMarket, [["confidence"], ["confidence_level"]], "faible")
-  );
+  const gaugeValue = selectorResult?.reference_reliability
+    ? probabilityToGaugeValue(selectorResult.reference_reliability)
+    : probabilityToGaugeValue(bestMarketFallback?.market.max_probability);
 
-  const bttsRisk = formatRisk(
-    readText(bttsMarket, [["risk_level"], ["risk"], ["riskLevel"]], "élevé")
-  );
-
-  const confidencePercent =
-    getConfidencePercent(matchPredictions) ??
-    getConfidencePercent(oneXTwoMarket) ??
-    null;
-
-  const gaugeValue = confidencePercent ?? 48;
-  const signalConfidenceLabel = confidencePercent ? `${confidencePercent}%` : "prudente";
-  const predictionStatusLabel = matchPredictionsStatus.toLowerCase().includes("charg")
-    ? "Analyse disponible"
-    : matchPredictionsStatus || "Analyse disponible";
-
+  const safeGaugeValue = gaugeValue || 0;
   const gaugeStyle = {
-    "--rb-pred-v3-gauge": `${Math.round((gaugeValue / 100) * 360)}deg`,
+    "--rb-pred-v3-gauge": `${Math.round((safeGaugeValue / 100) * 360)}deg`,
   } as CSSProperties;
 
-  const globalRisk = formatRisk(
-    readText(matchPredictions, [["risk_level"], ["risk"], ["global_risk"]], oneXTwoRisk)
-  );
+  const predictionStatusLabel = isModelComputed
+    ? "Modèle national calculé"
+    : matchPredictionsStatus || "Modèle national indisponible";
 
-  const globalConfidence = confidencePercent
-    ? confidencePercent >= 70
-      ? "modérée à élevée"
-      : confidencePercent >= 45
-        ? "faible à modérée"
-        : "faible"
-    : "faible à modérée";
+  const globalRisk = formatRisk(selectorResult?.risk_level);
+  const globalConfidence = safeGaugeValue >= 80
+    ? "fiabilité de référence élevée"
+    : safeGaugeValue >= 60
+      ? "fiabilité de référence modérée"
+      : "fiabilité de référence limitée";
 
   const contextSummary = readText(
     matchContext,
-    [["summary"], ["main_context"], ["context"], ["overview"]],
+    [["context", "summary", "title"], ["summary"], ["main_context"], ["context"], ["overview"]],
     "Match analysé avant le coup d’envoi, à partir des données disponibles."
   );
+
+  const unavailableReason = nationalMlPrediction?.unavailable_reason ||
+    "Le modèle national expérimental n’a pas retourné de prédiction calculable pour ce match.";
 
   return (
     <div className="rb-pred-v3-screen">
@@ -655,7 +648,7 @@ function PredictionsScreen({
             </span>
             <div>
               <h2>Prédictions</h2>
-              <p>Tendances analysées avant coup d’envoi.</p>
+              <p>Signaux du modèle RubyBets national expérimental.</p>
             </div>
           </div>
 
@@ -679,9 +672,7 @@ function PredictionsScreen({
           <div>
             <p>Domicile</p>
             <h3>{homeTeamName}</h3>
-            <span>
-              {getTeamRank(matchDetails, "home")} · {getTeamPoints(matchDetails, "home")}
-            </span>
+            <span>Équipe A du modèle</span>
           </div>
         </div>
 
@@ -697,9 +688,7 @@ function PredictionsScreen({
           <div>
             <p>Extérieur</p>
             <h3>{awayTeamName}</h3>
-            <span>
-              {getTeamRank(matchDetails, "away")} · {getTeamPoints(matchDetails, "away")}
-            </span>
+            <span>Équipe B du modèle</span>
           </div>
         </div>
       </section>
@@ -709,10 +698,10 @@ function PredictionsScreen({
           <section className="rb-pred-v3-panel">
             <header className="rb-pred-v3-panel__header">
               <div>
-                <p className="rb-pred-v3-eyebrow">PRÉDICTIONS POUR CE MATCH</p>
-                <h3>Tendances analysées</h3>
+                <p className="rb-pred-v3-eyebrow">MODÈLE RUBYBETS NATIONAL EXPÉRIMENTAL</p>
+                <h3>Prédictions par marché</h3>
                 <span>
-                  Basées sur les données disponibles, la dynamique des équipes et le contexte avant-match.
+                  Basées sur le modèle national V18.3.4 dc018, sans cote FlashScore et sans promesse de résultat.
                 </span>
               </div>
 
@@ -722,37 +711,51 @@ function PredictionsScreen({
               </span>
             </header>
 
+            {!isModelComputed && (
+              <article className="rb-pred-v3-signal-card">
+                <div className="rb-pred-v3-signal-card__title">
+                  <Info size={22} aria-hidden="true" />
+                  <div>
+                    <p>MODÈLE INDISPONIBLE</p>
+                    <h4>Prédiction nationale non calculable</h4>
+                    <span>{unavailableReason}</span>
+                  </div>
+                </div>
+              </article>
+            )}
+
             <div className="rb-pred-v3-predictions-grid">
               <PredictionCard
                 icon={<Trophy size={17} aria-hidden="true" />}
-                title="1X2"
-                subtitle="Tendance résultat"
-                bodyTitle="Lecture RubyBets"
-                bodyText={oneXTwoPrediction || "Tendance prudente · match à surveiller"}
-                confidence={oneXTwoConfidence}
-                risk={oneXTwoRisk}
+                title={oneXTwoMarket.title}
+                subtitle={oneXTwoMarket.subtitle}
+                bodyTitle={oneXTwoMarket.predictionLabel}
+                bodyText={oneXTwoMarket.reading}
+                probability={oneXTwoMarket.probabilityLabel}
+                modelName={oneXTwoMarket.modelLabel}
+                muted={oneXTwoMarket.muted}
               />
 
               <PredictionCard
                 icon={<BarChart3 size={17} aria-hidden="true" />}
-                title="Nombre de buts"
-                subtitle="Volume offensif"
-                bodyTitle="Données insuffisantes"
-                bodyText="Les moyennes offensives disponibles ne permettent pas de produire une lecture fiable."
-                confidence={goalsConfidence}
-                risk={goalsRisk}
-                muted
+                title={goalsMarket.title}
+                subtitle={goalsMarket.subtitle}
+                bodyTitle={goalsMarket.predictionLabel}
+                bodyText={goalsMarket.reading}
+                probability={goalsMarket.probabilityLabel}
+                modelName={goalsMarket.modelLabel}
+                muted={goalsMarket.muted}
               />
 
               <PredictionCard
                 icon={<Sparkles size={17} aria-hidden="true" />}
-                title="BTTS"
-                subtitle="Les deux équipes marquent"
-                bodyTitle="Données insuffisantes"
-                bodyText="Les signaux disponibles ne permettent pas d’évaluer clairement cette tendance."
-                confidence={bttsConfidence}
-                risk={bttsRisk}
-                muted
+                title={bttsMarket.title}
+                subtitle={bttsMarket.subtitle}
+                bodyTitle={bttsMarket.predictionLabel}
+                bodyText={bttsMarket.reading}
+                probability={bttsMarket.probabilityLabel}
+                modelName={bttsMarket.modelLabel}
+                muted={bttsMarket.muted}
               />
             </div>
 
@@ -761,20 +764,20 @@ function PredictionsScreen({
                 <Zap size={22} aria-hidden="true" />
                 <div>
                   <p>SIGNAL COMPLÉMENTAIRE</p>
-                  <h4>Double chance : {homeTeamName} ou match nul</h4>
+                  <h4>{selectorMarketLabel} · {selectorPredictionLabel}</h4>
                   <span>
-                    Ce signal complète la lecture principale sans constituer une prédiction certaine.
+                    Signal sélectionné par le modèle national expérimental selon son profil prudent.
                   </span>
                 </div>
               </div>
 
               <div className="rb-pred-v3-signal-card__premium-side">
-                <strong>{signalConfidenceLabel}</strong>
-                <span>Confiance indicative</span>
+                <strong>{selectorConfidenceLabel}</strong>
+                <span>Confiance sélection</span>
 
                 <div className="rb-pred-v3-signal-card__badges">
-                  <span>Signal complémentaire</span>
-                  <span>Lecture prudente</span>
+                  <span>Fiabilité réf. {referenceReliabilityLabel}</span>
+                  <span>Risque {globalRisk}</span>
                 </div>
               </div>
             </article>
@@ -782,37 +785,37 @@ function PredictionsScreen({
 
           <section className="rb-pred-v3-panel rb-pred-v3-global-reading">
             <p className="rb-pred-v3-eyebrow">LECTURE GLOBALE DE LA RENCONTRE</p>
-            <h3>Synthèse des signaux disponibles</h3>
+            <h3>Synthèse des signaux modèle</h3>
             <p>
-              Les éléments disponibles indiquent un contexte relativement équilibré entre les deux
-              équipes. L’écart observé ne permet pas de dégager une tendance fortement orientée avant
-              le coup d’envoi.
+              Les cartes affichent les trois marchés principaux demandés : 1X2, Over 1.5 et BTTS.
+              Le signal complémentaire correspond au marché sélectionné par le modèle national expérimental,
+              avec sa confiance et sa fiabilité de référence lorsqu’elles sont disponibles.
             </p>
 
             <div className="rb-pred-v3-reading-grid">
               <article>
                 <Gauge size={30} aria-hidden="true" />
-                <strong>Équilibre général</strong>
-                <span>Pas d’avantage clair avant le match.</span>
+                <strong>{globalConfidence}</strong>
+                <span>Lecture issue des métriques de référence du sélecteur.</span>
               </article>
 
               <article>
                 <ShieldCheck size={30} aria-hidden="true" />
-                <strong>Contexte prudent</strong>
-                <span>Plusieurs facteurs restent encore incertains.</span>
+                <strong>Cadre expérimental</strong>
+                <span>Le modèle national reste une aide analytique, pas une garantie.</span>
               </article>
 
               <article>
                 <Eye size={30} aria-hidden="true" />
-                <strong>Lecture responsable</strong>
-                <span>Basée uniquement sur les données actuelles.</span>
+                <strong>Aucune cote utilisée</strong>
+                <span>RubyBets n’utilise pas les odds FlashScore pour cet écran.</span>
               </article>
             </div>
           </section>
 
           <p className="rb-pred-v3-footer-note">
             <Info size={16} aria-hidden="true" />
-            Les prédictions présentées sont des lectures analytiques et ne garantissent aucun résultat sportif.
+            Les prédictions présentées sont expérimentales et ne garantissent aucun résultat sportif.
           </p>
         </main>
 
@@ -822,14 +825,14 @@ function PredictionsScreen({
 
             <div className="rb-pred-v3-gauge-row">
               <div className="rb-pred-v3-gauge" style={gaugeStyle}>
-                <span>{gaugeValue}%</span>
+                <span>{safeGaugeValue}%</span>
               </div>
 
               <div>
-                <span>Confiance globale</span>
+                <span>Fiabilité référence</span>
                 <strong>{globalConfidence}</strong>
-                <p>Lecture prudente et responsable.</p>
-                <small>Basée uniquement sur les données disponibles.</small>
+                <p>Risque signal : {globalRisk}.</p>
+                <small>Basée uniquement sur la réponse du modèle national.</small>
               </div>
             </div>
           </section>
@@ -838,27 +841,19 @@ function PredictionsScreen({
             <p className="rb-pred-v3-eyebrow">EN RÉSUMÉ</p>
 
             <ul className="rb-pred-v3-sidebar-list">
-              <SidebarLine icon={<Sparkles size={17} aria-hidden="true" />}>
-                Aucun avantage clair avant le match.
+              <SidebarLine icon={<Trophy size={17} aria-hidden="true" />}>
+                1X2 : {oneXTwoMarket.predictionLabel} · {oneXTwoMarket.probabilityLabel}.
               </SidebarLine>
               <SidebarLine icon={<BarChart3 size={17} aria-hidden="true" />}>
-                Les données offensives restent limitées pour évaluer le volume de buts.
+                Nombre de buts : {goalsMarket.predictionLabel} · {goalsMarket.probabilityLabel}.
               </SidebarLine>
-              <SidebarLine icon={<Gauge size={17} aria-hidden="true" />}>
-                Risque global : {globalRisk}.
+              <SidebarLine icon={<Sparkles size={17} aria-hidden="true" />}>
+                BTTS : {bttsMarket.predictionLabel} · {bttsMarket.probabilityLabel}.
               </SidebarLine>
               <SidebarLine icon={<Zap size={17} aria-hidden="true" />}>
-                La double chance constitue un signal complémentaire, non déterminant.
+                Signal complémentaire : {selectorMarketLabel} · {selectorConfidenceLabel}.
               </SidebarLine>
             </ul>
-          </section>
-
-          <section className="rb-pred-v3-side-card">
-            <p className="rb-pred-v3-eyebrow">FACE À FACE</p>
-            <h3>Historique récent indisponible</h3>
-            <p className="rb-pred-v3-side-card__text">
-              Les confrontations directes ne sont pas encore disponibles pour cette rencontre.
-            </p>
           </section>
 
           <section className="rb-pred-v3-side-card">
@@ -869,7 +864,7 @@ function PredictionsScreen({
                 Match analysé avant le coup d’envoi.
               </SidebarLine>
               <SidebarLine icon={<ShieldCheck size={17} aria-hidden="true" />}>
-                Lecture basée sur les données disponibles.
+                Source match : {nationalMlPrediction?.source_used_for_match || "donnée non disponible"}.
               </SidebarLine>
               <SidebarLine icon={<Info size={17} aria-hidden="true" />}>
                 {contextSummary}
@@ -882,10 +877,10 @@ function PredictionsScreen({
             <div>
               <p className="rb-pred-v3-eyebrow">CADRE RESPONSABLE</p>
               <p>
-                RubyBets est un outil d’aide à la décision. Nos analyses reposent sur des données
-                réelles, mais ne garantissent aucun résultat.
+                RubyBets est un outil d’aide à la décision. Le modèle national expérimental produit des signaux,
+                mais ne garantit aucun résultat.
               </p>
-              <strong>Aucun conseil en investissement ou pari.</strong>
+              <strong>Aucune cote FlashScore utilisée.</strong>
             </div>
           </section>
         </aside>
@@ -898,7 +893,7 @@ export default PredictionsScreen;
 
 // Schéma de communication du fichier :
 // PredictionsScreen.tsx
-// ├── reçoit matchPredictions, matchDetails et matchContext depuis App.tsx
-// ├── affiche les tendances 1X2, buts, BTTS et signal complémentaire
-// ├── utilise une variante du panneau Détail match pour le résumé de rencontre
-// └── utilise App.css avec les classes rb-pred-v3-* sans modifier le backend ni les contrats API
+// ├── reçoit nationalMlPrediction, matchDetails et matchContext depuis App.tsx
+// ├── affiche 1X2, Over 1.5, BTTS et Signal complémentaire depuis le modèle national
+// ├── n’utilise aucune cote FlashScore et ne calcule pas de prédiction côté interface
+// └── utilise App.css avec les classes rb-pred-v3-* sans modifier le backend

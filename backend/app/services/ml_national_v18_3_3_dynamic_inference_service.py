@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+import copy
 import csv
 import unicodedata
 from datetime import datetime, timezone
@@ -539,6 +540,66 @@ def predict_market_from_features(
     }
 
 
+# Applique les regles de coherence metier entre les marches predictifs.
+def apply_market_consistency_rules(
+    predictions: dict[str, dict[str, Any]],
+) -> tuple[dict[str, dict[str, Any]], dict[str, Any]]:
+    adjusted_predictions = copy.deepcopy(predictions)
+    adjustments: list[dict[str, Any]] = []
+
+    over_1_5_prediction = adjusted_predictions.get("over_1_5", {}).get("prediction")
+    btts_prediction = adjusted_predictions.get("btts", {}).get("prediction")
+
+    if over_1_5_prediction == "NO" and btts_prediction == "YES":
+        btts_market = adjusted_predictions["btts"]
+        btts_probabilities = btts_market.get("probabilities", {})
+        corrected_probability = btts_probabilities.get("NO")
+        raw_prediction = btts_market.get("prediction")
+        raw_max_probability = btts_market.get("max_probability")
+
+        btts_market["prediction"] = "NO"
+        if corrected_probability is not None:
+            btts_market["max_probability"] = corrected_probability
+
+        btts_market["consistency_status"] = "adjusted"
+        btts_market["raw_prediction"] = raw_prediction
+        btts_market["raw_max_probability"] = raw_max_probability
+        btts_market["adjusted_by_rule"] = "BTTS_YES_INCOMPATIBLE_WITH_OVER_1_5_NO"
+        btts_market["adjustment_reason"] = (
+            "BTTS YES est impossible lorsque le modele de reference over_1_5 predit NO. "
+            "La prediction BTTS est donc ramenee a NO sans inventer de nouvelle probabilite."
+        )
+
+        adjustments.append(
+            {
+                "code": "BTTS_YES_INCOMPATIBLE_WITH_OVER_1_5_NO",
+                "severity": "high",
+                "reference_market": "over_1_5",
+                "adjusted_market": "btts",
+                "raw_prediction": raw_prediction,
+                "adjusted_prediction": "NO",
+                "reference_prediction": "NO",
+                "raw_max_probability": raw_max_probability,
+                "adjusted_probability": corrected_probability,
+                "message": (
+                    "over_1_5 NO implique un maximum d'un but dans le match ; "
+                    "BTTS YES est donc incoherent et corrige en BTTS NO."
+                ),
+            }
+        )
+
+    consistency_checks = {
+        "source": "rubybets_market_consistency_rules",
+        "scope": "experimental_backend",
+        "status": "adjusted" if adjustments else "ok",
+        "rules_version": "market_consistency_v1",
+        "adjustments_count": len(adjustments),
+        "adjustments": adjustments,
+    }
+
+    return adjusted_predictions, consistency_checks
+
+
 # Transforme les sorties des modeles en features compatibles avec le selecteur V18.3.4 dc018.
 def build_selector_features_from_dynamic_predictions(
     predictions: dict[str, dict[str, Any]],
@@ -597,10 +658,11 @@ def infer_v18_3_3_for_rubybets_match(match: dict[str, Any]) -> dict[str, Any]:
         return build_unavailable_dynamic_response(match, validation_message)
 
     dynamic_features = build_v18_3_3_dynamic_features(match)
-    predictions = {
+    raw_predictions = {
         market_key: predict_market_from_features(market_key, dynamic_features)
         for market_key in MODEL_FILES
     }
+    predictions, consistency_checks = apply_market_consistency_rules(raw_predictions)
     selector_features = build_selector_features_from_dynamic_predictions(predictions)
     selector_result = select_market_with_v18_3_4_dc018(selector_features)
 
@@ -611,7 +673,9 @@ def infer_v18_3_3_for_rubybets_match(match: dict[str, Any]) -> dict[str, Any]:
         "data_source_file": "dynamic_selected_match_inference",
         "match": build_dynamic_match_metadata(match),
         "dynamic_features": dynamic_features,
+        "raw_market_predictions": raw_predictions,
         "market_predictions": predictions,
+        "consistency_checks": consistency_checks,
         "selector_result": selector_result,
         "responsible_note": (
             "Resultat experimental V18.3.4 dc018 calcule dynamiquement pour le match selectionne. "
@@ -626,5 +690,6 @@ def infer_v18_3_3_for_rubybets_match(match: dict[str, Any]) -> dict[str, Any]:
 #   -> lit les donnees historiques data/external/national_results/results.csv
 #   -> lit les ratings reports/evidence/ml_training/299_national_elo_final_rankings.csv
 #   -> charge les modeles models/ml_national/v18_3_global_multimarket/*.joblib
+#   -> applique les regles de coherence metier entre marches predictifs
 #   -> appelle ml_national_v18_3_3_selector.py avec la variante V18.3.4 dc018
 #   -> retourne une analyse experimentale au routeur experimental_ml_national_v18_3_3.py

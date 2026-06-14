@@ -1,10 +1,9 @@
-// Ce composant affiche le générateur de sélection multi-matchs avec contrôles segmentés et tableau premium lisible.
+// Ce composant affiche le générateur de sélection multi-matchs issu du modèle national RubyBets.
 
 import type { CSSProperties } from "react";
 import type { MultiMatchRecommendationResponse } from "../models/rubybets";
 import {
   cleanTextItems,
-  formatConfidenceLevel,
   formatRiskLevel,
   getTeamInitials,
   getTeamShortName,
@@ -54,56 +53,144 @@ function getTeamLabel(team: RecommendationTeam) {
   return getTeamShortName(team);
 }
 
-// Cette fonction convertit un niveau de confiance en score visuel.
-function getConfidencePercent(confidence: string) {
-  const values: Record<string, number> = {
-    high: 72,
-    medium: 64,
-    low: 56,
-  };
+// Cette fonction convertit une probabilité modèle en pourcentage affichable.
+function formatProbabilityPercent(value: number | null | undefined) {
+  if (typeof value !== "number" || Number.isNaN(value)) {
+    return "—";
+  }
 
-  return values[confidence] ?? 60;
+  return `${Math.round(value * 100)}%`;
 }
 
-// Cette fonction calcule une confiance globale indicative pour la sélection.
+// Cette fonction convertit une probabilité modèle en nombre utilisable par le ring CSS.
+function getProbabilityPercentValue(value: number | null | undefined) {
+  if (typeof value !== "number" || Number.isNaN(value)) {
+    return 0;
+  }
+
+  return Math.round(value * 100);
+}
+
+// Cette fonction calcule une confiance globale à partir des selected_confidence réels du backend.
 function getGlobalConfidence(
   multiMatchRecommendation: MultiMatchRecommendationResponse | null,
 ) {
   const recommendations = multiMatchRecommendation?.recommendations ?? [];
+  const confidences = recommendations
+    .map((item) => item.selected_confidence)
+    .filter((value): value is number => typeof value === "number");
 
-  if (recommendations.length === 0) {
+  if (confidences.length === 0) {
     return "—";
   }
 
-  const total = recommendations.reduce((sum, item) => {
-    return sum + getConfidencePercent(item.selected_prediction.confidence);
-  }, 0);
-
-  return `${Math.round(total / recommendations.length)}%`;
+  const total = confidences.reduce((sum, confidence) => sum + confidence, 0);
+  return formatProbabilityPercent(total / confidences.length);
 }
 
-// Cette fonction retourne un libellé de marché court et stable.
-function formatMarketLabel(market: string) {
+// Cette fonction retourne un libellé de marché clair pour les signaux du selector national.
+function formatMarketLabel(market: string | null) {
   const labels: Record<string, string> = {
-    one_x_two: "1X2",
-    goals: "Buts",
-    btts: "BTTS",
+    DOUBLE_CHANCE: "Double chance",
+    "1X2": "1X2",
+    TEAM_A_WIN: "Victoire équipe A",
+    TEAM_B_WIN: "Victoire équipe B",
+    DRAW: "Match nul",
+    OVER_1_5: "Plus de 1,5 but",
+    OVER_2_5: "Plus de 2,5 buts",
+    BTTS: "BTTS",
   };
 
-  return labels[market] ?? market;
+  if (!market) {
+    return "Marché à confirmer";
+  }
+
+  return labels[market] ?? market.replaceAll("_", " ");
 }
 
-// Cette fonction retourne une lecture courte pour la mini-card de recommandation.
+// Cette fonction traduit une prédiction technique du selector en phrase utilisateur.
+function formatSelectedPrediction(item: RecommendationItem) {
+  const prediction = item.selected_prediction;
+  const homeName = getTeamLabel(item.match.home_team);
+  const awayName = getTeamLabel(item.match.away_team);
+
+  const labels: Record<string, string> = {
+    TEAM_A_WIN: `Victoire ${homeName}`,
+    TEAM_B_WIN: `Victoire ${awayName}`,
+    DRAW: "Match nul",
+    DRAW_OR_TEAM_A: `Nul ou ${homeName}`,
+    DRAW_OR_TEAM_B: `Nul ou ${awayName}`,
+    TEAM_A_OR_TEAM_B: `${homeName} ou ${awayName}`,
+    YES: "Oui",
+    NO: "Non",
+  };
+
+  if (!prediction) {
+    return "Sélection à confirmer";
+  }
+
+  return labels[prediction] ?? prediction.replaceAll("_", " ");
+}
+
+// Cette fonction retourne une lecture courte à partir du selector_result reçu du backend.
 function formatSelectionSummary(item: RecommendationItem) {
-  if (item.selected_prediction.risk === "high") {
-    return "Tendance prudente / match à surveiller";
+  if (item.selected_market === "DOUBLE_CHANCE") {
+    return "Signal prudent issu du sélecteur national";
   }
 
-  if (item.selected_prediction.confidence === "high") {
-    return "Signal principal / lecture encadrée";
+  if (item.consistency_checks?.status === "adjusted") {
+    return "Signal corrigé par cohérence métier";
   }
 
-  return "Lecture prudente / à confirmer";
+  return "Signal ML national sélectionné";
+}
+
+// Cette fonction résume la règle du sélecteur sans surcharger le tableau.
+function formatSelectorRule(item: RecommendationItem) {
+  if (item.consistency_checks?.status === "adjusted") {
+    return "Cohérence inter-marchés appliquée. Le signal reste encadré par le modèle national expérimental.";
+  }
+
+  return item.selector_rule || "Signal retenu par le sélecteur national expérimental.";
+}
+
+// Cette fonction prépare le message affiché quand aucune sélection n’est retournée par le backend.
+function getEmptyStateContent(
+  multiMatchRecommendation: MultiMatchRecommendationResponse | null,
+  recommendationRiskLevel: RiskLevel,
+  multiMatchStatus: string,
+) {
+  const requestedRiskLevel =
+    multiMatchRecommendation?.request.risk_level ?? recommendationRiskLevel;
+
+  const isBackendEmptyResponse =
+    multiMatchRecommendation?.status === "empty" ||
+    multiMatchRecommendation?.selected_count === 0;
+
+  if (isBackendEmptyResponse && requestedRiskLevel === "high") {
+    return {
+      title: "Aucune sélection à risque élevé disponible",
+      message:
+        "Le modèle national n’a identifié aucun signal suffisamment cohérent pour ce niveau de risque sur les matchs actuellement disponibles.",
+      hint: "Vous pouvez essayer un niveau de risque moyen ou faible.",
+    };
+  }
+
+  if (isBackendEmptyResponse) {
+    return {
+      title: `Aucune sélection ${formatRiskLevel(requestedRiskLevel).toLowerCase()} disponible`,
+      message:
+        "Aucun signal compatible avec ce niveau de risque n’est disponible sur les matchs actuellement calculés.",
+      hint: "Vous pouvez modifier le niveau de risque ou relancer la génération plus tard.",
+    };
+  }
+
+  return {
+    title: "Aucune sélection affichée",
+    message: multiMatchStatus,
+    hint:
+      "Lancez une génération pour afficher une sélection structurée à partir des signaux déjà produits par le modèle national.",
+  };
 }
 
 // Ce composant affiche un logo d’équipe avec fallback.
@@ -196,11 +283,11 @@ function RiskLevelSegments({
   );
 }
 
-// Ce composant affiche une ligne de recommandation dans le tableau premium.
+// Ce composant affiche une ligne de sélection issue du modèle national expérimental.
 function RecommendationRow({ item }: { item: RecommendationItem }) {
-  const confidencePercent = getConfidencePercent(
-    item.selected_prediction.confidence,
-  );
+  const confidencePercent = getProbabilityPercentValue(item.selected_confidence);
+  const reliabilityLabel = formatProbabilityPercent(item.reference_reliability);
+  const riskLevel = item.risk_level || "medium";
 
   return (
     <article className="rb-reco-table-row">
@@ -232,8 +319,9 @@ function RecommendationRow({ item }: { item: RecommendationItem }) {
       <div className="rb-reco-table-cell rb-reco-selection-cell">
         <div className="rb-reco-selection-card">
           <span className="rb-reco-market-badge rb-reco-market-badge--solo">
-            {formatMarketLabel(item.selected_prediction.market)}
+            {formatMarketLabel(item.selected_market)}
           </span>
+          <strong>{formatSelectedPrediction(item)}</strong>
           <p>{formatSelectionSummary(item)}</p>
         </div>
       </div>
@@ -245,21 +333,19 @@ function RecommendationRow({ item }: { item: RecommendationItem }) {
             { "--rb-reco-confidence": `${confidencePercent}%` } as CSSProperties
           }
         >
-          {confidencePercent}%
+          {formatProbabilityPercent(item.selected_confidence)}
         </span>
-        <small>{formatConfidenceLevel(item.selected_prediction.confidence)}</small>
+        <small>Fiabilité réf. {reliabilityLabel}</small>
       </div>
 
       <div className="rb-reco-table-cell">
-        <span
-          className={`rb-reco-risk-badge rb-reco-risk-badge--${item.selected_prediction.risk}`}
-        >
-          {formatRiskLevel(item.selected_prediction.risk)}
+        <span className={`rb-reco-risk-badge rb-reco-risk-badge--${riskLevel}`}>
+          {formatRiskLevel(riskLevel)}
         </span>
       </div>
 
       <div className="rb-reco-table-cell">
-        <p>{item.selected_prediction.justification}</p>
+        <p>{formatSelectorRule(item)}</p>
       </div>
     </article>
   );
@@ -289,7 +375,7 @@ function RecommendationLimits({
   );
 }
 
-// Ce composant permet de paramétrer, générer et afficher une recommandation multi-matchs explicable.
+// Ce composant permet de paramétrer, générer et afficher une sélection multi-matchs expérimentale.
 function MultiMatchRecommendationSection({
   recommendationMatchCount,
   recommendationRiskLevel,
@@ -304,6 +390,11 @@ function MultiMatchRecommendationSection({
     Boolean(multiMatchRecommendation) &&
     multiMatchRecommendation!.recommendations.length > 0;
 
+    const emptyStateContent = getEmptyStateContent(
+    multiMatchRecommendation,
+    recommendationRiskLevel,
+    multiMatchStatus,
+  );
   return (
     <section className="rb-reco-generator-panel">
       <div className="rb-reco-controls-panel">
@@ -327,12 +418,12 @@ function MultiMatchRecommendationSection({
           >
             {isGenerating
               ? "Génération en cours..."
-              : "Générer la recommandation"}
+              : "Générer la sélection"}
           </button>
 
           <p role="status">
             <span>✧</span>
-            Analyse basée sur des données avant-match
+            Signaux issus du modèle national expérimental
           </p>
         </div>
       </div>
@@ -340,8 +431,8 @@ function MultiMatchRecommendationSection({
       <div className="rb-reco-results-panel">
         <div className="rb-reco-results-header">
           <div>
-            <p className="rb-reco-kicker">Votre recommandation multi-matchs</p>
-            <h3>Sélection analytique</h3>
+            <p className="rb-reco-kicker">Votre sélection multi-matchs</p>
+            <h3>Sélection analytique nationale</h3>
           </div>
 
           <div className="rb-reco-results-stats">
@@ -364,14 +455,11 @@ function MultiMatchRecommendationSection({
           </div>
         </div>
 
-        {!hasRecommendations ? (
+                {!hasRecommendations ? (
           <div className="rb-reco-empty-state">
-            <h3>Aucune sélection affichée</h3>
-            <p>{multiMatchStatus}</p>
-            <p>
-              Lancez une génération pour afficher une recommandation structurée à
-              partir des matchs disponibles.
-            </p>
+            <h3>{emptyStateContent.title}</h3>
+            <p>{emptyStateContent.message}</p>
+            <p>{emptyStateContent.hint}</p>
           </div>
         ) : null}
 
@@ -380,14 +468,17 @@ function MultiMatchRecommendationSection({
             <div className="rb-reco-table">
               <div className="rb-reco-table-head">
                 <span>Match</span>
-                <span>Recommandation</span>
+                <span>Marché & sélection</span>
                 <span>Confiance</span>
                 <span>Risque</span>
                 <span>Analyse clé</span>
               </div>
 
               {multiMatchRecommendation!.recommendations.map((item) => (
-                <RecommendationRow item={item} key={item.match.id} />
+                <RecommendationRow
+                  item={item}
+                  key={`${item.match.id}-${item.selected_market}`}
+                />
               ))}
             </div>
 
@@ -405,6 +496,6 @@ export default MultiMatchRecommendationSection;
 // MultiMatchRecommendationSection.tsx
 // ├── reçoit les paramètres et résultats depuis RecommendationScreen.tsx
 // ├── conserve les callbacks onChangeMatchCount, onChangeRiskLevel et onGenerateRecommendation
-// ├── affiche les sélections reçues du backend sous forme de tableau premium
-// ├── sépare clairement Match, Recommandation, Confiance, Risque et Analyse clé
-// └── ne modifie ni API, ni backend, ni modèle de données
+// ├── affiche les sélections issues du endpoint national expérimental sous forme de tableau premium
+// ├── sépare clairement Match, Marché & sélection, Confiance, Risque et Analyse clé
+// └── ne modifie ni backend, ni modèle ML ; il restitue uniquement la réponse typée reçue par App.tsx

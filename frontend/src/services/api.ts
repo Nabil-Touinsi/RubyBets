@@ -8,10 +8,13 @@ import type {
   MatchAnalysisResponse,
   MatchContextResponse,
   MatchDetailsResponse,
+  MatchLineupsResponse,
   MatchPredictionsResponse,
   MatchesResponse,
+  NationalMlPredictionResponse,
   MultiMatchRecommendationResponse,
   ResponsibleInfoResponse,
+  TeamHistoryResponse,
   V1833MatchPredictionResponse,
 } from "../models/rubybets";
 
@@ -76,6 +79,16 @@ export async function getMatchContext(
   );
 }
 
+// Cette fonction récupère l'historique récent des deux équipes pour alimenter la fiche détail match.
+export async function getMatchTeamHistory(
+  matchId: number
+): Promise<TeamHistoryResponse> {
+  return fetchJson<TeamHistoryResponse>(
+    `/api/matches/${matchId}/team-history`,
+    "Erreur lors du chargement de l'historique des équipes."
+  );
+}
+
 // Cette fonction récupère l’analyse explicable avant-match d’un match précis.
 export async function getMatchAnalysis(
   matchId: number
@@ -83,6 +96,17 @@ export async function getMatchAnalysis(
   return fetchJson<MatchAnalysisResponse>(
     `/api/matches/${matchId}/analysis`,
     "Erreur lors du chargement de l’analyse du match."
+  );
+}
+
+
+// Cette fonction récupère les compositions probables, officielles et absences disponibles pour un match précis.
+export async function getMatchLineups(
+  matchId: number
+): Promise<MatchLineupsResponse> {
+  return fetchJson<MatchLineupsResponse>(
+    `/api/matches/${matchId}/lineups`,
+    "Erreur lors du chargement des compositions du match."
   );
 }
 
@@ -106,25 +130,32 @@ export async function getV1833PredictionByMatchId(
   );
 }
 
-// Cette fonction demande au backend de calculer V18.3.3 dynamiquement pour le match RubyBets sélectionné.
-export async function getV1833DynamicPredictionByRubyBetsMatchId(
+// Cette fonction demande au backend de calculer le modèle national expérimental pour le match RubyBets sélectionné.
+export async function getNationalDynamicPredictionByRubyBetsMatchId(
   matchId: number
-): Promise<V1833MatchPredictionResponse> {
-  return fetchJson<V1833MatchPredictionResponse>(
+): Promise<NationalMlPredictionResponse> {
+  return fetchJson<NationalMlPredictionResponse>(
     `/api/experimental/ml-national/v18-3-3/rubybets-matches/${matchId}`,
-    "Erreur lors du calcul dynamique expérimental V18.3.3."
+    "Erreur lors du calcul dynamique du modèle national expérimental."
   );
 }
 
-// Cette fonction demande au backend de générer une recommandation multi-matchs selon une compétition, un nombre de matchs et un niveau de risque.
-export async function getMultiMatchRecommendation(
+// Cette fonction conserve l’ancien nom d’appel V18.3.3 pour éviter de casser les imports existants pendant la migration.
+export async function getV1833DynamicPredictionByRubyBetsMatchId(
+  matchId: number
+): Promise<V1833MatchPredictionResponse> {
+  return getNationalDynamicPredictionByRubyBetsMatchId(matchId);
+}
+
+// Cette fonction demande au backend de générer une sélection ML nationale à partir des mêmes prédictions que l’écran Prédictions.
+export async function getNationalMlMultiMatchSelection(
   competitionCode: string,
   matchCount: number,
   riskLevel: "low" | "medium" | "high"
 ): Promise<MultiMatchRecommendationResponse> {
   return fetchJson<MultiMatchRecommendationResponse>(
-    "/api/recommendations/multimatch",
-    "Erreur lors de la génération de la recommandation multi-matchs.",
+    "/api/experimental/ml-national/v18-3-3/selection",
+    "Erreur lors de la génération de la sélection ML nationale.",
     {
       method: "POST",
       headers: {
@@ -134,8 +165,23 @@ export async function getMultiMatchRecommendation(
         competition_code: competitionCode,
         match_count: matchCount,
         risk_level: riskLevel,
+        date_from: null,
+        date_to: null,
       }),
     }
+  );
+}
+
+// Cette fonction conserve l’ancien nom utilisé par App.tsx pendant la migration de l’écran Sélection.
+export async function getMultiMatchRecommendation(
+  competitionCode: string,
+  matchCount: number,
+  riskLevel: "low" | "medium" | "high"
+): Promise<MultiMatchRecommendationResponse> {
+  return getNationalMlMultiMatchSelection(
+    competitionCode,
+    matchCount,
+    riskLevel
   );
 }
 
@@ -160,5 +206,5 @@ export async function getResponsibleInfo(): Promise<ResponsibleInfoResponse> {
 // ├── appelle le backend FastAPI RubyBets
 // ├── utilise rubybets.ts pour typer les réponses reçues
 // ├── alimente App.tsx avec des données sécurisées
-// ├── transmet les données aux composants React d’affichage
-// └── expose les appels V18.3.3 historique et dynamique pour le bloc expérimental
+// ├── transmet les données aux composants React d’affichage, dont l’historique des équipes et les compositions dans la fiche détail match
+// └── expose les appels V18.3.3 historique, dynamique et sélection nationale pour les écrans Prédictions/Sélection

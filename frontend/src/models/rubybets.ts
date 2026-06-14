@@ -23,12 +23,12 @@ export type MatchCompositeDataFreshness = {
   standings_cache: CacheFreshness | null;
 };
 
-// Ce type décrit la fraîcheur d’une recommandation multi-matchs.
+// Ce type décrit la fraîcheur d’une recommandation multi-matchs ou d’une sélection nationale.
 export type RecommendationDataFreshness = {
   provider: string;
   generated_at: string;
   matches_cache: CacheFreshness;
-  standings_cache: CacheFreshness;
+  standings_cache?: CacheFreshness;
 };
 
 // Ce type décrit une compétition football suivie par RubyBets.
@@ -132,6 +132,104 @@ export type MatchContextResponse = {
   data_freshness: MatchCompositeDataFreshness;
 };
 
+// Ce type décrit les sources possibles utilisées par la route d'historique des équipes.
+export type TeamHistorySourceUsed =
+  | "cache"
+  | "football_data"
+  | "api_football"
+  | "flashscore"
+  | "unavailable";
+
+// Ce type décrit le statut de disponibilité des données d'historique.
+export type TeamHistoryDataStatus = "available" | "partial" | "unavailable";
+
+// Ce type décrit le résultat d'une équipe sur un match récent.
+export type TeamRecentMatchResult = "W" | "D" | "L";
+
+// Ce type décrit un match récent normalisé pour l'historique d'une équipe.
+export type TeamRecentMatch = {
+  match_id: number | null;
+  utc_date: string | null;
+  competition_name: string | null;
+  home_team: string | null;
+  away_team: string | null;
+  home_score: number | null;
+  away_score: number | null;
+  team_result: TeamRecentMatchResult;
+  is_home: boolean;
+  goals_for: number;
+  goals_against: number;
+  data_source: string;
+};
+
+// Ce type décrit la synthèse statistique de forme d'une équipe.
+export type TeamFormSummary = {
+  matches_count: number;
+  wins: number;
+  draws: number;
+  losses: number;
+  goals_for: number;
+  goals_against: number;
+  avg_goals_for: number;
+  avg_goals_against: number;
+  recent_series: TeamRecentMatchResult[];
+};
+
+// Ce type décrit le bloc d'historique complet d'une équipe.
+export type TeamHistoryBlock = {
+  team_id: number | null;
+  team_name: string | null;
+  team?: Team;
+  recent_matches: TeamRecentMatch[];
+  recent_matches_overview: TeamRecentMatch[];
+  form_summary: TeamFormSummary;
+};
+
+// Ce type décrit une confrontation directe disponible entre les deux équipes.
+export type HeadToHeadMatch = {
+  match_id: number | null;
+  utc_date: string | null;
+  competition_name: string | null;
+  home_team: string | null;
+  away_team: string | null;
+  home_score: number | null;
+  away_score: number | null;
+  result_label: string;
+  data_source: string;
+};
+
+// Ce type décrit la synthèse responsable produite par la route d'historique.
+export type TeamHistorySummary = {
+  home_recent_form_label?: string;
+  away_recent_form_label?: string;
+  comparison_note?: string;
+  head_to_head_note?: string;
+  responsible_note: string;
+};
+
+// Ce type décrit la fraîcheur des données utilisées pour l'historique des équipes.
+export type TeamHistoryFreshness = {
+  last_updated_at: string | null;
+  source_label: string;
+  is_cache: boolean;
+  match_cache?: CacheFreshness | null;
+  home_team_history_cache?: CacheFreshness | null;
+  away_team_history_cache?: CacheFreshness | null;
+  limitations: string[];
+};
+
+// Ce type décrit la réponse backend complète de la route /team-history.
+export type TeamHistoryResponse = {
+  match_id: number;
+  source_used: TeamHistorySourceUsed;
+  data_status: TeamHistoryDataStatus;
+  home_team_history: TeamHistoryBlock;
+  away_team_history: TeamHistoryBlock;
+  head_to_head: HeadToHeadMatch[];
+  summary: TeamHistorySummary;
+  data_freshness: TeamHistoryFreshness;
+};
+
 // Ce type décrit un facteur clé affiché dans l’analyse pré-match.
 export type AnalysisKeyFactor = {
   label: string;
@@ -158,6 +256,66 @@ export type MatchAnalysisResponse = {
     away_team_standing_available: boolean;
   };
   data_freshness: MatchCompositeDataFreshness;
+};
+
+
+// Ce type décrit un joueur de composition ou d'absence fourni par la route /lineups.
+export type MatchLineupPlayer = {
+  name: string | null;
+  field_name: string | null;
+  number: string | null;
+  player_id: string | null;
+  player_url: string | null;
+  image_path: string | null;
+  club_name: string | null;
+  club_logo: string | null;
+  reason: string | null;
+};
+
+// Ce type décrit la composition disponible pour une équipe sur un match.
+export type MatchLineupSide = {
+  side: "home" | "away" | string;
+  status: "official_available" | "predicted_available" | "unavailable" | string;
+  average_rating: number | null;
+  formation: string | null;
+  official_formation: string | null;
+  predicted_formation: string | null;
+  official_available: boolean;
+  predicted_available: boolean;
+  starting_lineups: MatchLineupPlayer[];
+  substitutes: MatchLineupPlayer[];
+  predicted_lineups: MatchLineupPlayer[];
+  missing_players: MatchLineupPlayer[];
+  unsure_missing_players: MatchLineupPlayer[];
+};
+
+// Ce type décrit la réponse backend des compositions probables, absences et statuts de disponibilité.
+export type MatchLineupsResponse = {
+  source: string;
+  source_used: string | null;
+  status: "available" | "unavailable" | string;
+  match_id: number;
+  source_match_id: string | null;
+  lineups: {
+    composition_status: "official_available" | "predicted_available" | "unavailable" | string;
+    official_available: boolean;
+    predicted_available: boolean;
+    squad_available: boolean;
+    home: MatchLineupSide;
+    away: MatchLineupSide;
+    empty_state: string | null;
+    limits: string[];
+  };
+  data_used: {
+    flashscore_lineups: boolean;
+    official_lineups: boolean;
+    predicted_lineups: boolean;
+    missing_players: boolean;
+    squad: boolean;
+    odds_used: boolean;
+  };
+  data_freshness: CacheFreshness;
+  fallback_available: boolean;
 };
 
 // Ce type décrit une prédiction individuelle affichée dans RubyBets.
@@ -204,24 +362,57 @@ export type MatchPredictionsResponse = {
   data_freshness: MatchCompositeDataFreshness;
 };
 
-// Ce type décrit une recommandation sélectionnée dans la réponse multi-matchs.
-export type MultiMatchRecommendationItem = {
-  match: Match;
-  selected_prediction: PredictionItem;
-  selection_score: number;
-  prediction_key: string;
-  method: string;
-  data_used: {
-    match_details: boolean;
-    competition_standings: boolean;
-    home_team_standing_available: boolean;
-    away_team_standing_available: boolean;
-  };
+// Ce type décrit une correction de cohérence appliquée entre deux marchés prédictifs.
+export type MarketConsistencyAdjustment = {
+  code: string;
+  severity: string;
+  reference_market: string;
+  adjusted_market: string;
+  raw_prediction: string;
+  adjusted_prediction: string;
+  reference_prediction: string;
+  raw_max_probability: number | null;
+  adjusted_probability: number | null;
+  message: string;
 };
 
-// Ce type décrit la réponse backend du générateur de recommandation multi-matchs.
+// Ce type décrit le diagnostic de cohérence inter-marchés renvoyé par le backend expérimental.
+export type MarketConsistencyChecks = {
+  source: string;
+  scope: string;
+  status: "ok" | "adjusted" | string;
+  rules_version: string;
+  adjustments_count: number;
+  adjustments: MarketConsistencyAdjustment[];
+};
+
+// Ce type décrit une sélection issue du selector_result du modèle national expérimental.
+export type MultiMatchRecommendationItem = {
+  match: Match;
+  selected_market: string | null;
+  selected_prediction: string | null;
+  selected_confidence: number | null;
+  risk_level: "low" | "medium" | "high" | string;
+  selector_rule: string | null;
+  reference_reliability: number | null;
+  reference_coverage: number | null;
+  reference_selected_rows: number | null;
+  selector_version: string | null;
+  selector_profile: string | null;
+  selector_variant: string | null;
+  model_family: string;
+  model_variant: string;
+  odds_used: boolean;
+  source_match_prediction: string | null;
+  consistency_checks?: MarketConsistencyChecks | null;
+  responsible_note?: string | null;
+};
+
+// Ce type décrit la réponse backend de la sélection multi-matchs basée sur le modèle national.
 export type MultiMatchRecommendationResponse = {
   source: string;
+  scope?: string;
+  status: "computed" | "empty" | string;
   method: string;
   request: {
     competition_code: string;
@@ -231,18 +422,22 @@ export type MultiMatchRecommendationResponse = {
     date_to: string | null;
   };
   available_matches_count: number;
+  computed_matches_count?: number;
+  skipped_matches_count?: number;
   selected_count: number;
   recommendations: MultiMatchRecommendationItem[];
   selection_logic: {
     description: string;
-    risk_levels: {
+    risk_filter?: string;
+    sorting?: string;
+    risk_levels?: {
       low: string;
       medium: string;
       high: string;
     };
   };
   limits: string[];
-  data_freshness: RecommendationDataFreshness;
+  data_freshness?: RecommendationDataFreshness;
 };
 
 // Ce type décrit un élément du glossaire pédagogique.
@@ -286,8 +481,8 @@ export type ResponsibleInfoResponse = {
   };
 };
 
-// Ce type décrit les métadonnées d’un match réel issu du CSV V18.3 global.
-export type V1833MatchMetadata = {
+// Ce type décrit les métadonnées d’un match analysé par le modèle national expérimental.
+export type NationalMlMatchMetadata = {
   clean_match_id: string;
   rubybets_match_id?: number | null;
   feature_id: string;
@@ -303,11 +498,14 @@ export type V1833MatchMetadata = {
   inference_mode?: string;
 };
 
-// Ce type décrit le résultat du sélecteur expérimental V18.3.3.
-export type V1833SelectorResult = {
+// Ce type limite les clés de marchés principales utilisées par l’écran Prédictions.
+export type NationalMlMarketKey = "1x2" | "over_1_5" | "over_2_5" | "btts";
+
+// Ce type décrit le résultat du sélecteur expérimental du modèle national.
+export type NationalMlSelectorResult = {
   source: string;
   scope: string;
-  status: "RECOMMEND" | "ABSTAIN";
+  status: "RECOMMEND" | "ABSTAIN" | string;
   selector_version: string;
   selector_profile: string;
   selector_variant: string;
@@ -316,42 +514,67 @@ export type V1833SelectorResult = {
   selected_confidence: number | null;
   risk_level: string;
   selector_rule: string;
-  reference_reliability: number;
-  reference_coverage: number;
-  reference_selected_rows: number;
-  reference_double_chance_share: number;
+  reference_reliability: number | null;
+  reference_coverage: number | null;
+  reference_selected_rows: number | null;
+  reference_double_chance_share: number | null;
   responsible_note: string;
   excluded_outcome?: string;
 };
 
-// Ce type décrit une prédiction brute par marché pour l'inférence dynamique V18.3.3.
-export type V1833MarketPrediction = {
+// Ce type décrit une prédiction brute ou corrigée par marché produite par le modèle national.
+export type NationalMlMarketPrediction = {
   model_name: string;
   prediction: string;
   probabilities: Record<string, number>;
   max_probability: number;
+  consistency_status?: "adjusted" | "ok" | string;
+  raw_prediction?: string;
+  raw_max_probability?: number;
+  adjusted_by_rule?: string;
+  adjustment_reason?: string;
 };
 
 // Ce type décrit les features construites dynamiquement pour le match sélectionné.
-export type V1833DynamicFeatures = Record<string, number | null>;
+export type NationalMlDynamicFeatures = Record<string, number | null>;
 
-// Ce type décrit la réponse API expérimentale V18.3.3 pour un match réel ou sélectionné.
-export type V1833MatchPredictionResponse = {
+// Ce type décrit la réponse API du modèle national expérimental pour un match sélectionné.
+export type NationalMlPredictionResponse = {
   source: string;
   scope: string;
-  status: "computed" | "unavailable";
+  status: "computed" | "unavailable" | string;
   data_source_file: string;
-  match: V1833MatchMetadata;
-  dynamic_features?: V1833DynamicFeatures;
-  market_predictions?: Record<string, V1833MarketPrediction>;
-  selector_result: V1833SelectorResult | null;
+  match: NationalMlMatchMetadata;
+  dynamic_features?: NationalMlDynamicFeatures;
+  market_predictions?: Partial<Record<NationalMlMarketKey, NationalMlMarketPrediction>> &
+    Record<string, NationalMlMarketPrediction | undefined>;
+  raw_market_predictions?: Partial<Record<NationalMlMarketKey, NationalMlMarketPrediction>> &
+    Record<string, NationalMlMarketPrediction | undefined>;
+  consistency_checks?: MarketConsistencyChecks | null;
+  selector_result: NationalMlSelectorResult | null;
   unavailable_reason?: string;
   responsible_note: string;
+  rubybets_match_id?: number | null;
+  source_used_for_match?: string;
+  model_family?: "national" | string;
+  model_variant?: string;
+  odds_used?: boolean;
+  data_freshness?: {
+    match_cache?: CacheFreshness | null;
+    match_last_updated?: string | null;
+  };
 };
+
+// Ces alias conservent la compatibilité avec l’ancien nommage V18.3.3 déjà utilisé dans certains composants.
+export type V1833MatchMetadata = NationalMlMatchMetadata;
+export type V1833SelectorResult = NationalMlSelectorResult;
+export type V1833MarketPrediction = NationalMlMarketPrediction;
+export type V1833DynamicFeatures = NationalMlDynamicFeatures;
+export type V1833MatchPredictionResponse = NationalMlPredictionResponse;
 
 // Schéma de communication du fichier :
 // rubybets.ts
 // ├── utilisé par api.ts pour typer les réponses backend
 // ├── utilisé par App.tsx pour stocker les données dans les states React
-// ├── utilisé par les composants frontend pour afficher matchs, analyses, prédictions et recommandations
-// └── prépare le typage du Lab ML V18.3.3 dynamique sans toucher aux prédictions officielles
+// ├── utilisé par les composants frontend pour afficher matchs, historiques d'équipes, compositions probables, analyses, prédictions et recommandations
+// └── prépare le typage du modèle national expérimental V18.3.4 dc018 pour les écrans Prédictions et Sélection

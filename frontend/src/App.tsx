@@ -9,9 +9,12 @@ import {
   getMatchAnalysis,
   getMatchContext,
   getMatchDetails,
+  getMatchLineups,
   getMatchPredictions,
+  getNationalDynamicPredictionByRubyBetsMatchId,
+  getMatchTeamHistory,
   getMatches,
-  getMultiMatchRecommendation,
+  getNationalMlMultiMatchSelection,
   getResponsibleInfo,
 } from "./services/api";
 import type {
@@ -21,9 +24,12 @@ import type {
   MatchAnalysisResponse,
   MatchContextResponse,
   MatchDetailsResponse,
+  MatchLineupsResponse,
   MatchPredictionsResponse,
+  NationalMlPredictionResponse,
   MultiMatchRecommendationResponse,
   ResponsibleInfoResponse,
+  TeamHistoryResponse,
 } from "./models/rubybets";
 import AppShell from "./layout/AppShell";
 import type { AppScreen } from "./types/navigation";
@@ -41,6 +47,9 @@ import ResourcesScreen from "./screens/ResourcesScreen";
 function App() {
   // État de navigation interne utilisé pour afficher un écran MVP à la fois.
   const [currentScreen, setCurrentScreen] = useState<AppScreen>("dashboard");
+
+  // Active le panneau technique uniquement si la variable VITE_SHOW_STATUS_PANEL vaut "true".
+  const showStatusPanel = import.meta.env.VITE_SHOW_STATUS_PANEL === "true";
 
   // États globaux de connexion et de données principales.
   const [apiStatus, setApiStatus] = useState<string>("Vérification en cours...");
@@ -60,6 +69,15 @@ function App() {
 
   const [selectedMatchPredictions, setSelectedMatchPredictions] =
     useState<MatchPredictionsResponse | null>(null);
+
+  const [selectedMatchLineups, setSelectedMatchLineups] =
+    useState<MatchLineupsResponse | null>(null);
+
+  const [selectedNationalMlPrediction, setSelectedNationalMlPrediction] =
+    useState<NationalMlPredictionResponse | null>(null);
+
+  const [selectedTeamHistory, setSelectedTeamHistory] =
+    useState<TeamHistoryResponse | null>(null);
 
   // États liés à la recommandation multi-matchs.
   const [recommendationMatchCount, setRecommendationMatchCount] =
@@ -86,7 +104,7 @@ function App() {
     "Chargement des informations responsables..."
   );
 
-  // États textuels affichés à l’écran pour suivre les chargements.
+  // États textuels conservés pour le mode debug du panneau technique.
   const [competitionsStatus, setCompetitionsStatus] = useState<string>(
     "Chargement des compétitions..."
   );
@@ -111,6 +129,11 @@ function App() {
     "Aucune prédiction chargée"
   );
 
+  const [matchLineupsStatus, setMatchLineupsStatus] = useState<string>(
+    "Aucune composition chargée"
+  );
+
+
   const [multiMatchStatus, setMultiMatchStatus] = useState<string>(
     "Aucune recommandation multi-matchs générée"
   );
@@ -119,7 +142,10 @@ function App() {
     selectedMatchDetails ||
       selectedMatchContext ||
       selectedMatchAnalysis ||
-      selectedMatchPredictions
+      selectedMatchPredictions ||
+      selectedNationalMlPrediction ||
+      selectedMatchLineups ||
+      selectedTeamHistory
   );
 
   // Chargement initial : vérification backend + récupération des données transversales.
@@ -170,12 +196,16 @@ function App() {
     setSelectedMatchContext(null);
     setSelectedMatchAnalysis(null);
     setSelectedMatchPredictions(null);
+    setSelectedMatchLineups(null);
+    setSelectedNationalMlPrediction(null);
+    setSelectedTeamHistory(null);
     setMultiMatchRecommendation(null);
 
     setMatchDetailsStatus("Aucun match sélectionné");
     setMatchContextStatus("Aucun contexte chargé");
     setMatchAnalysisStatus("Aucune analyse chargée");
     setMatchPredictionsStatus("Aucune prédiction chargée");
+    setMatchLineupsStatus("Aucune composition chargée");
     setMultiMatchStatus("Aucune recommandation multi-matchs générée");
 
     getMatches(selectedCompetition)
@@ -203,68 +233,107 @@ function App() {
     setSelectedMatchContext(null);
     setSelectedMatchAnalysis(null);
     setSelectedMatchPredictions(null);
+    setSelectedMatchLineups(null);
+    setSelectedNationalMlPrediction(null);
+    setSelectedTeamHistory(null);
 
     setMatchDetailsStatus("Chargement du détail du match...");
     setMatchContextStatus("Chargement du contexte avant-match...");
     setMatchAnalysisStatus("Chargement de l’analyse pré-match...");
     setMatchPredictionsStatus("Chargement des prédictions...");
+    setMatchLineupsStatus("Chargement des compositions probables...");
 
     Promise.allSettled([
       getMatchDetails(matchId),
       getMatchContext(matchId),
       getMatchAnalysis(matchId),
       getMatchPredictions(matchId),
-    ]).then(([detailsResult, contextResult, analysisResult, predictionsResult]) => {
-      if (detailsResult.status === "fulfilled") {
-        setSelectedMatchDetails(detailsResult.value);
-        setMatchDetailsStatus("Détail du match chargé");
-      } else {
-        setSelectedMatchDetails(null);
-        setMatchDetailsStatus("Impossible de charger le détail du match");
-      }
+      getMatchLineups(matchId),
+      getNationalDynamicPredictionByRubyBetsMatchId(matchId),
+      getMatchTeamHistory(matchId),
+    ]).then(
+      ([
+        detailsResult,
+        contextResult,
+        analysisResult,
+        predictionsResult,
+        lineupsResult,
+        nationalMlPredictionResult,
+        teamHistoryResult,
+      ]) => {
+        if (detailsResult.status === "fulfilled") {
+          setSelectedMatchDetails(detailsResult.value);
+          setMatchDetailsStatus("Détail du match chargé");
+        } else {
+          setSelectedMatchDetails(null);
+          setMatchDetailsStatus("Impossible de charger le détail du match");
+        }
 
-      if (contextResult.status === "fulfilled") {
-        setSelectedMatchContext(contextResult.value);
-        setMatchContextStatus("Contexte avant-match chargé");
-      } else {
-        setSelectedMatchContext(null);
-        setMatchContextStatus("Impossible de charger le contexte avant-match");
-      }
+        if (contextResult.status === "fulfilled") {
+          setSelectedMatchContext(contextResult.value);
+          setMatchContextStatus("Contexte avant-match chargé");
+        } else {
+          setSelectedMatchContext(null);
+          setMatchContextStatus("Impossible de charger le contexte avant-match");
+        }
 
-      if (analysisResult.status === "fulfilled") {
-        setSelectedMatchAnalysis(analysisResult.value);
-        setMatchAnalysisStatus("Analyse pré-match chargée");
-      } else {
-        setSelectedMatchAnalysis(null);
-        setMatchAnalysisStatus("Impossible de charger l’analyse pré-match");
-      }
+        if (analysisResult.status === "fulfilled") {
+          setSelectedMatchAnalysis(analysisResult.value);
+          setMatchAnalysisStatus("Analyse pré-match chargée");
+        } else {
+          setSelectedMatchAnalysis(null);
+          setMatchAnalysisStatus("Impossible de charger l’analyse pré-match");
+        }
 
-      if (predictionsResult.status === "fulfilled") {
-        setSelectedMatchPredictions(predictionsResult.value);
-        setMatchPredictionsStatus("Prédictions chargées");
-      } else {
-        setSelectedMatchPredictions(null);
-        setMatchPredictionsStatus("Impossible de charger les prédictions");
+        if (predictionsResult.status === "fulfilled") {
+          setSelectedMatchPredictions(predictionsResult.value);
+          setMatchPredictionsStatus("Prédictions chargées");
+        } else {
+          setSelectedMatchPredictions(null);
+          setMatchPredictionsStatus("Impossible de charger les prédictions");
+        }
+
+        if (lineupsResult.status === "fulfilled") {
+          setSelectedMatchLineups(lineupsResult.value);
+          setMatchLineupsStatus("Compositions chargées");
+        } else {
+          setSelectedMatchLineups(null);
+          setMatchLineupsStatus("Impossible de charger les compositions");
+        }
+
+        if (nationalMlPredictionResult.status === "fulfilled") {
+          setSelectedNationalMlPrediction(nationalMlPredictionResult.value);
+        } else {
+          setSelectedNationalMlPrediction(null);
+        }
+
+        if (teamHistoryResult.status === "fulfilled") {
+          setSelectedTeamHistory(teamHistoryResult.value);
+        } else {
+          setSelectedTeamHistory(null);
+        }
       }
-    });
+    );
   }
 
-  // Génère une recommandation multi-matchs à partir des prédictions disponibles côté backend.
+  // Génère une sélection multi-matchs depuis le modèle national déjà utilisé par l’écran Prédictions.
   function handleGenerateMultiMatchRecommendation() {
-    setMultiMatchStatus("Génération de la recommandation multi-matchs...");
+    const nationalSelectionCompetitionCode = "WC";
 
-    getMultiMatchRecommendation(
-      selectedCompetition,
+    setMultiMatchStatus("Génération de la sélection ML nationale...");
+
+    getNationalMlMultiMatchSelection(
+      nationalSelectionCompetitionCode,
       recommendationMatchCount,
       recommendationRiskLevel
     )
       .then((data) => {
         setMultiMatchRecommendation(data);
-        setMultiMatchStatus("Recommandation multi-matchs générée");
+        setMultiMatchStatus("Sélection ML nationale générée");
       })
       .catch(() => {
         setMultiMatchRecommendation(null);
-        setMultiMatchStatus("Impossible de générer la recommandation multi-matchs");
+        setMultiMatchStatus("Impossible de générer la sélection ML nationale");
       });
   }
 
@@ -320,8 +389,13 @@ function App() {
         <MatchDetailsScreen
           matchDetails={selectedMatchDetails}
           matchContext={selectedMatchContext}
+          matchAnalysis={selectedMatchAnalysis}
+          matchLineups={selectedMatchLineups}
+          teamHistory={selectedTeamHistory}
           matchDetailsStatus={matchDetailsStatus}
           matchContextStatus={matchContextStatus}
+          matchAnalysisStatus={matchAnalysisStatus}
+          matchLineupsStatus={matchLineupsStatus}
           onNavigate={setCurrentScreen}
         />
       );
@@ -350,7 +424,7 @@ function App() {
 
       return (
         <PredictionsScreen
-          matchPredictions={selectedMatchPredictions}
+          nationalMlPrediction={selectedNationalMlPrediction}
           matchDetails={selectedMatchDetails}
           matchContext={selectedMatchContext}
           matchPredictionsStatus={matchPredictionsStatus}
@@ -373,7 +447,7 @@ function App() {
       );
     }
 
-       if (currentScreen === "resources") {
+    if (currentScreen === "resources") {
       return (
         <ResourcesScreen
           glossary={glossary}
@@ -394,18 +468,20 @@ function App() {
       hasSelectedMatch={hasSelectedMatch}
       onNavigate={setCurrentScreen}
       statusNode={
-        <StatusPanel
-          apiStatus={apiStatus}
-          competitionsStatus={competitionsStatus}
-          matchesStatus={matchesStatus}
-          matchDetailsStatus={matchDetailsStatus}
-          matchContextStatus={matchContextStatus}
-          matchAnalysisStatus={matchAnalysisStatus}
-          matchPredictionsStatus={matchPredictionsStatus}
-          multiMatchStatus={multiMatchStatus}
-          glossaryStatus={glossaryStatus}
-          responsibleInfoStatus={responsibleInfoStatus}
-        />
+        showStatusPanel ? (
+          <StatusPanel
+            apiStatus={apiStatus}
+            competitionsStatus={competitionsStatus}
+            matchesStatus={matchesStatus}
+            matchDetailsStatus={matchDetailsStatus}
+            matchContextStatus={matchContextStatus}
+            matchAnalysisStatus={matchAnalysisStatus}
+            matchPredictionsStatus={matchPredictionsStatus}
+            multiMatchStatus={multiMatchStatus}
+            glossaryStatus={glossaryStatus}
+            responsibleInfoStatus={responsibleInfoStatus}
+          />
+        ) : null
       }
     >
       {renderCurrentScreen()}
@@ -418,7 +494,10 @@ export default App;
 // Schéma de communication du fichier :
 // App.tsx
 // ├── appelle services/api.ts pour récupérer les données backend
+// ├── charge aussi /analysis, /lineups, /team-history et le modèle national lors de la sélection d’un match
+// ├── transmet l’analyse détaillée et les compositions à MatchDetailsScreen.tsx pour les onglets dédiés
 // ├── pilote la navigation via currentScreen
 // ├── utilise AppShell.tsx pour structurer l’application
+// ├── peut transmettre StatusPanel.tsx à AppShell.tsx uniquement en mode debug
 // ├── affiche les écrans du dossier screens/ selon l’écran actif
-// └── garde le Lab ML national intégré dans PredictionsScreen plutôt que dans la navigation
+// └── branche aussi l’écran Sélection sur la route expérimentale nationale issue du même modèle que Prédictions

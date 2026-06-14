@@ -1,5 +1,5 @@
 // Ce composant définit la structure générale de l’application RubyBets : header premium, logo officiel, navigation et contenu.
-// Il garde le statut backend hors de la navbar afin de conserver une interface plus sobre et moins technique.
+// Il garde les statuts techniques hors de l’interface finale afin de conserver une expérience sobre et non technique.
 
 import { Moon } from "lucide-react";
 import type { ReactNode } from "react";
@@ -47,7 +47,11 @@ function AppShell({
             />
 
             <div className="rb-navbar-actions" aria-label="Actions d’interface">
-              <span className="rb-theme-indicator" aria-label="Mode sombre actif" title="Mode sombre actif">
+              <span
+                className="rb-theme-indicator"
+                aria-label="Mode sombre actif"
+                title="Mode sombre actif"
+              >
                 <Moon aria-hidden="true" size={16} strokeWidth={1.9} />
               </span>
             </div>
@@ -57,7 +61,7 @@ function AppShell({
 
       <section className="rb-screen-container">{children}</section>
 
-      <footer className="rb-status-footer">{statusNode}</footer>
+      {statusNode ? <footer className="rb-status-footer">{statusNode}</footer> : null}
     </main>
   );
 }
@@ -68,5 +72,6 @@ export default AppShell;
 // AppShell.tsx
 // ├── utilise rubybets_logo_navbar.svg pour afficher le logo premium dans la navbar
 // ├── utilise TopNavigation.tsx pour afficher le menu principal
-// ├── reçoit l’écran actif et les contenus depuis App.tsx
+// ├── reçoit l’écran actif, le contenu courant et l’éventuel statusNode depuis App.tsx
+// ├── masque totalement le footer technique quand App.tsx transmet statusNode=null
 // └── encadre les écrans du dossier screens/ sans modifier les appels API

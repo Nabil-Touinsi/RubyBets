@@ -193,8 +193,10 @@ def test_competitions_route_returns_mvp_competitions(monkeypatch):
     assert data["competitions"][0]["current_season"]["current_matchday"] == 34
 
 
-# Ce test vérifie que la route matchs retourne les rencontres programmées sans écrire de cache réel.
+# Ce test vérifie le fallback Football-Data pour la liste des matchs programmés.
 def test_matches_route_returns_scheduled_matches(monkeypatch):
+    monkeypatch.setattr(matches_api, "is_flashscore_available", lambda: False)
+
     # Ce mock simule le service de cache pour éviter tout appel API réel pendant le test.
     async def fake_get_cached_football_data(
         cache_name: str,
@@ -205,7 +207,7 @@ def test_matches_route_returns_scheduled_matches(monkeypatch):
         assert cache_name == "matches_pl_scheduled_all_start_dates_all_end_dates"
         assert endpoint == "/competitions/PL/matches"
         assert params["status"] == "SCHEDULED"
-        assert ttl_minutes == 30
+        assert ttl_minutes == matches_api.MATCHES_CACHE_TTL_MINUTES
         return {"matches": [FAKE_MATCH]}, FAKE_FRESHNESS
 
     monkeypatch.setattr(matches_api, "get_cached_football_data", fake_get_cached_football_data)
@@ -216,12 +218,12 @@ def test_matches_route_returns_scheduled_matches(monkeypatch):
     assert response.status_code == 200
     assert data["competition_code"] == "PL"
     assert data["count"] == 1
-    assert len(data["matches"]) == 1
-    assert data["data_freshness"]["from_cache"] is False
 
 
-# Ce test vérifie que la fiche détail d'un match retourne les bonnes informations sans cache réel.
+# Ce test vérifie le fallback Football-Data pour la fiche détail d'un match.
 def test_match_details_route_returns_match(monkeypatch):
+    monkeypatch.setattr(matches_api, "is_flashscore_available", lambda: False)
+
     # Ce mock simule le service de cache pour la fiche détail d'un match.
     async def fake_get_cached_football_data(
         cache_name: str,
@@ -232,7 +234,7 @@ def test_match_details_route_returns_match(monkeypatch):
         assert cache_name == "match_538122"
         assert endpoint == "/matches/538122"
         assert params is None
-        assert ttl_minutes == 30
+        assert ttl_minutes == matches_api.MATCH_DETAIL_CACHE_TTL_MINUTES
         return {"match": FAKE_MATCH}, FAKE_FRESHNESS
 
     monkeypatch.setattr(matches_api, "get_cached_football_data", fake_get_cached_football_data)
@@ -241,9 +243,8 @@ def test_match_details_route_returns_match(monkeypatch):
     data = response.json()
 
     assert response.status_code == 200
+    assert data["source"] == matches_api.FOOTBALL_DATA_PROVIDER
     assert data["match"]["id"] == 538122
-    assert data["data_freshness"]["last_updated"] == "2026-04-30T10:00:00Z"
-    assert data["data_freshness"]["from_cache"] is False
 
 
 # Ce test vérifie que la route contexte retourne les classements et le résumé du match.
