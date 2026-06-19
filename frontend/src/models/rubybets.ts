@@ -132,6 +132,66 @@ export type MatchContextResponse = {
   data_freshness: MatchCompositeDataFreshness;
 };
 
+// Ce type décrit les catégories d'actualités contextuelles affichées dans l'onglet Contexte.
+export type NewsCategory =
+  | "injury_absence"
+  | "lineup_squad"
+  | "recent_form"
+  | "coach_tactics"
+  | "competition_context"
+  | "other";
+
+// Ce type décrit un article d'actualité normalisé par le backend RubyBets.
+export type TeamNewsArticle = {
+  title: string | null;
+  description: string | null;
+  url: string | null;
+  source_name: string | null;
+  source_url: string | null;
+  published_at: string | null;
+  category: NewsCategory | string;
+  category_label: string;
+  relevance: "low" | "medium" | "high" | string;
+  team_detected: string | null;
+};
+
+// Ce type décrit le bloc d'actualités associé à une équipe.
+export type TeamNewsBlock = {
+  name: string | null;
+  query: string | null;
+  status: "available" | "partial" | "empty" | "unavailable" | string;
+  articles_count: number;
+  articles: TeamNewsArticle[];
+  message: string | null;
+};
+
+// Ce type décrit la réponse backend dédiée aux actualités contextuelles d'un match.
+export type MatchNewsContextResponse = {
+  status: "available" | "partial" | "empty" | "unavailable" | string;
+  source: string;
+  source_used?: string;
+  match_source?: string;
+  match_id: number;
+  competition: string | null;
+  generated_at: string;
+  home_team: TeamNewsBlock;
+  away_team: TeamNewsBlock;
+  empty_state: string | null;
+  limits: string[];
+  match?: Match;
+  data_used?: {
+    match_details: boolean;
+    rss_news: boolean;
+    odds_used: boolean;
+  };
+  data_freshness?: {
+    provider: string;
+    generated_at: string;
+    match_cache?: CacheFreshness | null;
+  };
+  fallback_available?: boolean;
+};
+
 // Ce type décrit les sources possibles utilisées par la route d'historique des équipes.
 export type TeamHistorySourceUsed =
   | "cache"
@@ -576,5 +636,5 @@ export type V1833MatchPredictionResponse = NationalMlPredictionResponse;
 // rubybets.ts
 // ├── utilisé par api.ts pour typer les réponses backend
 // ├── utilisé par App.tsx pour stocker les données dans les states React
-// ├── utilisé par les composants frontend pour afficher matchs, historiques d'équipes, compositions probables, analyses, prédictions et recommandations
+// ├── utilisé par les composants frontend pour afficher matchs, historiques d'équipes, compositions probables, actualités contextuelles, analyses, prédictions et recommandations
 // └── prépare le typage du modèle national expérimental V18.3.4 dc018 pour les écrans Prédictions et Sélection

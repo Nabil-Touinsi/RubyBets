@@ -10,6 +10,7 @@ import type {
   MatchLineupPlayer,
   MatchLineupSide,
   MatchLineupsResponse,
+  MatchNewsContextResponse,
   MatchDetailsResponse,
   Team,
   TeamFormSummary,
@@ -19,6 +20,7 @@ import type {
   TeamStanding,
 } from "../models/rubybets";
 import type { AppScreen } from "../types/navigation";
+import MatchNewsContextSection from "../components/MatchNewsContextSection";
 import {
   formatDateTime,
   formatMatchStatus,
@@ -33,11 +35,13 @@ type MatchDetailsScreenProps = {
   matchContext: MatchContextResponse | null;
   matchAnalysis: MatchAnalysisResponse | null;
   matchLineups: MatchLineupsResponse | null;
+  matchNewsContext: MatchNewsContextResponse | null;
   teamHistory: TeamHistoryResponse | null;
   matchDetailsStatus: string;
   matchContextStatus: string;
   matchAnalysisStatus: string;
   matchLineupsStatus: string;
+  matchNewsContextStatus: string;
   onNavigate: (screen: AppScreen) => void;
 };
 
@@ -2313,11 +2317,13 @@ function MatchDetailsScreen({
   matchContext,
   matchAnalysis,
   matchLineups,
+  matchNewsContext,
   teamHistory,
   matchDetailsStatus,
   matchContextStatus,
   matchAnalysisStatus,
   matchLineupsStatus,
+  matchNewsContextStatus,
   onNavigate,
 }: MatchDetailsScreenProps) {
   const [activeTab, setActiveTab] = useState<DetailTabKey>("overview");
@@ -2404,7 +2410,14 @@ function MatchDetailsScreen({
             />
           ) : null}
 
-          {activeTab !== "overview" && activeTab !== "analysis" && activeTab !== "form" && activeTab !== "lineup" && activeTab !== "headToHead" ? (
+          {activeTab === "context" ? (
+            <MatchNewsContextSection
+              matchNewsContext={matchNewsContext}
+              matchNewsContextStatus={matchNewsContextStatus}
+            />
+          ) : null}
+
+          {activeTab !== "overview" && activeTab !== "analysis" && activeTab !== "form" && activeTab !== "lineup" && activeTab !== "headToHead" && activeTab !== "context" ? (
             <PendingTabContent activeTab={activeTab} />
           ) : null}
         </section>

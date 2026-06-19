@@ -10,6 +10,7 @@ import {
   getMatchContext,
   getMatchDetails,
   getMatchLineups,
+  getMatchNewsContext,
   getMatchPredictions,
   getNationalDynamicPredictionByRubyBetsMatchId,
   getMatchTeamHistory,
@@ -25,6 +26,7 @@ import type {
   MatchContextResponse,
   MatchDetailsResponse,
   MatchLineupsResponse,
+  MatchNewsContextResponse,
   MatchPredictionsResponse,
   NationalMlPredictionResponse,
   MultiMatchRecommendationResponse,
@@ -72,6 +74,9 @@ function App() {
 
   const [selectedMatchLineups, setSelectedMatchLineups] =
     useState<MatchLineupsResponse | null>(null);
+
+  const [selectedMatchNewsContext, setSelectedMatchNewsContext] =
+    useState<MatchNewsContextResponse | null>(null);
 
   const [selectedNationalMlPrediction, setSelectedNationalMlPrediction] =
     useState<NationalMlPredictionResponse | null>(null);
@@ -133,6 +138,9 @@ function App() {
     "Aucune composition chargée"
   );
 
+  const [matchNewsContextStatus, setMatchNewsContextStatus] = useState<string>(
+    "Aucune actualité contextuelle chargée"
+  );
 
   const [multiMatchStatus, setMultiMatchStatus] = useState<string>(
     "Aucune recommandation multi-matchs générée"
@@ -145,6 +153,7 @@ function App() {
       selectedMatchPredictions ||
       selectedNationalMlPrediction ||
       selectedMatchLineups ||
+      selectedMatchNewsContext ||
       selectedTeamHistory
   );
 
@@ -197,6 +206,7 @@ function App() {
     setSelectedMatchAnalysis(null);
     setSelectedMatchPredictions(null);
     setSelectedMatchLineups(null);
+    setSelectedMatchNewsContext(null);
     setSelectedNationalMlPrediction(null);
     setSelectedTeamHistory(null);
     setMultiMatchRecommendation(null);
@@ -206,6 +216,7 @@ function App() {
     setMatchAnalysisStatus("Aucune analyse chargée");
     setMatchPredictionsStatus("Aucune prédiction chargée");
     setMatchLineupsStatus("Aucune composition chargée");
+    setMatchNewsContextStatus("Aucune actualité contextuelle chargée");
     setMultiMatchStatus("Aucune recommandation multi-matchs générée");
 
     getMatches(selectedCompetition)
@@ -234,6 +245,7 @@ function App() {
     setSelectedMatchAnalysis(null);
     setSelectedMatchPredictions(null);
     setSelectedMatchLineups(null);
+    setSelectedMatchNewsContext(null);
     setSelectedNationalMlPrediction(null);
     setSelectedTeamHistory(null);
 
@@ -242,6 +254,7 @@ function App() {
     setMatchAnalysisStatus("Chargement de l’analyse pré-match...");
     setMatchPredictionsStatus("Chargement des prédictions...");
     setMatchLineupsStatus("Chargement des compositions probables...");
+    setMatchNewsContextStatus("Chargement des actualités contextuelles...");
 
     Promise.allSettled([
       getMatchDetails(matchId),
@@ -249,6 +262,7 @@ function App() {
       getMatchAnalysis(matchId),
       getMatchPredictions(matchId),
       getMatchLineups(matchId),
+      getMatchNewsContext(matchId),
       getNationalDynamicPredictionByRubyBetsMatchId(matchId),
       getMatchTeamHistory(matchId),
     ]).then(
@@ -258,6 +272,7 @@ function App() {
         analysisResult,
         predictionsResult,
         lineupsResult,
+        newsContextResult,
         nationalMlPredictionResult,
         teamHistoryResult,
       ]) => {
@@ -299,6 +314,14 @@ function App() {
         } else {
           setSelectedMatchLineups(null);
           setMatchLineupsStatus("Impossible de charger les compositions");
+        }
+
+        if (newsContextResult.status === "fulfilled") {
+          setSelectedMatchNewsContext(newsContextResult.value);
+          setMatchNewsContextStatus("Actualités contextuelles chargées");
+        } else {
+          setSelectedMatchNewsContext(null);
+          setMatchNewsContextStatus("Impossible de charger les actualités contextuelles");
         }
 
         if (nationalMlPredictionResult.status === "fulfilled") {
@@ -391,11 +414,13 @@ function App() {
           matchContext={selectedMatchContext}
           matchAnalysis={selectedMatchAnalysis}
           matchLineups={selectedMatchLineups}
+          matchNewsContext={selectedMatchNewsContext}
           teamHistory={selectedTeamHistory}
           matchDetailsStatus={matchDetailsStatus}
           matchContextStatus={matchContextStatus}
           matchAnalysisStatus={matchAnalysisStatus}
           matchLineupsStatus={matchLineupsStatus}
+          matchNewsContextStatus={matchNewsContextStatus}
           onNavigate={setCurrentScreen}
         />
       );
@@ -494,8 +519,8 @@ export default App;
 // Schéma de communication du fichier :
 // App.tsx
 // ├── appelle services/api.ts pour récupérer les données backend
-// ├── charge aussi /analysis, /lineups, /team-history et le modèle national lors de la sélection d’un match
-// ├── transmet l’analyse détaillée et les compositions à MatchDetailsScreen.tsx pour les onglets dédiés
+// ├── charge aussi /analysis, /lineups, /news-context, /team-history et le modèle national lors de la sélection d’un match
+// ├── transmet l’analyse détaillée, les compositions et les actualités contextuelles à MatchDetailsScreen.tsx pour les onglets dédiés
 // ├── pilote la navigation via currentScreen
 // ├── utilise AppShell.tsx pour structurer l’application
 // ├── peut transmettre StatusPanel.tsx à AppShell.tsx uniquement en mode debug

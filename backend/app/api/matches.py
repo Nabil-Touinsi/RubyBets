@@ -37,6 +37,7 @@ from app.services.rapidapi_flashscore_client import (
     get_rapidapi_flashscore_data,
 )
 from app.services.team_history_service import build_team_history_response
+from app.services.team_news_context_service import build_match_news_context_response
 
 
 router = APIRouter(prefix="/api/matches", tags=["Matches"])
@@ -870,6 +871,72 @@ async def get_match_details(match_id: int) -> dict[str, Any]:
         ),
     }
 
+# Cette route retourne les actualités publiques récentes liées aux deux équipes d'un match.
+@router.get("/{match_id}/news-context")
+async def get_match_news_context(match_id: int) -> dict[str, Any]:
+    flashscore_metadata: dict[str, Any] | None = None
+
+    if is_flashscore_available():
+        match, flashscore_metadata, flashscore_freshness = get_cached_flashscore_match_detail(match_id)
+
+        if match and flashscore_metadata.get("status") == "success":
+            news_context = build_match_news_context_response(
+                match_id=match_id,
+                match=match,
+            )
+
+            return {
+                **news_context,
+                "source_used": news_context.get("source"),
+                "match_source": FLASHSCORE_SOURCE,
+                "match": format_match(match),
+                "data_used": {
+                    "match_details": True,
+                    "rss_news": news_context.get("status") in {"available", "partial"},
+                    "odds_used": False,
+                },
+                "data_freshness": {
+                    "provider": news_context.get("source"),
+                    "generated_at": news_context.get("generated_at"),
+                    "match_cache": build_flashscore_match_data_freshness(
+                        data_freshness=flashscore_freshness,
+                        metadata=flashscore_metadata,
+                        match_last_updated=match.get("lastUpdated"),
+                    ),
+                },
+                "fallback_available": True,
+            }
+
+    data, data_freshness = await get_cached_football_data(
+        cache_name=build_cache_name("match", match_id),
+        endpoint=f"/matches/{match_id}",
+        ttl_minutes=MATCH_DETAIL_CACHE_TTL_MINUTES,
+    )
+    match = data.get("match", data)
+
+    news_context = build_match_news_context_response(
+        match_id=match_id,
+        match=match,
+    )
+
+    return {
+        **news_context,
+        "source_used": news_context.get("source"),
+        "match_source": FOOTBALL_DATA_PROVIDER,
+        "fallback_reason": flashscore_metadata,
+        "match": format_match(match),
+        "data_used": {
+            "match_details": True,
+            "rss_news": news_context.get("status") in {"available", "partial"},
+            "odds_used": False,
+        },
+        "data_freshness": {
+            "provider": news_context.get("source"),
+            "generated_at": news_context.get("generated_at"),
+            "match_cache": build_match_data_freshness(data_freshness),
+        },
+    }
+
 
 # Cette route retourne les compositions probables, officielles et absences disponibles pour un match.
 @router.get("/{match_id}/lineups")
@@ -1615,6 +1682,7 @@ async def get_match_predictions(match_id: int) -> dict[str, Any]:
 # ├── utilise cache_service.py pour le cache FlashScore et le fallback Football-Data temporaire
 # ├── utilise match_service.py pour le formatage et le fallback Football-Data temporaire
 # ├── utilise team_history_service.py pour produire les historiques récents, face-à-face, l’analyse et les prédictions FlashScore partielles
+# ├── utilise team_news_context_service.py pour produire les actualités contextuelles publiques par équipe
 # ├── utilise /matches/match/lineups via rapidapi_flashscore_client.py pour les compositions probables et absences
 # ├── utilise analysis_service.py pour générer les synthèses Football-Data et les prédictions explicables
 # ├── utilise persistence_service.py uniquement pour le fallback Football-Data temporaire

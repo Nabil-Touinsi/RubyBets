@@ -9,6 +9,7 @@ import type {
   MatchContextResponse,
   MatchDetailsResponse,
   MatchLineupsResponse,
+  MatchNewsContextResponse,
   MatchPredictionsResponse,
   MatchesResponse,
   NationalMlPredictionResponse,
@@ -76,6 +77,16 @@ export async function getMatchContext(
   return fetchJson<MatchContextResponse>(
     `/api/matches/${matchId}/context`,
     "Erreur lors du chargement du contexte du match."
+  );
+}
+
+// Cette fonction récupère les actualités publiques récentes liées aux deux équipes d'un match.
+export async function getMatchNewsContext(
+  matchId: number
+): Promise<MatchNewsContextResponse> {
+  return fetchJson<MatchNewsContextResponse>(
+    `/api/matches/${matchId}/news-context`,
+    "Erreur lors du chargement des actualités contextuelles du match."
   );
 }
 
@@ -206,5 +217,5 @@ export async function getResponsibleInfo(): Promise<ResponsibleInfoResponse> {
 // ├── appelle le backend FastAPI RubyBets
 // ├── utilise rubybets.ts pour typer les réponses reçues
 // ├── alimente App.tsx avec des données sécurisées
-// ├── transmet les données aux composants React d’affichage, dont l’historique des équipes et les compositions dans la fiche détail match
+// ├── transmet les données aux composants React d’affichage, dont l’historique des équipes, les compositions et les actualités contextuelles dans la fiche détail match
 // └── expose les appels V18.3.3 historique, dynamique et sélection nationale pour les écrans Prédictions/Sélection
