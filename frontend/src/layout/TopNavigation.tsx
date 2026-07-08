@@ -3,6 +3,7 @@
 
 import {
   Activity,
+  Archive,
   BookOpen,
   CalendarDays,
   CheckCircle2,
@@ -27,6 +28,7 @@ const NAVIGATION_ICONS: Record<AppScreen, LucideIcon> = {
   analysis: Activity,
   predictions: TrendingUp,
   recommendation: CheckCircle2,
+  archives: Archive,
   resources: BookOpen,
 };
 
@@ -75,4 +77,5 @@ export default TopNavigation;
 // ├── reçoit les écrans depuis navigation.ts
 // ├── reçoit currentScreen et onNavigate depuis AppShell.tsx
 // ├── déclenche le changement d’écran affiché dans App.tsx
+// ├── affiche aussi l’entrée Archives ajoutée au MVP
 // └── utilise App.css pour rendre la navigation compacte et alignée

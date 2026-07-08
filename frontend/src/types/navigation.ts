@@ -7,6 +7,7 @@ export type AppScreen =
   | "analysis"
   | "predictions"
   | "recommendation"
+  | "archives"
   | "resources";
 
 export type NavigationItem = {
@@ -22,6 +23,7 @@ export const NAVIGATION_ITEMS: NavigationItem[] = [
   { id: "match-details", label: "Détail match", shortLabel: "Détail", requiresMatch: true },
   { id: "predictions", label: "Prédictions", requiresMatch: true },
   { id: "recommendation", label: "Recommandation", shortLabel: "Sélection" },
+  { id: "archives", label: "Archives" },
   { id: "resources", label: "Ressources" },
 ];
 
@@ -30,4 +32,5 @@ export const NAVIGATION_ITEMS: NavigationItem[] = [
 // ├── fournit la liste des écrans disponibles dans RubyBets
 // ├── alimente TopNavigation.tsx pour afficher le menu principal simplifié
 // ├── conserve analysis pour l’accès interne depuis le détail match
+// ├── ajoute archives comme nouvel écran de suivi des prédictions
 // └── regroupe glossaire et informations responsables dans resources

@@ -42,6 +42,7 @@ import MatchDetailsScreen from "./screens/MatchDetailsScreen";
 import AnalysisScreen from "./screens/AnalysisScreen";
 import PredictionsScreen from "./screens/PredictionsScreen";
 import RecommendationScreen from "./screens/RecommendationScreen";
+import ArchivesScreen from "./screens/ArchivesScreen";
 import StatusPanel from "./components/StatusPanel";
 import ResourcesScreen from "./screens/ResourcesScreen";
 
@@ -472,6 +473,10 @@ function App() {
       );
     }
 
+    if (currentScreen === "archives") {
+      return <ArchivesScreen />;
+    }
+
     if (currentScreen === "resources") {
       return (
         <ResourcesScreen
@@ -525,4 +530,5 @@ export default App;
 // ├── utilise AppShell.tsx pour structurer l’application
 // ├── peut transmettre StatusPanel.tsx à AppShell.tsx uniquement en mode debug
 // ├── affiche les écrans du dossier screens/ selon l’écran actif
-// └── branche aussi l’écran Sélection sur la route expérimentale nationale issue du même modèle que Prédictions
+// ├── branche aussi l’écran Sélection sur la route expérimentale nationale issue du même modèle que Prédictions
+// └── affiche l’écran Archives avec données mockées avant création du backend dédié
