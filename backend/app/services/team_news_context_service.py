@@ -1,5 +1,7 @@
+# Rôle du fichier :
 # Ce fichier orchestre les actualités contextuelles d'un match RubyBets.
-# Il récupère plusieurs flux RSS par équipe, filtre les articles et prépare une réponse API responsable.
+# Il récupère plusieurs flux RSS par équipe, filtre les articles,
+# prépare une réponse API responsable et ajoute une lecture IA optionnelle.
 
 from datetime import UTC, datetime
 from typing import Any
@@ -8,6 +10,7 @@ from app.services.google_news_rss_client import (
     GOOGLE_NEWS_RSS_SOURCE,
     fetch_google_news_rss_articles,
 )
+from app.services.news_context_ai_service import build_match_news_ai_context
 from app.services.news_nlp_service import filter_and_enrich_team_news_articles
 
 
@@ -304,9 +307,17 @@ def build_match_news_context_response(
 
     status = build_news_context_status(home_block, away_block)
 
+    ai_context = build_match_news_ai_context(
+        home_team_name=home_team_name or "Équipe domicile",
+        home_articles=home_block.get("articles", []),
+        away_team_name=away_team_name or "Équipe extérieure",
+        away_articles=away_block.get("articles", []),
+    )
+
     return {
         "status": status,
         "source": GOOGLE_NEWS_RSS_SOURCE,
+        "ai_context": ai_context,
         "match_id": match_id,
         "competition": competition_name,
         "generated_at": datetime.now(UTC).isoformat(),
@@ -321,4 +332,5 @@ def build_match_news_context_response(
 # matches.py -> team_news_context_service.py
 # ├── utilise google_news_rss_client.py pour récupérer plusieurs flux publics par équipe
 # ├── utilise news_nlp_service.py pour filtrer et classer les articles
+# ├── utilise news_context_ai_service.py pour préparer la lecture contextuelle IA optionnelle
 # └── renvoie une réponse news-context à l'API puis au frontend
