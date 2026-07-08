@@ -29,6 +29,7 @@ from app.services.ml_national_v18_3_3_inference_adapter import (
     select_v18_3_3_from_prediction_row,
 )
 from app.services.match_service import clean_params, format_match
+from app.services.archives_service import archive_national_dynamic_predictions
 from app.services.rapidapi_flashscore_client import (
     FLASHSCORE_SOURCE,
     get_normalized_flashscore_match_details,
@@ -546,9 +547,15 @@ async def get_v18_3_3_dynamic_prediction_by_rubybets_match_id(
                 flashscore_match
             )
             inference_response = infer_v18_3_3_for_rubybets_match(normalized_match)
+            archive_status = archive_national_dynamic_predictions(
+                inference_response=inference_response,
+                rubybets_match_id=match_id,
+                source_match=normalized_match,
+            )
 
             return {
                 **inference_response,
+                "archive": archive_status,
                 "rubybets_match_id": match_id,
                 "source_used_for_match": FLASHSCORE_SOURCE,
                 "model_family": "national",
@@ -568,9 +575,15 @@ async def get_v18_3_3_dynamic_prediction_by_rubybets_match_id(
     )
     match = data.get("match", data)
     inference_response = infer_v18_3_3_for_rubybets_match(match)
+    archive_status = archive_national_dynamic_predictions(
+        inference_response=inference_response,
+        rubybets_match_id=match_id,
+        source_match=match,
+    )
 
     return {
         **inference_response,
+        "archive": archive_status,
         "rubybets_match_id": match_id,
         "source_used_for_match": "football-data.org",
         "model_family": "national",

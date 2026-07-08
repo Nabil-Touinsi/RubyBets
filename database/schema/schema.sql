@@ -1,6 +1,5 @@
--- Rôle du fichier :
 -- Ce fichier crée le schéma SQL initial de RubyBets pour stocker les compétitions,
--- équipes, matchs, prédictions et recommandations du MVP.
+-- équipes, matchs, prédictions, recommandations et archives de prédictions du MVP.
 
 BEGIN;
 
@@ -84,12 +83,75 @@ CREATE TABLE IF NOT EXISTS recommendation_items (
     CONSTRAINT uq_recommendation_prediction UNIQUE (recommendation_id, prediction_id)
 );
 
+-- Table des archives de prédictions RubyBets.
+-- Elle conserve un snapshot des prédictions générées afin de les comparer plus tard au score final.
+CREATE TABLE IF NOT EXISTS archived_predictions (
+    id SERIAL PRIMARY KEY,
+
+    match_id INTEGER REFERENCES matches(id) ON DELETE SET NULL,
+    prediction_id INTEGER REFERENCES predictions(id) ON DELETE SET NULL,
+
+    rubybets_match_id VARCHAR(100) NOT NULL,
+    source_match_id VARCHAR(100),
+
+    competition_name VARCHAR(150),
+    home_team_name VARCHAR(150) NOT NULL,
+    away_team_name VARCHAR(150) NOT NULL,
+
+    home_team_logo_url TEXT,
+    away_team_logo_url TEXT,
+    home_team_country_code VARCHAR(10),
+    away_team_country_code VARCHAR(10),
+
+    match_date TIMESTAMP,
+    prediction_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    market_type VARCHAR(50) NOT NULL,
+    predicted_value VARCHAR(100) NOT NULL,
+    confidence_level VARCHAR(20),
+    risk_level VARCHAR(20),
+    justification TEXT,
+    engine_version VARCHAR(150) NOT NULL,
+
+    final_home_score INTEGER,
+    final_away_score INTEGER,
+    match_status VARCHAR(50) NOT NULL DEFAULT 'scheduled',
+
+    verdict VARCHAR(30) NOT NULL DEFAULT 'pending',
+    checked_at TIMESTAMP,
+
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT chk_archived_predictions_confidence
+        CHECK (confidence_level IS NULL OR confidence_level IN ('low', 'medium', 'high')),
+
+    CONSTRAINT chk_archived_predictions_risk
+        CHECK (risk_level IS NULL OR risk_level IN ('low', 'medium', 'high')),
+
+    CONSTRAINT chk_archived_predictions_verdict
+        CHECK (verdict IN ('pending', 'correct', 'incorrect', 'not_verifiable'))
+);
+
 CREATE INDEX IF NOT EXISTS idx_matches_utc_date ON matches(utc_date);
 CREATE INDEX IF NOT EXISTS idx_matches_competition_id ON matches(competition_id);
 CREATE INDEX IF NOT EXISTS idx_predictions_match_id ON predictions(match_id);
 CREATE INDEX IF NOT EXISTS idx_predictions_risk_level ON predictions(risk_level);
 CREATE INDEX IF NOT EXISTS idx_recommendations_generated_at ON recommendations(generated_at);
+CREATE INDEX IF NOT EXISTS idx_archived_predictions_rubybets_match_id
+ON archived_predictions(rubybets_match_id);
 
+CREATE INDEX IF NOT EXISTS idx_archived_predictions_market_type
+ON archived_predictions(market_type);
+
+CREATE INDEX IF NOT EXISTS idx_archived_predictions_verdict
+ON archived_predictions(verdict);
+
+CREATE INDEX IF NOT EXISTS idx_archived_predictions_prediction_date
+ON archived_predictions(prediction_date);
+
+CREATE INDEX IF NOT EXISTS idx_archived_predictions_match_status
+ON archived_predictions(match_status);
 COMMIT;
 
 -- Schéma de communication :
@@ -98,6 +160,8 @@ COMMIT;
 -- competitions / teams / matches
 --        ↓
 -- predictions
+--        ↓
+-- archived_predictions
 --        ↓
 -- recommendations / recommendation_items
 --        ↓
