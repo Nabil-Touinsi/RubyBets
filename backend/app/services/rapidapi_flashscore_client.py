@@ -44,7 +44,7 @@ FLASHSCORE_MVP_COMPETITION_FILTERS = {
     },
     "CL": {
         "required": ["europe", "champions league"],
-        "excluded": ["women", "youth", "u19", "qualification", "qualifying"],
+        "excluded": ["women", "youth", "u19"],
     },
     "WC": {
         "required": ["world"],
@@ -92,15 +92,28 @@ def is_flashscore_error_response(data: Any) -> bool:
     return isinstance(data, dict) and data.get("status") == "error"
 
 
-# Cette fonction normalise un texte pour comparer des noms d'équipes entre plusieurs sources.
+# Cette fonction normalise un texte FlashScore pour comparer des noms d'équipes malgré les suffixes pays.
 def normalize_flashscore_text(value: str | None) -> str:
     raw_value = str(value or "").strip().lower()
+
     without_accents = "".join(
         char
         for char in unicodedata.normalize("NFKD", raw_value)
         if not unicodedata.combining(char)
     )
-    return " ".join(without_accents.replace(".", " ").replace("-", " ").split())
+
+    without_country_suffix = without_accents
+    if without_country_suffix.endswith(")") and "(" in without_country_suffix:
+        without_country_suffix = without_country_suffix.rsplit("(", 1)[0]
+
+    normalized = (
+        without_country_suffix
+        .replace(".", " ")
+        .replace("-", " ")
+        .replace("_", " ")
+    )
+
+    return " ".join(normalized.split())
 
 
 # Cette fonction transforme une date ISO RubyBets en objet datetime UTC.
@@ -703,7 +716,7 @@ def does_flashscore_team_name_match(expected_name: str | None, actual_name: str 
     return expected == actual or expected in actual or actual in expected
 
 
-# Cette fonction vérifie strictement une équipe pour un face-à-face afin d'éviter les faux positifs.
+# Cette fonction vérifie une équipe H2H en acceptant les variantes FlashScore comme "Levski Sofia (Bul)".
 def does_flashscore_h2h_team_match(expected_name: str | None, actual_name: str | None) -> bool:
     expected = normalize_flashscore_text(expected_name)
     actual = normalize_flashscore_text(actual_name)
@@ -711,7 +724,13 @@ def does_flashscore_h2h_team_match(expected_name: str | None, actual_name: str |
     if not expected or not actual:
         return False
 
-    return expected == actual
+    if expected == actual:
+        return True
+
+    if len(expected) >= 5 and len(actual) >= 5:
+        return expected in actual or actual in expected
+
+    return False
 
 
 # Cette fonction calcule un score de correspondance entre un match RubyBets et un match FlashScore.

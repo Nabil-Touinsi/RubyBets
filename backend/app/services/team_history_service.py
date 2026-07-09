@@ -2,6 +2,7 @@
 # Il utilise FlashScore comme source principale et garde Football-Data en fallback sans inventer de donnees.
 
 from typing import Any
+import unicodedata
 
 from app.core.constants import FOOTBALL_DATA_PROVIDER
 from app.services.api_football_client import get_normalized_api_football_team_history
@@ -25,6 +26,7 @@ from app.services.match_service import format_team, get_match_with_standings
 TEAM_HISTORY_CACHE_TTL_MINUTES = 720
 TEAM_HISTORY_LIMIT = 20
 OVERVIEW_RECENT_MATCHES_LIMIT = 5
+CLUB_ANALYSIS_RECENT_MATCHES_MIN = 8
 API_FOOTBALL_HISTORY_LIMIT = 20
 FLASHSCORE_HISTORY_LIMIT = 20
 TEAM_HISTORY_RESPONSE_CACHE_TTL_MINUTES = 720
@@ -50,7 +52,7 @@ def build_team_history_response_cache_name(match_id: int) -> str:
         "team_history_response",
         match_id,
         "flashscore_first",
-        "v3",
+        "v4",
         f"ttl_{TEAM_HISTORY_RESPONSE_CACHE_TTL_MINUTES}",
     )
 
@@ -76,9 +78,28 @@ def attach_team_history_response_cache_metadata(
     }
 
 
-# Cette fonction normalise un nom d'equipe pour comparer des sources differentes.
+# Cette fonction normalise un nom d'équipe pour comparer des sources différentes malgré les suffixes pays.
 def normalize_team_name(value: str | None) -> str:
-    return str(value or "").strip().lower()
+    raw_value = str(value or "").strip().lower()
+
+    without_accents = "".join(
+        char
+        for char in unicodedata.normalize("NFKD", raw_value)
+        if not unicodedata.combining(char)
+    )
+
+    without_country_suffix = without_accents
+    if without_country_suffix.endswith(")") and "(" in without_country_suffix:
+        without_country_suffix = without_country_suffix.rsplit("(", 1)[0]
+
+    normalized = (
+        without_country_suffix
+        .replace(".", " ")
+        .replace("-", " ")
+        .replace("_", " ")
+    )
+
+    return " ".join(normalized.split())
 
 
 # Cette fonction construit une liste de noms possibles pour reconnaitre une equipe entre plusieurs sources.
@@ -330,6 +351,11 @@ def rebuild_history_with_matches(
 # Cette fonction indique si un historique possede assez de matchs pour l'aperçu MVP.
 def has_enough_recent_overview_matches(history: dict[str, Any]) -> bool:
     return len(history.get("recent_matches_overview", [])) >= OVERVIEW_RECENT_MATCHES_LIMIT
+
+
+# Cette fonction indique si un historique possède assez de matchs pour alimenter un moteur clubs.
+def has_enough_analysis_matches(history: dict[str, Any]) -> bool:
+    return len(history.get("recent_matches", [])) >= CLUB_ANALYSIS_RECENT_MATCHES_MIN
 
 
 # Cette fonction calcule la synthese de forme d'une equipe a partir de ses matchs normalises.
@@ -653,8 +679,8 @@ async def enrich_histories_with_known_flashscore_match(
         team_names=away_team_names,
     )
 
-    should_enrich_home = not has_enough_recent_overview_matches(home_history)
-    should_enrich_away = not has_enough_recent_overview_matches(away_history)
+    should_enrich_home = not has_enough_analysis_matches(home_history)
+    should_enrich_away = not has_enough_analysis_matches(away_history)
 
     enriched_home_matches = (
         merge_formatted_matches(
@@ -731,8 +757,8 @@ async def enrich_histories_with_flashscore(
         team_names=away_team_names,
     )
 
-    should_enrich_home = not has_enough_recent_overview_matches(home_history)
-    should_enrich_away = not has_enough_recent_overview_matches(away_history)
+    should_enrich_home = not has_enough_analysis_matches(home_history)
+    should_enrich_away = not has_enough_analysis_matches(away_history)
 
     enriched_home_matches = (
         merge_formatted_matches(
@@ -1026,7 +1052,7 @@ async def build_team_history_response(match_id: int) -> dict[str, Any]:
             target_utc_date=target_utc_date,
         )
 
-    if not has_enough_recent_overview_matches(home_history):
+    if not has_enough_analysis_matches(home_history):
         fallback_home_history, home_freshness, home_eligible_matches = await build_team_history(
             team=home_team,
             excluded_match_id=match_id,
@@ -1037,7 +1063,7 @@ async def build_team_history_response(match_id: int) -> dict[str, Any]:
             fallback_history=fallback_home_history,
         )
 
-    if not has_enough_recent_overview_matches(away_history):
+    if not has_enough_analysis_matches(away_history):
         fallback_away_history, away_freshness, _ = await build_team_history(
             team=away_team,
             excluded_match_id=match_id,
