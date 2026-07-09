@@ -152,6 +152,9 @@ ON archived_predictions(prediction_date);
 
 CREATE INDEX IF NOT EXISTS idx_archived_predictions_match_status
 ON archived_predictions(match_status);
+
+CREATE INDEX IF NOT EXISTS idx_archived_predictions_competition_name
+ON archived_predictions(competition_name);
 COMMIT;
 
 -- Schéma de communication :

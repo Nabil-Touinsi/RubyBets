@@ -632,9 +632,67 @@ export type V1833MarketPrediction = NationalMlMarketPrediction;
 export type V1833DynamicFeatures = NationalMlDynamicFeatures;
 export type V1833MatchPredictionResponse = NationalMlPredictionResponse;
 
+
+// Ce type décrit les verdicts possibles d’une prédiction archivée.
+export type ArchivedPredictionVerdict =
+  | "correct"
+  | "incorrect"
+  | "pending"
+  | "not_verifiable"
+  | string;
+
+// Ce type décrit une prédiction historisée dans la table archived_predictions.
+export type ArchivedPrediction = {
+  id: number;
+  rubybets_match_id: string | number | null;
+  source_match_id: string | null;
+  competition_name: string | null;
+  home_team_name: string | null;
+  away_team_name: string | null;
+  home_team_logo_url: string | null;
+  away_team_logo_url: string | null;
+  home_team_country_code: string | null;
+  away_team_country_code: string | null;
+  match_date: string | null;
+  prediction_date: string | null;
+  market_type: string | null;
+  predicted_value: string | null;
+  confidence_level: string | null;
+  risk_level: string | null;
+  justification: string | null;
+  engine_version: string | null;
+  final_home_score: number | null;
+  final_away_score: number | null;
+  match_status: string | null;
+  verdict: ArchivedPredictionVerdict;
+  checked_at: string | null;
+};
+
+// Ce type décrit les filtres envoyés à l’API Archives.
+export type ArchivedPredictionsQuery = {
+  market_type?: string;
+  verdict?: string;
+  match_status?: string;
+  competition_name?: string;
+  search?: string;
+  limit?: number;
+  offset?: number;
+};
+
+// Ce type décrit la réponse backend de la liste paginée des prédictions archivées.
+export type ArchivedPredictionsResponse = {
+  status: "available" | "unavailable" | string;
+  count: number;
+  limit: number;
+  offset: number;
+  items: ArchivedPrediction[];
+  available_competitions?: string[];
+  message?: string;
+};
+
 // Schéma de communication du fichier :
 // rubybets.ts
 // ├── utilisé par api.ts pour typer les réponses backend
 // ├── utilisé par App.tsx pour stocker les données dans les states React
-// ├── utilisé par les composants frontend pour afficher matchs, historiques d'équipes, compositions probables, actualités contextuelles, analyses, prédictions et recommandations
-// └── prépare le typage du modèle national expérimental V18.3.4 dc018 pour les écrans Prédictions et Sélection
+// ├── utilisé par les composants frontend pour afficher matchs, historiques d'équipes, compositions probables, actualités contextuelles, analyses, prédictions, recommandations et archives
+// └── prépare le typage du modèle national expérimental V18.3.4 dc018 et des archives pour les écrans Prédictions, Sélection et Archives

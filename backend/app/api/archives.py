@@ -21,6 +21,7 @@ def read_archived_predictions(
     market_type: str | None = Query(default=None),
     verdict: str | None = Query(default=None),
     match_status: str | None = Query(default=None),
+    competition_name: str | None = Query(default=None),
     search: str | None = Query(default=None),
     limit: int = Query(default=50, ge=1, le=100),
     offset: int = Query(default=0, ge=0),
@@ -29,6 +30,7 @@ def read_archived_predictions(
         market_type=market_type,
         verdict=verdict,
         match_status=match_status,
+        competition_name=competition_name,
         search=search,
         limit=limit,
         offset=offset,
@@ -38,7 +40,7 @@ def read_archived_predictions(
 # Schéma de communication :
 # frontend ArchivesScreen.tsx
 #     ↓
-# GET /api/archives/predictions
+# GET /api/archives/predictions?competition_name=...
 #     ↓
 # archives_service.py
 #     ↓

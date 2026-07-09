@@ -1,0 +1,19 @@
+<!--
+  rubybets-logo.svg
+  Rôle : icône navigateur officielle de RubyBets affichée dans l’onglet.
+-->
+
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <rect width="64" height="64" rx="14" fill="#061616"/>
+  <text x="8" y="42" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="800" fill="#22f5d0">R</text>
+  <text x="31" y="42" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="800" fill="#ffffff">B</text>
+</svg>
+
+<!--
+  Schéma de communication :
+  rubybets-logo.svg
+      ↑ utilisé par
+  index.html
+      ↑ affiché par
+  navigateur
+-->

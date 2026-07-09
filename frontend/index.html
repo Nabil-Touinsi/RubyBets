@@ -1,13 +1,28 @@
+<!--
+  index.html
+  Rôle : point d’entrée HTML de RubyBets.
+  Il définit le titre de l’onglet, l’icône navigateur et charge l’application React.
+-->
+
 <!doctype html>
-<html lang="en">
+<html lang="fr">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href="/rubybets-logo.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>frontend</title>
+    <title>RubyBets</title>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
+
+<!--
+  Schéma de communication :
+  index.html
+      ↓ charge
+  src/main.tsx
+      ↓ monte
+  App React RubyBets
+-->

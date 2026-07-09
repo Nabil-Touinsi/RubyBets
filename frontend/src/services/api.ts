@@ -2,6 +2,8 @@
 // Il sécurise les échanges front/back avec des réponses TypeScript typées.
 
 import type {
+  ArchivedPredictionsQuery,
+  ArchivedPredictionsResponse,
   CompetitionsResponse,
   GlossaryResponse,
   HealthResponse,
@@ -196,6 +198,50 @@ export async function getMultiMatchRecommendation(
   );
 }
 
+
+// Cette fonction récupère les prédictions archivées avec filtres et pagination.
+export async function getArchivedPredictions(
+  filters: ArchivedPredictionsQuery = {}
+): Promise<ArchivedPredictionsResponse> {
+  const params = new URLSearchParams();
+
+  if (filters.market_type) {
+    params.set("market_type", filters.market_type);
+  }
+
+  if (filters.verdict) {
+    params.set("verdict", filters.verdict);
+  }
+
+  if (filters.match_status) {
+    params.set("match_status", filters.match_status);
+  }
+
+  if (filters.competition_name) {
+    params.set("competition_name", filters.competition_name);
+  }
+
+  if (filters.search) {
+    params.set("search", filters.search);
+  }
+
+  if (filters.limit !== undefined) {
+    params.set("limit", String(filters.limit));
+  }
+
+  if (filters.offset !== undefined) {
+    params.set("offset", String(filters.offset));
+  }
+
+  const queryString = params.toString();
+  const endpoint = `/api/archives/predictions${queryString ? `?${queryString}` : ""}`;
+
+  return fetchJson<ArchivedPredictionsResponse>(
+    endpoint,
+    "Erreur lors du chargement des archives de prédictions."
+  );
+}
+
 // Cette fonction récupère le glossaire pédagogique de RubyBets.
 export async function getGlossary(): Promise<GlossaryResponse> {
   return fetchJson<GlossaryResponse>(
@@ -217,5 +263,5 @@ export async function getResponsibleInfo(): Promise<ResponsibleInfoResponse> {
 // ├── appelle le backend FastAPI RubyBets
 // ├── utilise rubybets.ts pour typer les réponses reçues
 // ├── alimente App.tsx avec des données sécurisées
-// ├── transmet les données aux composants React d’affichage, dont l’historique des équipes, les compositions et les actualités contextuelles dans la fiche détail match
-// └── expose les appels V18.3.3 historique, dynamique et sélection nationale pour les écrans Prédictions/Sélection
+// ├── transmet les données aux composants React d’affichage, dont l’historique des équipes, les compositions, les actualités contextuelles et les archives
+// └── expose les appels V18.3.3 historique, dynamique, sélection nationale et archives pour les écrans Prédictions/Sélection/Archives

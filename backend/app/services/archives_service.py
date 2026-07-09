@@ -42,6 +42,7 @@ def build_archive_filters(
     market_type: str | None = None,
     verdict: str | None = None,
     match_status: str | None = None,
+    competition_name: str | None = None,
     search: str | None = None,
 ) -> tuple[list[str], dict[str, Any]]:
     filters = []
@@ -58,6 +59,10 @@ def build_archive_filters(
     if match_status:
         filters.append("match_status = %(match_status)s")
         params["match_status"] = match_status
+
+    if competition_name:
+        filters.append("competition_name = %(competition_name)s")
+        params["competition_name"] = competition_name
 
     if search:
         filters.append(
@@ -99,6 +104,23 @@ def count_archived_predictions(
             result = cursor.fetchone()
 
     return int(result[0]) if result else 0
+
+
+# Cette fonction récupère la liste des compétitions disponibles dans les archives.
+def fetch_archive_competitions() -> list[str]:
+    query = """
+        SELECT DISTINCT competition_name
+        FROM archived_predictions
+        WHERE competition_name IS NOT NULL
+        ORDER BY competition_name ASC;
+    """
+
+    with get_database_connection() as connection:
+        with connection.cursor() as cursor:
+            cursor.execute(query)
+            rows = cursor.fetchall()
+
+    return [str(row[0]) for row in rows if row and row[0]]
 
 
 # Cette fonction récupère les archives depuis PostgreSQL avec pagination.
@@ -159,6 +181,7 @@ def get_archived_predictions(
     market_type: str | None = None,
     verdict: str | None = None,
     match_status: str | None = None,
+    competition_name: str | None = None,
     search: str | None = None,
     limit: int = 50,
     offset: int = 0,
@@ -171,6 +194,7 @@ def get_archived_predictions(
             market_type=market_type,
             verdict=verdict,
             match_status=match_status,
+            competition_name=competition_name,
             search=search,
         )
         where_clause = build_where_clause(filters)
@@ -186,6 +210,7 @@ def get_archived_predictions(
             limit=safe_limit,
             offset=safe_offset,
         )
+        available_competitions = fetch_archive_competitions()
 
         return {
             "status": "available",
@@ -193,6 +218,7 @@ def get_archived_predictions(
             "limit": safe_limit,
             "offset": safe_offset,
             "items": items,
+            "available_competitions": available_competitions,
         }
 
     except Exception:
@@ -202,6 +228,7 @@ def get_archived_predictions(
             "limit": safe_limit,
             "offset": safe_offset,
             "items": [],
+            "available_competitions": [],
             "message": "Archives database is unavailable or not initialized yet.",
         }
 
