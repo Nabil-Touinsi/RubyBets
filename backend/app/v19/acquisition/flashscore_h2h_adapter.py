@@ -211,13 +211,86 @@ def resolve_flashscore_team_identity(
     )
 
 
-# Construit un contexte de compétition conservateur à partir des champs réellement disponibles.
+# Normalise le libellé de compétition utilisé par les règles déterministes de classement.
+def normalize_competition_text(value: Any) -> str:
+    return " ".join(str(value or "").strip().casefold().split())
+
+
+# Classe une compétition FlashScore à partir de son libellé sans utiliser de données sportives futures.
+def classify_flashscore_competition(
+    competition_data: dict[str, Any],
+    entity_type: H2HEntityType,
+) -> tuple[H2HCompetitionCategory, H2HOfficialStatus]:
+    competition_text = normalize_competition_text(
+        " ".join(
+            str(value)
+            for value in (
+                competition_data.get("name"),
+                competition_data.get("code"),
+                competition_data.get("type"),
+            )
+            if value
+        )
+    )
+
+    if not competition_text:
+        return (
+            H2HCompetitionCategory.UNKNOWN,
+            H2HOfficialStatus.UNKNOWN,
+        )
+
+    friendly_markers = ("friendly", "amical", "amistoso")
+    if any(marker in competition_text for marker in friendly_markers):
+        return (
+            H2HCompetitionCategory.FRIENDLY,
+            H2HOfficialStatus.FRIENDLY,
+        )
+
+    if entity_type == H2HEntityType.NATIONAL_TEAM:
+        if "nations league" in competition_text:
+            category = H2HCompetitionCategory.NATIONS_LEAGUE
+        elif any(
+            marker in competition_text
+            for marker in ("qualif", "qualification", "qualifier")
+        ):
+            category = H2HCompetitionCategory.INTERNATIONAL_QUALIFIER
+        else:
+            category = H2HCompetitionCategory.INTERNATIONAL_TOURNAMENT
+
+        return category, H2HOfficialStatus.OFFICIAL
+
+    continental_markers = (
+        "champions league",
+        "europa league",
+        "conference league",
+        "libertadores",
+        "sudamericana",
+        "afc champions",
+        "caf champions",
+        "concacaf",
+    )
+    if any(marker in competition_text for marker in continental_markers):
+        category = H2HCompetitionCategory.CONTINENTAL_CLUB_COMPETITION
+    elif any(
+        marker in competition_text
+        for marker in (" cup", "cup ", "coupe", "coppa", "pokal", "taça", "taca")
+    ):
+        category = H2HCompetitionCategory.DOMESTIC_CUP
+    else:
+        category = H2HCompetitionCategory.DOMESTIC_LEAGUE
+
+    return category, H2HOfficialStatus.OFFICIAL
+
+
+# Construit un contexte de compétition versionné à partir des champs réellement disponibles.
 def build_flashscore_competition_context(
     competition_data: dict[str, Any],
     entity_type: H2HEntityType,
 ) -> CompetitionContextV1:
     provider_competition_id = normalize_optional_identifier(
-        competition_data.get("id")
+        competition_data.get("sourceCompetitionId")
+        or competition_data.get("source_competition_id")
+        or competition_data.get("id")
     )
     provider_ids = (
         ((H2HProvider.FLASHSCORE, provider_competition_id),)
@@ -227,17 +300,21 @@ def build_flashscore_competition_context(
     competition_name = str(
         competition_data.get("name") or competition_data.get("code") or ""
     ).strip()
+    category, official_status = classify_flashscore_competition(
+        competition_data=competition_data,
+        entity_type=entity_type,
+    )
 
     return CompetitionContextV1(
         canonical_competition_id=None,
         provider_competition_ids=provider_ids,
         name=competition_name,
         domain=entity_type,
-        category=H2HCompetitionCategory.UNKNOWN,
+        category=category,
         season=None,
         phase=None,
         round=None,
-        official_status=H2HOfficialStatus.UNKNOWN,
+        official_status=official_status,
     )
 
 
@@ -266,22 +343,43 @@ def extract_displayed_score(match_data: dict[str, Any]) -> tuple[int, int] | Non
     return home_score, away_score
 
 
-# Construit un score prudent sans déduire le temps réglementaire d'un score final ambigu.
+# Construit le score réglementaire lorsque le normaliseur historique le marque explicitement REGULAR.
 def build_flashscore_score_context(
     match_data: dict[str, Any],
 ) -> ScoreContextV1:
     displayed_score = extract_displayed_score(match_data)
+    score_data = match_data.get("score")
+    if not isinstance(score_data, dict):
+        score_data = {}
+
+    duration = str(score_data.get("duration") or "").strip().upper()
+    status = str(match_data.get("status") or "").strip().upper()
+    has_reliable_regulation_score = (
+        displayed_score is not None
+        and duration == "REGULAR"
+        and status == "FINISHED"
+    )
 
     return ScoreContextV1(
-        score_type=H2HScoreType.UNKNOWN,
-        regulation_time=None,
+        score_type=(
+            H2HScoreType.REGULATION_90
+            if has_reliable_regulation_score
+            else H2HScoreType.UNKNOWN
+        ),
+        regulation_time=(
+            displayed_score if has_reliable_regulation_score else None
+        ),
         extra_time=None,
         penalties=None,
         displayed_final_score=displayed_score,
         score_reliability=(
-            H2HScoreReliability.PARTIAL
-            if displayed_score is not None
-            else H2HScoreReliability.UNKNOWN
+            H2HScoreReliability.RELIABLE
+            if has_reliable_regulation_score
+            else (
+                H2HScoreReliability.PARTIAL
+                if displayed_score is not None
+                else H2HScoreReliability.UNKNOWN
+            )
         ),
     )
 
@@ -470,7 +568,7 @@ def adapt_flashscore_h2h_match(
 #   -> fournit des matchs H2H déjà filtrés et normalisés
 # flashscore_h2h_adapter.py
 #   -> lit TargetTeamsV1 et le domaine du match cible
-#   -> produit H2HMeetingV1 avec identités, score prudent et provenance
+#   -> produit H2HMeetingV1 avec identités, compétition classée, score réglementaire traçable et provenance
 # h2h_acquisition_service.py
 #   -> assemble les confrontations produites dans H2HModuleInputV1
 #   -> aucune feature ni recommandation sportive n'est calculée ici

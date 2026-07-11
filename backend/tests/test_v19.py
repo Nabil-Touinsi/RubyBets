@@ -1,5 +1,5 @@
 # Role du fichier :
-# Ces tests protegent les enums et les contrats immuables du domaine RubyBets V19.
+# Ces tests protègent les contrats et la chaîne interne H2H du domaine RubyBets V19.
 
 from collections.abc import Callable
 from dataclasses import FrozenInstanceError, is_dataclass, replace
@@ -13,6 +13,16 @@ from app.v19.acquisition.flashscore_h2h_adapter import (
 from app.v19.acquisition.h2h_acquisition_service import (
     H2H_ACQUISITION_CANDIDATE_LIMIT,
     acquire_h2h_module_input,
+)
+from app.v19.acquisition.target_match_adapter import (
+    TargetMatchAdapterError,
+    adapt_normalized_target_match,
+)
+from app.v19.application.h2h_service import (
+    H2HTargetMatchInvalidError,
+    H2HTargetMatchNotFoundError,
+    H2HTargetMatchProviderError,
+    build_h2h_result_for_match,
 )
 from app.v19.domain.h2h_contracts import (
     CompetitionContextV1,
@@ -656,10 +666,10 @@ def test_v19_flashscore_adapter_keeps_missing_context_unknown() -> None:
     assert meeting.competition.official_status == H2HOfficialStatus.UNKNOWN
     assert meeting.venue_context.neutral_ground == H2HTriState.UNKNOWN
     assert meeting.tie_context.format == H2HTieFormat.UNKNOWN
-    assert meeting.score_context.score_type == H2HScoreType.UNKNOWN
-    assert meeting.score_context.regulation_time is None
+    assert meeting.score_context.score_type == H2HScoreType.REGULATION_90
+    assert meeting.score_context.regulation_time == (2, 1)
     assert meeting.score_context.displayed_final_score == (2, 1)
-    assert meeting.score_context.score_reliability == H2HScoreReliability.PARTIAL
+    assert meeting.score_context.score_reliability == H2HScoreReliability.RELIABLE
     assert meeting.normalization_state == H2HNormalizationState.PARTIAL
 
 
@@ -1410,11 +1420,289 @@ def test_v19_h2h_invalid_input_returns_structured_invalid_result() -> None:
     )
 
 
+
+
+# Construit un match cible FlashScore normalisé pour tester l'orchestration applicative V19.
+def build_normalized_target_match() -> dict:
+    return {
+        "id": 1813105023365578,
+        "sourceMatchId": "Target01",
+        "source": "flashscore_rapidapi",
+        "utcDate": "2026-07-12T18:00:00Z",
+        "status": "SCHEDULED",
+        "stage": "QUALIFICATION",
+        "matchday": 1,
+        "competition": {
+            "id": 1001,
+            "code": "CL",
+            "name": "Champions League - Qualification",
+            "type": None,
+            "sourceCompetitionId": "CL001",
+        },
+        "season": {
+            "id": 2026,
+            "sourceSeasonId": "2026-2027",
+        },
+        "homeTeam": {
+            "id": 501,
+            "sourceTeamId": "Home01",
+            "name": "Home Club",
+        },
+        "awayTeam": {
+            "id": 502,
+            "sourceTeamId": "Away01",
+            "name": "Away Club",
+        },
+    }
+
+
+# Construit quatre confrontations FlashScore exploitables par le pipeline complet.
+def build_application_h2h_meetings() -> list[dict]:
+    meetings = []
+    scores = ((2, 1), (1, 1), (0, 2), (3, 2))
+
+    for index, score in enumerate(scores, start=1):
+        meeting = build_normalized_flashscore_h2h_match(
+            match_id=f"AppH2H{index}",
+            home_team_id=("Home01" if index % 2 else "Away01"),
+            home_team_name=("Home Club" if index % 2 else "Away Club"),
+            away_team_id=("Away01" if index % 2 else "Home01"),
+            away_team_name=("Away Club" if index % 2 else "Home Club"),
+            utc_date=f"2026-0{index + 1}-01T18:00:00Z",
+        )
+        meeting["competition"]["code"] = "CL"
+        meeting["competition"]["name"] = "Champions League"
+        meeting["score"]["fullTime"] = {
+            "home": score[0],
+            "away": score[1],
+        }
+        meetings.append(meeting)
+
+    return meetings
+
+
+# Vérifie que l'adaptateur cible conserve IDs, cutoff et contextes explicitement connus ou inconnus.
+def test_v19_target_match_adapter_builds_traceable_contracts() -> None:
+    cutoff = datetime(2026, 7, 12, 17, 0, tzinfo=timezone.utc)
+
+    target_match, target_teams = adapt_normalized_target_match(
+        match_data=build_normalized_target_match(),
+        cutoff_utc=cutoff,
+        entity_type=H2HEntityType.CLUB,
+    )
+
+    assert target_match.canonical_match_id == "1813105023365578"
+    assert target_match.provider_match_ids == (
+        (H2HProvider.FLASHSCORE, "Target01"),
+    )
+    assert target_match.cutoff_utc == cutoff
+    assert target_match.domain == H2HEntityType.CLUB
+    assert (
+        target_match.competition.category
+        == H2HCompetitionCategory.CONTINENTAL_CLUB_COMPETITION
+    )
+    assert target_match.competition.official_status == H2HOfficialStatus.OFFICIAL
+    assert target_match.venue_context.neutral_ground == H2HTriState.UNKNOWN
+    assert target_match.tie_context.format == H2HTieFormat.UNKNOWN
+    assert target_teams.home_team.provider_ids == (
+        (H2HProvider.FLASHSCORE, "Home01"),
+    )
+    assert target_teams.away_team.provider_ids == (
+        (H2HProvider.FLASHSCORE, "Away01"),
+    )
+
+
+# Vérifie que le domaine national est explicite et n'est pas déduit silencieusement du nom des équipes.
+def test_v19_target_match_adapter_applies_explicit_national_domain() -> None:
+    match_data = build_normalized_target_match()
+    match_data["competition"]["name"] = "World Championship - Qualification"
+
+    target_match, target_teams = adapt_normalized_target_match(
+        match_data=match_data,
+        cutoff_utc=datetime(2026, 7, 12, 17, 0, tzinfo=timezone.utc),
+        entity_type=H2HEntityType.NATIONAL_TEAM,
+    )
+
+    assert target_match.domain == H2HEntityType.NATIONAL_TEAM
+    assert (
+        target_match.competition.category
+        == H2HCompetitionCategory.INTERNATIONAL_QUALIFIER
+    )
+    assert target_teams.home_team.entity_type == H2HEntityType.NATIONAL_TEAM
+    assert target_teams.away_team.entity_type == H2HEntityType.NATIONAL_TEAM
+
+
+# Vérifie qu'un cutoff postérieur au coup d'envoi est rejeté avant toute acquisition.
+def test_v19_target_match_adapter_rejects_cutoff_after_kickoff() -> None:
+    with pytest.raises(
+        TargetMatchAdapterError,
+        match="target_match_cutoff_after_kickoff",
+    ):
+        adapt_normalized_target_match(
+            match_data=build_normalized_target_match(),
+            cutoff_utc=datetime(2026, 7, 12, 18, 1, tzinfo=timezone.utc),
+            entity_type=H2HEntityType.CLUB,
+        )
+
+
+# Vérifie le flux match cible -> acquisition -> features avec des dépendances injectées.
+def test_v19_h2h_application_service_runs_end_to_end() -> None:
+    fixed_time = datetime(2026, 7, 12, 16, 30, tzinfo=timezone.utc)
+
+    # Retourne un match cible contrôlé sans appel fournisseur réel.
+    def fake_match_loader(match_id: int | str | None) -> tuple[dict, dict]:
+        assert match_id == 1813105023365578
+        return build_normalized_target_match(), {
+            "status": "success",
+            "provider": "flashscore_rapidapi",
+        }
+
+    # Retourne quatre confrontations contrôlées et vérifie les entrées d'acquisition.
+    def fake_h2h_client(
+        match_id: str | None,
+        home_team_name: str,
+        away_team_name: str,
+        limit: int,
+    ) -> tuple[list[dict], dict]:
+        assert match_id == "Target01"
+        assert home_team_name == "Home Club"
+        assert away_team_name == "Away Club"
+        assert limit == H2H_ACQUISITION_CANDIDATE_LIMIT
+        return build_application_h2h_meetings(), {
+            "status": "success",
+            "provider": "flashscore_rapidapi",
+            "endpoint": "/matches/h2h",
+            "results": 4,
+        }
+
+    result = build_h2h_result_for_match(
+        match_id=1813105023365578,
+        request_id="v19-application-test",
+        cutoff_utc=datetime(2026, 7, 12, 17, 0, tzinfo=timezone.utc),
+        entity_type=H2HEntityType.CLUB,
+        match_loader=fake_match_loader,
+        h2h_client=fake_h2h_client,
+        clock=build_static_clock(fixed_time),
+    )
+    values = get_feature_values(result)
+
+    assert result.request_id == "v19-application-test"
+    assert result.target_match_id == "1813105023365578"
+    assert result.module_outcome == H2HModuleOutcome.FEATURES_PRODUCED
+    assert result.module_status == H2HModuleStatus.DEGRADED
+    assert values["h2h_matches_count"] == 4
+    assert values["h2h_total_goals_avg"] == pytest.approx(3.0)
+    assert values["h2h_over_15_rate"] == pytest.approx(1.0)
+    assert values["h2h_btts_rate"] == pytest.approx(0.75)
+    assert get_consumer_readiness(
+        result,
+        H2HConsumerId.OVER_1_5,
+    ).status == H2HConsumerReadinessStatus.DEGRADED
+    assert get_consumer_readiness(
+        result,
+        H2HConsumerId.BTTS,
+    ).status == H2HConsumerReadinessStatus.DEGRADED
+
+
+# Vérifie qu'une panne H2H produit une abstention structurée sans masquer le match cible valide.
+def test_v19_h2h_application_service_handles_h2h_provider_failure() -> None:
+    # Retourne un match cible contrôlé sans appel réseau.
+    def fake_match_loader(match_id: int | str | None) -> tuple[dict, dict]:
+        del match_id
+        return build_normalized_target_match(), {"status": "success"}
+
+    # Simule une panne fournisseur absorbée par la couche d'acquisition.
+    def failing_h2h_client(
+        match_id: str | None,
+        home_team_name: str,
+        away_team_name: str,
+        limit: int,
+    ) -> tuple[list[dict], dict]:
+        del match_id, home_team_name, away_team_name, limit
+        raise RuntimeError("controlled h2h failure")
+
+    result = build_h2h_result_for_match(
+        match_id=1813105023365578,
+        request_id="v19-h2h-provider-error-test",
+        cutoff_utc=datetime(2026, 7, 12, 17, 0, tzinfo=timezone.utc),
+        entity_type=H2HEntityType.CLUB,
+        match_loader=fake_match_loader,
+        h2h_client=failing_h2h_client,
+        clock=build_static_clock(
+            datetime(2026, 7, 12, 16, 30, tzinfo=timezone.utc)
+        ),
+    )
+
+    assert result.module_status == H2HModuleStatus.UNAVAILABLE
+    assert result.module_outcome == H2HModuleOutcome.H2H_MODULE_ABSTAIN
+    assert H2HIssueCode.H2H_SOURCE_UNAVAILABLE in {
+        issue.code for issue in result.abstention_reasons
+    }
+
+
+# Vérifie qu'un match absent est distingué d'une panne fournisseur du chargeur cible.
+def test_v19_h2h_application_service_distinguishes_target_match_errors() -> None:
+    # Simule un identifiant qui ne correspond pas à un match FlashScore.
+    def missing_loader(match_id: int | str | None) -> tuple[None, dict]:
+        del match_id
+        return None, {"status": "not_flashscore_match_id"}
+
+    # Simule une panne du fournisseur du match cible.
+    def failing_loader(match_id: int | str | None) -> tuple[dict, dict]:
+        del match_id
+        raise TimeoutError("controlled target timeout")
+
+    with pytest.raises(H2HTargetMatchNotFoundError):
+        build_h2h_result_for_match(
+            match_id=1,
+            request_id="v19-target-missing-test",
+            cutoff_utc=datetime(2026, 7, 12, 17, 0, tzinfo=timezone.utc),
+            entity_type=H2HEntityType.CLUB,
+            match_loader=missing_loader,
+        )
+
+    with pytest.raises(
+        H2HTargetMatchProviderError,
+        match="target_match_provider_error:TimeoutError",
+    ):
+        build_h2h_result_for_match(
+            match_id=2,
+            request_id="v19-target-provider-test",
+            cutoff_utc=datetime(2026, 7, 12, 17, 0, tzinfo=timezone.utc),
+            entity_type=H2HEntityType.CLUB,
+            match_loader=failing_loader,
+        )
+
+
+# Vérifie qu'un match cible partiel devient une erreur applicative stable et testable.
+def test_v19_h2h_application_service_rejects_invalid_target_match() -> None:
+    # Retourne un match sans date de coup d'envoi.
+    def invalid_loader(match_id: int | str | None) -> tuple[dict, dict]:
+        del match_id
+        match_data = build_normalized_target_match()
+        match_data["utcDate"] = None
+        return match_data, {"status": "success"}
+
+    with pytest.raises(
+        H2HTargetMatchInvalidError,
+        match="target_match_kickoff_missing",
+    ):
+        build_h2h_result_for_match(
+            match_id=1813105023365578,
+            request_id="v19-invalid-target-test",
+            cutoff_utc=datetime(2026, 7, 12, 17, 0, tzinfo=timezone.utc),
+            entity_type=H2HEntityType.CLUB,
+            match_loader=invalid_loader,
+        )
+
+
 # Schema de communication :
 # test_v19.py
 #   -> importe backend/app/v19/domain/h2h_enums.py
 #   -> importe backend/app/v19/acquisition/flashscore_h2h_adapter.py
 #   -> importe backend/app/v19/acquisition/h2h_acquisition_service.py
+#   -> importe backend/app/v19/acquisition/target_match_adapter.py
+#   -> importe backend/app/v19/application/h2h_service.py
 #   -> importe backend/app/v19/domain/h2h_contracts.py
 #   -> importe backend/app/v19/features/h2h_feature_catalog.py
 #   -> importe backend/app/v19/features/h2h_feature_builder.py
@@ -1422,6 +1710,7 @@ def test_v19_h2h_invalid_input_returns_structured_invalid_result() -> None:
 #   -> verifie la composition de H2HModuleInputV1 et H2HModuleResultV1
 #   -> verifie l'immutabilite des vingt dataclasses V19
 #   -> verifie acquisition, identites, orientation, provenance et donnees manquantes
+#   -> verifie la chaîne match cible -> acquisition -> features et ses erreurs contrôlées
 #   -> verifie formules, profils, qualite, readiness et abstention locale H2H
 #   -> injecte des clients controles et ne contacte aucune API reelle
 #   -> ne teste aucune recommandation sportive
