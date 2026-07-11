@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+import re
 from typing import Any
 
 from app.v19.domain.h2h_contracts import (
@@ -37,7 +38,8 @@ from app.v19.domain.h2h_enums import (
 
 FLASHSCORE_H2H_ENDPOINT = "/matches/h2h"
 FLASHSCORE_H2H_NORMALIZATION_VERSION = "v19.h2h.flashscore-adapter.1"
-FLASHSCORE_H2H_IDENTITY_RESOLVER_VERSION = "v19.h2h.identity.flashscore.1"
+FLASHSCORE_H2H_IDENTITY_RESOLVER_VERSION = "v19.h2h.identity.flashscore.2"
+COUNTRY_SUFFIX_PATTERN = re.compile(r"\s+\([A-Z]{2,3}\)\s*$")
 
 
 # Convertit une valeur non vide en identifiant texte stable pour les contrats V19.
@@ -49,9 +51,11 @@ def normalize_optional_identifier(value: Any) -> str | None:
     return normalized_value or None
 
 
-# Normalise un nom uniquement pour comparer des identités sans modifier le nom affiché.
+# Normalise un nom pour l'identité et retire uniquement un suffixe pays final contrôlé.
 def normalize_identity_name(value: Any) -> str:
-    return " ".join(str(value or "").strip().casefold().split())
+    compact_name = " ".join(str(value or "").strip().split())
+    canonical_name = COUNTRY_SUFFIX_PATTERN.sub("", compact_name).strip()
+    return " ".join(canonical_name.casefold().split())
 
 
 # Convertit une date ISO ou datetime en datetime UTC consciente du fuseau.
@@ -168,7 +172,7 @@ def build_unresolved_identity(
     )
 
 
-# Résout une équipe historique contre les deux identités cibles par ID puis par nom.
+# Résout une équipe historique par ID exact, puis par nom canonique seulement si l'ID H2H manque.
 def resolve_flashscore_team_identity(
     team_data: dict[str, Any],
     target_teams: TargetTeamsV1,
@@ -176,33 +180,44 @@ def resolve_flashscore_team_identity(
 ) -> TeamIdentityV1:
     provider_team_id = normalize_optional_identifier(team_data.get("id"))
     observed_name = str(team_data.get("name") or "").strip()
+    target_team_candidates = (target_teams.home_team, target_teams.away_team)
 
-    for target_team in (target_teams.home_team, target_teams.away_team):
-        target_provider_id = get_flashscore_team_id(target_team)
-        if (
-            provider_team_id is not None
-            and target_provider_id is not None
-            and provider_team_id == target_provider_id
-        ):
-            return build_provider_resolved_identity(
-                target_team=target_team,
-                provider_team_id=provider_team_id,
-                observed_name=observed_name,
-            )
+    if provider_team_id is not None:
+        for target_team in target_team_candidates:
+            target_provider_id = get_flashscore_team_id(target_team)
+            if (
+                target_provider_id is not None
+                and provider_team_id == target_provider_id
+            ):
+                return build_provider_resolved_identity(
+                    target_team=target_team,
+                    provider_team_id=provider_team_id,
+                    observed_name=observed_name,
+                )
+
+        return build_unresolved_identity(
+            provider_team_id=provider_team_id,
+            observed_name=observed_name,
+            entity_type=entity_type,
+        )
 
     observed_normalized_name = normalize_identity_name(observed_name)
+    matching_targets = []
     if observed_normalized_name:
-        for target_team in (target_teams.home_team, target_teams.away_team):
+        for target_team in target_team_candidates:
             target_names = {
                 normalize_identity_name(target_team.display_name),
                 normalize_identity_name(target_team.normalized_name),
             }
             if observed_normalized_name in target_names:
-                return build_name_resolved_identity(
-                    target_team=target_team,
-                    provider_team_id=provider_team_id,
-                    observed_name=observed_name,
-                )
+                matching_targets.append(target_team)
+
+    if len(matching_targets) == 1:
+        return build_name_resolved_identity(
+            target_team=matching_targets[0],
+            provider_team_id=None,
+            observed_name=observed_name,
+        )
 
     return build_unresolved_identity(
         provider_team_id=provider_team_id,

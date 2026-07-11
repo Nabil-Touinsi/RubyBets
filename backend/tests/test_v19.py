@@ -569,6 +569,133 @@ def test_v19_flashscore_adapter_keeps_reversed_historical_orientation() -> None:
     assert meeting.away_team.canonical_team_id == "home-team-test"
 
 
+# Vérifie que le fallback nominal retire uniquement les suffixes pays finaux du match cible.
+def test_v19_flashscore_adapter_resolves_country_suffix_names_without_h2h_ids() -> None:
+    target_data = build_normalized_target_match()
+    target_data["homeTeam"]["name"] = "Iberia 1999 (GEO)"
+    target_data["awayTeam"]["name"] = "Flora (EST)"
+    _, target_teams = adapt_normalized_target_match(
+        match_data=target_data,
+        cutoff_utc=datetime(2026, 7, 12, 17, 0, tzinfo=timezone.utc),
+        entity_type=H2HEntityType.CLUB,
+    )
+
+    meeting = adapt_flashscore_h2h_match(
+        match_data=build_normalized_flashscore_h2h_match(
+            match_id="meeting-country-suffix",
+            home_team_id=None,
+            home_team_name="Iberia 1999",
+            away_team_id=None,
+            away_team_name="Flora",
+        ),
+        target_teams=target_teams,
+        entity_type=H2HEntityType.CLUB,
+        retrieved_at_utc=datetime(2026, 7, 12, 16, 0, tzinfo=timezone.utc),
+    )
+
+    assert target_teams.home_team.normalized_name == "iberia 1999"
+    assert target_teams.away_team.normalized_name == "flora"
+    assert meeting.home_team.canonical_team_id == "501"
+    assert meeting.away_team.canonical_team_id == "502"
+    assert meeting.home_team.identity_resolution.method == H2HIdentityMethod.NORMALIZED_NAME
+    assert meeting.away_team.identity_resolution.method == H2HIdentityMethod.NORMALIZED_NAME
+    assert meeting.mapping_quality == H2HQualityLevel.PARTIAL
+
+
+# Vérifie que le fallback nominal conserve l'orientation historique inversée sans IDs H2H.
+def test_v19_flashscore_adapter_resolves_reversed_country_suffix_names_without_ids() -> None:
+    target_data = build_normalized_target_match()
+    target_data["homeTeam"]["name"] = "Iberia 1999 (GEO)"
+    target_data["awayTeam"]["name"] = "Flora (EST)"
+    _, target_teams = adapt_normalized_target_match(
+        match_data=target_data,
+        cutoff_utc=datetime(2026, 7, 12, 17, 0, tzinfo=timezone.utc),
+        entity_type=H2HEntityType.CLUB,
+    )
+
+    meeting = adapt_flashscore_h2h_match(
+        match_data=build_normalized_flashscore_h2h_match(
+            match_id="meeting-country-suffix-reversed",
+            home_team_id=None,
+            home_team_name="Flora",
+            away_team_id=None,
+            away_team_name="Iberia 1999",
+        ),
+        target_teams=target_teams,
+        entity_type=H2HEntityType.CLUB,
+        retrieved_at_utc=datetime(2026, 7, 12, 16, 0, tzinfo=timezone.utc),
+    )
+
+    assert meeting.home_team.canonical_team_id == "502"
+    assert meeting.away_team.canonical_team_id == "501"
+    assert meeting.mapping_quality == H2HQualityLevel.PARTIAL
+
+
+# Vérifie qu'un identifiant fournisseur exact reste prioritaire sur un nom historique contradictoire.
+def test_v19_flashscore_adapter_prioritizes_provider_id_over_name() -> None:
+    reference_input = build_h2h_module_input()
+    meeting = adapt_flashscore_h2h_match(
+        match_data=build_normalized_flashscore_h2h_match(
+            match_id="meeting-id-priority",
+            home_team_id="away-provider-test",
+            home_team_name="Home Team Test",
+            away_team_id="home-provider-test",
+            away_team_name="Away Team Test",
+        ),
+        target_teams=reference_input.target_teams,
+        entity_type=H2HEntityType.CLUB,
+        retrieved_at_utc=datetime(2026, 7, 12, 16, 0, tzinfo=timezone.utc),
+    )
+
+    assert meeting.home_team.canonical_team_id == "away-team-test"
+    assert meeting.away_team.canonical_team_id == "home-team-test"
+    assert meeting.home_team.identity_resolution.method == H2HIdentityMethod.PROVIDER_ID_EXACT
+    assert meeting.away_team.identity_resolution.method == H2HIdentityMethod.PROVIDER_ID_EXACT
+
+
+# Vérifie qu'un ID fournisseur inconnu bloque le fallback nominal pour éviter un rapprochement contradictoire.
+def test_v19_flashscore_adapter_rejects_conflicting_provider_id_and_name() -> None:
+    reference_input = build_h2h_module_input()
+    meeting = adapt_flashscore_h2h_match(
+        match_data=build_normalized_flashscore_h2h_match(
+            match_id="meeting-id-conflict",
+            home_team_id="unknown-provider-test",
+            home_team_name="Home Team Test",
+            away_team_id="away-provider-test",
+            away_team_name="Away Team Test",
+        ),
+        target_teams=reference_input.target_teams,
+        entity_type=H2HEntityType.CLUB,
+        retrieved_at_utc=datetime(2026, 7, 12, 16, 0, tzinfo=timezone.utc),
+    )
+
+    assert meeting.home_team.canonical_team_id is None
+    assert meeting.home_team.identity_resolution.status == H2HIdentityStatus.UNRESOLVED
+    assert meeting.away_team.canonical_team_id == "away-team-test"
+    assert meeting.mapping_quality == H2HQualityLevel.POOR
+
+
+# Vérifie qu'un nom réellement différent reste non résolu lorsque le H2H ne fournit aucun ID.
+def test_v19_flashscore_adapter_keeps_different_name_unresolved() -> None:
+    reference_input = build_h2h_module_input()
+    meeting = adapt_flashscore_h2h_match(
+        match_data=build_normalized_flashscore_h2h_match(
+            match_id="meeting-name-unresolved",
+            home_team_id=None,
+            home_team_name="Different Club",
+            away_team_id=None,
+            away_team_name="Away Team Test",
+        ),
+        target_teams=reference_input.target_teams,
+        entity_type=H2HEntityType.CLUB,
+        retrieved_at_utc=datetime(2026, 7, 12, 16, 0, tzinfo=timezone.utc),
+    )
+
+    assert meeting.home_team.canonical_team_id is None
+    assert meeting.home_team.identity_resolution.status == H2HIdentityStatus.UNRESOLVED
+    assert meeting.away_team.canonical_team_id == "away-team-test"
+
+
 # Verifie que la provenance FlashScore et l'etat de cache restent attaches a la confrontation.
 def test_v19_h2h_acquisition_preserves_flashscore_provenance() -> None:
     reference_input = build_h2h_module_input()
@@ -1608,6 +1735,74 @@ def test_v19_h2h_application_service_runs_end_to_end() -> None:
     ).status == H2HConsumerReadinessStatus.DEGRADED
 
 
+# Vérifie le cas réel où le match cible porte des suffixes pays mais le H2H ne fournit aucun ID équipe.
+def test_v19_h2h_application_service_uses_country_suffix_name_fallback() -> None:
+    # Retourne un match cible FlashScore avec les suffixes pays observés dans le flux réel.
+    def fake_match_loader(match_id: int | str | None) -> tuple[dict, dict]:
+        del match_id
+        match_data = build_normalized_target_match()
+        match_data["homeTeam"].update(
+            {
+                "id": 272448811140462,
+                "sourceTeamId": "dhfRkskl",
+                "name": "Iberia 1999 (GEO)",
+            }
+        )
+        match_data["awayTeam"].update(
+            {
+                "id": 60886512433049,
+                "sourceTeamId": "zLFV5ykn",
+                "name": "Flora (EST)",
+            }
+        )
+        return match_data, {"status": "success"}
+
+    # Retourne la confrontation réelle normalisée sans identifiants d'équipes H2H.
+    def fake_h2h_client(
+        match_id: str | None,
+        home_team_name: str,
+        away_team_name: str,
+        limit: int,
+    ) -> tuple[list[dict], dict]:
+        del match_id, home_team_name, away_team_name, limit
+        meeting = build_normalized_flashscore_h2h_match(
+            match_id="jwbWPU57",
+            home_team_id=None,
+            home_team_name="Flora",
+            away_team_id=None,
+            away_team_name="Iberia 1999",
+            utc_date="2025-07-15T18:00:00Z",
+        )
+        meeting["competition"]["code"] = "CL"
+        meeting["competition"]["name"] = "Champions League"
+        return [meeting], {
+            "provider": "flashscore_rapidapi",
+            "status": "success",
+            "endpoint": "/matches/h2h",
+            "results": 1,
+        }
+
+    result = build_h2h_result_for_match(
+        match_id=1813105023365578,
+        request_id="v19-country-suffix-live-shape-test",
+        cutoff_utc=datetime(2026, 7, 12, 17, 0, tzinfo=timezone.utc),
+        entity_type=H2HEntityType.CLUB,
+        match_loader=fake_match_loader,
+        h2h_client=fake_h2h_client,
+        clock=build_static_clock(
+            datetime(2026, 7, 12, 16, 30, tzinfo=timezone.utc)
+        ),
+    )
+    values = get_feature_values(result)
+
+    assert result.module_status == H2HModuleStatus.DEGRADED
+    assert result.module_outcome == H2HModuleOutcome.FEATURES_PRODUCED
+    assert result.meeting_selection_summary.identity_eligible_count == 1
+    assert result.meeting_selection_summary.usable_count == 1
+    assert values["h2h_matches_count"] == 1
+    assert values["h2h_identity_resolved_rate"] == pytest.approx(1.0)
+
+
 # Vérifie qu'une panne H2H produit une abstention structurée sans masquer le match cible valide.
 def test_v19_h2h_application_service_handles_h2h_provider_failure() -> None:
     # Retourne un match cible contrôlé sans appel réseau.
@@ -1825,7 +2020,7 @@ def test_v19_h2h_api_maps_application_errors(
 #   -> verifie le vocabulaire controle du domaine V19
 #   -> verifie la composition de H2HModuleInputV1 et H2HModuleResultV1
 #   -> verifie l'immutabilite des vingt dataclasses V19
-#   -> verifie acquisition, identites, orientation, provenance et donnees manquantes
+#   -> verifie acquisition, identites, orientation, suffixes pays, provenance et donnees manquantes
 #   -> verifie la chaîne match cible -> acquisition -> features et ses erreurs contrôlées
 #   -> verifie la sérialisation et les statuts HTTP de la route expérimentale H2H V19
 #   -> verifie formules, profils, qualite, readiness et abstention locale H2H

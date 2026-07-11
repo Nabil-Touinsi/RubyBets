@@ -34,8 +34,8 @@ from app.v19.domain.h2h_enums import (
 )
 
 
-TARGET_MATCH_ADAPTER_VERSION = "v19.h2h.target-match-adapter.1"
-TARGET_MATCH_IDENTITY_RESOLVER_VERSION = "v19.h2h.target-identity.1"
+TARGET_MATCH_ADAPTER_VERSION = "v19.h2h.target-match-adapter.2"
+TARGET_MATCH_IDENTITY_RESOLVER_VERSION = "v19.h2h.target-identity.2"
 
 
 # Signale qu'un match normalisé ne contient pas les informations minimales du contrat cible.
