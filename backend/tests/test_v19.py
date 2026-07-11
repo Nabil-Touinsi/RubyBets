@@ -6,6 +6,10 @@ from dataclasses import FrozenInstanceError, is_dataclass, replace
 from datetime import datetime, timedelta, timezone
 
 import pytest
+from fastapi import FastAPI
+from fastapi.testclient import TestClient
+
+from app.api import experimental_ml_v19_h2h as v19_h2h_api
 
 from app.v19.acquisition.flashscore_h2h_adapter import (
     adapt_flashscore_h2h_match,
@@ -1696,6 +1700,117 @@ def test_v19_h2h_application_service_rejects_invalid_target_match() -> None:
         )
 
 
+# Construit une application FastAPI minimale pour tester uniquement la route H2H V19.
+def build_v19_h2h_test_client() -> TestClient:
+    test_app = FastAPI()
+    test_app.include_router(v19_h2h_api.router)
+    return TestClient(test_app)
+
+
+# Vérifie que la route H2H V19 expose un contrat JSON stable sans recommandation sportive.
+def test_v19_h2h_api_returns_experimental_module_result(monkeypatch) -> None:
+    captured_arguments: dict[str, object] = {}
+    expected_cutoff = datetime(2026, 7, 12, 17, 0, tzinfo=timezone.utc)
+    expected_result = build_h2h_feature_result(build_h2h_module_input())
+
+    # Retourne un résultat H2H contrôlé et conserve les arguments transmis par la route.
+    def fake_build_h2h_result_for_match(**kwargs) -> H2HModuleResultV1:
+        captured_arguments.update(kwargs)
+        return replace(
+            expected_result,
+            request_id=str(kwargs["request_id"]),
+            cutoff_utc=kwargs["cutoff_utc"],
+        )
+
+    monkeypatch.setattr(
+        v19_h2h_api,
+        "build_h2h_result_for_match",
+        fake_build_h2h_result_for_match,
+    )
+    monkeypatch.setattr(
+        v19_h2h_api,
+        "build_request_id",
+        lambda match_id: f"v19-h2h-{match_id}-test",
+    )
+
+    client = build_v19_h2h_test_client()
+    response = client.get(
+        "/api/experimental/ml-v19/h2h/rubybets-matches/1813105023365578",
+        params={
+            "entity_type": "CLUB",
+            "cutoff_utc": expected_cutoff.isoformat(),
+        },
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+
+    assert payload["source"] == "rubybets_v19_h2h_api"
+    assert payload["scope"] == "experimental_h2h_module"
+    assert payload["match_id"] == 1813105023365578
+    assert payload["entity_type"] == "CLUB"
+    assert payload["request_id"] == "v19-h2h-1813105023365578-test"
+    assert payload["module_status"] == expected_result.module_status.value
+    assert payload["module_outcome"] == expected_result.module_outcome.value
+    assert payload["feature_set_version"] == H2H_FEATURE_SET_VERSION
+    assert len(payload["result"]["features"]) == len(H2H_FEATURE_NAMES)
+    assert payload["result"]["cutoff_utc"] == expected_cutoff.isoformat()
+    assert "recommendation" not in payload
+    assert "ne constitue pas une recommandation sportive" in payload["responsible_note"]
+    assert captured_arguments["match_id"] == 1813105023365578
+    assert captured_arguments["cutoff_utc"] == expected_cutoff
+    assert captured_arguments["entity_type"] == H2HEntityType.CLUB
+
+
+# Vérifie la traduction HTTP stable des erreurs applicatives du service H2H V19.
+@pytest.mark.parametrize(
+    ("application_error", "expected_status", "expected_code"),
+    (
+        (
+            H2HTargetMatchNotFoundError("target_match_not_found"),
+            404,
+            "V19_H2H_TARGET_MATCH_NOT_FOUND",
+        ),
+        (
+            H2HTargetMatchInvalidError("target_match_kickoff_missing"),
+            422,
+            "V19_H2H_TARGET_MATCH_INVALID",
+        ),
+        (
+            H2HTargetMatchProviderError("target_match_provider_unavailable"),
+            503,
+            "V19_H2H_TARGET_PROVIDER_UNAVAILABLE",
+        ),
+    ),
+)
+def test_v19_h2h_api_maps_application_errors(
+    monkeypatch,
+    application_error: Exception,
+    expected_status: int,
+    expected_code: str,
+) -> None:
+    # Relève l'erreur applicative contrôlée attendue sans appeler les fournisseurs réels.
+    def fake_build_h2h_result_for_match(**kwargs) -> H2HModuleResultV1:
+        del kwargs
+        raise application_error
+
+    monkeypatch.setattr(
+        v19_h2h_api,
+        "build_h2h_result_for_match",
+        fake_build_h2h_result_for_match,
+    )
+
+    client = build_v19_h2h_test_client()
+    response = client.get(
+        "/api/experimental/ml-v19/h2h/rubybets-matches/1813105023365578",
+        params={"cutoff_utc": "2026-07-12T17:00:00Z"},
+    )
+
+    assert response.status_code == expected_status
+    assert response.json()["detail"]["code"] == expected_code
+    assert response.json()["detail"]["match_id"] == 1813105023365578
+
+
 # Schema de communication :
 # test_v19.py
 #   -> importe backend/app/v19/domain/h2h_enums.py
@@ -1703,6 +1818,7 @@ def test_v19_h2h_application_service_rejects_invalid_target_match() -> None:
 #   -> importe backend/app/v19/acquisition/h2h_acquisition_service.py
 #   -> importe backend/app/v19/acquisition/target_match_adapter.py
 #   -> importe backend/app/v19/application/h2h_service.py
+#   -> importe backend/app/api/experimental_ml_v19_h2h.py
 #   -> importe backend/app/v19/domain/h2h_contracts.py
 #   -> importe backend/app/v19/features/h2h_feature_catalog.py
 #   -> importe backend/app/v19/features/h2h_feature_builder.py
@@ -1711,6 +1827,7 @@ def test_v19_h2h_application_service_rejects_invalid_target_match() -> None:
 #   -> verifie l'immutabilite des vingt dataclasses V19
 #   -> verifie acquisition, identites, orientation, provenance et donnees manquantes
 #   -> verifie la chaîne match cible -> acquisition -> features et ses erreurs contrôlées
+#   -> verifie la sérialisation et les statuts HTTP de la route expérimentale H2H V19
 #   -> verifie formules, profils, qualite, readiness et abstention locale H2H
 #   -> injecte des clients controles et ne contacte aucune API reelle
 #   -> ne teste aucune recommandation sportive
