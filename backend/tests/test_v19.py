@@ -2,8 +2,8 @@
 # Ces tests protegent les enums et les contrats immuables du domaine RubyBets V19.
 
 from collections.abc import Callable
-from dataclasses import FrozenInstanceError, is_dataclass
-from datetime import datetime, timezone
+from dataclasses import FrozenInstanceError, is_dataclass, replace
+from datetime import datetime, timedelta, timezone
 
 import pytest
 
@@ -36,6 +36,14 @@ from app.v19.domain.h2h_contracts import (
     TieContextV1,
     VenueContextV1,
 )
+from app.v19.features.h2h_feature_builder import (
+    build_h2h_module_result as build_h2h_feature_result,
+)
+from app.v19.features.h2h_feature_catalog import (
+    H2H_FEATURE_NAMES,
+    H2H_FEATURE_SET_VERSION,
+    get_h2h_profile_policy,
+)
 from app.v19.domain.h2h_enums import (
     H2HCacheState,
     H2HCompetitionCategory,
@@ -43,11 +51,13 @@ from app.v19.domain.h2h_enums import (
     H2HConsumerReadinessStatus,
     H2HDomainProfile,
     H2HEntityType,
+    H2HExclusionReason,
     H2HFeatureDataType,
     H2HFeatureUnit,
     H2HIdentityMethod,
     H2HIdentityStatus,
     H2HIssueCode,
+    H2HIssueSeverity,
     H2HLegNumber,
     H2HModuleOutcome,
     H2HModuleStatus,
@@ -702,15 +712,716 @@ def test_v19_h2h_acquisition_selects_national_team_profile() -> None:
     )
 
 
+
+
+# Construit une identité de test adaptée au domaine club ou sélection nationale.
+def build_feature_team_identity(
+    canonical_team_id: str,
+    provider_team_id: str,
+    display_name: str,
+    entity_type: H2HEntityType,
+    identity_status: H2HIdentityStatus = H2HIdentityStatus.RESOLVED,
+) -> TeamIdentityV1:
+    identity = build_team_identity(
+        canonical_team_id=canonical_team_id,
+        provider_team_id=provider_team_id,
+        display_name=display_name,
+    )
+    return replace(
+        identity,
+        entity_type=entity_type,
+        identity_resolution=replace(
+            identity.identity_resolution,
+            status=identity_status,
+            method=(
+                H2HIdentityMethod.PROVIDER_ID_EXACT
+                if identity_status == H2HIdentityStatus.RESOLVED
+                else H2HIdentityMethod.UNRESOLVED
+            ),
+        ),
+    )
+
+
+# Construit une confrontation contrôlée pour vérifier les formules et politiques H2H.
+def build_feature_meeting(
+    meeting_id: str,
+    kickoff_utc: datetime,
+    target_home: TeamIdentityV1,
+    target_away: TeamIdentityV1,
+    score: tuple[int, int] = (2, 1),
+    reverse_orientation: bool = False,
+    official_status: H2HOfficialStatus = H2HOfficialStatus.OFFICIAL,
+    category: H2HCompetitionCategory = H2HCompetitionCategory.DOMESTIC_LEAGUE,
+    neutral_ground: H2HTriState = H2HTriState.FALSE,
+    identity_status: H2HIdentityStatus = H2HIdentityStatus.RESOLVED,
+    score_reliability: H2HScoreReliability = H2HScoreReliability.RELIABLE,
+    raw_payload_hash: str | None = None,
+) -> H2HMeetingV1:
+    entity_type = target_home.entity_type
+    home_source = target_away if reverse_orientation else target_home
+    away_source = target_home if reverse_orientation else target_away
+    home_team = replace(
+        home_source,
+        identity_resolution=replace(
+            home_source.identity_resolution,
+            status=identity_status,
+            method=(
+                H2HIdentityMethod.PROVIDER_ID_EXACT
+                if identity_status == H2HIdentityStatus.RESOLVED
+                else H2HIdentityMethod.UNRESOLVED
+            ),
+        ),
+    )
+    away_team = replace(
+        away_source,
+        identity_resolution=replace(
+            away_source.identity_resolution,
+            status=identity_status,
+            method=(
+                H2HIdentityMethod.PROVIDER_ID_EXACT
+                if identity_status == H2HIdentityStatus.RESOLVED
+                else H2HIdentityMethod.UNRESOLVED
+            ),
+        ),
+    )
+    competition = CompetitionContextV1(
+        canonical_competition_id=f"competition-{meeting_id}",
+        provider_competition_ids=(
+            (H2HProvider.FLASHSCORE, f"provider-competition-{meeting_id}"),
+        ),
+        name=f"Competition {meeting_id}",
+        domain=entity_type,
+        category=category,
+        season="2025-2026",
+        phase=None,
+        round=None,
+        official_status=official_status,
+    )
+    provenance = SourceProvenanceV1(
+        provider=H2HProvider.FLASHSCORE,
+        endpoint="/matches/h2h",
+        provider_match_id=meeting_id,
+        retrieved_at_utc=datetime(2026, 7, 1, 12, 0, tzinfo=timezone.utc),
+        source_priority=1,
+        fallback_used=False,
+        cache_state=H2HCacheState.MISS,
+        raw_payload_hash=raw_payload_hash or f"hash-{meeting_id}",
+        normalization_version="v19.h2h.normalization.test",
+    )
+    score_context = ScoreContextV1(
+        score_type=H2HScoreType.REGULATION_90,
+        regulation_time=score,
+        extra_time=None,
+        penalties=None,
+        displayed_final_score=score,
+        score_reliability=score_reliability,
+    )
+
+    return H2HMeetingV1(
+        canonical_match_id=meeting_id,
+        provider_match_ids=((H2HProvider.FLASHSCORE, meeting_id),),
+        kickoff_utc=kickoff_utc,
+        status=("FINISHED", "FINISHED"),
+        competition=competition,
+        home_team=home_team,
+        away_team=away_team,
+        venue_context=VenueContextV1(
+            neutral_ground=neutral_ground,
+            venue_name=None,
+            venue_country=None,
+            source_reliability=H2HQualityLevel.GOOD,
+        ),
+        score_context=score_context,
+        tie_context=TieContextV1(
+            format=H2HTieFormat.SINGLE_MATCH,
+            tie_id=None,
+            leg_number=H2HLegNumber.UNKNOWN,
+            aggregate_score_before=None,
+            aggregate_score_after=None,
+            detection_method="test-single-match",
+        ),
+        provenance=(provenance,),
+        mapping_quality=(
+            H2HQualityLevel.GOOD
+            if identity_status == H2HIdentityStatus.RESOLVED
+            else H2HQualityLevel.POOR
+        ),
+        normalization_state=(
+            H2HNormalizationState.VALID
+            if score_reliability == H2HScoreReliability.RELIABLE
+            else H2HNormalizationState.PARTIAL
+        ),
+        exclusion_reasons=(),
+    )
+
+
+# Construit une entrée de feature engineering avec un domaine et des candidats contrôlés.
+def build_feature_module_input(
+    meetings: tuple[H2HMeetingV1, ...],
+    entity_type: H2HEntityType = H2HEntityType.CLUB,
+    provider_status: H2HProviderResultStatus = H2HProviderResultStatus.AVAILABLE,
+) -> H2HModuleInputV1:
+    target_home = build_feature_team_identity(
+        canonical_team_id="feature-home-team",
+        provider_team_id="feature-home-provider",
+        display_name="Feature Home Team",
+        entity_type=entity_type,
+    )
+    target_away = build_feature_team_identity(
+        canonical_team_id="feature-away-team",
+        provider_team_id="feature-away-provider",
+        display_name="Feature Away Team",
+        entity_type=entity_type,
+    )
+    target_competition_category = (
+        H2HCompetitionCategory.INTERNATIONAL_TOURNAMENT
+        if entity_type == H2HEntityType.NATIONAL_TEAM
+        else H2HCompetitionCategory.DOMESTIC_LEAGUE
+    )
+    target_competition = CompetitionContextV1(
+        canonical_competition_id="feature-target-competition",
+        provider_competition_ids=(
+            (H2HProvider.FLASHSCORE, "feature-target-competition-provider"),
+        ),
+        name="Feature Target Competition",
+        domain=entity_type,
+        category=target_competition_category,
+        season="2025-2026",
+        phase=None,
+        round=None,
+        official_status=H2HOfficialStatus.OFFICIAL,
+    )
+    cutoff_utc = datetime(2026, 7, 12, 17, 0, tzinfo=timezone.utc)
+    target_match = TargetMatchRefV1(
+        canonical_match_id="feature-target-match",
+        provider_match_ids=(
+            (H2HProvider.FLASHSCORE, "feature-target-provider-match"),
+        ),
+        kickoff_utc=datetime(2026, 7, 12, 18, 0, tzinfo=timezone.utc),
+        cutoff_utc=cutoff_utc,
+        domain=entity_type,
+        competition=target_competition,
+        venue_context=VenueContextV1(
+            neutral_ground=H2HTriState.FALSE,
+            venue_name=None,
+            venue_country=None,
+            source_reliability=H2HQualityLevel.GOOD,
+        ),
+        tie_context=TieContextV1(
+            format=H2HTieFormat.SINGLE_MATCH,
+            tie_id=None,
+            leg_number=H2HLegNumber.UNKNOWN,
+            aggregate_score_before=None,
+            aggregate_score_after=None,
+            detection_method="test-single-match",
+        ),
+        match_status=("SCHEDULED", "SCHEDULED"),
+    )
+    profile = (
+        H2HDomainProfile.NATIONAL_TEAM_H2H_V1
+        if entity_type == H2HEntityType.NATIONAL_TEAM
+        else H2HDomainProfile.CLUB_H2H_V1
+    )
+
+    return H2HModuleInputV1(
+        contract_version="H2HModuleInputV1",
+        request_id="feature-request-test",
+        assembled_at_utc=datetime(2026, 7, 12, 16, 0, tzinfo=timezone.utc),
+        target_match=target_match,
+        target_teams=TargetTeamsV1(
+            home_team=target_home,
+            away_team=target_away,
+        ),
+        candidate_meetings=meetings,
+        acquisition_context=H2HAcquisitionContextV1(
+            primary_provider=H2HProvider.FLASHSCORE,
+            providers_attempted=(H2HProvider.FLASHSCORE,),
+            provider_results=((H2HProvider.FLASHSCORE, provider_status),),
+            fallback_used=False,
+            assembled_from_cache=False,
+            earliest_retrieved_at_utc=datetime(
+                2026, 7, 1, 12, 0, tzinfo=timezone.utc
+            ),
+            latest_retrieved_at_utc=datetime(
+                2026, 7, 1, 12, 0, tzinfo=timezone.utc
+            ),
+            warnings=(),
+        ),
+        processing_policy=H2HProcessingPolicyV1(
+            policy_version="v19.h2h.processing-policy.test",
+            domain_profile=profile,
+            temporal_policy=(("strict_cutoff", True),),
+            exclusion_policy=(("profile", profile.value),),
+            deduplication_policy=(("provider_priority", "FLASHSCORE"),),
+            identity_policy=(("require_resolved_identity", True),),
+        ),
+    )
+
+
+# Retourne un dictionnaire simple des features d'un résultat H2H.
+def get_feature_values(result: H2HModuleResultV1) -> dict[str, object]:
+    return {feature.name: feature.value for feature in result.features}
+
+
+# Retourne la readiness associée au consommateur demandé.
+def get_consumer_readiness(
+    result: H2HModuleResultV1,
+    consumer_id: H2HConsumerId,
+) -> H2HConsumerReadinessV1:
+    return next(
+        readiness
+        for readiness in result.readiness_by_consumer
+        if readiness.consumer_id == consumer_id
+    )
+
+
+# Vérifie que le catalogue expose exactement les douze features et les profils verrouillés.
+def test_v19_h2h_feature_catalog_matches_core_1_specification() -> None:
+    assert H2H_FEATURE_SET_VERSION == "v19.h2h.core.1"
+    assert len(H2H_FEATURE_NAMES) == 12
+    assert H2H_FEATURE_NAMES == (
+        "h2h_matches_count",
+        "h2h_total_goals_avg",
+        "h2h_over_15_rate",
+        "h2h_over_25_rate",
+        "h2h_btts_rate",
+        "h2h_home_team_scored_rate",
+        "h2h_away_team_scored_rate",
+        "h2h_days_since_last_meeting",
+        "h2h_identity_resolved_rate",
+        "h2h_reliable_score_rate",
+        "h2h_official_match_rate",
+        "h2h_neutral_ground_unknown_rate",
+    )
+
+    club_policy = get_h2h_profile_policy(H2HDomainProfile.CLUB_H2H_V1)
+    national_policy = get_h2h_profile_policy(
+        H2HDomainProfile.NATIONAL_TEAM_H2H_V1
+    )
+
+    assert club_policy.absolute_window_years == 6
+    assert club_policy.max_meetings == 5
+    assert national_policy.absolute_window_years == 12
+    assert national_policy.friendly_supplement_years == 6
+    assert national_policy.max_meetings == 8
+
+
+# Vérifie les huit formules sportives et la réorientation des scores historiques.
+def test_v19_h2h_feature_builder_calculates_oriented_core_features() -> None:
+    empty_input = build_feature_module_input(())
+    target_home = empty_input.target_teams.home_team
+    target_away = empty_input.target_teams.away_team
+    cutoff = empty_input.target_match.cutoff_utc
+    meetings = (
+        build_feature_meeting(
+            "feature-meeting-1",
+            cutoff - timedelta(days=10),
+            target_home,
+            target_away,
+            score=(2, 1),
+        ),
+        build_feature_meeting(
+            "feature-meeting-2",
+            cutoff - timedelta(days=20),
+            target_home,
+            target_away,
+            score=(3, 0),
+            reverse_orientation=True,
+        ),
+        build_feature_meeting(
+            "feature-meeting-3",
+            cutoff - timedelta(days=30),
+            target_home,
+            target_away,
+            score=(0, 0),
+        ),
+        build_feature_meeting(
+            "feature-meeting-4",
+            cutoff - timedelta(days=40),
+            target_home,
+            target_away,
+            score=(1, 2),
+        ),
+    )
+    module_input = replace(empty_input, candidate_meetings=meetings)
+
+    result = build_h2h_feature_result(
+        module_input,
+        clock=build_static_clock(
+            datetime(2026, 7, 12, 17, 5, tzinfo=timezone.utc)
+        ),
+    )
+    values = get_feature_values(result)
+
+    assert result.module_status == H2HModuleStatus.READY
+    assert result.module_outcome == H2HModuleOutcome.FEATURES_PRODUCED
+    assert values["h2h_matches_count"] == 4
+    assert values["h2h_total_goals_avg"] == pytest.approx(2.25)
+    assert values["h2h_over_15_rate"] == pytest.approx(0.75)
+    assert values["h2h_over_25_rate"] == pytest.approx(0.75)
+    assert values["h2h_btts_rate"] == pytest.approx(0.5)
+    assert values["h2h_home_team_scored_rate"] == pytest.approx(0.5)
+    assert values["h2h_away_team_scored_rate"] == pytest.approx(0.75)
+    assert values["h2h_days_since_last_meeting"] == 10
+    assert values["h2h_identity_resolved_rate"] == pytest.approx(1.0)
+    assert values["h2h_reliable_score_rate"] == pytest.approx(1.0)
+    assert values["h2h_official_match_rate"] == pytest.approx(1.0)
+    assert values["h2h_neutral_ground_unknown_rate"] == pytest.approx(0.0)
+    assert result.quality_report.overall_score is None
+    assert get_consumer_readiness(
+        result, H2HConsumerId.OVER_1_5
+    ).status == H2HConsumerReadinessStatus.READY
+    assert get_consumer_readiness(
+        result, H2HConsumerId.BTTS
+    ).status == H2HConsumerReadinessStatus.READY
+
+
+# Vérifie la fenêtre clubs, l'exclusion des amicaux et la limite des cinq plus récentes.
+def test_v19_h2h_club_profile_filters_and_caps_selected_meetings() -> None:
+    empty_input = build_feature_module_input(())
+    target_home = empty_input.target_teams.home_team
+    target_away = empty_input.target_teams.away_team
+    cutoff = empty_input.target_match.cutoff_utc
+    official_meetings = tuple(
+        build_feature_meeting(
+            f"club-official-{index}",
+            cutoff - timedelta(days=index * 30),
+            target_home,
+            target_away,
+        )
+        for index in range(1, 7)
+    )
+    friendly = build_feature_meeting(
+        "club-friendly",
+        cutoff - timedelta(days=5),
+        target_home,
+        target_away,
+        official_status=H2HOfficialStatus.FRIENDLY,
+        category=H2HCompetitionCategory.FRIENDLY,
+    )
+    too_old = build_feature_meeting(
+        "club-too-old",
+        datetime(2019, 1, 1, 12, 0, tzinfo=timezone.utc),
+        target_home,
+        target_away,
+    )
+    module_input = replace(
+        empty_input,
+        candidate_meetings=official_meetings + (friendly, too_old),
+    )
+
+    result = build_h2h_feature_result(module_input)
+    summary = result.meeting_selection_summary
+
+    assert summary.candidate_count == 8
+    assert summary.usable_count == 5
+    assert summary.selected_meeting_ids == tuple(
+        f"club-official-{index}" for index in range(1, 6)
+    )
+    assert summary.exclusion_counts_by_reason == (
+        (H2HExclusionReason.H2H_CLUB_FRIENDLY_EXCLUDED, 1),
+    )
+
+
+# Vérifie que les sélections priorisent les matchs officiels puis complètent avec les amicaux récents.
+def test_v19_h2h_national_profile_prioritizes_official_then_friendlies() -> None:
+    empty_input = build_feature_module_input(
+        (),
+        entity_type=H2HEntityType.NATIONAL_TEAM,
+    )
+    target_home = empty_input.target_teams.home_team
+    target_away = empty_input.target_teams.away_team
+    cutoff = empty_input.target_match.cutoff_utc
+    official_meetings = tuple(
+        build_feature_meeting(
+            f"national-official-{index}",
+            cutoff - timedelta(days=index * 60),
+            target_home,
+            target_away,
+            category=H2HCompetitionCategory.INTERNATIONAL_QUALIFIER,
+        )
+        for index in range(1, 4)
+    )
+    friendly_meetings = tuple(
+        build_feature_meeting(
+            f"national-friendly-{index}",
+            cutoff - timedelta(days=index * 45),
+            target_home,
+            target_away,
+            official_status=H2HOfficialStatus.FRIENDLY,
+            category=H2HCompetitionCategory.FRIENDLY,
+        )
+        for index in range(1, 8)
+    )
+    module_input = replace(
+        empty_input,
+        candidate_meetings=official_meetings + friendly_meetings,
+    )
+
+    result = build_h2h_feature_result(module_input)
+    selected_ids = result.meeting_selection_summary.selected_meeting_ids
+
+    assert len(selected_ids) == 8
+    assert selected_ids[:3] == tuple(
+        f"national-official-{index}" for index in range(1, 4)
+    )
+    assert selected_ids[3:] == tuple(
+        f"national-friendly-{index}" for index in range(1, 6)
+    )
+    assert get_feature_values(result)["h2h_official_match_rate"] == pytest.approx(
+        3 / 8
+    )
+
+
+# Vérifie que des amicaux seuls restent utilisables mais dégradent explicitement la qualité.
+def test_v19_h2h_national_only_friendlies_adds_quality_flag() -> None:
+    empty_input = build_feature_module_input(
+        (),
+        entity_type=H2HEntityType.NATIONAL_TEAM,
+    )
+    target_home = empty_input.target_teams.home_team
+    target_away = empty_input.target_teams.away_team
+    cutoff = empty_input.target_match.cutoff_utc
+    meetings = tuple(
+        build_feature_meeting(
+            f"only-friendly-{index}",
+            cutoff - timedelta(days=index * 40),
+            target_home,
+            target_away,
+            official_status=H2HOfficialStatus.FRIENDLY,
+            category=H2HCompetitionCategory.FRIENDLY,
+        )
+        for index in range(1, 5)
+    )
+    result = build_h2h_feature_result(
+        replace(empty_input, candidate_meetings=meetings)
+    )
+
+    assert result.module_status == H2HModuleStatus.DEGRADED
+    assert result.quality_report.overall_status == H2HQualityLevel.PARTIAL
+    assert all(
+        H2HQualityFlag.H2H_ONLY_FRIENDLIES in feature.quality_flags
+        for feature in result.features
+        if feature.name in H2H_FEATURE_NAMES[:8]
+    )
+    assert get_consumer_readiness(
+        result, H2HConsumerId.BTTS
+    ).status == H2HConsumerReadinessStatus.DEGRADED
+
+
+# Vérifie les valeurs manquantes normatives et l'abstention locale lorsque N vaut zéro.
+def test_v19_h2h_no_usable_meeting_returns_unavailable_and_null_features() -> None:
+    module_input = build_feature_module_input(
+        (),
+        provider_status=H2HProviderResultStatus.UNAVAILABLE,
+    )
+
+    result = build_h2h_feature_result(module_input)
+    values = get_feature_values(result)
+
+    assert result.module_status == H2HModuleStatus.UNAVAILABLE
+    assert result.module_outcome == H2HModuleOutcome.H2H_MODULE_ABSTAIN
+    assert values["h2h_matches_count"] == 0
+    assert all(values[name] is None for name in H2H_FEATURE_NAMES[1:])
+    assert set(result.missing_features) == set(H2H_FEATURE_NAMES[1:])
+    assert get_consumer_readiness(
+        result, H2HConsumerId.OVER_1_5
+    ).status == H2HConsumerReadinessStatus.NOT_READY
+    assert get_consumer_readiness(
+        result, H2HConsumerId.BTTS
+    ).status == H2HConsumerReadinessStatus.NOT_READY
+    assert {
+        issue.code for issue in result.abstention_reasons
+    } == {
+        H2HIssueCode.H2H_SOURCE_UNAVAILABLE,
+        H2HIssueCode.H2H_NO_ELIGIBLE_MEETING,
+    }
+
+
+# Vérifie les seuils distincts de readiness Over 1.5 et BTTS à trois confrontations.
+def test_v19_h2h_three_meetings_ready_for_over15_only() -> None:
+    empty_input = build_feature_module_input(())
+    target_home = empty_input.target_teams.home_team
+    target_away = empty_input.target_teams.away_team
+    cutoff = empty_input.target_match.cutoff_utc
+    meetings = tuple(
+        build_feature_meeting(
+            f"depth-three-{index}",
+            cutoff - timedelta(days=index * 20),
+            target_home,
+            target_away,
+        )
+        for index in range(1, 4)
+    )
+
+    result = build_h2h_feature_result(
+        replace(empty_input, candidate_meetings=meetings)
+    )
+
+    assert result.module_status == H2HModuleStatus.DEGRADED
+    assert get_consumer_readiness(
+        result, H2HConsumerId.OVER_1_5
+    ).status == H2HConsumerReadinessStatus.READY
+    assert get_consumer_readiness(
+        result, H2HConsumerId.BTTS
+    ).status == H2HConsumerReadinessStatus.NOT_READY
+    assert all(
+        H2HQualityFlag.H2H_DEPTH_INSUFFICIENT_FOR_BTTS
+        in feature.quality_flags
+        for feature in result.features
+        if feature.name in H2H_FEATURE_NAMES[:8]
+    )
+
+
+# Vérifie que les identités et scores rejetés restent visibles dans les ratios de la population A.
+def test_v19_h2h_quality_features_use_population_a_before_mandatory_exclusions() -> None:
+    empty_input = build_feature_module_input(())
+    target_home = empty_input.target_teams.home_team
+    target_away = empty_input.target_teams.away_team
+    cutoff = empty_input.target_match.cutoff_utc
+    valid = build_feature_meeting(
+        "quality-valid",
+        cutoff - timedelta(days=10),
+        target_home,
+        target_away,
+    )
+    unresolved = build_feature_meeting(
+        "quality-unresolved",
+        cutoff - timedelta(days=20),
+        target_home,
+        target_away,
+        identity_status=H2HIdentityStatus.UNRESOLVED,
+    )
+    unreliable = build_feature_meeting(
+        "quality-unreliable",
+        cutoff - timedelta(days=30),
+        target_home,
+        target_away,
+        score_reliability=H2HScoreReliability.PARTIAL,
+    )
+
+    result = build_h2h_feature_result(
+        replace(
+            empty_input,
+            candidate_meetings=(valid, unresolved, unreliable),
+        )
+    )
+    values = get_feature_values(result)
+
+    assert result.meeting_selection_summary.deduplicated_count == 3
+    assert result.meeting_selection_summary.usable_count == 1
+    assert values["h2h_identity_resolved_rate"] == pytest.approx(2 / 3)
+    assert values["h2h_reliable_score_rate"] == pytest.approx(2 / 3)
+    assert {
+        issue.code for issue in result.quality_report.issues
+    }.issuperset(
+        {
+            H2HIssueCode.H2H_TEAM_IDENTITY_AMBIGUOUS,
+            H2HIssueCode.H2H_SCORE_UNRELIABLE,
+        }
+    )
+
+
+# Vérifie qu'un doublon conflictuel est diagnostiqué et exclu de la population U.
+def test_v19_h2h_conflicting_duplicate_is_not_used() -> None:
+    empty_input = build_feature_module_input(())
+    target_home = empty_input.target_teams.home_team
+    target_away = empty_input.target_teams.away_team
+    kickoff = empty_input.target_match.cutoff_utc - timedelta(days=10)
+    first = build_feature_meeting(
+        "duplicate-meeting",
+        kickoff,
+        target_home,
+        target_away,
+        score=(2, 1),
+        raw_payload_hash="duplicate-hash-a",
+    )
+    conflicting = build_feature_meeting(
+        "duplicate-meeting",
+        kickoff,
+        target_home,
+        target_away,
+        score=(0, 0),
+        raw_payload_hash="duplicate-hash-b",
+    )
+
+    result = build_h2h_feature_result(
+        replace(empty_input, candidate_meetings=(first, conflicting))
+    )
+
+    assert result.meeting_selection_summary.deduplicated_count == 1
+    assert result.meeting_selection_summary.usable_count == 0
+    assert result.module_status == H2HModuleStatus.UNAVAILABLE
+    assert H2HIssueCode.H2H_DUPLICATE_CONFLICT in {
+        issue.code for issue in result.quality_report.issues
+    }
+
+
+# Vérifie que la provenance et l'empreinte du contrat restent déterministes.
+def test_v19_h2h_result_provenance_is_versioned_and_deterministic() -> None:
+    empty_input = build_feature_module_input(())
+    meeting = build_feature_meeting(
+        "provenance-meeting",
+        empty_input.target_match.cutoff_utc - timedelta(days=10),
+        empty_input.target_teams.home_team,
+        empty_input.target_teams.away_team,
+    )
+    module_input = replace(empty_input, candidate_meetings=(meeting,))
+    static_clock = build_static_clock(
+        datetime(2026, 7, 12, 17, 5, tzinfo=timezone.utc)
+    )
+
+    first_result = build_h2h_feature_result(module_input, clock=static_clock)
+    second_result = build_h2h_feature_result(module_input, clock=static_clock)
+
+    assert (
+        first_result.provenance.input_contract_hash
+        == second_result.provenance.input_contract_hash
+    )
+    assert len(first_result.provenance.input_contract_hash) == 64
+    assert first_result.provenance.source_providers == (
+        H2HProvider.FLASHSCORE,
+    )
+    assert first_result.provenance.provider_snapshot_ids == (
+        "hash-provenance-meeting",
+    )
+    assert first_result.provenance.feature_builder_version
+    assert first_result.feature_set_version == H2H_FEATURE_SET_VERSION
+
+
+# Vérifie qu'un contrat incohérent produit INVALID sans exception ni recommandation.
+def test_v19_h2h_invalid_input_returns_structured_invalid_result() -> None:
+    module_input = build_feature_module_input(())
+    invalid_target = replace(
+        module_input.target_match,
+        cutoff_utc=module_input.target_match.kickoff_utc + timedelta(minutes=1),
+    )
+
+    result = build_h2h_feature_result(
+        replace(module_input, target_match=invalid_target)
+    )
+
+    assert result.module_status == H2HModuleStatus.INVALID
+    assert result.module_outcome == H2HModuleOutcome.H2H_MODULE_ABSTAIN
+    assert result.abstention_reasons
+    assert all(
+        issue.severity == H2HIssueSeverity.BLOCKER
+        for issue in result.abstention_reasons
+    )
+
+
 # Schema de communication :
 # test_v19.py
 #   -> importe backend/app/v19/domain/h2h_enums.py
 #   -> importe backend/app/v19/acquisition/flashscore_h2h_adapter.py
 #   -> importe backend/app/v19/acquisition/h2h_acquisition_service.py
 #   -> importe backend/app/v19/domain/h2h_contracts.py
+#   -> importe backend/app/v19/features/h2h_feature_catalog.py
+#   -> importe backend/app/v19/features/h2h_feature_builder.py
 #   -> verifie le vocabulaire controle du domaine V19
 #   -> verifie la composition de H2HModuleInputV1 et H2HModuleResultV1
 #   -> verifie l'immutabilite des vingt dataclasses V19
 #   -> verifie acquisition, identites, orientation, provenance et donnees manquantes
+#   -> verifie formules, profils, qualite, readiness et abstention locale H2H
 #   -> injecte des clients controles et ne contacte aucune API reelle
 #   -> ne teste aucune recommandation sportive
