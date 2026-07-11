@@ -18,6 +18,7 @@ import type {
   TeamHistoryResponse,
   TeamRecentMatch,
   TeamStanding,
+  V19H2HResponse,
 } from "../models/rubybets";
 import type { AppScreen } from "../types/navigation";
 import MatchNewsContextSection from "../components/MatchNewsContextSection";
@@ -37,11 +38,13 @@ type MatchDetailsScreenProps = {
   matchLineups: MatchLineupsResponse | null;
   matchNewsContext: MatchNewsContextResponse | null;
   teamHistory: TeamHistoryResponse | null;
+  v19H2HAnalysis: V19H2HResponse | null;
   matchDetailsStatus: string;
   matchContextStatus: string;
   matchAnalysisStatus: string;
   matchLineupsStatus: string;
   matchNewsContextStatus: string;
+  v19H2HStatus: string;
   onNavigate: (screen: AppScreen) => void;
 };
 
@@ -2180,13 +2183,121 @@ function HeadToHeadMatchesTable({
   );
 }
 
+// Cette fonction récupère une valeur numérique précise dans le catalogue H2H V19.
+function getV19H2HFeatureNumber(
+  analysis: V19H2HResponse,
+  featureName: string,
+): number | null {
+  const feature = analysis.result.features.find(
+    (item) => item.name === featureName,
+  );
+
+  return typeof feature?.value === "number" ? feature.value : null;
+}
+
+// Cette fonction transforme les résultats H2H V19 en résumé compréhensible.
+function buildV19H2HUserSummary(
+  analysis: V19H2HResponse | null,
+  statusMessage: string,
+): string | null {
+  if (!analysis) {
+    return statusMessage.startsWith("Chargement")
+      ? "L’analyse enrichie des confrontations est en cours de chargement."
+      : null;
+  }
+
+  const usableCount =
+    analysis.result.meeting_selection_summary.usable_count;
+
+  if (usableCount <= 0) {
+    return (
+      "Aucune confrontation directe suffisamment fiable n’est disponible " +
+      "pour enrichir l’analyse de ce match."
+    );
+  }
+
+  const totalGoalsAverage = getV19H2HFeatureNumber(
+    analysis,
+    "h2h_total_goals_avg",
+  );
+  const bttsRate = getV19H2HFeatureNumber(
+    analysis,
+    "h2h_btts_rate",
+  );
+  const sentences: string[] = [];
+
+  if (usableCount === 1) {
+    sentences.push(
+      "Une seule confrontation directe exploitable est disponible.",
+    );
+
+    if (totalGoalsAverage !== null) {
+      const roundedGoals = Math.round(totalGoalsAverage);
+
+      sentences.push(
+        `Elle s’est terminée avec ${roundedGoals} but${
+          roundedGoals > 1 ? "s" : ""
+        }.`,
+      );
+    }
+
+    if (bttsRate === 1) {
+      sentences.push("Les deux équipes ont marqué.");
+    } else if (bttsRate === 0) {
+      sentences.push("Les deux équipes n’ont pas marqué.");
+    }
+
+    sentences.push(
+      "Cet historique est trop limité pour influencer fortement " +
+        "l’analyse du prochain match.",
+    );
+
+    return sentences.join(" ");
+  }
+
+  sentences.push(
+    `${usableCount} confrontations directes exploitables sont disponibles.`,
+  );
+
+  if (totalGoalsAverage !== null) {
+    sentences.push(
+      `La moyenne observée est de ${totalGoalsAverage.toLocaleString(
+        "fr-FR",
+        {
+          minimumFractionDigits: 1,
+          maximumFractionDigits: 2,
+        },
+      )} buts par match.`,
+    );
+  }
+
+  if (bttsRate !== null) {
+    sentences.push(
+      `Les deux équipes ont marqué dans ${Math.round(
+        bttsRate * 100,
+      )} % de ces matchs.`,
+    );
+  }
+
+  sentences.push(
+    "Ces résultats apportent un contexte historique, mais restent " +
+      "un signal secondaire.",
+  );
+
+  return sentences.join(" ");
+}
+
 // Ce composant affiche l’onglet Face à face comme un historique détaillé et non comme un résumé de sidebar.
 function HeadToHeadTabContent({
   match,
   teamHistory,
+  v19H2HAnalysis,
+  v19H2HStatus,
 }: {
   match: Match;
   teamHistory: TeamHistoryResponse | null;
+  v19H2HAnalysis: V19H2HResponse | null;
+  v19H2HStatus: string;
 }) {
   const headToHeadMatches = teamHistory?.head_to_head ?? [];
   const summary = buildHeadToHeadHistoricalSummary(headToHeadMatches, match);
@@ -2196,20 +2307,20 @@ function HeadToHeadTabContent({
     match,
     teamHistory?.summary?.head_to_head_note ?? null,
   );
+  const v19UserSummary = buildV19H2HUserSummary(
+    v19H2HAnalysis,
+    v19H2HStatus,
+  );
 
-  if (!headToHeadMatches.length) {
-    return (
-      <section className="rb-detail-v2-card rb-detail-v2-pending-tab">
-        <p>Face à face</p>
-        <h3>Aucune confrontation directe disponible</h3>
-        <p>
-          La source actuelle ne fournit pas de confrontation directe exploitable pour cette rencontre. RubyBets n’invente pas d’historique absent.
-        </p>
-      </section>
-    );
-  }
-
-  return (
+  const historicalContent = !headToHeadMatches.length ? (
+    <section className="rb-detail-v2-card rb-detail-v2-pending-tab">
+      <p>Historique d'affichage existant</p>
+      <h3>Aucune confrontation directe disponible</h3>
+      <p>
+        La source historique actuelle ne fournit pas de confrontation directe exploitable pour cette rencontre. RubyBets n’invente pas d’historique absent.
+      </p>
+    </section>
+  ) : (
     <>
       <section className="rb-detail-v2-card rb-detail-v2-analysis-card">
         <div className="rb-detail-v2-section-header">
@@ -2237,7 +2348,12 @@ function HeadToHeadTabContent({
         </div>
 
         <p className="rb-detail-v2-analysis-lead">
-          RubyBets a trouvé {summary.total} confrontation{summary.total > 1 ? "s" : ""} directe{summary.total > 1 ? "s" : ""} dans les données disponibles. Cet historique sert à contextualiser la rencontre, sans être transformé en certitude sportive.
+          {v19UserSummary ??
+            `RubyBets a trouvé ${summary.total} confrontation${
+              summary.total > 1 ? "s" : ""
+            } directe${
+              summary.total > 1 ? "s" : ""
+            } dans les données disponibles. Cet historique sert à contextualiser la rencontre, sans être transformé en certitude sportive.`}
         </p>
       </section>
 
@@ -2264,6 +2380,8 @@ function HeadToHeadTabContent({
       </section>
     </>
   );
+
+  return historicalContent;
 }
 
 // Ce composant affiche un état propre pour les onglets non encore détaillés.
@@ -2319,11 +2437,13 @@ function MatchDetailsScreen({
   matchLineups,
   matchNewsContext,
   teamHistory,
+  v19H2HAnalysis,
   matchDetailsStatus,
   matchContextStatus,
   matchAnalysisStatus,
   matchLineupsStatus,
   matchNewsContextStatus,
+  v19H2HStatus,
   onNavigate,
 }: MatchDetailsScreenProps) {
   const [activeTab, setActiveTab] = useState<DetailTabKey>("overview");
@@ -2407,6 +2527,8 @@ function MatchDetailsScreen({
             <HeadToHeadTabContent
               match={selectedMatch}
               teamHistory={teamHistory}
+              v19H2HAnalysis={v19H2HAnalysis}
+              v19H2HStatus={v19H2HStatus}
             />
           ) : null}
 
@@ -2441,8 +2563,8 @@ export default MatchDetailsScreen;
 
 // Schéma de communication du fichier :
 // MatchDetailsScreen.tsx
-// ├── reçoit le détail, le contexte, l’analyse, les compositions et l’historique des équipes depuis App.tsx
-// ├── utilise les types MatchDetailsResponse, MatchContextResponse, MatchAnalysisResponse, MatchLineupsResponse et TeamHistoryResponse de models/rubybets.ts
+// ├── reçoit le détail, le contexte, l’analyse, les compositions, l’historique et le signal H2H V19 depuis App.tsx
+// ├── utilise aussi V19H2HResponse de models/rubybets.ts pour afficher le catalogue v19.h2h.core.1
 // ├── utilise les helpers d’affichage de helpers/displayText.ts
 // ├── alimente l’onglet Analyse détaillée avec matchAnalysis.analysis
 // ├── alimente l’onglet Compo probable avec matchLineups.lineups sans inventer de joueurs

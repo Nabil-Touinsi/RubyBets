@@ -19,6 +19,8 @@ import type {
   ResponsibleInfoResponse,
   TeamHistoryResponse,
   V1833MatchPredictionResponse,
+  V19H2HEntityType,
+  V19H2HResponse,
 } from "../models/rubybets";
 
 const API_BASE_URL = "http://127.0.0.1:8000";
@@ -99,6 +101,25 @@ export async function getMatchTeamHistory(
   return fetchJson<TeamHistoryResponse>(
     `/api/matches/${matchId}/team-history`,
     "Erreur lors du chargement de l'historique des équipes."
+  );
+}
+
+
+// Cette fonction détermine le profil H2H V19 selon la compétition actuellement sélectionnée.
+function getV19H2HEntityType(competitionCode: string): V19H2HEntityType {
+  return competitionCode === "WC" ? "NATIONAL_TEAM" : "CLUB";
+}
+
+// Cette fonction récupère l'analyse expérimentale H2H V19 d'un match RubyBets réel.
+export async function getV19H2HAnalysis(
+  matchId: number,
+  competitionCode: string
+): Promise<V19H2HResponse> {
+  const entityType = getV19H2HEntityType(competitionCode);
+
+  return fetchJson<V19H2HResponse>(
+    `/api/experimental/ml-v19/h2h/rubybets-matches/${matchId}?entity_type=${entityType}`,
+    "Erreur lors du chargement de l'analyse H2H V19."
   );
 }
 

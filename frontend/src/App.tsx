@@ -14,6 +14,7 @@ import {
   getMatchPredictions,
   getNationalDynamicPredictionByRubyBetsMatchId,
   getMatchTeamHistory,
+  getV19H2HAnalysis,
   getMatches,
   getNationalMlMultiMatchSelection,
   getResponsibleInfo,
@@ -32,6 +33,7 @@ import type {
   MultiMatchRecommendationResponse,
   ResponsibleInfoResponse,
   TeamHistoryResponse,
+  V19H2HResponse,
 } from "./models/rubybets";
 import AppShell from "./layout/AppShell";
 import type { AppScreen } from "./types/navigation";
@@ -84,6 +86,10 @@ function App() {
 
   const [selectedTeamHistory, setSelectedTeamHistory] =
     useState<TeamHistoryResponse | null>(null);
+
+
+  const [selectedV19H2HAnalysis, setSelectedV19H2HAnalysis] =
+    useState<V19H2HResponse | null>(null);
 
   // États liés à la recommandation multi-matchs.
   const [recommendationMatchCount, setRecommendationMatchCount] =
@@ -143,6 +149,11 @@ function App() {
     "Aucune actualité contextuelle chargée"
   );
 
+
+  const [v19H2HStatus, setV19H2HStatus] = useState<string>(
+    "Aucune analyse H2H V19 chargée"
+  );
+
   const [multiMatchStatus, setMultiMatchStatus] = useState<string>(
     "Aucune recommandation multi-matchs générée"
   );
@@ -155,7 +166,8 @@ function App() {
       selectedNationalMlPrediction ||
       selectedMatchLineups ||
       selectedMatchNewsContext ||
-      selectedTeamHistory
+      selectedTeamHistory ||
+      selectedV19H2HAnalysis
   );
 
   // Chargement initial : vérification backend + récupération des données transversales.
@@ -210,6 +222,7 @@ function App() {
     setSelectedMatchNewsContext(null);
     setSelectedNationalMlPrediction(null);
     setSelectedTeamHistory(null);
+    setSelectedV19H2HAnalysis(null);
     setMultiMatchRecommendation(null);
 
     setMatchDetailsStatus("Aucun match sélectionné");
@@ -218,6 +231,7 @@ function App() {
     setMatchPredictionsStatus("Aucune prédiction chargée");
     setMatchLineupsStatus("Aucune composition chargée");
     setMatchNewsContextStatus("Aucune actualité contextuelle chargée");
+    setV19H2HStatus("Aucune analyse H2H V19 chargée");
     setMultiMatchStatus("Aucune recommandation multi-matchs générée");
 
     getMatches(selectedCompetition)
@@ -249,6 +263,7 @@ function App() {
     setSelectedMatchNewsContext(null);
     setSelectedNationalMlPrediction(null);
     setSelectedTeamHistory(null);
+    setSelectedV19H2HAnalysis(null);
 
     setMatchDetailsStatus("Chargement du détail du match...");
     setMatchContextStatus("Chargement du contexte avant-match...");
@@ -256,6 +271,7 @@ function App() {
     setMatchPredictionsStatus("Chargement des prédictions...");
     setMatchLineupsStatus("Chargement des compositions probables...");
     setMatchNewsContextStatus("Chargement des actualités contextuelles...");
+    setV19H2HStatus("Chargement de l’analyse H2H V19...");
 
     Promise.allSettled([
       getMatchDetails(matchId),
@@ -266,6 +282,7 @@ function App() {
       getMatchNewsContext(matchId),
       getNationalDynamicPredictionByRubyBetsMatchId(matchId),
       getMatchTeamHistory(matchId),
+      getV19H2HAnalysis(matchId, selectedCompetition),
     ]).then(
       ([
         detailsResult,
@@ -276,6 +293,7 @@ function App() {
         newsContextResult,
         nationalMlPredictionResult,
         teamHistoryResult,
+        v19H2HResult,
       ]) => {
         if (detailsResult.status === "fulfilled") {
           setSelectedMatchDetails(detailsResult.value);
@@ -335,6 +353,15 @@ function App() {
           setSelectedTeamHistory(teamHistoryResult.value);
         } else {
           setSelectedTeamHistory(null);
+        }
+
+
+        if (v19H2HResult.status === "fulfilled") {
+          setSelectedV19H2HAnalysis(v19H2HResult.value);
+          setV19H2HStatus("Analyse H2H V19 chargée");
+        } else {
+          setSelectedV19H2HAnalysis(null);
+          setV19H2HStatus("Analyse H2H V19 indisponible pour ce match");
         }
       }
     );
@@ -417,11 +444,13 @@ function App() {
           matchLineups={selectedMatchLineups}
           matchNewsContext={selectedMatchNewsContext}
           teamHistory={selectedTeamHistory}
+          v19H2HAnalysis={selectedV19H2HAnalysis}
           matchDetailsStatus={matchDetailsStatus}
           matchContextStatus={matchContextStatus}
           matchAnalysisStatus={matchAnalysisStatus}
           matchLineupsStatus={matchLineupsStatus}
           matchNewsContextStatus={matchNewsContextStatus}
+          v19H2HStatus={v19H2HStatus}
           onNavigate={setCurrentScreen}
         />
       );
@@ -524,8 +553,8 @@ export default App;
 // Schéma de communication du fichier :
 // App.tsx
 // ├── appelle services/api.ts pour récupérer les données backend
-// ├── charge aussi /analysis, /lineups, /news-context, /team-history et le modèle national lors de la sélection d’un match
-// ├── transmet l’analyse détaillée, les compositions et les actualités contextuelles à MatchDetailsScreen.tsx pour les onglets dédiés
+// ├── charge aussi /analysis, /lineups, /news-context, /team-history, le module H2H V19 et le modèle national lors de la sélection d’un match
+// ├── transmet l’analyse détaillée, les compositions, les actualités contextuelles et le résultat H2H V19 à MatchDetailsScreen.tsx
 // ├── pilote la navigation via currentScreen
 // ├── utilise AppShell.tsx pour structurer l’application
 // ├── peut transmettre StatusPanel.tsx à AppShell.tsx uniquement en mode debug

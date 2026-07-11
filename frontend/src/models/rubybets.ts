@@ -290,6 +290,123 @@ export type TeamHistoryResponse = {
   data_freshness: TeamHistoryFreshness;
 };
 
+
+// Ce type décrit le domaine d'équipe attendu par le module H2H expérimental V19.
+export type V19H2HEntityType = "CLUB" | "NATIONAL_TEAM";
+
+// Ce type décrit le statut global renvoyé par le module H2H V19.
+export type V19H2HModuleStatus =
+  | "READY"
+  | "DEGRADED"
+  | "UNAVAILABLE"
+  | "INVALID"
+  | string;
+
+// Ce type décrit une feature typée calculée par le catalogue v19.h2h.core.1.
+export type V19H2HFeature = {
+  name: string;
+  value: number | string | boolean | null;
+  data_type: string;
+  unit: string;
+  feature_version: string;
+  meeting_count_used: number;
+  source_meeting_ids: string[];
+  missing_state: string | null;
+  quality_flags: string[];
+};
+
+// Ce type décrit une anomalie ou un motif structuré du module H2H V19.
+export type V19H2HIssue = {
+  code: string;
+  severity: string;
+  scope: string;
+  message: string;
+  affected_meeting_ids: string[];
+};
+
+// Ce type décrit la disponibilité du résultat H2H pour un consommateur spécialisé.
+export type V19H2HConsumerReadiness = {
+  consumer_id: string;
+  status: string;
+  available_features: string[];
+  missing_features: string[];
+  blocking_issues: V19H2HIssue[];
+  warnings: V19H2HIssue[];
+};
+
+// Ce type décrit le résumé de sélection des confrontations candidates et exploitables.
+export type V19H2HMeetingSelectionSummary = {
+  domain_profile: string;
+  candidate_count: number;
+  temporally_eligible_count: number;
+  identity_eligible_count: number;
+  deduplicated_count: number;
+  usable_count: number;
+  excluded_count: number;
+  exclusion_counts_by_reason: Array<{
+    reason: string;
+    count: number;
+  }>;
+  newest_meeting_utc: string | null;
+  oldest_meeting_utc: string | null;
+  selected_meeting_ids: string[];
+};
+
+// Ce type décrit le diagnostic qualité global produit par le module H2H V19.
+export type V19H2HQualityReport = {
+  overall_status: string;
+  overall_score: number | null;
+  temporal_integrity: string;
+  identity_quality: string;
+  source_reliability: string;
+  score_reliability: string;
+  competition_context_coverage: string;
+  venue_context_coverage: string;
+  tie_context_coverage: string;
+  data_completeness: string;
+  issues: V19H2HIssue[];
+};
+
+// Ce type décrit la réponse expérimentale H2H V19 exposée au frontend.
+export type V19H2HResponse = {
+  source: string;
+  scope: string;
+  match_id: number;
+  entity_type: V19H2HEntityType;
+  request_id: string;
+  module_status: V19H2HModuleStatus;
+  module_outcome: string;
+  feature_set_version: string;
+  result: {
+    contract_version: string;
+    request_id: string;
+    target_match_id: string;
+    computed_at_utc: string;
+    cutoff_utc: string;
+    module_status: V19H2HModuleStatus;
+    module_outcome: string;
+    feature_set_version: string;
+    features: V19H2HFeature[];
+    meeting_selection_summary: V19H2HMeetingSelectionSummary;
+    quality_report: V19H2HQualityReport;
+    readiness_by_consumer: V19H2HConsumerReadiness[];
+    missing_features: string[];
+    warnings: V19H2HIssue[];
+    abstention_reasons: V19H2HIssue[];
+    provenance: {
+      input_contract_hash: string;
+      source_providers: string[];
+      provider_snapshot_ids: string[];
+      normalization_version: string;
+      identity_resolver_version: string;
+      processing_policy_version: string;
+      deduplication_policy_version: string;
+      feature_builder_version: string;
+    };
+  };
+  responsible_note: string;
+};
+
 // Ce type décrit un facteur clé affiché dans l’analyse pré-match.
 export type AnalysisKeyFactor = {
   label: string;
