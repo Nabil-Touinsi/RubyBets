@@ -16,6 +16,10 @@ from app.v19.application.v19_prediction_service import (
     build_v19_prediction_for_match,
 )
 from app.v19.domain.decision_contracts import DecisionResultV1
+from app.v19.explainability.explanation_builder import (
+    EXPLANATION_CONTRACT_VERSION,
+    build_public_explanation,
+)
 
 
 API_SOURCE = "rubybets_v19_product_api"
@@ -68,6 +72,10 @@ def build_v19_product_api_response(
         "status": result.status.value,
         "recommendation": build_recommendation_summary(result),
         "decision": jsonable_encoder(result),
+        "explanation": build_public_explanation(
+            result=result,
+            responsible_note=RESPONSIBLE_NOTE,
+        ),
         "data_quality": {
             "target_match_provider_status": metadata.get("target_match_provider_status"),
             "market_provider_status": metadata.get("market_provider_status"),
@@ -82,6 +90,7 @@ def build_v19_product_api_response(
             "experts": dict(result.expert_versions),
             "features": list(result.feature_versions),
             "product_service": metadata.get("product_service_version"),
+            "explanation": EXPLANATION_CONTRACT_VERSION,
         },
         "responsible_note": RESPONSIBLE_NOTE,
     }
@@ -145,6 +154,7 @@ async def get_v19_rubybets_match_prediction(match_id: int) -> dict[str, Any]:
 # Schéma de communication :
 # experimental_ml_v19.py
 #   -> appelle v19_prediction_service.py sans contenir de règle sportive
+#   -> appelle explanation_builder.py pour la projection publique déterministe
 #   -> sérialise DecisionResultV1 et les diagnostics de qualité
 #   -> est enregistré dans backend/app/main.py
 #   -> n'expose jamais les odds, les bookmakers ou le payload brut FlashScore
