@@ -416,6 +416,21 @@ export type V19ProductRecommendation = {
   risk_level: string | null;
 };
 
+// Ce type décrit l’explication publique déterministe produite par le backend V19.
+export type V19PublicExplanation = {
+  contract_version: string;
+  headline: string;
+  summary: string;
+  supporting_factors: string[];
+  caution_factors: string[];
+  rejected_alternatives: string[];
+  data_quality_summary: string;
+  confidence_explanation: string;
+  abstention_explanation: string | null;
+  source_freshness_summary: string;
+  responsible_note: string;
+};
+
 // Ce type décrit la réponse publique stable du pipeline produit V19.
 export type V19ProductPredictionResponse = {
   source: string;
@@ -425,6 +440,7 @@ export type V19ProductPredictionResponse = {
   status: "RECOMMEND" | "ABSTAIN" | string;
   recommendation: V19ProductRecommendation | null;
   decision: Record<string, unknown>;
+  explanation: V19PublicExplanation;
   data_quality: {
     target_match_provider_status: string | null;
     market_provider_status: string | null;
@@ -439,6 +455,7 @@ export type V19ProductPredictionResponse = {
     experts: Record<string, string>;
     features: string[];
     product_service: string | null;
+    explanation: string;
   };
   responsible_note: string;
 };

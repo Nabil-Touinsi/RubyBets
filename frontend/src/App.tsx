@@ -505,10 +505,10 @@ function App() {
 
       return (
         <PredictionsScreen
-          nationalMlPrediction={selectedNationalMlPrediction}
+          v19ProductPrediction={selectedV19ProductPrediction}
           matchDetails={selectedMatchDetails}
           matchContext={selectedMatchContext}
-          matchPredictionsStatus={matchPredictionsStatus}
+          v19ProductStatus={v19ProductStatus}
           onNavigate={setCurrentScreen}
         />
       );
@@ -580,7 +580,7 @@ export default App;
 // App.tsx
 // ├── appelle services/api.ts pour récupérer les données backend
 // ├── charge aussi /analysis, /lineups, /news-context, /team-history, le H2H V19, la décision produit V19 et le modèle national
-// ├── transmet aussi la décision produit V19 à MatchDetailsScreen.tsx sans exposer les données internes de marché
+// ├── transmet la décision produit V19 à MatchDetailsScreen.tsx et PredictionsScreen.tsx sans exposer les données internes de marché
 // ├── pilote la navigation via currentScreen
 // ├── utilise AppShell.tsx pour structurer l’application
 // ├── peut transmettre StatusPanel.tsx à AppShell.tsx uniquement en mode debug
