@@ -16,6 +16,7 @@ from app.api.experimental_ml_v17_8 import router as experimental_ml_v17_8_router
 from app.api.experimental_ml_national_v18_3_3 import router as experimental_ml_national_v18_3_3_router
 from app.api.experimental_ml_clubs_v17_8 import router as experimental_ml_clubs_v17_8_router
 from app.api.experimental_ml_v19_h2h import router as experimental_ml_v19_h2h_router
+from app.api.experimental_ml_v19 import router as experimental_ml_v19_router
 
 app = FastAPI(
     title=settings.app_name,
@@ -43,3 +44,4 @@ app.include_router(experimental_ml_v17_8_router)
 app.include_router(experimental_ml_national_v18_3_3_router)
 app.include_router(experimental_ml_clubs_v17_8_router)
 app.include_router(experimental_ml_v19_h2h_router)
+app.include_router(experimental_ml_v19_router)
