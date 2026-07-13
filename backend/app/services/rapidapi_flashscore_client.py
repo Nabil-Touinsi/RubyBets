@@ -311,6 +311,10 @@ def normalize_flashscore_competition_for_rubybets(
 # Cette fonction normalise une équipe FlashScore pour les routes matchs RubyBets.
 def normalize_flashscore_team_for_rubybets(team: dict[str, Any]) -> dict[str, Any]:
     source_team_id = team.get("team_id") or team.get("id")
+    source_event_participant_id = (
+        team.get("event_participant_id")
+        or team.get("eventParticipantId")
+    )
     team_name = team.get("name")
     short_name = team.get("short_name") or team.get("shortName") or team_name
 
@@ -321,6 +325,7 @@ def normalize_flashscore_team_for_rubybets(team: dict[str, Any]) -> dict[str, An
         "tla": team.get("tla") or team.get("short_name") or team.get("shortName"),
         "crest": team.get("small_image_path") or team.get("image_path") or team.get("logo"),
         "sourceTeamId": source_team_id,
+        "sourceEventParticipantId": source_event_participant_id,
     }
 
 

@@ -45,7 +45,7 @@ from app.v19.features.market_feature_builder import (
 )
 
 
-V19_PRODUCT_SERVICE_VERSION = "v19.product-pipeline.legacy-parity.1"
+V19_PRODUCT_SERVICE_VERSION = "v19.product-pipeline.legacy-parity.2"
 V19_PRODUCT_POLICY_MODE = "LEGACY_PARITY"
 
 V19MatchLoader = Callable[
@@ -128,7 +128,7 @@ async def load_target_match(
     )
 
 
-# Extrait les identifiants nécessaires sans confondre les IDs internes et fournisseur.
+# Extrait les identifiants Market en privilégiant les participants d'événement FlashScore prouvés.
 def extract_target_match_identity(
     match_data: dict[str, Any],
 ) -> tuple[str | None, str, str]:
@@ -138,17 +138,25 @@ def extract_target_match_identity(
     if not isinstance(home_team, dict) or not isinstance(away_team, dict):
         raise V19ProductMatchInvalidError("target_match_teams_missing")
 
-    home_team_id = home_team.get("sourceTeamId") or home_team.get("id")
-    away_team_id = away_team.get("sourceTeamId") or away_team.get("id")
+    home_market_id = (
+        home_team.get("sourceEventParticipantId")
+        or home_team.get("sourceTeamId")
+        or home_team.get("id")
+    )
+    away_market_id = (
+        away_team.get("sourceEventParticipantId")
+        or away_team.get("sourceTeamId")
+        or away_team.get("id")
+    )
 
-    if home_team_id in (None, "") or away_team_id in (None, ""):
+    if home_market_id in (None, "") or away_market_id in (None, ""):
         raise V19ProductMatchInvalidError("target_match_team_ids_missing")
 
     source_match_id = match_data.get("sourceMatchId")
     return (
         str(source_match_id).strip() if source_match_id else None,
-        str(home_team_id).strip(),
-        str(away_team_id).strip(),
+        str(home_market_id).strip(),
+        str(away_market_id).strip(),
     )
 
 

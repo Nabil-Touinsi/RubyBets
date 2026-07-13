@@ -4,7 +4,10 @@
 from datetime import datetime, timezone
 from math import isclose
 
-from app.services.rapidapi_flashscore_client import encode_flashscore_match_id
+from app.services.rapidapi_flashscore_client import (
+    encode_flashscore_match_id,
+    normalize_flashscore_team_for_rubybets,
+)
 from app.v19.acquisition.flashscore_odds_adapter import adapt_flashscore_odds_payload
 from app.v19.acquisition.flashscore_odds_provider import (
     FLASHSCORE_ODDS_ENDPOINT,
@@ -81,6 +84,37 @@ def build_bookmaker(
     }
 
 
+# Construit le format réel bookmaker -> odds marchés -> odds sélections renvoyé par FlashScore.
+def build_real_flashscore_bookmaker(
+    bookmaker_name: str,
+    full_time_options: list[dict[str, object]],
+) -> dict[str, object]:
+    return {
+        "name": bookmaker_name,
+        "image": "https://example.invalid/bookmaker.png",
+        "odds": [
+            {
+                "bettingType": "HOME_DRAW_AWAY",
+                "bettingScope": "FIRST_HALF",
+                "hasLiveBettingOffers": False,
+                "odds": build_options(2.4, 2.8, 3.2),
+            },
+            {
+                "bettingType": "HOME_DRAW_AWAY",
+                "bettingScope": "FULL_TIME",
+                "hasLiveBettingOffers": False,
+                "odds": full_time_options,
+            },
+            {
+                "bettingType": "DOUBLE_CHANCE",
+                "bettingScope": "FULL_TIME",
+                "hasLiveBettingOffers": False,
+                "odds": [],
+            },
+        ],
+    }
+
+
 # Adapte un payload de test avec les identités de match communes aux scénarios.
 def adapt_payload(payload: object):
     return adapt_flashscore_odds_payload(
@@ -137,6 +171,60 @@ def test_flashscore_odds_provider_decodes_rubybets_match_id() -> None:
     assert payload == []
     assert observed_params == [{"match_id": "AbC123"}]
     assert metadata["rubybets_match_id"] == rubybets_match_id
+
+
+# Vérifie que la normalisation du match conserve l'identifiant participant utilisé par les odds.
+def test_flashscore_team_normalization_preserves_event_participant_id() -> None:
+    team = normalize_flashscore_team_for_rubybets(
+        {
+            "team_id": "home-team-id",
+            "event_participant_id": HOME_TEAM_ID,
+            "name": "Home FC",
+        }
+    )
+
+    assert team["sourceTeamId"] == "home-team-id"
+    assert team["sourceEventParticipantId"] == HOME_TEAM_ID
+
+
+# Vérifie le vrai format FlashScore sans utiliser l'ordre des sélections pour mapper les issues.
+def test_odds_adapter_supports_real_flashscore_nested_odds_shape() -> None:
+    options = [
+        {
+            "eventParticipantId": AWAY_TEAM_ID,
+            "value": 4.5,
+            "opening": 4.8,
+            "active": True,
+        },
+        {
+            "eventParticipantId": HOME_TEAM_ID,
+            "value": 1.8,
+            "opening": 2.0,
+            "active": True,
+        },
+        {
+            "eventParticipantId": None,
+            "value": 3.4,
+            "opening": 3.5,
+            "active": True,
+        },
+    ]
+
+    result = adapt_payload(
+        [build_real_flashscore_bookmaker("1xBet", options)]
+    )
+
+    assert result.status is MarketModuleStatus.DEGRADED
+    assert result.bookmaker_count_total == 1
+    assert result.bookmaker_count_eligible == 1
+    assert result.quality_flags == (MarketQualityFlag.SINGLE_BOOKMAKER_ONLY,)
+    triplet = result.triplets[0]
+    assert triplet.bookmaker_id == "1xBet"
+    assert triplet.bookmaker_name == "1xBet"
+    assert triplet.current_home_odd == 1.8
+    assert triplet.current_draw_odd == 3.4
+    assert triplet.current_away_odd == 4.5
+    assert triplet.opening_home_odd == 2.0
 
 
 # Vérifie le mapping domicile / nul / extérieur et la séparation current / opening.

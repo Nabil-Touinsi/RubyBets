@@ -33,8 +33,10 @@ from app.v19.domain.expert_enums import (
 
 MATCH_ID = 1813105023365578
 FIXED_NOW = datetime(2026, 7, 13, 8, 0, tzinfo=timezone.utc)
-HOME_TEAM_ID = "home-1"
-AWAY_TEAM_ID = "away-2"
+HOME_TEAM_ID = "home-team-1"
+AWAY_TEAM_ID = "away-team-2"
+HOME_EVENT_PARTICIPANT_ID = "home-participant-1"
+AWAY_EVENT_PARTICIPANT_ID = "away-participant-2"
 
 
 # Retourne une horloge fixe pour stabiliser les métadonnées temporelles des tests.
@@ -53,11 +55,13 @@ def build_target_match() -> dict[str, Any]:
         "homeTeam": {
             "id": 101,
             "sourceTeamId": HOME_TEAM_ID,
+            "sourceEventParticipantId": HOME_EVENT_PARTICIPANT_ID,
             "name": "Home FC",
         },
         "awayTeam": {
             "id": 202,
             "sourceTeamId": AWAY_TEAM_ID,
+            "sourceEventParticipantId": AWAY_EVENT_PARTICIPANT_ID,
             "name": "Away FC",
         },
     }
@@ -71,7 +75,7 @@ def build_market_options(
 ) -> list[dict[str, Any]]:
     return [
         {
-            "eventParticipantId": HOME_TEAM_ID,
+            "eventParticipantId": HOME_EVENT_PARTICIPANT_ID,
             "value": home_odd,
             "opening": None,
             "active": True,
@@ -83,7 +87,7 @@ def build_market_options(
             "active": True,
         },
         {
-            "eventParticipantId": AWAY_TEAM_ID,
+            "eventParticipantId": AWAY_EVENT_PARTICIPANT_ID,
             "value": away_odd,
             "opening": None,
             "active": True,
@@ -97,21 +101,21 @@ def build_market_payload(
     draw_odd: float,
     away_odd: float,
 ) -> list[dict[str, Any]]:
+    options = build_market_options(
+        home_odd,
+        draw_odd,
+        away_odd,
+    )
     return [
         {
-            "bookmaker": {
-                "id": "bk-test",
-                "name": "Bookmaker Test",
-            },
-            "markets": [
+            "name": "Bookmaker Test",
+            "image": "https://example.invalid/bookmaker.png",
+            "odds": [
                 {
-                    "marketType": "HOME_DRAW_AWAY",
-                    "period": "FULL_TIME",
-                    "options": build_market_options(
-                        home_odd,
-                        draw_odd,
-                        away_odd,
-                    ),
+                    "bettingType": "HOME_DRAW_AWAY",
+                    "bettingScope": "FULL_TIME",
+                    "hasLiveBettingOffers": False,
+                    "odds": [options[2], options[0], options[1]],
                 }
             ],
         }

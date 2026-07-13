@@ -17,7 +17,7 @@ from app.v19.domain.market_contracts import (
 
 
 MARKET_NORMALIZATION_CONTRACT_VERSION = "MarketNormalizationResultV1"
-MARKET_NORMALIZATION_VERSION = "v19.market.flashscore-normalizer.1"
+MARKET_NORMALIZATION_VERSION = "v19.market.flashscore-normalizer.2"
 MARKET_TYPE_HOME_DRAW_AWAY = "HOME_DRAW_AWAY"
 MARKET_PERIOD_FULL_TIME = "FULL_TIME"
 MARKET_SOURCE_ENDPOINT = "/matches/odds"
@@ -28,11 +28,30 @@ _BOOKMAKER_CONTAINER_KEYS = (
     "bookmakerInfo",
     "provider",
 )
+_MARKET_TYPE_KEYS = (
+    "market_type",
+    "marketType",
+    "bettingType",
+    "type",
+    "odds_type",
+    "oddsType",
+    "name",
+)
+_MARKET_PERIOD_KEYS = (
+    "period",
+    "period_type",
+    "periodType",
+    "bettingScope",
+    "scope",
+    "odds_period",
+    "oddsPeriod",
+)
 _MARKET_COLLECTION_KEYS = (
     "markets",
     "oddsMarkets",
     "odds_markets",
     "marketGroups",
+    "odds",
 )
 _OPTION_COLLECTION_KEYS = (
     "options",
@@ -79,6 +98,25 @@ def parse_valid_odd(value: object) -> float | None:
     return odd
 
 
+# Identifie le conteneur bookmaker réel renvoyé par FlashScore sans le confondre avec un marché.
+def is_flashscore_bookmaker_node(node: Mapping[str, Any]) -> bool:
+    markets = node.get("odds")
+    return (
+        isinstance(node.get("name"), str)
+        and isinstance(markets, list)
+        and any(
+            isinstance(item, Mapping)
+            and ("bettingType" in item or "bettingScope" in item)
+            for item in markets
+        )
+    )
+
+
+# Indique si le nœud porte explicitement la signature d'un marché fournisseur.
+def has_explicit_market_signature(node: Mapping[str, Any]) -> bool:
+    return any(key in node for key in (*_MARKET_TYPE_KEYS, *_MARKET_PERIOD_KEYS) if key != "name")
+
+
 # Extrait l'identité du bookmaker depuis le nœud courant ou son contexte parent.
 def extract_bookmaker_identity(
     node: Mapping[str, Any],
@@ -88,6 +126,17 @@ def extract_bookmaker_identity(
     bookmaker_value = first_present(node, _BOOKMAKER_CONTAINER_KEYS)
     bookmaker_id = inherited_id
     bookmaker_name = inherited_name
+
+    if is_flashscore_bookmaker_node(node):
+        bookmaker_name = str(node.get("name") or "").strip() or bookmaker_name
+        bookmaker_id = str(
+            first_present(
+                node,
+                ("id", "bookmaker_id", "bookmakerId"),
+                bookmaker_name,
+            )
+            or ""
+        ).strip() or bookmaker_name
 
     if isinstance(bookmaker_value, Mapping):
         bookmaker_id = str(
@@ -128,18 +177,8 @@ def extract_bookmaker_identity(
 
 # Extrait le type et la période d'un nœud marché potentiel.
 def extract_market_signature(node: Mapping[str, Any]) -> tuple[str, str]:
-    market_type = normalize_token(
-        first_present(
-            node,
-            ("market_type", "marketType", "type", "odds_type", "oddsType", "name"),
-        )
-    )
-    market_period = normalize_token(
-        first_present(
-            node,
-            ("period", "period_type", "periodType", "scope", "odds_period", "oddsPeriod"),
-        )
-    )
+    market_type = normalize_token(first_present(node, _MARKET_TYPE_KEYS))
+    market_period = normalize_token(first_present(node, _MARKET_PERIOD_KEYS))
     return market_type, market_period
 
 
@@ -187,8 +226,10 @@ def iter_home_draw_away_markets(
         fallback_id = bookmaker_id or fallback_name
         yield fallback_id, fallback_name, options
 
+    market_node = has_explicit_market_signature(payload)
+
     for key, value in payload.items():
-        if key in _OPTION_COLLECTION_KEYS:
+        if market_node and key in _OPTION_COLLECTION_KEYS:
             continue
         if key in _MARKET_COLLECTION_KEYS or isinstance(value, (dict, list)):
             yield from iter_home_draw_away_markets(
