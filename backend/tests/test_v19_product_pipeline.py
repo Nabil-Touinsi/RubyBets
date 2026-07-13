@@ -472,9 +472,9 @@ def test_v19_product_api_maps_application_errors(
     assert response.json()["detail"]["match_id"] == MATCH_ID
 
 
-# Vérifie que la route produit V19 est réellement enregistrée dans l'application FastAPI principale.
+# Vérifie que les routes V19 sont exposées dans le contrat OpenAPI public de l'application principale.
 def test_v19_product_route_is_registered_in_main_app() -> None:
-    paths = {route.path for route in main_app.routes}
+    paths = set(main_app.openapi().get("paths", {}))
 
     assert "/api/experimental/ml-v19/rubybets-matches/{match_id}" in paths
     assert "/api/experimental/ml-v19/h2h/rubybets-matches/{match_id}" in paths
