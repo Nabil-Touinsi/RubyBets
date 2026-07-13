@@ -21,6 +21,7 @@ import type {
   V1833MatchPredictionResponse,
   V19H2HEntityType,
   V19H2HResponse,
+  V19ProductPredictionResponse,
 } from "../models/rubybets";
 
 const API_BASE_URL = "http://127.0.0.1:8000";
@@ -120,6 +121,16 @@ export async function getV19H2HAnalysis(
   return fetchJson<V19H2HResponse>(
     `/api/experimental/ml-v19/h2h/rubybets-matches/${matchId}?entity_type=${entityType}`,
     "Erreur lors du chargement de l'analyse H2H V19."
+  );
+}
+
+// Cette fonction récupère la décision produit V19 d'un match RubyBets réel.
+export async function getV19ProductPrediction(
+  matchId: number
+): Promise<V19ProductPredictionResponse> {
+  return fetchJson<V19ProductPredictionResponse>(
+    `/api/experimental/ml-v19/rubybets-matches/${matchId}`,
+    "Erreur lors du chargement de la décision produit V19."
   );
 }
 
@@ -285,4 +296,4 @@ export async function getResponsibleInfo(): Promise<ResponsibleInfoResponse> {
 // ├── utilise rubybets.ts pour typer les réponses reçues
 // ├── alimente App.tsx avec des données sécurisées
 // ├── transmet les données aux composants React d’affichage, dont l’historique des équipes, les compositions, les actualités contextuelles et les archives
-// └── expose les appels V18.3.3 historique, dynamique, sélection nationale et archives pour les écrans Prédictions/Sélection/Archives
+// └── expose aussi la décision produit V19 à la fiche détail sans transmettre les odds ou payloads fournisseurs

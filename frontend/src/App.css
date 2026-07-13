@@ -24143,3 +24143,134 @@ section.rb-screen-container:has(.rb-resources-v2-screen) {
     gap: 0.25rem;
   }
 }
+
+
+/* Carte de décision produit V19 affichée en tête de la vue d’ensemble du match. */
+.rb-v19-decision-card {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  gap: 1rem;
+  padding: 1.25rem;
+  border: 1px solid rgba(45, 212, 191, 0.2);
+  border-radius: 1.25rem;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(45, 212, 191, 0.12), transparent 38%),
+    linear-gradient(145deg, rgba(8, 18, 29, 0.98), rgba(10, 25, 37, 0.94));
+  box-shadow: 0 18px 44px rgba(2, 8, 23, 0.2);
+}
+
+.rb-v19-decision-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: #2dd4bf;
+}
+
+.rb-v19-decision-card__header,
+.rb-v19-decision-card__decision {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.rb-v19-decision-card__header p,
+.rb-v19-decision-card__decision small {
+  margin: 0;
+  color: rgba(153, 246, 228, 0.78);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.rb-v19-decision-card__header span {
+  padding: 0.38rem 0.68rem;
+  border: 1px solid rgba(45, 212, 191, 0.24);
+  border-radius: 999px;
+  background: rgba(20, 184, 166, 0.1);
+  color: #99f6e4;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.rb-v19-decision-card h3,
+.rb-v19-decision-card p,
+.rb-v19-decision-card small {
+  position: relative;
+  z-index: 1;
+}
+
+.rb-v19-decision-card h3 {
+  margin: 0.25rem 0 0;
+  color: #f8ffff;
+  font-size: clamp(1.15rem, 2vw, 1.55rem);
+}
+
+.rb-v19-decision-card > p {
+  margin: 0;
+  max-width: 74ch;
+  color: rgba(226, 232, 240, 0.78);
+  line-height: 1.65;
+}
+
+.rb-v19-decision-card__decision strong {
+  padding: 0.72rem 1rem;
+  border: 1px solid rgba(45, 212, 191, 0.28);
+  border-radius: 0.9rem;
+  background: rgba(20, 184, 166, 0.12);
+  color: #ccfbf1;
+  font-size: 1rem;
+  text-align: right;
+}
+
+.rb-v19-decision-card__note {
+  color: rgba(148, 163, 184, 0.76);
+  line-height: 1.5;
+}
+
+.rb-v19-decision-card--abstain {
+  border-color: rgba(245, 158, 11, 0.26);
+}
+
+.rb-v19-decision-card--abstain::before {
+  background: #f59e0b;
+}
+
+.rb-v19-decision-card--abstain .rb-v19-decision-card__header span {
+  border-color: rgba(245, 158, 11, 0.3);
+  background: rgba(245, 158, 11, 0.1);
+  color: #fcd34d;
+}
+
+.rb-v19-decision-card--unavailable,
+.rb-v19-decision-card--loading {
+  border-color: rgba(148, 163, 184, 0.2);
+}
+
+.rb-v19-decision-card--unavailable::before,
+.rb-v19-decision-card--loading::before {
+  background: #64748b;
+}
+
+.rb-v19-decision-card--unavailable .rb-v19-decision-card__header span,
+.rb-v19-decision-card--loading .rb-v19-decision-card__header span {
+  border-color: rgba(148, 163, 184, 0.24);
+  background: rgba(148, 163, 184, 0.08);
+  color: #cbd5e1;
+}
+
+@media (max-width: 720px) {
+  .rb-v19-decision-card__header,
+  .rb-v19-decision-card__decision {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .rb-v19-decision-card__decision strong {
+    width: 100%;
+    text-align: left;
+  }
+}

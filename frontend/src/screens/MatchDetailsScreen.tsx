@@ -19,9 +19,11 @@ import type {
   TeamRecentMatch,
   TeamStanding,
   V19H2HResponse,
+  V19ProductPredictionResponse,
 } from "../models/rubybets";
 import type { AppScreen } from "../types/navigation";
 import MatchNewsContextSection from "../components/MatchNewsContextSection";
+import V19ProductDecisionCard from "../components/V19ProductDecisionCard";
 import {
   formatDateTime,
   formatMatchStatus,
@@ -39,12 +41,14 @@ type MatchDetailsScreenProps = {
   matchNewsContext: MatchNewsContextResponse | null;
   teamHistory: TeamHistoryResponse | null;
   v19H2HAnalysis: V19H2HResponse | null;
+  v19ProductPrediction: V19ProductPredictionResponse | null;
   matchDetailsStatus: string;
   matchContextStatus: string;
   matchAnalysisStatus: string;
   matchLineupsStatus: string;
   matchNewsContextStatus: string;
   v19H2HStatus: string;
+  v19ProductStatus: string;
   onNavigate: (screen: AppScreen) => void;
 };
 
@@ -2404,15 +2408,23 @@ function OverviewTabContent({
   match,
   matchContext,
   teamHistory,
+  v19ProductPrediction,
+  v19ProductStatus,
   onNavigate,
 }: {
   match: Match;
   matchContext: MatchContextResponse | null;
   teamHistory: TeamHistoryResponse | null;
+  v19ProductPrediction: V19ProductPredictionResponse | null;
+  v19ProductStatus: string;
   onNavigate: (screen: AppScreen) => void;
 }) {
   return (
     <>
+      <V19ProductDecisionCard
+        prediction={v19ProductPrediction}
+        statusMessage={v19ProductStatus}
+      />
       <PreMatchAnalysisSection
         match={match}
         matchContext={matchContext}
@@ -2438,12 +2450,14 @@ function MatchDetailsScreen({
   matchNewsContext,
   teamHistory,
   v19H2HAnalysis,
+  v19ProductPrediction,
   matchDetailsStatus,
   matchContextStatus,
   matchAnalysisStatus,
   matchLineupsStatus,
   matchNewsContextStatus,
   v19H2HStatus,
+  v19ProductStatus,
   onNavigate,
 }: MatchDetailsScreenProps) {
   const [activeTab, setActiveTab] = useState<DetailTabKey>("overview");
@@ -2497,6 +2511,8 @@ function MatchDetailsScreen({
               match={selectedMatch}
               matchContext={matchContext}
               teamHistory={teamHistory}
+              v19ProductPrediction={v19ProductPrediction}
+              v19ProductStatus={v19ProductStatus}
               onNavigate={onNavigate}
             />
           ) : null}
@@ -2563,7 +2579,7 @@ export default MatchDetailsScreen;
 
 // Schéma de communication du fichier :
 // MatchDetailsScreen.tsx
-// ├── reçoit le détail, le contexte, l’analyse, les compositions, l’historique et le signal H2H V19 depuis App.tsx
+// ├── reçoit aussi la décision produit V19 depuis App.tsx et l’affiche au début de la Vue d’ensemble
 // ├── utilise aussi V19H2HResponse de models/rubybets.ts pour afficher le catalogue v19.h2h.core.1
 // ├── utilise les helpers d’affichage de helpers/displayText.ts
 // ├── alimente l’onglet Analyse détaillée avec matchAnalysis.analysis
@@ -2574,4 +2590,4 @@ export default MatchDetailsScreen;
 // ├── affiche les derniers matchs disponibles uniquement dans la Vue d’ensemble via teamHistory.recent_matches_overview
 // ├── affiche les confrontations directes disponibles via teamHistory.head_to_head
 // ├── déclenche la navigation vers Matchs, Analyse et Prédictions via onNavigate
-// └── reste isolé visuellement avec les classes rb-detail-v2-* définies dans App.css
+// └── utilise V19ProductDecisionCard.tsx et les classes rb-v19-decision-card-* définies dans App.css

@@ -407,6 +407,42 @@ export type V19H2HResponse = {
   responsible_note: string;
 };
 
+// Ce type décrit le résumé public de la recommandation produit V19.
+export type V19ProductRecommendation = {
+  market_type: string;
+  value: string;
+  score: number | null;
+  confidence_level: string | null;
+  risk_level: string | null;
+};
+
+// Ce type décrit la réponse publique stable du pipeline produit V19.
+export type V19ProductPredictionResponse = {
+  source: string;
+  scope: string;
+  match_id: number;
+  request_id: string;
+  status: "RECOMMEND" | "ABSTAIN" | string;
+  recommendation: V19ProductRecommendation | null;
+  decision: Record<string, unknown>;
+  data_quality: {
+    target_match_provider_status: string | null;
+    market_provider_status: string | null;
+    market_module_status: string | null;
+    market_quality_flags: string[] | null;
+    history_provider_status: string | null;
+    history_data_status: string | null;
+    history_source_used: string | null;
+  };
+  versions: {
+    engine: string;
+    experts: Record<string, string>;
+    features: string[];
+    product_service: string | null;
+  };
+  responsible_note: string;
+};
+
 // Ce type décrit un facteur clé affiché dans l’analyse pré-match.
 export type AnalysisKeyFactor = {
   label: string;
@@ -812,4 +848,4 @@ export type ArchivedPredictionsResponse = {
 // ├── utilisé par api.ts pour typer les réponses backend
 // ├── utilisé par App.tsx pour stocker les données dans les states React
 // ├── utilisé par les composants frontend pour afficher matchs, historiques d'équipes, compositions probables, actualités contextuelles, analyses, prédictions, recommandations et archives
-// └── prépare le typage du modèle national expérimental V18.3.4 dc018 et des archives pour les écrans Prédictions, Sélection et Archives
+// └── prépare aussi le contrat public V19 utilisé par la fiche détail match, sans exposer les odds internes
