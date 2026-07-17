@@ -1,0 +1,12 @@
+﻿RubyBets - Preuve finale du build frontend
+Date de capture : 2026-07-17T22:38:18.8558541+02:00
+
+Commande : npm run build
+Résultat : SUCCESS
+TypeScript : compilation réussie
+Vite : 8.0.10
+Modules transformés : 1773
+Durée du build : 662 ms
+Code de sortie : 0
+
+Conclusion : le frontend React + TypeScript compile en mode production.

@@ -1,0 +1,20 @@
+﻿{
+    "captured_at":  "2026-07-17T22:36:14.5052942+02:00",
+    "title":  "RubyBets API",
+    "version":  "0.1.0",
+    "paths_available":  49,
+    "required_paths":  [
+                           "/health",
+                           "/api/competitions",
+                           "/api/matches",
+                           "/api/archives/predictions",
+                           "/api/glossary",
+                           "/api/responsible-info",
+                           "/api/experimental/ml-v19/rubybets-matches/{match_id}",
+                           "/api/experimental/ml-v19/selection"
+                       ],
+    "required_paths_found":  8,
+    "missing_paths":  [
+
+                      ]
+}

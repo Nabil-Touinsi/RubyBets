@@ -1,0 +1,23 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.13.7, pytest-9.0.3, pluggy-1.6.0
+rootdir: C:\dev_classe\RNCP\RubyBets\backend
+plugins: anyio-4.13.0
+collected 194 items
+
+tests\test_api.py .................                                      [  8%]
+tests\test_archives_public_contract.py ..                                [  9%]
+tests\test_evaluate_saved_1x2_model.py .....                             [ 12%]
+tests\test_ml_1x2.py ..........                                          [ 17%]
+tests\test_ml_national_v18_3_3_selector.py ...............               [ 25%]
+tests\test_ml_v17_8_service.py ........                                  [ 29%]
+tests\test_v19.py .........................................              [ 50%]
+tests\test_v19_decision_orchestrator.py .............                    [ 57%]
+tests\test_v19_expert_contracts.py .......                               [ 60%]
+tests\test_v19_explanation_builder.py .....                              [ 63%]
+tests\test_v19_legacy_experts.py ............                            [ 69%]
+tests\test_v19_market_module.py .........................                [ 82%]
+tests\test_v19_product_pipeline.py ...............                       [ 90%]
+tests\test_v19_selection_api.py ....                                     [ 92%]
+tests\test_v19_selection_service.py ...............                      [100%]
+
+============================= 194 passed in 5.55s =============================
