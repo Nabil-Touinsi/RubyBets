@@ -911,7 +911,6 @@ export type ArchivedPrediction = {
   confidence_level: string | null;
   risk_level: string | null;
   justification: string | null;
-  engine_version: string | null;
   final_home_score: number | null;
   final_away_score: number | null;
   match_status: string | null;

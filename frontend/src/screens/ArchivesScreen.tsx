@@ -390,10 +390,6 @@ function ArchiveDetailPanel({ archive }: { archive: ArchivedPrediction | null })
         <p>{archive.justification ?? "Aucune justification enregistrée pour cette archive."}</p>
       </div>
       <div className="rb-archive-detail__note">
-        <span>Version moteur</span>
-        <p>{archive.engine_version ?? "—"}</p>
-      </div>
-      <div className="rb-archive-detail__note">
         <span>Vérification</span>
         <p>
           {archive.checked_at

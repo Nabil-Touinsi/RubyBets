@@ -8,6 +8,35 @@ from typing import Any
 from app.services.database_service import get_database_connection
 
 
+# Cette fonction produit une justification publique sans métrique ou détail interne.
+def sanitize_public_archive_justification(
+    justification: Any,
+    market_type: Any,
+) -> str:
+    public_market = str(market_type or "archive").replace("_", " ")
+    value = str(justification or "").strip()
+    lowered_value = value.lower()
+
+    forbidden_fragments = (
+        "probabilité",
+        "probability",
+        "max_probability",
+        "score brut",
+        "raw_score",
+        "cote",
+        "odds",
+        "bookmaker",
+    )
+
+    if value and not any(fragment in lowered_value for fragment in forbidden_fragments):
+        return value
+
+    return (
+        f"Prédiction {public_market} archivée par RubyBets à partir des données "
+        "disponibles au moment de l’analyse."
+    )
+
+
 # Cette fonction transforme une ligne SQL en dictionnaire Python lisible.
 def map_archive_row(row: tuple[Any, ...]) -> dict[str, Any]:
     return {
@@ -27,8 +56,7 @@ def map_archive_row(row: tuple[Any, ...]) -> dict[str, Any]:
         "predicted_value": row[13],
         "confidence_level": row[14],
         "risk_level": row[15],
-        "justification": row[16],
-        "engine_version": row[17],
+        "justification": sanitize_public_archive_justification(row[16], row[12]),
         "final_home_score": row[18],
         "final_away_score": row[19],
         "match_status": row[20],
@@ -573,24 +601,16 @@ def normalize_archive_market_type(market_key: str) -> str:
     return market_map.get(market_key, market_key.upper())
 
 
-# Cette fonction construit une justification courte pour l'archive.
+# Cette fonction construit une justification publique sans probabilité interne.
 def build_archive_justification(
     market_type: str,
     prediction: dict[str, Any],
 ) -> str:
-    probability = prediction.get("max_probability")
-
-    if probability is None:
-        return f"Prédiction {market_type} générée par le moteur RubyBets."
-
-    try:
-        probability_percent = round(float(probability) * 100, 1)
-    except (TypeError, ValueError):
-        return f"Prédiction {market_type} générée par le moteur RubyBets."
+    _ = prediction
 
     return (
-        f"Prédiction {market_type} générée par le moteur RubyBets "
-        f"avec une probabilité maximale de {probability_percent} %."
+        f"Prédiction {market_type} générée par RubyBets à partir des données "
+        "disponibles au moment de l’analyse."
     )
 
 
