@@ -411,7 +411,6 @@ export type V19H2HResponse = {
 export type V19ProductRecommendation = {
   market_type: string;
   value: string;
-  score: number | null;
   confidence_level: string | null;
   risk_level: string | null;
 };
@@ -439,7 +438,6 @@ export type V19ProductPredictionResponse = {
   request_id: string;
   status: "RECOMMEND" | "ABSTAIN" | string;
   recommendation: V19ProductRecommendation | null;
-  decision: Record<string, unknown>;
   explanation: V19PublicExplanation;
   data_quality: {
     target_match_provider_status: string | null;

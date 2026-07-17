@@ -7,7 +7,6 @@ from typing import Any
 from uuid import uuid4
 
 from fastapi import APIRouter, HTTPException
-from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel, Field
 
 from app.v19.application.v19_selection_service import (
@@ -279,7 +278,6 @@ def build_recommendation_summary(result: DecisionResultV1) -> dict[str, Any] | N
     return {
         "market_type": candidate.market_type.value,
         "value": candidate.recommendation_value,
-        "score": candidate.raw_score,
         "confidence_level": candidate.confidence_level,
         "risk_level": candidate.local_risk_level,
     }
@@ -301,7 +299,6 @@ def build_v19_product_api_response(
         "request_id": request_id,
         "status": result.status.value,
         "recommendation": build_recommendation_summary(result),
-        "decision": jsonable_encoder(result),
         "explanation": build_public_explanation(
             result=result,
             responsible_note=RESPONSIBLE_NOTE,
@@ -441,6 +438,6 @@ async def create_v19_selection(
 #   -> appelle v19_prediction_service.py pour une décision individuelle
 #   -> appelle v19_selection_service.py pour la composition multi-matchs
 #   -> appelle explanation_builder.py pour les projections publiques
-#   -> sérialise les diagnostics sans recalcul sportif
+#   -> projette uniquement le contrat public sans diagnostics internes
 #   -> est enregistré dans backend/app/main.py
 #   -> n'expose jamais score brut, odds, bookmaker ou payload fournisseur

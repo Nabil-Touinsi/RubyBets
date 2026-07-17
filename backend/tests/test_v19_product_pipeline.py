@@ -378,8 +378,8 @@ def build_v19_product_test_client() -> TestClient:
     return TestClient(test_app)
 
 
-# Vérifie la sérialisation complète de la route et l'absence d'odds ou de bookmakers exposés.
-def test_v19_product_api_serializes_decision_without_odds(monkeypatch) -> None:
+# Vérifie que la route expose uniquement le contrat produit public autorisé.
+def test_v19_product_api_hides_internal_decision_diagnostics(monkeypatch) -> None:
     expected_result = run_product_service(
         odds_payload=build_market_payload(1.10, 10.0, 10.0),
     )
@@ -418,7 +418,12 @@ def test_v19_product_api_serializes_decision_without_odds(monkeypatch) -> None:
     assert payload["scope"] == "experimental_clubs_product_pipeline"
     assert payload["status"] == "RECOMMEND"
     assert payload["recommendation"]["market_type"] == "STRICT_1X2"
-    assert len(payload["decision"]["evaluated_candidates"]) == 4
+    assert "decision" not in payload
+    assert "score" not in payload["recommendation"]
+    assert "raw_score" not in serialized
+    assert "calibrated_probability" not in serialized
+    assert "max_probability" not in serialized
+    assert '"score":' not in serialized
     assert "odds" not in serialized
     assert "bookmaker test" not in serialized
     assert "ne garantit aucun résultat sportif" in payload["responsible_note"]
@@ -530,4 +535,4 @@ def test_product_pipeline_rejects_started_match_before_downstream_calls() -> Non
 #   -> valide les quatre experts, l'orchestrateur et les cas RECOMMEND / ABSTAIN
 #   -> vérifie le rejet avant appel aval des matchs déjà commencés
 #   -> teste experimental_ml_v19.py et l'enregistrement dans main.py
-#   -> interdit tout appel réseau réel et toute exposition des odds ou payloads fournisseurs
+#   -> interdit tout appel réseau réel et toute exposition des diagnostics, odds ou payloads fournisseurs
