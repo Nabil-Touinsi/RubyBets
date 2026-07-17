@@ -21078,9 +21078,9 @@ section.rb-screen-container:has(.rb-recommendation-screen--mockup) {
   }
 }
 /*
-  Patch Sélection 26R.8 FINAL TABLE
-  Ce bloc stabilise définitivement le tableau de sélection :
-  fixture lisible, recommandation en mini-card, séparation nette des colonnes.
+  Patch Sélection 26R.9 TABLE SANS PROFIL REDONDANT
+  Ce bloc stabilise le tableau de sélection sur quatre colonnes :
+  fixture lisible, recommandation en mini-card et espace renforcé pour l’analyse clé.
   Il ne touche pas au hero validé, à la navbar, au backend, à l’API ni aux modèles ML.
 */
 
@@ -21092,11 +21092,10 @@ section.rb-screen-container:has(.rb-recommendation-screen--mockup) {
 .rb-recommendation-screen--mockup .rb-reco-table-head,
 .rb-recommendation-screen--mockup .rb-reco-table-row {
   grid-template-columns:
-    minmax(0, 1.55fr)
+    minmax(0, 1.48fr)
     minmax(158px, 0.52fr)
-    86px
-    84px
-    minmax(0, 1.08fr) !important;
+    96px
+    minmax(0, 1.3fr) !important;
   gap: 22px !important;
   align-items: center !important;
 }
@@ -21299,7 +21298,7 @@ section.rb-screen-container:has(.rb-recommendation-screen--mockup) {
   font-weight: 720 !important;
 }
 
-.rb-recommendation-screen--mockup .rb-reco-table-row > .rb-reco-table-cell:nth-child(5) p {
+.rb-recommendation-screen--mockup .rb-reco-table-row > .rb-reco-table-cell:nth-child(4) p {
   display: -webkit-box !important;
   margin: 0 !important;
   color: #cfe0e1 !important;
@@ -21317,11 +21316,10 @@ section.rb-screen-container:has(.rb-recommendation-screen--mockup) {
   .rb-recommendation-screen--mockup .rb-reco-table-head,
   .rb-recommendation-screen--mockup .rb-reco-table-row {
     grid-template-columns:
-      minmax(0, 1.45fr)
+      minmax(0, 1.4fr)
       minmax(150px, 0.56fr)
-      82px
-      78px
-      minmax(0, 1fr) !important;
+      92px
+      minmax(0, 1.2fr) !important;
     gap: 18px !important;
   }
 
@@ -21345,12 +21343,12 @@ section.rb-screen-container:has(.rb-recommendation-screen--mockup) {
 }
 
 /*
-  Schéma de communication du patch 26R.8 :
+  Schéma de communication du patch 26R.9 :
   App.css
-  ├── stabilise le tableau rendu par MultiMatchRecommendationSection.tsx
-  ├── isole la recommandation dans une mini-card compacte
-  ├── conserve le hero validé dans RecommendationScreen.tsx
-  └── ne modifie ni navbar, ni backend, ni API, ni modèles ML
+  ├── aligne le tableau à quatre colonnes rendu par MultiMatchRecommendationSection.tsx
+  ├── réserve davantage d’espace à la colonne Analyse clé
+  ├── conserve le profil global dans l’en-tête des résultats
+  └── ne modifie ni hero, ni navbar, ni backend, ni API, ni modèles ML
 */
 /*
   Correctif écran Ressources Phase 27R.1
@@ -24884,4 +24882,11 @@ section.rb-screen-container:has(.rb-v19-pred-screen) {
    AppShell / rb-screen-container
      -> fournit le conteneur global responsive
    Aucun style ne calcule ou n’infère une décision sportive.
+*/
+
+/* Schéma de communication final du fichier :
+   App.css
+     -> stylise MultiMatchRecommendationSection.tsx avec un tableau à quatre colonnes
+     -> conserve le profil de sélectivité dans le résumé global de RecommendationScreen.tsx
+     -> n’altère aucun calcul backend, contrat API ou décision V19.
 */

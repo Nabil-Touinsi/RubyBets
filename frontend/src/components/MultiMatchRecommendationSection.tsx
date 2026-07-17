@@ -75,21 +75,6 @@ function formatSelectionProfile(profile: SelectionProfileLevel) {
   return labels[profile];
 }
 
-// Cette fonction convertit le profil public V19 en suffixe compatible avec les badges existants.
-function getProfileTone(value: string): SelectionProfileLevel {
-  const normalizedValue = value.toUpperCase();
-
-  if (normalizedValue === "LOW") {
-    return "low";
-  }
-
-  if (normalizedValue === "HIGH") {
-    return "high";
-  }
-
-  return "medium";
-}
-
 // Cette fonction retourne un libellé de marché clair pour les décisions publiques V19.
 function formatMarketLabel(market: string) {
   const labels: Record<string, string> = {
@@ -327,18 +312,13 @@ function SelectionProfileSegments({
 function RecommendationRow({
   item,
   match,
-  profileLabel,
-  profileValue,
 }: {
   item: V19SelectionItem;
   match: Match | null;
-  profileLabel: string;
-  profileValue: string;
 }) {
   const homeLabel = getTeamLabel(match?.home_team);
   const awayLabel = getTeamLabel(match?.away_team);
   const quality = getQualityPresentation(item.data_quality);
-  const profileTone = getProfileTone(profileValue);
 
   return (
     <article className="rb-reco-table-row">
@@ -380,14 +360,6 @@ function RecommendationRow({
           {quality.label}
         </span>
         <small>{quality.detail}</small>
-      </div>
-
-      <div className="rb-reco-table-cell">
-        <span
-          className={`rb-reco-risk-badge rb-reco-risk-badge--${profileTone}`}
-        >
-          {profileLabel}
-        </span>
       </div>
 
       <div className="rb-reco-table-cell">
@@ -532,7 +504,6 @@ function MultiMatchRecommendationSection({
                 <span>Match</span>
                 <span>Marché & sélection</span>
                 <span>Qualité des données</span>
-                <span>Profil</span>
                 <span>Analyse clé</span>
               </div>
 
@@ -542,8 +513,6 @@ function MultiMatchRecommendationSection({
                   match={
                     matches.find((match) => match.id === item.match_id) ?? null
                   }
-                  profileLabel={multiMatchRecommendation.profile.label}
-                  profileValue={multiMatchRecommendation.profile.value}
                   key={`${item.match_id}-${item.recommendation.market_type}`}
                 />
               ))}
@@ -565,5 +534,5 @@ export default MultiMatchRecommendationSection;
 // ├── conserve les composants visuels et classes CSS du design Obsidian Teal
 // ├── rapproche chaque sélection publique de son match local grâce au match_id
 // ├── affiche la compétition active, le nombre de candidats et bloque la génération sous deux matchs
-// ├── affiche qualité, profil, explication et exclusions sans score brut ni probabilité
+// ├── affiche qualité, profil global, explication et exclusions sans score brut ni probabilité
 // └── ne recalcule aucune décision métier et ne transforme jamais une abstention en recommandation
