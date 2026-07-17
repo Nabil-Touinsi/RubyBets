@@ -1,6 +1,9 @@
 # Ce fichier vérifie automatiquement les routes API principales du MVP RubyBets.
 # Il contrôle les réponses attendues sans appeler réellement les services externes (pour éviter les appels API pendant les tests, gagner du temps et ne pas polluer le cache local).
 
+from datetime import date, datetime, timezone
+from typing import Any
+
 from fastapi.testclient import TestClient
 
 from app.api import competitions as competitions_api
@@ -109,6 +112,32 @@ FAKE_MATCH_WITH_STANDINGS = {
         "standings": FAKE_FRESHNESS,
     },
 }
+
+
+# Cette fonction construit un match FlashScore normalisé pour tester le cache et la fraîcheur.
+def build_flashscore_cached_match(
+    *,
+    match_id: int,
+    utc_date: str,
+    area_name: str,
+    competition_name: str,
+    status: str = "SCHEDULED",
+) -> dict[str, Any]:
+    return {
+        "id": match_id,
+        "sourceMatchId": f"source-{match_id}",
+        "source": matches_api.FLASHSCORE_SOURCE,
+        "utcDate": utc_date,
+        "status": status,
+        "area": {"name": area_name, "code": None},
+        "competition": {
+            "name": competition_name,
+            "code": None,
+            "sourceCompetitionId": None,
+        },
+        "homeTeam": {"id": match_id * 10, "name": f"Home {match_id}"},
+        "awayTeam": {"id": match_id * 10 + 1, "name": f"Away {match_id}"},
+    }
 
 
 # Ce test vérifie que la route de santé du backend répond correctement.
@@ -472,9 +501,181 @@ def test_multimatch_recommendation_rejects_invalid_risk_level():
     assert response.status_code == 422
 
 
+# Ce test vérifie que la fenêtre FlashScore par défaut couvre exactement sept journées.
+def test_flashscore_default_window_is_limited_to_seven_days() -> None:
+    assert matches_api.build_flashscore_day_offsets_from_filters(None, None) == list(range(7))
+
+
+# Ce test vérifie que le cache FlashScore est daté, partagé entre compétitions et réutilisé au second appel.
+def test_flashscore_cache_is_shared_and_filters_started_matches(monkeypatch) -> None:
+    fixed_now = datetime(2026, 7, 17, 16, 0, tzinfo=timezone.utc)
+    cache_payloads: dict[str, dict[str, Any]] = {}
+    provider_calls: list[int] = []
+
+    future_pl_match = build_flashscore_cached_match(
+        match_id=1,
+        utc_date="2026-07-18T18:00:00Z",
+        area_name="England",
+        competition_name="Premier League",
+    )
+    future_cl_match = build_flashscore_cached_match(
+        match_id=2,
+        utc_date="2026-07-18T20:00:00Z",
+        area_name="Europe",
+        competition_name="Champions League",
+    )
+    started_cl_match = build_flashscore_cached_match(
+        match_id=3,
+        utc_date="2026-07-17T15:00:00Z",
+        area_name="Europe",
+        competition_name="Champions League",
+    )
+
+    # Ce mock retourne le cache en mémoire utilisé par les appels successifs.
+    def fake_load_cache(cache_name: str):
+        return cache_payloads.get(cache_name)
+
+    # Ce mock sauvegarde le cache source partagé sans écrire sur disque.
+    def fake_save_cache(
+        cache_name: str,
+        data: dict[str, Any],
+        source: str = matches_api.FLASHSCORE_SOURCE,
+    ):
+        payload = {
+            "updated_at": fixed_now.isoformat(),
+            "source": source,
+            "data": data,
+        }
+        cache_payloads[cache_name] = payload
+        return payload
+
+    # Ce mock considère le cache en mémoire comme frais pendant tout le test.
+    def fake_is_cache_fresh(
+        cache_payload: dict[str, Any],
+        ttl_minutes: int,
+    ) -> bool:
+        assert cache_payload
+        assert ttl_minutes == 30
+        return True
+
+    # Ce mock simule une seule récupération source contenant toutes les compétitions de la journée.
+    def fake_get_normalized_flashscore_matches_by_day(
+        day_offset: int,
+        status: str | None,
+        team: str | None,
+        timezone: str,
+        competition_code: str | None,
+    ):
+        assert status is None
+        assert team is None
+        assert competition_code is None
+        assert timezone == matches_api.FLASHSCORE_DEFAULT_TIMEZONE
+        provider_calls.append(day_offset)
+        return [future_pl_match, future_cl_match, started_cl_match], {
+            "provider": matches_api.FLASHSCORE_SOURCE,
+            "status": "success",
+            "matches_count": 3,
+        }
+
+    monkeypatch.setattr(matches_api, "get_current_utc_date", lambda: date(2026, 7, 17))
+    monkeypatch.setattr(matches_api, "get_current_utc_datetime", lambda: fixed_now)
+    monkeypatch.setattr(matches_api, "load_cache", fake_load_cache)
+    monkeypatch.setattr(matches_api, "save_cache", fake_save_cache)
+    monkeypatch.setattr(matches_api, "is_cache_fresh", fake_is_cache_fresh)
+    monkeypatch.setattr(
+        matches_api,
+        "get_normalized_flashscore_matches_by_day",
+        fake_get_normalized_flashscore_matches_by_day,
+    )
+
+    pl_matches, pl_metadata, pl_freshness = matches_api.get_cached_flashscore_matches(
+        day_offset=0,
+        status="SCHEDULED",
+        team=None,
+        timezone=matches_api.FLASHSCORE_DEFAULT_TIMEZONE,
+        competition_code="PL",
+    )
+    cl_matches, cl_metadata, cl_freshness = matches_api.get_cached_flashscore_matches(
+        day_offset=0,
+        status="SCHEDULED",
+        team=None,
+        timezone=matches_api.FLASHSCORE_DEFAULT_TIMEZONE,
+        competition_code="CL",
+    )
+    repeated_cl_matches, _, repeated_cl_freshness = matches_api.get_cached_flashscore_matches(
+        day_offset=0,
+        status="SCHEDULED",
+        team=None,
+        timezone=matches_api.FLASHSCORE_DEFAULT_TIMEZONE,
+        competition_code="CL",
+    )
+
+    assert [match["id"] for match in pl_matches] == [1]
+    assert [match["id"] for match in cl_matches] == [2]
+    assert repeated_cl_matches == cl_matches
+    assert pl_metadata["requested_competition_code"] == "PL"
+    assert cl_metadata["requested_competition_code"] == "CL"
+    assert cl_metadata["team_filtered_count"] == 2
+    assert cl_metadata["filtered_count"] == 1
+    assert pl_freshness["from_cache"] is False
+    assert cl_freshness["from_cache"] is True
+    assert repeated_cl_freshness["from_cache"] is True
+    assert provider_calls == [0]
+    assert len(cache_payloads) == 1
+    assert "2026-07-17" in next(iter(cache_payloads))
+
+
+# Ce test vérifie que les erreurs de journées sans données ne dégradent pas le signal du cache utile.
+def test_flashscore_range_cache_flag_uses_successful_days_only(monkeypatch) -> None:
+    future_match = build_flashscore_cached_match(
+        match_id=4,
+        utc_date="2026-07-18T18:00:00Z",
+        area_name="Europe",
+        competition_name="Champions League",
+    )
+
+    # Ce mock simule une journée servie du cache et une journée fournisseur en erreur sans donnée.
+    def fake_get_cached_flashscore_matches(
+        day_offset: int,
+        status: str | None,
+        team: str | None,
+        timezone: str,
+        competition_code: str | None,
+    ):
+        del status, team, timezone, competition_code
+        if day_offset == 0:
+            return [future_match], {"status": "success", "filtered_count": 1}, {
+                "from_cache": True,
+                "updated_at": "2026-07-17T16:00:00+00:00",
+            }
+        return [], {"status": "error"}, {
+            "from_cache": False,
+            "updated_at": None,
+        }
+
+    monkeypatch.setattr(
+        matches_api,
+        "get_cached_flashscore_matches",
+        fake_get_cached_flashscore_matches,
+    )
+
+    matches, metadata, freshness = matches_api.get_cached_flashscore_matches_for_offsets(
+        day_offsets=[0, 1],
+        status="SCHEDULED",
+        team=None,
+        timezone=matches_api.FLASHSCORE_DEFAULT_TIMEZONE,
+        competition_code="CL",
+    )
+
+    assert [match["id"] for match in matches] == [4]
+    assert metadata["days_successful"] == 1
+    assert metadata["days_failed"] == 1
+    assert freshness["from_cache"] is True
+
+
 # Schéma de communication du fichier :
 # test_api.py
 # ├── appelle app.main pour créer le client de test
 # ├── simule app.api.competitions pour tester /api/competitions sans cache réel
-# ├── simule app.api.matches pour tester les routes matchs, contexte, analyse et prédictions
+# ├── simule app.api.matches pour tester routes, cache partagé, TTL et fraîcheur avant-match
 # └── simule app.api.recommendations pour tester la recommandation multi-matchs sans cache réel

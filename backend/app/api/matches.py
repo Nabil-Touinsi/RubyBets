@@ -1,7 +1,7 @@
 # Ce fichier expose les routes API des matchs RubyBets pour le MVP.
 # Il bascule progressivement les matchs vers FlashScore comme source principale, avec Football-Data en fallback temporaire.
 
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime, timedelta
 from typing import Any
 
 from fastapi import APIRouter, HTTPException, Query
@@ -32,6 +32,9 @@ from app.services.rapidapi_flashscore_client import (
     FLASHSCORE_DEFAULT_TIMEZONE,
     FLASHSCORE_SOURCE,
     decode_flashscore_match_id,
+    filter_flashscore_matches_by_competition,
+    filter_flashscore_matches_by_status,
+    filter_flashscore_matches_by_team,
     get_normalized_flashscore_match_details,
     get_normalized_flashscore_matches_by_day,
     get_rapidapi_flashscore_data,
@@ -43,12 +46,12 @@ from app.services.team_news_context_service import build_match_news_context_resp
 router = APIRouter(prefix="/api/matches", tags=["Matches"])
 
 
-MATCHES_CACHE_TTL_MINUTES = 720
-MATCH_DETAIL_CACHE_TTL_MINUTES = 720
-FLASHSCORE_MATCHES_CACHE_TTL_MINUTES = 720
-FLASHSCORE_MATCH_DETAIL_CACHE_TTL_MINUTES = 720
+MATCHES_CACHE_TTL_MINUTES = 30
+MATCH_DETAIL_CACHE_TTL_MINUTES = 30
+FLASHSCORE_MATCHES_CACHE_TTL_MINUTES = 30
+FLASHSCORE_MATCH_DETAIL_CACHE_TTL_MINUTES = 30
 FLASHSCORE_LINEUPS_CACHE_TTL_MINUTES = 60
-FLASHSCORE_DEFAULT_UPCOMING_DAYS = 10
+FLASHSCORE_DEFAULT_UPCOMING_DAYS = 7
 
 
 # Cette fonction vérifie qu'une compétition appartient bien au périmètre MVP RubyBets.
@@ -97,7 +100,7 @@ def build_flashscore_day_offsets_from_filters(
     end_offset = build_flashscore_day_offset_from_date(date_to)
 
     if start_offset is None and end_offset is None:
-        return list(range(0, FLASHSCORE_DEFAULT_UPCOMING_DAYS + 1))
+        return list(range(0, FLASHSCORE_DEFAULT_UPCOMING_DAYS))
 
     if start_offset is None:
         return [end_offset or 0]
@@ -107,7 +110,7 @@ def build_flashscore_day_offsets_from_filters(
 
     safe_start = min(start_offset, end_offset)
     safe_end = max(start_offset, end_offset)
-    safe_end = min(safe_end, safe_start + FLASHSCORE_DEFAULT_UPCOMING_DAYS)
+    safe_end = min(safe_end, safe_start + FLASHSCORE_DEFAULT_UPCOMING_DAYS - 1)
 
     return list(range(safe_start, safe_end + 1))
 
@@ -128,7 +131,22 @@ def build_matches_cache_name(
     )
 
 
-# Cette fonction construit un nom de cache stable pour les listes de matchs FlashScore.
+# Cette fonction retourne la date UTC courante pour stabiliser les clés de cache et les tests.
+def get_current_utc_date() -> date:
+    return datetime.now(UTC).date()
+
+
+# Cette fonction retourne l'instant UTC courant utilisé pour filtrer les matchs déjà commencés.
+def get_current_utc_datetime() -> datetime:
+    return datetime.now(UTC)
+
+
+# Cette fonction calcule la date civile réelle couverte par un day_offset FlashScore.
+def build_flashscore_target_date(day_offset: int) -> date:
+    return get_current_utc_date() + timedelta(days=day_offset)
+
+
+# Cette fonction construit une clé de cache partagée entre compétitions pour une date FlashScore réelle.
 def build_flashscore_matches_cache_name(
     day_offset: int,
     status: str | None,
@@ -136,15 +154,99 @@ def build_flashscore_matches_cache_name(
     timezone: str,
     competition_code: str | None,
 ) -> str:
+    del status, team, competition_code
     return build_cache_name(
         "flashscore_matches",
-        competition_code or "all_competitions",
-        "day",
-        day_offset,
-        status or "all_statuses",
-        team or "all_teams",
+        build_flashscore_target_date(day_offset).isoformat(),
         timezone,
     )
+
+
+# Cette fonction transforme une date ISO de match en datetime UTC comparable.
+def parse_match_utc_datetime(value: Any) -> datetime | None:
+    if not isinstance(value, str) or not value.strip():
+        return None
+
+    normalized_value = value.strip().replace("Z", "+00:00")
+
+    try:
+        parsed_value = datetime.fromisoformat(normalized_value)
+    except ValueError:
+        return None
+
+    if parsed_value.tzinfo is None:
+        return parsed_value.replace(tzinfo=UTC)
+
+    return parsed_value.astimezone(UTC)
+
+
+# Cette fonction retire les matchs SCHEDULED dont le coup d'envoi est déjà passé.
+def filter_matches_before_kickoff(
+    matches: list[dict[str, Any]],
+    requested_status: str | None,
+) -> list[dict[str, Any]]:
+    if str(requested_status or "").upper() != "SCHEDULED":
+        return matches
+
+    current_time = get_current_utc_datetime()
+    upcoming_matches: list[dict[str, Any]] = []
+
+    for match in matches:
+        kickoff_time = parse_match_utc_datetime(match.get("utcDate"))
+
+        if kickoff_time is not None and kickoff_time > current_time:
+            upcoming_matches.append(match)
+
+    return upcoming_matches
+
+
+# Cette fonction applique localement les filtres de route sur le cache FlashScore partagé.
+def filter_cached_flashscore_matches(
+    matches: list[dict[str, Any]],
+    status: str | None,
+    team: str | None,
+    competition_code: str | None,
+) -> tuple[list[dict[str, Any]], dict[str, int]]:
+    status_filtered_matches = filter_flashscore_matches_by_status(matches, status)
+    competition_filtered_matches = filter_flashscore_matches_by_competition(
+        status_filtered_matches,
+        competition_code,
+    )
+    team_filtered_matches = filter_flashscore_matches_by_team(
+        competition_filtered_matches,
+        team,
+    )
+    upcoming_matches = filter_matches_before_kickoff(
+        team_filtered_matches,
+        requested_status=status,
+    )
+
+    return upcoming_matches, {
+        "source_matches_count": len(matches),
+        "status_filtered_count": len(status_filtered_matches),
+        "competition_filtered_count": len(competition_filtered_matches),
+        "team_filtered_count": len(team_filtered_matches),
+        "filtered_count": len(upcoming_matches),
+    }
+
+
+# Cette fonction adapte les métadonnées du cache partagé aux filtres de la requête courante.
+def build_filtered_flashscore_metadata(
+    source_metadata: dict[str, Any],
+    matches: list[dict[str, Any]],
+    filter_counts: dict[str, int],
+    status: str | None,
+    team: str | None,
+    competition_code: str | None,
+) -> dict[str, Any]:
+    return {
+        **source_metadata,
+        "status": "success" if matches else "empty",
+        "requested_status": status,
+        "requested_competition_code": competition_code,
+        "team_filter": team,
+        **filter_counts,
+    }
 
 
 # Cette fonction construit un nom de cache stable pour les fiches match FlashScore.
@@ -193,7 +295,7 @@ def build_flashscore_match_data_freshness(
     }
 
 
-# Cette fonction récupère la liste des matchs FlashScore depuis le cache ou RapidAPI.
+# Cette fonction récupère une journée FlashScore depuis un cache source partagé puis applique les filtres locaux.
 def get_cached_flashscore_matches(
     day_offset: int,
     status: str | None,
@@ -215,9 +317,24 @@ def get_cached_flashscore_matches(
         ttl_minutes=FLASHSCORE_MATCHES_CACHE_TTL_MINUTES,
     ):
         cached_data = cached_payload.get("data", {})
+        source_matches = cached_data.get("matches", [])
+        source_metadata = cached_data.get("metadata", {})
+        filtered_matches, filter_counts = filter_cached_flashscore_matches(
+            source_matches,
+            status=status,
+            team=team,
+            competition_code=competition_code,
+        )
         return (
-            cached_data.get("matches", []),
-            cached_data.get("metadata", {}),
+            filtered_matches,
+            build_filtered_flashscore_metadata(
+                source_metadata=source_metadata,
+                matches=filtered_matches,
+                filter_counts=filter_counts,
+                status=status,
+                team=team,
+                competition_code=competition_code,
+            ),
             build_data_freshness(
                 cache_payload=cached_payload,
                 from_cache=True,
@@ -225,16 +342,16 @@ def get_cached_flashscore_matches(
             ),
         )
 
-    matches, metadata = get_normalized_flashscore_matches_by_day(
+    source_matches, source_metadata = get_normalized_flashscore_matches_by_day(
         day_offset=day_offset,
-        status=status,
-        team=team,
+        status=None,
+        team=None,
         timezone=timezone,
-        competition_code=competition_code,
+        competition_code=None,
     )
 
-    if metadata.get("status") not in {"success", "empty"}:
-        return matches, metadata, {
+    if source_metadata.get("status") not in {"success", "empty"}:
+        return source_matches, source_metadata, {
             "source": FLASHSCORE_SOURCE,
             "from_cache": False,
             "updated_at": None,
@@ -243,13 +360,29 @@ def get_cached_flashscore_matches(
 
     saved_payload = save_cache(
         cache_name,
-        {"matches": matches, "metadata": metadata},
+        {"matches": source_matches, "metadata": source_metadata},
         source=FLASHSCORE_SOURCE,
+    )
+    saved_data = saved_payload.get("data", {})
+    saved_matches = saved_data.get("matches", [])
+    saved_metadata = saved_data.get("metadata", source_metadata)
+    filtered_matches, filter_counts = filter_cached_flashscore_matches(
+        saved_matches,
+        status=status,
+        team=team,
+        competition_code=competition_code,
     )
 
     return (
-        saved_payload["data"].get("matches", []),
-        saved_payload["data"].get("metadata", metadata),
+        filtered_matches,
+        build_filtered_flashscore_metadata(
+            source_metadata=saved_metadata,
+            matches=filtered_matches,
+            filter_counts=filter_counts,
+            status=status,
+            team=team,
+            competition_code=competition_code,
+        ),
         build_data_freshness(
             cache_payload=saved_payload,
             from_cache=False,
@@ -333,6 +466,7 @@ def get_cached_flashscore_matches_for_offsets(
         if metadata_status in {"success", "empty"}:
             successful_days += 1
             merge_flashscore_matches_by_id(matches_by_id, matches)
+            from_cache_flags.append(bool(freshness.get("from_cache")))
         elif first_error_metadata is None:
             first_error_metadata = metadata
 
@@ -340,8 +474,6 @@ def get_cached_flashscore_matches_for_offsets(
 
         if freshness_updated_at:
             freshness_updates.append(freshness_updated_at)
-
-        from_cache_flags.append(bool(freshness.get("from_cache")))
 
     merged_matches = sort_flashscore_matches_by_date(list(matches_by_id.values()))
 
@@ -367,6 +499,7 @@ def get_cached_flashscore_matches_for_offsets(
         "day_offsets": unique_day_offsets,
         "days_requested": len(unique_day_offsets),
         "days_successful": successful_days,
+        "days_failed": len(unique_day_offsets) - successful_days,
         "requested_status": status,
         "requested_competition_code": competition_code,
         "team_filter": team,
@@ -1678,7 +1811,9 @@ async def get_match_predictions(match_id: int) -> dict[str, Any]:
 # Schéma de communication du fichier :
 # matches.py
 # ├── utilise rapidapi_flashscore_client.py pour /api/matches, /api/matches/{match_id} et le contexte partiel FlashScore
-# ├── interroge plusieurs journées FlashScore quand aucun filtre de date n’est fourni
+# ├── interroge au maximum sept journées FlashScore quand aucun filtre de date n’est fourni
+# ├── partage le cache source par date réelle entre compétitions puis filtre localement
+# ├── retire les matchs SCHEDULED dont le coup d’envoi est déjà passé
 # ├── utilise cache_service.py pour le cache FlashScore et le fallback Football-Data temporaire
 # ├── utilise match_service.py pour le formatage et le fallback Football-Data temporaire
 # ├── utilise team_history_service.py pour produire les historiques récents, face-à-face, l’analyse et les prédictions FlashScore partielles

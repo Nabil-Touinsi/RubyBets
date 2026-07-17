@@ -13,6 +13,7 @@ from starlette.concurrency import run_in_threadpool
 from app.services.ml_clubs_v17_8_feature_builder import BUILDER_SOURCE
 from app.services.rapidapi_flashscore_client import (
     get_normalized_flashscore_match_details,
+    parse_rubybets_utc_datetime,
 )
 from app.services.team_history_service import build_team_history_response
 from app.v19.acquisition.flashscore_odds_adapter import (
@@ -126,6 +127,27 @@ async def load_target_match(
     raise V19ProductMatchProviderError(
         f"target_match_provider_unavailable:{status}"
     )
+
+
+# Vérifie que le match cible est encore strictement exploitable avant son coup d'envoi.
+def ensure_target_match_is_before_kickoff(
+    match_data: dict[str, Any],
+    computed_at_utc: datetime,
+) -> None:
+    match_status = str(match_data.get("status") or "").strip().upper()
+
+    if match_status != "SCHEDULED":
+        raise V19ProductMatchInvalidError(
+            f"target_match_not_scheduled:{match_status or 'missing'}"
+        )
+
+    kickoff_time = parse_rubybets_utc_datetime(match_data.get("utcDate"))
+
+    if kickoff_time is None:
+        raise V19ProductMatchInvalidError("target_match_kickoff_missing_or_invalid")
+
+    if ensure_utc_datetime(kickoff_time) <= computed_at_utc:
+        raise V19ProductMatchInvalidError("target_match_kickoff_not_future")
 
 
 # Extrait les identifiants Market en privilégiant les participants d'événement FlashScore prouvés.
@@ -298,6 +320,10 @@ async def build_v19_prediction_for_match(
     source_match_id, home_team_id, away_team_id = extract_target_match_identity(
         match_data
     )
+    ensure_target_match_is_before_kickoff(
+        match_data=match_data,
+        computed_at_utc=computed_at_utc,
+    )
 
     market_payload, market_metadata = await load_market_payload(
         match_id=match_id,
@@ -354,6 +380,7 @@ async def build_v19_prediction_for_match(
 # Schéma de communication :
 # rapidapi_flashscore_client.py / team_history_service.py / flashscore_odds_provider.py
 #   -> fournissent match cible, historiques et payload odds au service
+#   -> le match cible est rejeté avant les autres appels si son coup d’envoi est passé
 # flashscore_odds_adapter.py / market_feature_builder.py / experts legacy
 #   -> normalisent les sources puis produisent quatre ExpertCandidateV1
 # decision_orchestrator.py

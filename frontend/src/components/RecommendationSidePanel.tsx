@@ -1,9 +1,9 @@
-// Ce composant affiche la sidebar pédagogique et responsable de l’écran Recommandation.
+// Ce composant affiche la sidebar pédagogique et responsable de l’écran Sélection V19.
 
-import type { MultiMatchRecommendationResponse } from "../models/rubybets";
+import type { V19SelectionResponse } from "../models/rubybets";
 
 type RecommendationSidePanelProps = {
-  multiMatchRecommendation: MultiMatchRecommendationResponse | null;
+  multiMatchRecommendation: V19SelectionResponse | null;
 };
 
 // Ce composant affiche une ligne courte dans la carte pédagogique.
@@ -16,7 +16,21 @@ function SidePanelItem({ children }: { children: string }) {
   );
 }
 
-// Ce composant regroupe les explications de sélection et le rappel responsable.
+// Cette fonction construit la note publique affichée après une génération V19.
+function getSelectionNote(
+  multiMatchRecommendation: V19SelectionResponse | null,
+) {
+  if (!multiMatchRecommendation) {
+    return (
+      "Lancez une génération pour afficher la synthèse publique de la " +
+      "sélection proposée."
+    );
+  }
+
+  return `${multiMatchRecommendation.selection_explanation.headline}. ${multiMatchRecommendation.selection_explanation.summary}`;
+}
+
+// Ce composant regroupe l’explication publique V19 et le rappel responsable.
 function RecommendationSidePanel({
   multiMatchRecommendation,
 }: RecommendationSidePanelProps) {
@@ -33,26 +47,25 @@ function RecommendationSidePanel({
 
         <div className="rb-reco-side-list">
           <SidePanelItem>
-            Analyse des matchs disponibles à partir des données avant-match.
+            Analyse des décisions officielles V19 pour les matchs disponibles.
           </SidePanelItem>
           <SidePanelItem>
-            Prise en compte de la confiance, du risque et du contexte disponible.
+            Application du profil de sélectivité choisi sans classement par score brut.
           </SidePanelItem>
           <SidePanelItem>
-            Sélection cohérente, sans garantie de résultat sportif.
+            Exclusion systématique des abstentions et des décisions incompatibles.
           </SidePanelItem>
         </div>
 
+        <p className="rb-reco-side-note">
+          {getSelectionNote(multiMatchRecommendation)}
+        </p>
+
         {multiMatchRecommendation ? (
           <p className="rb-reco-side-note">
-            {multiMatchRecommendation.selection_logic.description}
+            {multiMatchRecommendation.profile.description}
           </p>
-        ) : (
-          <p className="rb-reco-side-note">
-            Lancez une génération pour afficher une lecture synthétique de la
-            sélection proposée.
-          </p>
-        )}
+        ) : null}
       </section>
 
       <section className="rb-reco-side-card rb-reco-side-card--responsible">
@@ -79,7 +92,7 @@ export default RecommendationSidePanel;
 
 // Schéma de communication du fichier :
 // RecommendationSidePanel.tsx
-// ├── reçoit multiMatchRecommendation depuis RecommendationScreen.tsx
-// ├── affiche la logique de sélection si elle existe
-// ├── affiche le rappel responsable de l’écran
-// └── ne modifie ni backend, ni API, ni logique métier
+// ├── reçoit la réponse publique V19 depuis RecommendationScreen.tsx
+// ├── affiche selection_explanation et la description du profil
+// ├── explique l’exclusion des abstentions sans exposer les détails internes
+// └── conserve le rappel responsable sans modifier l’API ni la logique métier

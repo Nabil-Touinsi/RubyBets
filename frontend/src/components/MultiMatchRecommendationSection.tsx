@@ -1,30 +1,37 @@
-// Ce composant affiche le générateur de sélection multi-matchs issu du modèle national RubyBets.
+// Ce composant affiche le générateur de sélection multi-matchs fondé sur les décisions publiques RubyBets V19.
 
-import type { CSSProperties } from "react";
-import type { MultiMatchRecommendationResponse } from "../models/rubybets";
+import type {
+  Match,
+  V19SelectionDataQuality,
+  V19SelectionItem,
+  V19SelectionResponse,
+} from "../models/rubybets";
 import {
   cleanTextItems,
-  formatRiskLevel,
   getTeamInitials,
   getTeamShortName,
 } from "../helpers/displayText";
 
-type RiskLevel = "low" | "medium" | "high";
+type SelectionProfileLevel = "low" | "medium" | "high";
+type RecommendationTeam = Match["home_team"];
 
 type MultiMatchRecommendationSectionProps = {
+  matches: Match[];
+  activeCompetitionLabel: string;
   recommendationMatchCount: number;
-  recommendationRiskLevel: RiskLevel;
-  multiMatchRecommendation: MultiMatchRecommendationResponse | null;
+  recommendationSelectionProfile: SelectionProfileLevel;
+  multiMatchRecommendation: V19SelectionResponse | null;
   multiMatchStatus: string;
   onChangeMatchCount: (count: number) => void;
-  onChangeRiskLevel: (riskLevel: RiskLevel) => void;
+  onChangeSelectionProfile: (profile: SelectionProfileLevel) => void;
   onGenerateRecommendation: () => void;
 };
 
-type RecommendationItem =
-  MultiMatchRecommendationResponse["recommendations"][number];
-
-type RecommendationTeam = RecommendationItem["match"]["home_team"];
+type QualityPresentation = {
+  label: string;
+  detail: string;
+  tone: SelectionProfileLevel;
+};
 
 // Cette fonction détecte l’état de génération à partir du statut existant.
 function isGenerationPending(status: string) {
@@ -32,7 +39,11 @@ function isGenerationPending(status: string) {
 }
 
 // Cette fonction formate une date courte pour garder le tableau compact.
-function formatShortDate(value: string) {
+function formatShortDate(value: string | null | undefined) {
+  if (!value) {
+    return "Date à confirmer";
+  }
+
   const date = new Date(value);
 
   if (Number.isNaN(date.getTime())) {
@@ -48,71 +59,58 @@ function formatShortDate(value: string) {
   }).format(date);
 }
 
-// Cette fonction retourne un nom court d’équipe.
-function getTeamLabel(team: RecommendationTeam) {
-  return getTeamShortName(team);
+// Cette fonction retourne un nom court d’équipe avec un fallback responsable.
+function getTeamLabel(team: RecommendationTeam | null | undefined) {
+  return team ? getTeamShortName(team) : "Équipe à confirmer";
 }
 
-// Cette fonction convertit une probabilité modèle en pourcentage affichable.
-function formatProbabilityPercent(value: number | null | undefined) {
-  if (typeof value !== "number" || Number.isNaN(value)) {
-    return "—";
+// Cette fonction retourne le libellé public du profil choisi avant la première génération.
+function formatSelectionProfile(profile: SelectionProfileLevel) {
+  const labels: Record<SelectionProfileLevel, string> = {
+    low: "Prudence renforcée",
+    medium: "Équilibre",
+    high: "Ouverture contrôlée",
+  };
+
+  return labels[profile];
+}
+
+// Cette fonction convertit le profil public V19 en suffixe compatible avec les badges existants.
+function getProfileTone(value: string): SelectionProfileLevel {
+  const normalizedValue = value.toUpperCase();
+
+  if (normalizedValue === "LOW") {
+    return "low";
   }
 
-  return `${Math.round(value * 100)}%`;
-}
-
-// Cette fonction convertit une probabilité modèle en nombre utilisable par le ring CSS.
-function getProbabilityPercentValue(value: number | null | undefined) {
-  if (typeof value !== "number" || Number.isNaN(value)) {
-    return 0;
+  if (normalizedValue === "HIGH") {
+    return "high";
   }
 
-  return Math.round(value * 100);
+  return "medium";
 }
 
-// Cette fonction calcule une confiance globale à partir des selected_confidence réels du backend.
-function getGlobalConfidence(
-  multiMatchRecommendation: MultiMatchRecommendationResponse | null,
-) {
-  const recommendations = multiMatchRecommendation?.recommendations ?? [];
-  const confidences = recommendations
-    .map((item) => item.selected_confidence)
-    .filter((value): value is number => typeof value === "number");
-
-  if (confidences.length === 0) {
-    return "—";
-  }
-
-  const total = confidences.reduce((sum, confidence) => sum + confidence, 0);
-  return formatProbabilityPercent(total / confidences.length);
-}
-
-// Cette fonction retourne un libellé de marché clair pour les signaux du selector national.
-function formatMarketLabel(market: string | null) {
+// Cette fonction retourne un libellé de marché clair pour les décisions publiques V19.
+function formatMarketLabel(market: string) {
   const labels: Record<string, string> = {
+    STRICT_1X2: "1X2",
     DOUBLE_CHANCE: "Double chance",
-    "1X2": "1X2",
-    TEAM_A_WIN: "Victoire équipe A",
-    TEAM_B_WIN: "Victoire équipe B",
-    DRAW: "Match nul",
     OVER_1_5: "Plus de 1,5 but",
     OVER_2_5: "Plus de 2,5 buts",
     BTTS: "BTTS",
   };
 
-  if (!market) {
-    return "Marché à confirmer";
-  }
-
   return labels[market] ?? market.replaceAll("_", " ");
 }
 
-// Cette fonction traduit une prédiction technique du selector en phrase utilisateur.
-function formatSelectedPrediction(item: RecommendationItem) {
-  const prediction = item.selected_prediction;
-  const homeName = getTeamLabel(item.match.home_team);
-  const awayName = getTeamLabel(item.match.away_team);
+// Cette fonction traduit une recommandation technique V19 en phrase utilisateur.
+function formatSelectedPrediction(
+  item: V19SelectionItem,
+  match: Match | null,
+) {
+  const prediction = item.recommendation.value;
+  const homeName = getTeamLabel(match?.home_team);
+  const awayName = getTeamLabel(match?.away_team);
 
   const labels: Record<string, string> = {
     TEAM_A_WIN: `Victoire ${homeName}`,
@@ -125,63 +123,96 @@ function formatSelectedPrediction(item: RecommendationItem) {
     NO: "Non",
   };
 
-  if (!prediction) {
-    return "Sélection à confirmer";
-  }
-
   return labels[prediction] ?? prediction.replaceAll("_", " ");
 }
 
-// Cette fonction retourne une lecture courte à partir du selector_result reçu du backend.
-function formatSelectionSummary(item: RecommendationItem) {
-  if (item.selected_market === "DOUBLE_CHANCE") {
-    return "Signal prudent issu du sélecteur national";
+// Cette fonction normalise les alertes de qualité, quel que soit leur format public.
+function normalizeQualityFlags(value: string[] | string | null) {
+  if (Array.isArray(value)) {
+    return cleanTextItems(value);
   }
 
-  if (item.consistency_checks?.status === "adjusted") {
-    return "Signal corrigé par cohérence métier";
+  if (typeof value === "string") {
+    return cleanTextItems(value.split(","));
   }
 
-  return "Signal ML national sélectionné";
+  return [];
 }
 
-// Cette fonction résume la règle du sélecteur sans surcharger le tableau.
-function formatSelectorRule(item: RecommendationItem) {
-  if (item.consistency_checks?.status === "adjusted") {
-    return "Cohérence inter-marchés appliquée. Le signal reste encadré par le modèle national expérimental.";
-  }
+// Cette fonction transforme les statuts publics V19 en lecture simple de qualité des données.
+function getQualityPresentation(
+  quality: V19SelectionDataQuality,
+): QualityPresentation {
+  const targetReady = quality.target_match_provider_status === "success";
+  const marketStatus = quality.market_module_status?.toUpperCase() ?? "";
+  const historyStatus = quality.history_data_status?.toLowerCase() ?? "";
+  const qualityFlags = normalizeQualityFlags(quality.market_quality_flags);
 
-  return item.selector_rule || "Signal retenu par le sélecteur national expérimental.";
-}
+  const historyAcceptable =
+    historyStatus === "" ||
+    historyStatus === "available" ||
+    historyStatus === "partial";
 
-// Cette fonction prépare le message affiché quand aucune sélection n’est retournée par le backend.
-function getEmptyStateContent(
-  multiMatchRecommendation: MultiMatchRecommendationResponse | null,
-  recommendationRiskLevel: RiskLevel,
-  multiMatchStatus: string,
-) {
-  const requestedRiskLevel =
-    multiMatchRecommendation?.request.risk_level ?? recommendationRiskLevel;
-
-  const isBackendEmptyResponse =
-    multiMatchRecommendation?.status === "empty" ||
-    multiMatchRecommendation?.selected_count === 0;
-
-  if (isBackendEmptyResponse && requestedRiskLevel === "high") {
+  if (
+    targetReady &&
+    marketStatus === "READY" &&
+    historyAcceptable &&
+    qualityFlags.length === 0
+  ) {
     return {
-      title: "Aucune sélection à risque élevé disponible",
-      message:
-        "Le modèle national n’a identifié aucun signal suffisamment cohérent pour ce niveau de risque sur les matchs actuellement disponibles.",
-      hint: "Vous pouvez essayer un niveau de risque moyen ou faible.",
+      label: "Disponible",
+      detail: "Sources principales disponibles",
+      tone: "low",
     };
   }
 
-  if (isBackendEmptyResponse) {
+  if (
+    targetReady &&
+    (marketStatus === "READY" || marketStatus === "DEGRADED")
+  ) {
     return {
-      title: `Aucune sélection ${formatRiskLevel(requestedRiskLevel).toLowerCase()} disponible`,
-      message:
-        "Aucun signal compatible avec ce niveau de risque n’est disponible sur les matchs actuellement calculés.",
-      hint: "Vous pouvez modifier le niveau de risque ou relancer la génération plus tard.",
+      label: "Partielle",
+      detail: "Données suffisantes avec limites",
+      tone: "medium",
+    };
+  }
+
+  return {
+    label: "À surveiller",
+    detail: "Disponibilité réduite des données",
+    tone: "high",
+  };
+}
+
+// Cette fonction choisit une explication publique courte pour la colonne Analyse clé.
+function getAnalysisKey(item: V19SelectionItem) {
+  const supportingFactors = cleanTextItems(
+    item.explanation.supporting_factors,
+  );
+  const cautionFactors = cleanTextItems(item.explanation.caution_factors);
+
+  if (supportingFactors.length > 0) {
+    return supportingFactors[0];
+  }
+
+  if (cautionFactors.length > 0) {
+    return cautionFactors[0];
+  }
+
+  return item.explanation.summary;
+}
+
+// Cette fonction prépare le message affiché quand aucune sélection V19 n’est disponible.
+function getEmptyStateContent(
+  multiMatchRecommendation: V19SelectionResponse | null,
+  multiMatchStatus: string,
+) {
+  if (multiMatchRecommendation?.status === "EMPTY") {
+    return {
+      title: multiMatchRecommendation.selection_explanation.headline,
+      message: multiMatchRecommendation.selection_explanation.summary,
+      hint:
+        "Modifiez le profil de sélectivité ou relancez la génération lorsque de nouveaux matchs seront disponibles.",
     };
   }
 
@@ -189,19 +220,25 @@ function getEmptyStateContent(
     title: "Aucune sélection affichée",
     message: multiMatchStatus,
     hint:
-      "Lancez une génération pour afficher une sélection structurée à partir des signaux déjà produits par le modèle national.",
+      "Lancez une génération pour analyser les décisions officielles V19 disponibles.",
   };
 }
 
 // Ce composant affiche un logo d’équipe avec fallback.
-function TeamLogo({ team }: { team: RecommendationTeam }) {
-  const teamLabel = getTeamLabel(team);
-
+function TeamLogo({
+  team,
+  label,
+}: {
+  team: RecommendationTeam | null | undefined;
+  label: string;
+}) {
   return (
-    <span className="rb-reco-team-logo" aria-label={`Logo ${teamLabel}`}>
-      <span className="rb-reco-team-logo__fallback">{getTeamInitials(team)}</span>
+    <span className="rb-reco-team-logo" aria-label={`Logo ${label}`}>
+      <span className="rb-reco-team-logo__fallback">
+        {team ? getTeamInitials(team) : "?"}
+      </span>
 
-      {team.crest ? (
+      {team?.crest ? (
         <img
           src={team.crest}
           alt=""
@@ -247,25 +284,28 @@ function MatchCountSegments({
   );
 }
 
-// Ce composant affiche les boutons segmentés du niveau de risque.
-function RiskLevelSegments({
+// Ce composant affiche les boutons segmentés du profil de sélectivité V19.
+function SelectionProfileSegments({
   value,
   disabled,
   onChange,
 }: {
-  value: RiskLevel;
+  value: SelectionProfileLevel;
   disabled: boolean;
-  onChange: (riskLevel: RiskLevel) => void;
+  onChange: (profile: SelectionProfileLevel) => void;
 }) {
-  const options: Array<{ value: RiskLevel; label: string }> = [
-    { value: "low", label: "Faible" },
-    { value: "medium", label: "Moyen" },
-    { value: "high", label: "Élevé" },
+  const options: Array<{
+    value: SelectionProfileLevel;
+    label: string;
+  }> = [
+    { value: "low", label: "Prudent" },
+    { value: "medium", label: "Équilibré" },
+    { value: "high", label: "Ouvert" },
   ];
 
   return (
     <div className="rb-reco-segment-group">
-      <span>Niveau de risque</span>
+      <span>Profil de sélectivité</span>
       <div>
         {options.map((option) => (
           <button
@@ -283,35 +323,42 @@ function RiskLevelSegments({
   );
 }
 
-// Ce composant affiche une ligne de sélection issue du modèle national expérimental.
-function RecommendationRow({ item }: { item: RecommendationItem }) {
-  const confidencePercent = getProbabilityPercentValue(item.selected_confidence);
-  const reliabilityLabel = formatProbabilityPercent(item.reference_reliability);
-  const riskLevel = item.risk_level || "medium";
+// Ce composant affiche une ligne de sélection issue du contrat public V19.
+function RecommendationRow({
+  item,
+  match,
+  profileLabel,
+  profileValue,
+}: {
+  item: V19SelectionItem;
+  match: Match | null;
+  profileLabel: string;
+  profileValue: string;
+}) {
+  const homeLabel = getTeamLabel(match?.home_team);
+  const awayLabel = getTeamLabel(match?.away_team);
+  const quality = getQualityPresentation(item.data_quality);
+  const profileTone = getProfileTone(profileValue);
 
   return (
     <article className="rb-reco-table-row">
       <div className="rb-reco-table-cell rb-reco-match-cell">
         <div className="rb-reco-match-meta">
-          <strong>{item.match.competition.name}</strong>
-          <span>{formatShortDate(item.match.utc_date)}</span>
+          <strong>{match?.competition.name ?? `Match V19 #${item.match_id}`}</strong>
+          <span>{formatShortDate(match?.utc_date)}</span>
         </div>
 
         <div className="rb-reco-fixture">
           <span className="rb-reco-fixture-team rb-reco-fixture-team--home">
-            <TeamLogo team={item.match.home_team} />
-            <span className="rb-reco-team-name">
-              {getTeamLabel(item.match.home_team)}
-            </span>
+            <TeamLogo team={match?.home_team} label={homeLabel} />
+            <span className="rb-reco-team-name">{homeLabel}</span>
           </span>
 
           <span className="rb-reco-vs">VS</span>
 
           <span className="rb-reco-fixture-team rb-reco-fixture-team--away">
-            <TeamLogo team={item.match.away_team} />
-            <span className="rb-reco-team-name">
-              {getTeamLabel(item.match.away_team)}
-            </span>
+            <TeamLogo team={match?.away_team} label={awayLabel} />
+            <span className="rb-reco-team-name">{awayLabel}</span>
           </span>
         </div>
       </div>
@@ -319,82 +366,93 @@ function RecommendationRow({ item }: { item: RecommendationItem }) {
       <div className="rb-reco-table-cell rb-reco-selection-cell">
         <div className="rb-reco-selection-card">
           <span className="rb-reco-market-badge rb-reco-market-badge--solo">
-            {formatMarketLabel(item.selected_market)}
+            {formatMarketLabel(item.recommendation.market_type)}
           </span>
-          <strong>{formatSelectedPrediction(item)}</strong>
-          <p>{formatSelectionSummary(item)}</p>
+          <strong>{formatSelectedPrediction(item, match)}</strong>
+          <p>{item.explanation.summary}</p>
         </div>
       </div>
 
       <div className="rb-reco-table-cell rb-reco-confidence-cell">
         <span
-          className="rb-reco-confidence-ring"
-          style={
-            { "--rb-reco-confidence": `${confidencePercent}%` } as CSSProperties
-          }
+          className={`rb-reco-risk-badge rb-reco-risk-badge--${quality.tone}`}
         >
-          {formatProbabilityPercent(item.selected_confidence)}
+          {quality.label}
         </span>
-        <small>Fiabilité réf. {reliabilityLabel}</small>
+        <small>{quality.detail}</small>
       </div>
 
       <div className="rb-reco-table-cell">
-        <span className={`rb-reco-risk-badge rb-reco-risk-badge--${riskLevel}`}>
-          {formatRiskLevel(riskLevel)}
+        <span
+          className={`rb-reco-risk-badge rb-reco-risk-badge--${profileTone}`}
+        >
+          {profileLabel}
         </span>
       </div>
 
       <div className="rb-reco-table-cell">
-        <p>{formatSelectorRule(item)}</p>
+        <p>{getAnalysisKey(item)}</p>
       </div>
     </article>
   );
 }
 
-// Ce composant affiche les limites de la recommandation sous forme compacte.
-function RecommendationLimits({
-  limits,
+// Ce composant affiche les exclusions publiques et le rappel responsable sans codes internes détaillés.
+function SelectionNotices({
+  response,
 }: {
-  limits: MultiMatchRecommendationResponse["limits"];
+  response: V19SelectionResponse;
 }) {
-  const cleanedLimits = cleanTextItems(limits).slice(0, 2);
+  const excludedMessages = cleanTextItems(
+    response.excluded_matches.map((item) => item.summary),
+  );
+  const messages = cleanTextItems([
+    ...excludedMessages,
+    response.responsible_note,
+  ]).slice(0, 3);
 
-  if (cleanedLimits.length === 0) {
+  if (messages.length === 0) {
     return null;
   }
 
   return (
     <div className="rb-reco-limits">
-      {cleanedLimits.map((limit) => (
-        <p key={limit}>
+      {messages.map((message) => (
+        <p key={message}>
           <span>ⓘ</span>
-          {limit}
+          {message}
         </p>
       ))}
     </div>
   );
 }
 
-// Ce composant permet de paramétrer, générer et afficher une sélection multi-matchs expérimentale.
+// Ce composant permet de paramétrer, générer et afficher une sélection multi-matchs V19.
 function MultiMatchRecommendationSection({
+  matches,
+  activeCompetitionLabel,
   recommendationMatchCount,
-  recommendationRiskLevel,
+  recommendationSelectionProfile,
   multiMatchRecommendation,
   multiMatchStatus,
   onChangeMatchCount,
-  onChangeRiskLevel,
+  onChangeSelectionProfile,
   onGenerateRecommendation,
 }: MultiMatchRecommendationSectionProps) {
   const isGenerating = isGenerationPending(multiMatchStatus);
+  const candidateCount = matches.length;
+  const canGenerateSelection = candidateCount >= 2;
   const hasRecommendations =
     Boolean(multiMatchRecommendation) &&
-    multiMatchRecommendation!.recommendations.length > 0;
-
-    const emptyStateContent = getEmptyStateContent(
+    multiMatchRecommendation!.selections.length > 0;
+  const emptyStateContent = getEmptyStateContent(
     multiMatchRecommendation,
-    recommendationRiskLevel,
     multiMatchStatus,
   );
+  const profileLabel = multiMatchRecommendation
+    ? multiMatchRecommendation.profile.label
+    : formatSelectionProfile(recommendationSelectionProfile);
+
   return (
     <section className="rb-reco-generator-panel">
       <div className="rb-reco-controls-panel">
@@ -404,17 +462,17 @@ function MultiMatchRecommendationSection({
           onChange={onChangeMatchCount}
         />
 
-        <RiskLevelSegments
-          value={recommendationRiskLevel}
+        <SelectionProfileSegments
+          value={recommendationSelectionProfile}
           disabled={isGenerating}
-          onChange={onChangeRiskLevel}
+          onChange={onChangeSelectionProfile}
         />
 
         <div className="rb-reco-action-box">
           <button
             type="button"
             onClick={onGenerateRecommendation}
-            disabled={isGenerating}
+            disabled={isGenerating || !canGenerateSelection}
           >
             {isGenerating
               ? "Génération en cours..."
@@ -423,7 +481,11 @@ function MultiMatchRecommendationSection({
 
           <p role="status">
             <span>✧</span>
-            Signaux issus du modèle national expérimental
+            {canGenerateSelection
+              ? `${activeCompetitionLabel} · ${candidateCount} matchs candidats`
+              : candidateCount === 0
+                ? `${activeCompetitionLabel} · aucun match candidat. Au moins 2 matchs sont nécessaires.`
+                : `${activeCompetitionLabel} · 1 match candidat. Au moins 2 matchs sont nécessaires.`}
           </p>
         </div>
       </div>
@@ -432,7 +494,7 @@ function MultiMatchRecommendationSection({
         <div className="rb-reco-results-header">
           <div>
             <p className="rb-reco-kicker">Votre sélection multi-matchs</p>
-            <h3>Sélection analytique nationale</h3>
+            <h3>Sélection analytique V19</h3>
           </div>
 
           <div className="rb-reco-results-stats">
@@ -441,21 +503,21 @@ function MultiMatchRecommendationSection({
               <strong>{multiMatchRecommendation?.selected_count ?? "—"}</strong>
             </p>
             <p>
-              <span>Confiance globale</span>
-              <strong>{getGlobalConfidence(multiMatchRecommendation)}</strong>
+              <span>
+                {multiMatchRecommendation ? "Matchs évalués" : "Candidats"}
+              </span>
+              <strong>
+                {multiMatchRecommendation?.evaluated_count ?? candidateCount}
+              </strong>
             </p>
             <p>
-              <span>Risque global</span>
-              <strong>
-                {multiMatchRecommendation
-                  ? formatRiskLevel(multiMatchRecommendation.request.risk_level)
-                  : formatRiskLevel(recommendationRiskLevel)}
-              </strong>
+              <span>Profil</span>
+              <strong>{profileLabel}</strong>
             </p>
           </div>
         </div>
 
-                {!hasRecommendations ? (
+        {!hasRecommendations ? (
           <div className="rb-reco-empty-state">
             <h3>{emptyStateContent.title}</h3>
             <p>{emptyStateContent.message}</p>
@@ -463,26 +525,31 @@ function MultiMatchRecommendationSection({
           </div>
         ) : null}
 
-        {hasRecommendations ? (
+        {hasRecommendations && multiMatchRecommendation ? (
           <>
             <div className="rb-reco-table">
               <div className="rb-reco-table-head">
                 <span>Match</span>
                 <span>Marché & sélection</span>
-                <span>Confiance</span>
-                <span>Risque</span>
+                <span>Qualité des données</span>
+                <span>Profil</span>
                 <span>Analyse clé</span>
               </div>
 
-              {multiMatchRecommendation!.recommendations.map((item) => (
+              {multiMatchRecommendation.selections.map((item) => (
                 <RecommendationRow
                   item={item}
-                  key={`${item.match.id}-${item.selected_market}`}
+                  match={
+                    matches.find((match) => match.id === item.match_id) ?? null
+                  }
+                  profileLabel={multiMatchRecommendation.profile.label}
+                  profileValue={multiMatchRecommendation.profile.value}
+                  key={`${item.match_id}-${item.recommendation.market_type}`}
                 />
               ))}
             </div>
 
-            <RecommendationLimits limits={multiMatchRecommendation!.limits} />
+            <SelectionNotices response={multiMatchRecommendation} />
           </>
         ) : null}
       </div>
@@ -494,8 +561,9 @@ export default MultiMatchRecommendationSection;
 
 // Schéma de communication du fichier :
 // MultiMatchRecommendationSection.tsx
-// ├── reçoit les paramètres et résultats depuis RecommendationScreen.tsx
-// ├── conserve les callbacks onChangeMatchCount, onChangeRiskLevel et onGenerateRecommendation
-// ├── affiche les sélections issues du endpoint national expérimental sous forme de tableau premium
-// ├── sépare clairement Match, Marché & sélection, Confiance, Risque et Analyse clé
-// └── ne modifie ni backend, ni modèle ML ; il restitue uniquement la réponse typée reçue par App.tsx
+// ├── reçoit les matchs, la compétition active et la réponse V19 depuis RecommendationScreen.tsx
+// ├── conserve les composants visuels et classes CSS du design Obsidian Teal
+// ├── rapproche chaque sélection publique de son match local grâce au match_id
+// ├── affiche la compétition active, le nombre de candidats et bloque la génération sous deux matchs
+// ├── affiche qualité, profil, explication et exclusions sans score brut ni probabilité
+// └── ne recalcule aucune décision métier et ne transforme jamais une abstention en recommandation

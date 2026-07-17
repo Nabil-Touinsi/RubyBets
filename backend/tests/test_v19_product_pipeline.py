@@ -480,9 +480,54 @@ def test_v19_product_route_is_registered_in_main_app() -> None:
     assert "/api/experimental/ml-v19/h2h/rubybets-matches/{match_id}" in paths
 
 
+# Vérifie qu'un match déjà commencé est rejeté avant tout appel aux marchés ou aux historiques.
+def test_product_pipeline_rejects_started_match_before_downstream_calls() -> None:
+    downstream_calls = {"odds": 0, "history": 0}
+    started_match = {
+        **build_target_match(),
+        "status": "SCHEDULED",
+        "utcDate": "2026-07-13T07:59:00Z",
+    }
+
+    # Retourne un match dont le coup d'envoi est antérieur à l'horloge du pipeline.
+    def match_loader(match_id: int | str | None):
+        assert int(match_id) == MATCH_ID
+        return started_match, {"status": "success"}
+
+    # Compte tout appel marché qui ne devrait jamais être exécuté.
+    def odds_loader(match_id: int | str | None):
+        del match_id
+        downstream_calls["odds"] += 1
+        return None, {"status": "unexpected"}
+
+    # Compte tout appel historique qui ne devrait jamais être exécuté.
+    async def history_loader(match_id: int):
+        del match_id
+        downstream_calls["history"] += 1
+        return {}
+
+    with pytest.raises(
+        V19ProductMatchInvalidError,
+        match="target_match_kickoff_not_future",
+    ):
+        asyncio.run(
+            build_v19_prediction_for_match(
+                match_id=MATCH_ID,
+                request_id="v19-started-match-test",
+                match_loader=match_loader,
+                odds_loader=odds_loader,
+                history_loader=history_loader,
+                clock=fixed_clock,
+            )
+        )
+
+    assert downstream_calls == {"odds": 0, "history": 0}
+
+
 # Schéma de communication :
 # test_v19_product_pipeline.py
 #   -> injecte match, odds et historiques contrôlés dans v19_prediction_service.py
 #   -> valide les quatre experts, l'orchestrateur et les cas RECOMMEND / ABSTAIN
+#   -> vérifie le rejet avant appel aval des matchs déjà commencés
 #   -> teste experimental_ml_v19.py et l'enregistrement dans main.py
 #   -> interdit tout appel réseau réel et toute exposition des odds ou payloads fournisseurs

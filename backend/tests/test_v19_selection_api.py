@@ -1,5 +1,5 @@
 # Rôle du fichier :
-# Ces tests valident le contrat API public de la sélection multi-matchs RubyBets V19.
+# Ces tests valident le contrat API public et la stratégie de sélection multi-matchs RubyBets V19.
 
 from __future__ import annotations
 
@@ -36,8 +36,8 @@ def build_recommend_decision(match_id: int) -> DecisionResultV1:
         status=ExpertCandidateStatus.ELIGIBLE,
         raw_score=0.81,
         calibrated_probability=None,
-        confidence_level=None,
-        local_risk_level=None,
+        confidence_level="HIGH",
+        local_risk_level="LOW",
         required_features=(),
         missing_features=(),
         positive_reasons=(
@@ -165,6 +165,13 @@ def test_v19_selection_api_returns_public_contract_without_raw_score(
     )
     assert "s\u00e9lectivit\u00e9" in (
         payload["selection_explanation"]["summary"]
+    )
+    assert "\u00e9valuation compl\u00e8te" in (
+        payload["selection_explanation"]["summary"]
+    )
+    assert payload["profile"]["description"] == (
+        "Recherche un \u00e9quilibre entre robustesse, diversit\u00e9 "
+        "des march\u00e9s et variabilit\u00e9 ma\u00eetris\u00e9e."
     )
     assert payload["contract_version"] == "v19.selection.public.1"
     assert payload["profile"]["value"] == "MEDIUM"

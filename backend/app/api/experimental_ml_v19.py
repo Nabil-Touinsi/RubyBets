@@ -78,16 +78,16 @@ def build_selection_profile_description(
 ) -> str:
     descriptions = {
         V19SelectionProfile.LOW: (
-            "Filtrage renforcé sur la disponibilité "
-            "et la qualité des données."
+            "Priorise les décisions robustes, peu variables "
+            "et appuyées par des données complètes."
         ),
         V19SelectionProfile.MEDIUM: (
-            "Filtrage adapté aux données nécessaires "
-            "au marché retenu."
+            "Recherche un équilibre entre robustesse, diversité "
+            "des marchés et variabilité maîtrisée."
         ),
         V19SelectionProfile.HIGH: (
-            "Toutes les décisions officielles RECOMMEND "
-            "restent éligibles."
+            "Priorise les décisions officielles plus variables "
+            "tout en maintenant un socle minimal de qualité."
         ),
     }
     return descriptions[profile]
@@ -196,16 +196,18 @@ def build_selection_summary(
 
     if result.status is V19SelectionStatus.READY:
         return (
-            f"{selected_count} match(s) ont été retenus selon "
-            "le profil de sélectivité demandé."
+            f"{selected_count} match(s) ont été retenus après "
+            "évaluation complète du pool et application "
+            "du profil de sélectivité demandé."
         )
 
     if result.status is V19SelectionStatus.PARTIAL:
         return (
             f"{selected_count} match(s) ont été retenus sur "
-            f"{result.requested_count} demandé(s). "
-            "RubyBets ne complète jamais une sélection "
-            "avec une abstention."
+            f"{result.requested_count} demandé(s) après "
+            "évaluation complète du pool. RubyBets ne complète "
+            "jamais une sélection avec une abstention ou une "
+            "donnée de qualité insuffisante."
         )
 
     return (

@@ -1,28 +1,37 @@
-// Ce fichier affiche l’écran Recommandation multi-matchs avec hero décoratif, générateur et sidebar responsable.
+// Ce fichier affiche l’écran Sélection multi-matchs V19 avec son hero, son générateur et sa sidebar responsable.
 
-import type { MultiMatchRecommendationResponse } from "../models/rubybets";
+import type {
+  Match,
+  V19SelectionResponse,
+} from "../models/rubybets";
 import MultiMatchRecommendationSection from "../components/MultiMatchRecommendationSection";
 import RecommendationHeroVisual from "../components/RecommendationHeroVisual";
 import RecommendationSidePanel from "../components/RecommendationSidePanel";
 
+type SelectionProfileLevel = "low" | "medium" | "high";
+
 type RecommendationScreenProps = {
+  matches: Match[];
+  activeCompetitionLabel: string;
   recommendationMatchCount: number;
-  recommendationRiskLevel: "low" | "medium" | "high";
-  multiMatchRecommendation: MultiMatchRecommendationResponse | null;
+  recommendationSelectionProfile: SelectionProfileLevel;
+  multiMatchRecommendation: V19SelectionResponse | null;
   multiMatchStatus: string;
   onChangeMatchCount: (matchCount: number) => void;
-  onChangeRiskLevel: (riskLevel: "low" | "medium" | "high") => void;
+  onChangeSelectionProfile: (profile: SelectionProfileLevel) => void;
   onGenerateRecommendation: () => void;
 };
 
-// Ce composant structure l’écran Recommandation sans modifier les appels existants.
+// Ce composant structure l’écran Sélection V19 sans modifier son design Obsidian Teal.
 function RecommendationScreen({
+  matches,
+  activeCompetitionLabel,
   recommendationMatchCount,
-  recommendationRiskLevel,
+  recommendationSelectionProfile,
   multiMatchRecommendation,
   multiMatchStatus,
   onChangeMatchCount,
-  onChangeRiskLevel,
+  onChangeSelectionProfile,
   onGenerateRecommendation,
 }: RecommendationScreenProps) {
   return (
@@ -33,7 +42,7 @@ function RecommendationScreen({
           <h2>Générateur de sélection</h2>
           <p>
             Construisez une recommandation analytique à partir des matchs
-            disponibles, du niveau de risque choisi et des données avant-match.
+            disponibles, du profil de sélectivité choisi et des décisions V19.
           </p>
         </div>
 
@@ -43,11 +52,13 @@ function RecommendationScreen({
       <div className="rb-reco-layout" role="main">
         <div className="rb-reco-main">
           <MultiMatchRecommendationSection
+            matches={matches}
+            activeCompetitionLabel={activeCompetitionLabel}
             recommendationMatchCount={recommendationMatchCount}
-            recommendationRiskLevel={recommendationRiskLevel}
+            recommendationSelectionProfile={recommendationSelectionProfile}
             multiMatchRecommendation={multiMatchRecommendation}
             onChangeMatchCount={onChangeMatchCount}
-            onChangeRiskLevel={onChangeRiskLevel}
+            onChangeSelectionProfile={onChangeSelectionProfile}
             onGenerateRecommendation={onGenerateRecommendation}
             multiMatchStatus={multiMatchStatus}
           />
@@ -70,7 +81,7 @@ export default RecommendationScreen;
 
 // Schéma de communication du fichier :
 // RecommendationScreen.tsx
-// ├── reçoit les paramètres et résultats depuis App.tsx
+// ├── reçoit les matchs, la compétition active, les paramètres et les résultats V19 depuis App.tsx
 // ├── utilise MultiMatchRecommendationSection.tsx pour le générateur et les résultats
-// ├── utilise RecommendationHeroVisual.tsx pour le décor haut de page
-// └──  utilise RecommendationSidePanel.tsx pour la pédagogie et le rappel responsable
+// ├── utilise RecommendationHeroVisual.tsx pour conserver le décor haut de page
+// └── utilise RecommendationSidePanel.tsx pour l’explication publique et le rappel responsable

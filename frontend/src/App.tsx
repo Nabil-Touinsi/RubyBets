@@ -1,6 +1,6 @@
 // Ce fichier pilote la navigation multi-écrans MVP de RubyBets en conservant les appels API et composants existants.
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./App.css";
 import {
   getCompetitions,
@@ -17,7 +17,7 @@ import {
   getV19H2HAnalysis,
   getV19ProductPrediction,
   getMatches,
-  getNationalMlMultiMatchSelection,
+  getV19MultiMatchSelection,
   getResponsibleInfo,
 } from "./services/api";
 import type {
@@ -31,7 +31,8 @@ import type {
   MatchNewsContextResponse,
   MatchPredictionsResponse,
   NationalMlPredictionResponse,
-  MultiMatchRecommendationResponse,
+  V19SelectionProfile,
+  V19SelectionResponse,
   ResponsibleInfoResponse,
   TeamHistoryResponse,
   V19H2HResponse,
@@ -50,6 +51,8 @@ import ArchivesScreen from "./screens/ArchivesScreen";
 import StatusPanel from "./components/StatusPanel";
 import ResourcesScreen from "./screens/ResourcesScreen";
 
+const DEFAULT_COMPETITION_CODE = "PL";
+
 // Ce composant orchestre le chargement des données, la navigation et le rendu des écrans RubyBets.
 function App() {
   // État de navigation interne utilisé pour afficher un écran MVP à la fois.
@@ -62,7 +65,13 @@ function App() {
   const [apiStatus, setApiStatus] = useState<string>("Vérification en cours...");
   const [competitions, setCompetitions] = useState<Competition[]>([]);
   const [matches, setMatches] = useState<Match[]>([]);
-  const [selectedCompetition, setSelectedCompetition] = useState<string>("PL");
+  const [selectedCompetition, setSelectedCompetition] = useState<string>(
+    DEFAULT_COMPETITION_CODE
+  );
+
+  // Références techniques empêchant les doubles chargements initiaux et les réponses obsolètes.
+  const initialLoadStarted = useRef<boolean>(false);
+  const matchLoadRequestId = useRef<number>(0);
 
   // États liés au match sélectionné.
   const [selectedMatchDetails, setSelectedMatchDetails] =
@@ -100,11 +109,11 @@ function App() {
   const [recommendationMatchCount, setRecommendationMatchCount] =
     useState<number>(3);
 
-  const [recommendationRiskLevel, setRecommendationRiskLevel] =
+  const [recommendationSelectionProfile, setRecommendationSelectionProfile] =
     useState<"low" | "medium" | "high">("medium");
 
   const [multiMatchRecommendation, setMultiMatchRecommendation] =
-    useState<MultiMatchRecommendationResponse | null>(null);
+    useState<V19SelectionResponse | null>(null);
 
   // États liés au glossaire pédagogique.
   const [glossary, setGlossary] = useState<GlossaryResponse | null>(null);
@@ -180,8 +189,121 @@ function App() {
       selectedV19ProductPrediction
   );
 
+  // Réinitialise les données qui dépendent de la compétition active.
+  function resetCompetitionDependentState() {
+    setSelectedMatchDetails(null);
+    setSelectedMatchContext(null);
+    setSelectedMatchAnalysis(null);
+    setSelectedMatchPredictions(null);
+    setSelectedMatchLineups(null);
+    setSelectedMatchNewsContext(null);
+    setSelectedNationalMlPrediction(null);
+    setSelectedTeamHistory(null);
+    setSelectedV19H2HAnalysis(null);
+    setSelectedV19ProductPrediction(null);
+    setMultiMatchRecommendation(null);
+
+    setMatchDetailsStatus("Aucun match sélectionné");
+    setMatchContextStatus("Aucun contexte chargé");
+    setMatchAnalysisStatus("Aucune analyse chargée");
+    setMatchPredictionsStatus("Aucune prédiction chargée");
+    setMatchLineupsStatus("Aucune composition chargée");
+    setMatchNewsContextStatus("Aucune actualité contextuelle chargée");
+    setV19H2HStatus("Aucune analyse H2H V19 chargée");
+    setV19ProductStatus("Aucune décision produit V19 chargée");
+    setMultiMatchStatus("Aucune recommandation multi-matchs générée");
+  }
+
+  // Construit l’ordre de recherche en testant d’abord la compétition demandée.
+  function buildCompetitionSearchOrder(
+    requestedCompetitionCode: string,
+    availableCompetitions: Competition[]
+  ): string[] {
+    const orderedCodes = [
+      requestedCompetitionCode,
+      ...availableCompetitions.map((competition) => competition.code),
+    ];
+
+    return orderedCodes.filter(
+      (competitionCode, index) =>
+        competitionCode.length > 0 &&
+        orderedCodes.indexOf(competitionCode) === index
+    );
+  }
+
+  // Charge une compétition et bascule sur la première alternative contenant des matchs.
+  async function loadMatchesForCompetition(
+    requestedCompetitionCode: string,
+    availableCompetitions: Competition[]
+  ): Promise<void> {
+    const requestId = matchLoadRequestId.current + 1;
+    matchLoadRequestId.current = requestId;
+
+    setSelectedCompetition(requestedCompetitionCode);
+    setMatches([]);
+    setMatchesStatus("Chargement des matchs...");
+    resetCompetitionDependentState();
+
+    const competitionCodes = buildCompetitionSearchOrder(
+      requestedCompetitionCode,
+      availableCompetitions
+    );
+    let failedRequestCount = 0;
+
+    for (const competitionCode of competitionCodes) {
+      if (matchLoadRequestId.current !== requestId) {
+        return;
+      }
+
+      try {
+        const data = await getMatches(competitionCode);
+
+        if (matchLoadRequestId.current !== requestId) {
+          return;
+        }
+
+        const loadedMatches = data.matches || [];
+
+        if (loadedMatches.length > 0) {
+          setSelectedCompetition(competitionCode);
+          setMatches(loadedMatches);
+          setMatchesStatus(
+            competitionCode === requestedCompetitionCode
+              ? "Matchs chargés"
+              : `Aucun match pour ${requestedCompetitionCode}. ${competitionCode} sélectionnée automatiquement.`
+          );
+          return;
+        }
+      } catch {
+        if (matchLoadRequestId.current !== requestId) {
+          return;
+        }
+
+        failedRequestCount += 1;
+      }
+    }
+
+    if (matchLoadRequestId.current !== requestId) {
+      return;
+    }
+
+    setMatches([]);
+    setSelectedCompetition(requestedCompetitionCode);
+    setMatchesStatus(
+      failedRequestCount === competitionCodes.length
+        ? "Impossible de charger les matchs des compétitions disponibles"
+        : "Aucun match disponible dans les compétitions suivies"
+    );
+  }
+
   // Chargement initial : vérification backend + récupération des données transversales.
   useEffect(() => {
+    if (initialLoadStarted.current) {
+      return;
+    }
+
+    initialLoadStarted.current = true;
+
     getHealth()
       .then((data) => {
         setApiStatus(data.status === "ok" ? "Backend connecté" : "Réponse inattendue");
@@ -192,11 +314,19 @@ function App() {
 
     getCompetitions()
       .then((data) => {
-        setCompetitions(data.competitions || []);
+        const loadedCompetitions = data.competitions || [];
+
+        setCompetitions(loadedCompetitions);
         setCompetitionsStatus("Compétitions chargées");
+        void loadMatchesForCompetition(
+          DEFAULT_COMPETITION_CODE,
+          loadedCompetitions
+        );
       })
       .catch(() => {
+        setCompetitions([]);
         setCompetitionsStatus("Impossible de charger les compétitions");
+        void loadMatchesForCompetition(DEFAULT_COMPETITION_CODE, []);
       });
 
     getGlossary()
@@ -220,47 +350,10 @@ function App() {
       });
   }, []);
 
-  // Chargement des matchs quand l’utilisateur change de compétition.
-  useEffect(() => {
-    setMatchesStatus("Chargement des matchs...");
-
-    setSelectedMatchDetails(null);
-    setSelectedMatchContext(null);
-    setSelectedMatchAnalysis(null);
-    setSelectedMatchPredictions(null);
-    setSelectedMatchLineups(null);
-    setSelectedMatchNewsContext(null);
-    setSelectedNationalMlPrediction(null);
-    setSelectedTeamHistory(null);
-    setSelectedV19H2HAnalysis(null);
-    setSelectedV19ProductPrediction(null);
-    setMultiMatchRecommendation(null);
-
-    setMatchDetailsStatus("Aucun match sélectionné");
-    setMatchContextStatus("Aucun contexte chargé");
-    setMatchAnalysisStatus("Aucune analyse chargée");
-    setMatchPredictionsStatus("Aucune prédiction chargée");
-    setMatchLineupsStatus("Aucune composition chargée");
-    setMatchNewsContextStatus("Aucune actualité contextuelle chargée");
-    setV19H2HStatus("Aucune analyse H2H V19 chargée");
-    setV19ProductStatus("Aucune décision produit V19 chargée");
-    setMultiMatchStatus("Aucune recommandation multi-matchs générée");
-
-    getMatches(selectedCompetition)
-      .then((data) => {
-        setMatches(data.matches || []);
-        setMatchesStatus("Matchs chargés");
-      })
-      .catch(() => {
-        setMatches([]);
-        setMatchesStatus("Impossible de charger les matchs");
-      });
-  }, [selectedCompetition]);
-
-  // Change la compétition active et ouvre l’écran Matchs.
+  // Change la compétition active, applique le fallback et ouvre l’écran Matchs.
   function handleSelectCompetition(competitionCode: string) {
-    setSelectedCompetition(competitionCode);
     setCurrentScreen("matches");
+    void loadMatchesForCompetition(competitionCode, competitions);
   }
 
   // Charge les données d’un match sélectionné sans bloquer tout l’affichage si un appel API échoue.
@@ -391,24 +484,40 @@ function App() {
     );
   }
 
-  // Génère une sélection multi-matchs depuis le modèle national déjà utilisé par l’écran Prédictions.
+  // Génère une sélection V19 à partir des identifiants des matchs actuellement chargés.
   function handleGenerateMultiMatchRecommendation() {
-    const nationalSelectionCompetitionCode = "WC";
+    const matchIds = matches.map((match) => match.id);
+    const profileMapping: Record<
+      "low" | "medium" | "high",
+      V19SelectionProfile
+    > = {
+      low: "LOW",
+      medium: "MEDIUM",
+      high: "HIGH",
+    };
 
-    setMultiMatchStatus("Génération de la sélection ML nationale...");
+    if (matchIds.length === 0) {
+      setMultiMatchRecommendation(null);
+      setMultiMatchStatus(
+        "Aucun match disponible pour générer une sélection V19"
+      );
+      return;
+    }
 
-    getNationalMlMultiMatchSelection(
-      nationalSelectionCompetitionCode,
+    setMultiMatchStatus("Génération de la sélection V19...");
+
+    getV19MultiMatchSelection(
+      matchIds,
       recommendationMatchCount,
-      recommendationRiskLevel
+      profileMapping[recommendationSelectionProfile]
     )
       .then((data) => {
         setMultiMatchRecommendation(data);
-        setMultiMatchStatus("Sélection ML nationale générée");
+        setMultiMatchStatus("Sélection V19 générée");
       })
       .catch(() => {
         setMultiMatchRecommendation(null);
-        setMultiMatchStatus("Impossible de générer la sélection ML nationale");
+        setMultiMatchStatus("Impossible de générer la sélection V19");
       });
   }
 
@@ -517,12 +626,18 @@ function App() {
     if (currentScreen === "recommendation") {
       return (
         <RecommendationScreen
+          matches={matches}
+          activeCompetitionLabel={
+            competitions.find(
+              (competition) => competition.code === selectedCompetition
+            )?.name ?? selectedCompetition
+          }
           recommendationMatchCount={recommendationMatchCount}
-          recommendationRiskLevel={recommendationRiskLevel}
+          recommendationSelectionProfile={recommendationSelectionProfile}
           multiMatchRecommendation={multiMatchRecommendation}
           multiMatchStatus={multiMatchStatus}
           onChangeMatchCount={setRecommendationMatchCount}
-          onChangeRiskLevel={setRecommendationRiskLevel}
+          onChangeSelectionProfile={setRecommendationSelectionProfile}
           onGenerateRecommendation={handleGenerateMultiMatchRecommendation}
         />
       );
@@ -585,5 +700,7 @@ export default App;
 // ├── utilise AppShell.tsx pour structurer l’application
 // ├── peut transmettre StatusPanel.tsx à AppShell.tsx uniquement en mode debug
 // ├── affiche les écrans du dossier screens/ selon l’écran actif
-// ├── branche aussi l’écran Sélection sur la route expérimentale nationale issue du même modèle que Prédictions
+// ├── sélectionne automatiquement la première compétition disposant de matchs lorsque la compétition demandée est vide
+// ├── ignore les réponses de chargement devenues obsolètes lors d’un changement rapide de compétition
+// ├── branche l’écran Sélection sur la route publique V19 à partir des matchs déjà chargés
 // └── affiche l’écran Archives avec données mockées avant création du backend dédié

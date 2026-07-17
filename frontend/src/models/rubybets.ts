@@ -460,6 +460,89 @@ export type V19ProductPredictionResponse = {
   responsible_note: string;
 };
 
+// Ce type décrit les profils publics de sélectivité acceptés par la sélection V19.
+export type V19SelectionProfile = "LOW" | "MEDIUM" | "HIGH";
+
+// Ce type décrit les états publics possibles d’une sélection multi-matchs V19.
+export type V19SelectionStatus = "READY" | "PARTIAL" | "EMPTY" | string;
+
+// Ce type décrit le payload public envoyé à la route de sélection V19.
+export type V19SelectionRequest = {
+  match_ids: number[];
+  match_count: number;
+  selection_profile: V19SelectionProfile;
+};
+
+// Ce type décrit la qualité des données publiques associée à une sélection V19.
+export type V19SelectionDataQuality = {
+  target_match_provider_status: string | null;
+  market_provider_status: string | null;
+  market_module_status: string | null;
+  market_quality_flags: string[] | string | null;
+  history_provider_status: string | null;
+  history_data_status: string | null;
+  history_source_used: string | null;
+};
+
+// Ce type décrit une décision V19 retenue dans la sélection multi-matchs publique.
+export type V19SelectionItem = {
+  match_id: number;
+  status: "RECOMMEND" | string;
+  recommendation: {
+    market_type: string;
+    value: string;
+  };
+  explanation: V19PublicExplanation;
+  data_quality: V19SelectionDataQuality;
+  versions: {
+    engine: string;
+    experts: Record<string, string>;
+    features: string[];
+    product_service: string | null;
+    explanation: string;
+  };
+};
+
+// Ce type décrit un match évalué mais exclu de la sélection publique V19.
+export type V19ExcludedSelectionMatch = {
+  match_id: number;
+  status: "ABSTAIN" | "PROFILE_FILTERED" | "PIPELINE_ERROR" | string;
+  summary: string;
+};
+
+// Ce type décrit la réponse publique stable de la sélection multi-matchs V19.
+export type V19SelectionResponse = {
+  source: string;
+  scope: string;
+  contract_version: string;
+  request_id: string;
+  status: V19SelectionStatus;
+  profile: {
+    value: V19SelectionProfile;
+    label: string;
+    description: string;
+  };
+  requested_count: number;
+  candidate_count: number;
+  evaluated_count: number;
+  selected_count: number;
+  abstain_count: number;
+  profile_filtered_count: number;
+  error_count: number;
+  selections: V19SelectionItem[];
+  excluded_matches: V19ExcludedSelectionMatch[];
+  selection_explanation: {
+    headline: string;
+    summary: string;
+  };
+  versions: {
+    selection_service: string;
+    selection_contract: string;
+    explanation: string;
+  };
+  responsible_note: string;
+};
+
 // Ce type décrit un facteur clé affiché dans l’analyse pré-match.
 export type AnalysisKeyFactor = {
   label: string;
@@ -865,4 +948,4 @@ export type ArchivedPredictionsResponse = {
 // ├── utilisé par api.ts pour typer les réponses backend
 // ├── utilisé par App.tsx pour stocker les données dans les states React
 // ├── utilisé par les composants frontend pour afficher matchs, historiques d'équipes, compositions probables, actualités contextuelles, analyses, prédictions, recommandations et archives
-// └── prépare aussi le contrat public V19 utilisé par la fiche détail match, sans exposer les odds internes
+// └── prépare aussi les contrats publics V19 de prédiction individuelle et de sélection multi-matchs, sans exposer les données internes

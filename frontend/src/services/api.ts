@@ -22,6 +22,9 @@ import type {
   V19H2HEntityType,
   V19H2HResponse,
   V19ProductPredictionResponse,
+  V19SelectionProfile,
+  V19SelectionRequest,
+  V19SelectionResponse,
 } from "../models/rubybets";
 
 const API_BASE_URL = "http://127.0.0.1:8000";
@@ -131,6 +134,31 @@ export async function getV19ProductPrediction(
   return fetchJson<V19ProductPredictionResponse>(
     `/api/experimental/ml-v19/rubybets-matches/${matchId}`,
     "Erreur lors du chargement de la décision produit V19."
+  );
+}
+
+// Cette fonction demande au backend de composer une sélection multi-matchs V19 à partir des matchs déjà chargés.
+export async function getV19MultiMatchSelection(
+  matchIds: number[],
+  matchCount: number,
+  selectionProfile: V19SelectionProfile
+): Promise<V19SelectionResponse> {
+  const payload: V19SelectionRequest = {
+    match_ids: matchIds,
+    match_count: matchCount,
+    selection_profile: selectionProfile,
+  };
+
+  return fetchJson<V19SelectionResponse>(
+    "/api/experimental/ml-v19/selection",
+    "Erreur lors de la génération de la sélection multi-matchs V19.",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    }
   );
 }
 
@@ -296,4 +324,4 @@ export async function getResponsibleInfo(): Promise<ResponsibleInfoResponse> {
 // ├── utilise rubybets.ts pour typer les réponses reçues
 // ├── alimente App.tsx avec des données sécurisées
 // ├── transmet les données aux composants React d’affichage, dont l’historique des équipes, les compositions, les actualités contextuelles et les archives
-// └── expose aussi la décision produit V19 à la fiche détail sans transmettre les odds ou payloads fournisseurs
+// └── expose les décisions produit V19 individuelles et multi-matchs sans transmettre de score brut, odds ou payload fournisseur
