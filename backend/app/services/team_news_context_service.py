@@ -291,6 +291,8 @@ def build_team_news_block(
     match_query: str | None = None,
     opponent_team_name: str | None = None,
     match_utc_date: str | None = None,
+    max_articles: int = TEAM_NEWS_CONTEXT_MAX_ARTICLES_PER_TEAM,
+    description_max_length: int | None = 220,
 ) -> dict[str, Any]:
     if not team_name:
         return build_empty_team_news_block(team_name=None)
@@ -319,7 +321,8 @@ def build_team_news_block(
         competition_name=competition_name,
         opponent_team_name=opponent_team_name,
         match_utc_date=match_utc_date,
-        max_articles=TEAM_NEWS_CONTEXT_MAX_ARTICLES_PER_TEAM,
+        max_articles=max_articles,
+        description_max_length=description_max_length,
     )
 
     if not enriched_articles:
@@ -396,7 +399,7 @@ def build_match_news_context_response(
     )
 
     # Les articles communs à l'affiche restent visibles dans les deux colonnes équipe.
-    # Une déduplication globale sera appliquée plus tard au corpus unique du chatbot Grok.
+    # Une déduplication globale est appliquée par le service du chatbot Groq avant analyse.
     home_block = normalize_team_news_block_status(home_block)
     away_block = normalize_team_news_block_status(away_block)
 

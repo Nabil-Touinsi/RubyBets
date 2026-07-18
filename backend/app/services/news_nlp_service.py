@@ -515,13 +515,18 @@ def enrich_news_article(
     article: dict[str, Any],
     team_name: str,
     competition_name: str | None = None,
+    description_max_length: int | None = 220,
 ) -> dict[str, Any]:
     category = classify_news_category(article)
     relevance = estimate_news_relevance(article, team_name, competition_name)
+    description = article.get("description")
+
+    if description_max_length is not None:
+        description = shorten_news_description(description, description_max_length)
 
     return {
         "title": article.get("title"),
-        "description": shorten_news_description(article.get("description")),
+        "description": description,
         "url": article.get("url"),
         "source_name": article.get("source_name"),
         "source_url": article.get("source_url"),
@@ -541,6 +546,7 @@ def filter_and_enrich_team_news_articles(
     opponent_team_name: str | None = None,
     match_utc_date: str | None = None,
     max_articles: int = 5,
+    description_max_length: int | None = 220,
 ) -> list[dict[str, Any]]:
     exploitable_articles = [
         article
@@ -568,7 +574,12 @@ def filter_and_enrich_team_news_articles(
     )
 
     return [
-        enrich_news_article(article, team_name, competition_name)
+        enrich_news_article(
+            article,
+            team_name,
+            competition_name,
+            description_max_length=description_max_length,
+        )
         for article in sorted_raw_articles[:max_articles]
     ]
 
