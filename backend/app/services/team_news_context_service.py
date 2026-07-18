@@ -4,6 +4,7 @@
 # prépare une réponse API responsable et ajoute une lecture IA optionnelle.
 
 from datetime import UTC, datetime
+import re
 from typing import Any
 
 from app.services.google_news_rss_client import (
@@ -11,11 +12,16 @@ from app.services.google_news_rss_client import (
     fetch_google_news_rss_articles,
 )
 from app.services.news_context_ai_service import build_match_news_ai_context
-from app.services.news_nlp_service import filter_and_enrich_team_news_articles
+from app.services.news_nlp_service import (
+    filter_and_enrich_team_news_articles,
+    normalize_news_text,
+)
 
 
 TEAM_NEWS_CONTEXT_MAX_ARTICLES_PER_TEAM = 5
 TEAM_NEWS_CONTEXT_MAX_RAW_ARTICLES = 12
+TEAM_COUNTRY_SUFFIX_PATTERN = re.compile(r"\s*\([A-Z0-9]{2,4}\)\s*$", re.IGNORECASE)
+TEAM_NAME_SEPARATOR_PATTERN = re.compile(r"[-‐‑‒–—]+")
 
 
 # Cette fonction extrait une valeur imbriquée dans un dictionnaire sans casser si une clé manque.
@@ -47,59 +53,148 @@ def extract_competition_name_from_match(match: dict[str, Any]) -> str | None:
     return get_nested_value(match, ["competition", "name"])
 
 
-# Cette fonction vérifie si le nom de compétition est trop technique pour une requête Google News.
-def is_generic_or_technical_competition_name(competition_name: str | None) -> bool:
+# Cette fonction récupère la date UTC du match depuis un payload brut ou déjà formaté.
+def extract_match_utc_date_from_match(match: dict[str, Any]) -> str | None:
+    return match.get("utc_date") or match.get("utcDate")
+
+
+# Cette fonction retire les suffixes fournisseur comme « (ARM) » sans modifier le nom affiché dans l'API.
+def normalize_team_name_for_news(team_name: str | None) -> str:
+    cleaned_name = TEAM_COUNTRY_SUFFIX_PATTERN.sub("", str(team_name or "")).strip()
+    return " ".join(cleaned_name.split())
+
+
+# Cette fonction produit les variantes utiles d'un nom d'équipe pour couvrir tirets et espaces.
+def build_team_name_variants(team_name: str | None) -> list[str]:
+    canonical_name = normalize_team_name_for_news(team_name)
+
+    if not canonical_name:
+        return []
+
+    variants = [canonical_name]
+    spaced_name = " ".join(TEAM_NAME_SEPARATOR_PATTERN.sub(" ", canonical_name).split())
+
+    if spaced_name and spaced_name.lower() != canonical_name.lower():
+        variants.append(spaced_name)
+
+    return variants
+
+
+# Cette fonction réduit les libellés fournisseur techniques à un nom de compétition recherché par les médias.
+def simplify_competition_name_for_news(competition_name: str | None) -> str | None:
     normalized_name = " ".join(str(competition_name or "").lower().split())
 
     if not normalized_name:
-        return True
+        return None
+
+    known_competitions = [
+        ("champions league", "Champions League"),
+        ("europa league", "Europa League"),
+        ("conference league", "Conference League"),
+        ("premier league", "Premier League"),
+        ("ligue 1", "Ligue 1"),
+        ("la liga", "La Liga"),
+        ("bundesliga", "Bundesliga"),
+        ("serie a", "Serie A"),
+    ]
+
+    for marker, public_name in known_competitions:
+        if marker in normalized_name:
+            return public_name
 
     technical_markers = [
         "round",
+        "qualification",
+        "quarter-final",
+        "semi-final",
         "journée",
         "fs_",
         "world championship -",
         "friendly international",
     ]
 
-    return any(marker in normalized_name for marker in technical_markers)
+    if any(marker in normalized_name for marker in technical_markers):
+        return None
+
+    return " ".join(str(competition_name or "").split())
 
 
-# Cette fonction construit plusieurs requêtes RSS naturelles pour une équipe.
+# Cette fonction supprime les doublons textuels tout en conservant l'ordre de priorité des requêtes.
+def deduplicate_queries(queries: list[str]) -> list[str]:
+    seen_queries: set[str] = set()
+    deduplicated_queries: list[str] = []
+
+    for query in queries:
+        query_key = " ".join(str(query or "").lower().split())
+
+        if not query_key or query_key in seen_queries:
+            continue
+
+        seen_queries.add(query_key)
+        deduplicated_queries.append(query)
+
+    return deduplicated_queries
+
+
+# Cette fonction construit plusieurs requêtes RSS naturelles pour une équipe de club.
 def build_team_news_queries(
     team_name: str,
     competition_name: str | None = None,
 ) -> list[str]:
+    team_variants = build_team_name_variants(team_name)
+
+    if not team_variants:
+        return []
+
+    primary_name = team_variants[0]
     queries = [
-        f'"{team_name}" football news',
-        f'"{team_name}" national football team news',
-        f'"{team_name}" football injury lineup squad',
+        f'"{primary_name}" news',
+        f'"{primary_name}" football',
+        f'"{primary_name}" injury lineup squad',
     ]
 
-    if competition_name and not is_generic_or_technical_competition_name(competition_name):
-        queries.append(f'"{team_name}" football "{competition_name}"')
+    for variant in team_variants[1:]:
+        queries.append(f'"{variant}" news')
 
-    return queries
+    competition_query_name = simplify_competition_name_for_news(competition_name)
+    if competition_query_name:
+        queries.append(f'"{primary_name}" "{competition_query_name}"')
+
+    return deduplicate_queries(queries)
 
 
-# Cette fonction construit une requête complémentaire liée à l'affiche du match.
+# Cette fonction construit une requête complémentaire directement liée à l'affiche du match.
 def build_match_news_query(
     home_team_name: str | None,
     away_team_name: str | None,
 ) -> str | None:
-    if not home_team_name or not away_team_name:
+    clean_home_name = normalize_team_name_for_news(home_team_name)
+    clean_away_name = normalize_team_name_for_news(away_team_name)
+
+    if not clean_home_name or not clean_away_name:
         return None
 
-    return f'"{home_team_name}" "{away_team_name}" football news'
+    return f'"{clean_home_name}" "{clean_away_name}"'
 
 
-# Cette fonction supprime les doublons dans une liste d'articles RSS bruts.
+# Cette fonction construit une signature de titre indépendante de l'URL et du nom de l'éditeur.
+def build_article_deduplication_key(article: dict[str, Any]) -> str:
+    normalized_title = normalize_news_text(article.get("title"))
+    normalized_source = normalize_news_text(article.get("source_name"))
+
+    if normalized_source and normalized_title.endswith(f" {normalized_source}"):
+        normalized_title = normalized_title[: -(len(normalized_source) + 1)].strip()
+
+    return normalized_title or str(article.get("url") or "").lower().strip()
+
+
+# Cette fonction supprime les doublons et les reprises éditoriales dans les articles RSS bruts.
 def deduplicate_raw_articles(articles: list[dict[str, Any]]) -> list[dict[str, Any]]:
     seen_keys: set[str] = set()
     deduplicated_articles: list[dict[str, Any]] = []
 
     for article in articles:
-        article_key = str(article.get("url") or article.get("title") or "").lower()
+        article_key = build_article_deduplication_key(article)
 
         if not article_key or article_key in seen_keys:
             continue
@@ -132,32 +227,6 @@ def collect_articles_from_queries(queries: list[str]) -> tuple[list[dict[str, An
     return deduplicate_raw_articles(collected_articles), unavailable_messages
 
 
-# Cette fonction supprime les doublons entre les deux équipes en privilégiant le premier bloc traité.
-def deduplicate_articles_between_teams(
-    home_articles: list[dict[str, Any]],
-    away_articles: list[dict[str, Any]],
-) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
-    seen_keys: set[str] = set()
-    cleaned_home_articles: list[dict[str, Any]] = []
-    cleaned_away_articles: list[dict[str, Any]] = []
-
-    for article in home_articles:
-        article_key = str(article.get("url") or article.get("title") or "").lower()
-
-        if article_key and article_key not in seen_keys:
-            seen_keys.add(article_key)
-            cleaned_home_articles.append(article)
-
-    for article in away_articles:
-        article_key = str(article.get("url") or article.get("title") or "").lower()
-
-        if article_key and article_key not in seen_keys:
-            seen_keys.add(article_key)
-            cleaned_away_articles.append(article)
-
-    return cleaned_home_articles, cleaned_away_articles
-
-
 # Cette fonction construit les messages responsables affichés avec les actualités.
 def build_team_news_context_limits() -> list[str]:
     return [
@@ -185,11 +254,43 @@ def build_empty_team_news_block(
     }
 
 
+# Cette fonction réaligne le statut d'un bloc équipe avec sa liste finale d'articles.
+def normalize_team_news_block_status(team_block: dict[str, Any]) -> dict[str, Any]:
+    articles = list(team_block.get("articles", []))
+
+    if articles:
+        return {
+            **team_block,
+            "status": "available",
+            "articles_count": len(articles),
+            "articles": articles,
+            "message": None,
+        }
+
+    if team_block.get("status") == "unavailable":
+        return {
+            **team_block,
+            "articles_count": 0,
+            "articles": [],
+        }
+
+    return {
+        **team_block,
+        "status": "empty",
+        "articles_count": 0,
+        "articles": [],
+        "message": team_block.get("message")
+        or "Aucune actualité récente exploitable pour cette équipe.",
+    }
+
+
 # Cette fonction récupère et prépare les actualités d'une équipe avec plusieurs requêtes RSS.
 def build_team_news_block(
     team_name: str | None,
     competition_name: str | None = None,
     match_query: str | None = None,
+    opponent_team_name: str | None = None,
+    match_utc_date: str | None = None,
 ) -> dict[str, Any]:
     if not team_name:
         return build_empty_team_news_block(team_name=None)
@@ -216,6 +317,8 @@ def build_team_news_block(
         articles=raw_articles,
         team_name=team_name,
         competition_name=competition_name,
+        opponent_team_name=opponent_team_name,
+        match_utc_date=match_utc_date,
         max_articles=TEAM_NEWS_CONTEXT_MAX_ARTICLES_PER_TEAM,
     )
 
@@ -274,36 +377,28 @@ def build_match_news_context_response(
     home_team_name = extract_team_name_from_match(match, "home")
     away_team_name = extract_team_name_from_match(match, "away")
     competition_name = extract_competition_name_from_match(match)
+    match_utc_date = extract_match_utc_date_from_match(match)
     match_query = build_match_news_query(home_team_name, away_team_name)
 
     home_block = build_team_news_block(
         team_name=home_team_name,
         competition_name=competition_name,
         match_query=match_query,
+        opponent_team_name=away_team_name,
+        match_utc_date=match_utc_date,
     )
     away_block = build_team_news_block(
         team_name=away_team_name,
         competition_name=competition_name,
         match_query=match_query,
+        opponent_team_name=home_team_name,
+        match_utc_date=match_utc_date,
     )
 
-    home_articles, away_articles = deduplicate_articles_between_teams(
-        home_articles=home_block.get("articles", []),
-        away_articles=away_block.get("articles", []),
-    )
-
-    home_block = {
-        **home_block,
-        "articles": home_articles,
-        "articles_count": len(home_articles),
-        "status": "available" if home_articles else home_block.get("status"),
-    }
-    away_block = {
-        **away_block,
-        "articles": away_articles,
-        "articles_count": len(away_articles),
-        "status": "available" if away_articles else away_block.get("status"),
-    }
+    # Les articles communs à l'affiche restent visibles dans les deux colonnes équipe.
+    # Une déduplication globale sera appliquée plus tard au corpus unique du chatbot Grok.
+    home_block = normalize_team_news_block_status(home_block)
+    away_block = normalize_team_news_block_status(away_block)
 
     status = build_news_context_status(home_block, away_block)
 
