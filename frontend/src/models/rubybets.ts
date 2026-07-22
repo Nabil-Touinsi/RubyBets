@@ -192,6 +192,47 @@ export type MatchNewsContextResponse = {
   fallback_available?: boolean;
 };
 
+// Ce type décrit les deux actions que Ruby peut envoyer au chatbot d'actualités du backend.
+export type NewsChatbotMode = "summary" | "question";
+
+// Ce type décrit la demande envoyée par Ruby pour résumer les actualités ou répondre à une question.
+export type NewsChatbotRequest = {
+  mode: NewsChatbotMode;
+  question?: string;
+};
+
+// Ce type décrit une source réellement citée dans une réponse de Ruby.
+export type NewsChatbotSource = {
+  article_id: string;
+  title: string;
+  url: string;
+  source_name: string | null;
+  published_at: string | null;
+  content_status: string;
+};
+
+// Ce type décrit la réponse complète du chatbot d'actualités Ruby.
+export type NewsChatbotResponse = {
+  status: string;
+  match_id: number;
+  mode: NewsChatbotMode;
+  answer: string;
+  sources: NewsChatbotSource[];
+  source_articles_count: number;
+  full_content_articles_count: number;
+  partial_content_articles_count: number;
+  unavailable_articles_count: number;
+  analyzed_articles_count: number;
+  analyzed_chunks_count: number;
+  insufficient_data: boolean;
+  cached: boolean;
+  generated_at: string;
+  model: string;
+  match_source: string | null;
+  responsible_note: string;
+  limitations: string[];
+};
+
 // Ce type décrit les sources possibles utilisées par la route d'historique des équipes.
 export type TeamHistorySourceUsed =
   | "cache"
@@ -944,5 +985,5 @@ export type ArchivedPredictionsResponse = {
 // rubybets.ts
 // ├── utilisé par api.ts pour typer les réponses backend
 // ├── utilisé par App.tsx pour stocker les données dans les states React
-// ├── utilisé par les composants frontend pour afficher matchs, historiques d'équipes, compositions probables, actualités contextuelles, analyses, prédictions, recommandations et archives
+// ├── utilisé par les composants frontend pour afficher matchs, historiques d'équipes, compositions probables, actualités contextuelles, Ruby, analyses, prédictions, recommandations et archives
 // └── prépare aussi les contrats publics V19 de prédiction individuelle et de sélection multi-matchs, sans exposer les données internes

@@ -12,6 +12,8 @@ import type {
   MatchDetailsResponse,
   MatchLineupsResponse,
   MatchNewsContextResponse,
+  NewsChatbotRequest,
+  NewsChatbotResponse,
   MatchPredictionsResponse,
   MatchesResponse,
   NationalMlPredictionResponse,
@@ -96,6 +98,81 @@ export async function getMatchNewsContext(
     `/api/matches/${matchId}/news-context`,
     "Erreur lors du chargement des actualités contextuelles du match."
   );
+}
+
+// Cette classe conserve le statut HTTP d'une erreur Ruby afin d'afficher un message adapté dans l'interface.
+export class RubyNewsChatApiError extends Error {
+  status: number;
+  code: string | null;
+
+  // Ce constructeur prépare une erreur lisible sans exposer les détails techniques du fournisseur.
+  constructor(message: string, status: number, code: string | null = null) {
+    super(message);
+    this.name = "RubyNewsChatApiError";
+    this.status = status;
+    this.code = code;
+  }
+}
+
+// Cette fonction extrait le message public renvoyé par FastAPI dans les réponses d'erreur de Ruby.
+function getRubyApiErrorDetails(payload: unknown): {
+  message: string | null;
+  code: string | null;
+} {
+  if (!payload || typeof payload !== "object") {
+    return { message: null, code: null };
+  }
+
+  const detail = "detail" in payload ? payload.detail : null;
+
+  if (typeof detail === "string") {
+    return { message: detail, code: null };
+  }
+
+  if (!detail || typeof detail !== "object") {
+    return { message: null, code: null };
+  }
+
+  const message =
+    "message" in detail && typeof detail.message === "string"
+      ? detail.message
+      : null;
+  const code =
+    "code" in detail && typeof detail.code === "string" ? detail.code : null;
+
+  return { message, code };
+}
+
+// Cette fonction demande à Ruby de résumer les actualités d'un match ou de répondre à une question.
+export async function askRubyAboutMatchNews(
+  matchId: number,
+  request: NewsChatbotRequest,
+  signal?: AbortSignal
+): Promise<NewsChatbotResponse> {
+  const response = await fetch(
+    `${API_BASE_URL}/api/matches/${matchId}/news-chat`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(request),
+      signal,
+    }
+  );
+
+  const payload = (await response.json().catch(() => null)) as unknown;
+
+  if (!response.ok) {
+    const details = getRubyApiErrorDetails(payload);
+    throw new RubyNewsChatApiError(
+      details.message || "Ruby n'a pas pu terminer la demande.",
+      response.status,
+      details.code
+    );
+  }
+
+  return payload as NewsChatbotResponse;
 }
 
 // Cette fonction récupère l'historique récent des deux équipes pour alimenter la fiche détail match.

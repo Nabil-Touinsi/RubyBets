@@ -23,6 +23,7 @@ import type {
 } from "../models/rubybets";
 import type { AppScreen } from "../types/navigation";
 import MatchNewsContextSection from "../components/MatchNewsContextSection";
+import RubyNewsChat from "../components/RubyNewsChat";
 import V19ProductDecisionCard from "../components/V19ProductDecisionCard";
 import {
   formatDateTime,
@@ -2561,10 +2562,20 @@ function MatchDetailsScreen({
         </section>
 
         <aside className="rb-detail-v2-side-column">
-          <MatchInfoCard match={selectedMatch} freshnessLabel={freshnessLabel} />
-          <HeadToHeadCard teamHistory={teamHistory} />
-          <ContextIssuesCard match={selectedMatch} matchContext={matchContext} />
-          <ResponsibleNoticeCard />
+          <RubyNewsChat
+            key={selectedMatch.id}
+            matchId={selectedMatch.id}
+            isVisible={activeTab === "context"}
+          />
+
+          {activeTab !== "context" ? (
+            <>
+              <MatchInfoCard match={selectedMatch} freshnessLabel={freshnessLabel} />
+              <HeadToHeadCard teamHistory={teamHistory} />
+              <ContextIssuesCard match={selectedMatch} matchContext={matchContext} />
+              <ResponsibleNoticeCard />
+            </>
+          ) : null}
         </aside>
       </main>
 
@@ -2581,6 +2592,7 @@ export default MatchDetailsScreen;
 // MatchDetailsScreen.tsx
 // ├── reçoit aussi la décision produit V19 depuis App.tsx et l’affiche au début de la Vue d’ensemble
 // ├── utilise aussi V19H2HResponse de models/rubybets.ts pour afficher le catalogue v19.h2h.core.1
+// ├── affiche RubyNewsChat.tsx dans la colonne droite uniquement lorsque l’onglet Contexte est actif
 // ├── utilise les helpers d’affichage de helpers/displayText.ts
 // ├── alimente l’onglet Analyse détaillée avec matchAnalysis.analysis
 // ├── alimente l’onglet Compo probable avec matchLineups.lineups sans inventer de joueurs

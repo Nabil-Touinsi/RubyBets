@@ -26,11 +26,15 @@ from app.services.groq_chatbot_client import (
     request_groq_chatbot_completion,
 )
 from app.services.match_news_chatbot_service import (
+    build_local_news_chatbot_fallback_answer,
     build_match_news_chatbot_response,
     build_news_chatbot_messages,
+    clean_local_news_chatbot_candidate,
     clear_news_chatbot_cache,
+    is_news_chatbot_outcome_question,
     merge_team_articles_for_chatbot,
     sanitize_uncited_news_chatbot_factual_claims,
+    select_news_chatbot_articles_for_question,
     validate_news_chatbot_source_ids,
 )
 from app.services.news_article_content_service import (
@@ -46,6 +50,8 @@ from app.services.news_article_content_service import (
     resolve_google_news_publisher_url,
 )
 from app.services.news_chatbot_summarization_service import (
+    build_fast_question_article_digests,
+    build_fast_summary_article_digests,
     clear_news_chatbot_article_digest_cache,
     normalize_chatbot_text,
     split_article_content_into_chunks,
@@ -897,6 +903,53 @@ def test_summarize_article_analyzes_all_chunks_and_reuses_cache(monkeypatch) -> 
     assert groq_calls == first_call_count
 
 
+# Cette fonction vérifie qu'un fragment Groq défaillant devient une limite partielle sans perdre l'article entier.
+def test_summarize_article_keeps_partial_digest_when_one_chunk_fails(monkeypatch) -> None:
+    clear_news_chatbot_article_digest_cache()
+    article = build_chatbot_article(
+        "NEWS-01",
+        "Article partiellement analysable",
+        "https://example.com/partial-digest",
+        "Ararat-Armenia (ARM)",
+        content=" ".join(f"Information-{index}" for index in range(900)),
+    )
+    groq_calls = 0
+
+    # Ce faux client échoue sur un seul fragment puis laisse les autres analyses continuer.
+    async def fake_groq_completion(messages, **kwargs):
+        nonlocal groq_calls
+        groq_calls += 1
+
+        if groq_calls == 2:
+            raise GroqChatbotError(
+                code="GROQ_REQUEST_REJECTED",
+                public_message="Fragment refusé.",
+                status_code=502,
+            )
+
+        return {
+            "summary": f"Résumé du fragment {groq_calls}.",
+            "key_facts": [f"Fait {groq_calls}."],
+            "limitations": [],
+            "source_ids": ["NEWS-01"],
+        }
+
+    monkeypatch.setattr(
+        "app.services.news_chatbot_summarization_service.request_groq_chatbot_completion",
+        fake_groq_completion,
+    )
+
+    digest, from_cache = asyncio.run(summarize_news_chatbot_article(article))
+
+    assert digest is not None
+    assert from_cache is False
+    assert digest["complete_analysis"] is False
+    assert digest["chunks_failed"] == 1
+    assert digest["chunks_analyzed"] == digest["chunks_expected"] - 1
+    assert digest["source_ids"] == ["NEWS-01"]
+    assert any("1 fragment" in limitation for limitation in digest["limitations"])
+
+
 # Cette fonction vérifie que les faits importants non cités sont retirés sans supprimer les titres.
 def test_uncited_factual_claim_guard_removes_unsupported_score() -> None:
     answer = (
@@ -958,17 +1011,15 @@ def test_match_news_chatbot_response_builds_cited_summary_and_reuses_cache(
             content_status="partial",
         ),
     ]
-    digests = [build_article_digest(article, chunks=2) for article in articles]
     groq_calls = 0
 
     # Ce faux préparateur évite tout RSS et tout téléchargement pendant le test.
     async def fake_get_prepared_articles(match_id, match):
         return articles, "fingerprint-test", False
 
-    # Ce faux analyseur simule les digests complets déjà générés par fragments.
+    # Ce faux analyseur échoue si l'ancien chemin Groq par fragments est encore utilisé.
     async def fake_summarize_articles(selected_articles):
-        assert selected_articles == articles
-        return digests, 0
+        raise AssertionError("Le résumé rapide ne doit plus analyser les fragments avec Groq.")
 
     # Ce faux client reproduit une réponse JSON Groq avec citations contrôlées.
     async def fake_groq_completion(messages, **kwargs):
@@ -977,6 +1028,7 @@ def test_match_news_chatbot_response_builds_cited_summary_and_reuses_cache(
         assert len(messages) == 1
         assert "SOURCE_ID: NEWS-01" in messages[0]["content"]
         assert "DIGESTS DES ARTICLES ANALYSÉS" in messages[0]["content"]
+        assert kwargs["max_completion_tokens"] == 900
         return {
             "answer": "Les deux équipes préparent le match avec prudence [NEWS-01] [NEWS-02].",
             "source_ids": ["NEWS-01", "NEWS-02"],
@@ -1017,7 +1069,7 @@ def test_match_news_chatbot_response_builds_cited_summary_and_reuses_cache(
     assert first_response["status"] == "partial"
     assert first_response["source_articles_count"] == 2
     assert first_response["analyzed_articles_count"] == 2
-    assert first_response["analyzed_chunks_count"] == 4
+    assert first_response["analyzed_chunks_count"] == 2
     assert [source["article_id"] for source in first_response["sources"]] == [
         "NEWS-01",
         "NEWS-02",
@@ -1108,8 +1160,306 @@ def test_match_news_chatbot_response_filters_unsupported_claims_and_sources(
     )
 
 
-# Cette fonction vérifie qu'une réponse sans citation valide est automatiquement rétrogradée.
-def test_match_news_chatbot_response_marks_missing_citations_as_insufficient(
+# Cette fonction vérifie que les questions sur le vainqueur sont reconnues sans dépendre des accents.
+def test_news_chatbot_outcome_question_detection_is_conversational() -> None:
+    assert is_news_chatbot_outcome_question("Selon toi Ruby, qui va gagner ce match ?") is True
+    assert is_news_chatbot_outcome_question("Quelle équipe est favorite ?") is True
+    assert is_news_chatbot_outcome_question("Quelles absences sont confirmées ?") is False
+
+
+# Cette fonction vérifie que les libellés techniques sont retirés des extraits de secours.
+def test_clean_local_news_chatbot_candidate_removes_metadata_labels() -> None:
+    assert clean_local_news_chatbot_candidate(
+        "Compétition: Ligue des champions UEFA."
+    ) == "Ligue des champions UEFA."
+    assert clean_local_news_chatbot_candidate(
+        "Teams: Ararat-Armenia and Shamrock Rovers."
+    ) == "Ararat-Armenia and Shamrock Rovers."
+
+
+# Cette fonction vérifie que le repli d'une question prédictive reste naturel, prudent et sourcé.
+def test_local_question_fallback_avoids_robotic_metadata_for_winner_question() -> None:
+    articles = [
+        build_chatbot_article(
+            "NEWS-03",
+            "Contexte du match",
+            "https://example.com/context",
+            "Ararat-Armenia (ARM)",
+        ),
+        build_chatbot_article(
+            "NEWS-05",
+            "Préparation des équipes",
+            "https://example.com/preparation",
+            "Shamrock Rovers (IRL)",
+        ),
+    ]
+    digests = [
+        {
+            **build_article_digest(articles[0]),
+            "summary": "Compétition: Ligue des champions UEFA, match aller.",
+            "key_facts": ["Match: Ararat-Armenia vs Shamrock Rovers."],
+        },
+        {
+            **build_article_digest(articles[1]),
+            "summary": "Teams: Ararat-Armenia and Shamrock Rovers.",
+            "key_facts": ["Date: 21 juillet 2026."],
+        },
+    ]
+
+    answer, source_ids, limitations = build_local_news_chatbot_fallback_answer(
+        mode=NewsChatbotMode.QUESTION,
+        question="Selon toi Ruby, qui va gagner ce match ?",
+        article_digests=digests,
+    )
+
+    assert "ne permettent pas de désigner un vainqueur fiable" in answer
+    assert "Le résultat reste donc ouvert" in answer
+    assert "Compétition:" not in answer
+    assert "Match:" not in answer
+    assert "Teams:" not in answer
+    assert source_ids == ["NEWS-03", "NEWS-05"]
+    assert "[NEWS-03]" in answer
+    assert "[NEWS-05]" in answer
+    assert limitations
+
+
+# Cette fonction vérifie que la question classe localement les sources et en retient au plus cinq.
+def test_question_article_selection_limits_and_prioritizes_relevant_sources() -> None:
+    articles = [
+        build_chatbot_article(
+            f"NEWS-{index:02d}",
+            f"Actualité générale {index}",
+            f"https://example.com/article-{index}",
+            "Ararat-Armenia (ARM)",
+        )
+        for index in range(1, 8)
+    ]
+    articles[-1]["title"] = "Deux absences confirmées avant le match"
+    articles[-1]["description"] = "Deux absences sont signalées dans le groupe."
+
+    selected_articles = select_news_chatbot_articles_for_question(
+        articles,
+        "Quelles absences sont confirmées ?",
+    )
+
+    assert len(selected_articles) == 5
+    assert selected_articles[0]["article_id"] == "NEWS-07"
+
+
+# Cette fonction vérifie que le mode question utilise des digests locaux puis un seul appel Groq final.
+def test_question_mode_skips_chunk_summarization_and_calls_groq_once(
+    monkeypatch,
+) -> None:
+    clear_news_chatbot_cache()
+    articles = [
+        build_chatbot_article(
+            f"NEWS-{index:02d}",
+            f"Préparation du match {index}",
+            f"https://example.com/preparation-{index}",
+            (
+                "Ararat-Armenia (ARM)"
+                if index % 2
+                else "Shamrock Rovers (IRL)"
+            ),
+        )
+        for index in range(1, 8)
+    ]
+    groq_calls = 0
+
+    # Ce faux préparateur fournit sept articles déjà extraits sans accès réseau.
+    async def fake_get_prepared_articles(match_id, match):
+        return articles, "fingerprint-fast-question", False
+
+    # Ce faux analyseur échoue si le chemin lent par fragments est appelé en mode question.
+    async def forbidden_summarize_articles(selected_articles):
+        raise AssertionError("Le mode question ne doit pas résumer les fragments avec Groq.")
+
+    # Ce faux client vérifie que seul le prompt final de cinq sources est envoyé.
+    async def fake_groq_completion(messages, **kwargs):
+        nonlocal groq_calls
+        groq_calls += 1
+        prompt = messages[0]["content"]
+        assert prompt.count("SOURCE_ID: NEWS-") == 5
+        assert kwargs["max_completion_tokens"] == 500
+        return {
+            "answer": (
+                "Ararat-Armenia semble disposer d'une préparation plus stable "
+                "selon les éléments publiés [NEWS-01]."
+            )
+        }
+
+    monkeypatch.setattr(
+        "app.services.match_news_chatbot_service.get_prepared_news_chatbot_articles",
+        fake_get_prepared_articles,
+    )
+    monkeypatch.setattr(
+        "app.services.match_news_chatbot_service.summarize_news_chatbot_articles",
+        forbidden_summarize_articles,
+    )
+    monkeypatch.setattr(
+        "app.services.match_news_chatbot_service.request_groq_chatbot_completion",
+        fake_groq_completion,
+    )
+
+    response = asyncio.run(
+        build_match_news_chatbot_response(
+            match_id=458,
+            match=FAKE_MATCH,
+            mode=NewsChatbotMode.QUESTION,
+            question="Quelle équipe semble la mieux préparée ?",
+        )
+    )
+
+    assert groq_calls == 1
+    assert response["status"] == "available"
+    assert response["source_articles_count"] == 7
+    assert response["analyzed_articles_count"] == 5
+    assert response["analyzed_chunks_count"] == 5
+    assert [source["article_id"] for source in response["sources"]] == [
+        "NEWS-01"
+    ]
+
+
+# Cette fonction vérifie que les digests rapides restent citables sans appel fournisseur.
+def test_fast_question_digests_preserve_source_metadata() -> None:
+    article = build_chatbot_article(
+        "NEWS-04",
+        "Point effectif avant le match",
+        "https://example.com/squad",
+        "Ararat-Armenia (ARM)",
+        content="Deux joueurs sont indisponibles pour la rencontre.",
+    )
+
+    digests = build_fast_question_article_digests([article])
+
+    assert len(digests) == 1
+    assert digests[0]["source_ids"] == ["NEWS-04"]
+    assert digests[0]["fast_local_digest"] is True
+    assert digests[0]["complete_analysis"] is True
+    assert "indisponibles" in digests[0]["summary"]
+
+
+# Cette fonction vérifie que le résumé rapide conserve toutes les sources sans appel fournisseur intermédiaire.
+def test_fast_summary_digests_preserve_all_sources_and_limit_content() -> None:
+    articles = [
+        build_chatbot_article(
+            f"NEWS-{index:02d}",
+            f"Actualité du match {index}",
+            f"https://example.com/summary-{index}",
+            "Ararat-Armenia (ARM)",
+            content=("Information détaillée sur la préparation. " * 100),
+        )
+        for index in range(1, 13)
+    ]
+
+    digests = build_fast_summary_article_digests(articles)
+
+    assert len(digests) == 12
+    assert [digest["article_id"] for digest in digests] == [
+        f"NEWS-{index:02d}" for index in range(1, 13)
+    ]
+    assert all(digest["fast_local_digest"] is True for digest in digests)
+    assert all(len(digest["summary"]) <= 1103 for digest in digests)
+
+
+# Cette fonction vérifie que le mode résumé utilise douze digests locaux puis un seul appel Groq final.
+def test_summary_mode_skips_chunk_summarization_and_calls_groq_once(
+    monkeypatch,
+) -> None:
+    clear_news_chatbot_cache()
+    articles = [
+        build_chatbot_article(
+            f"NEWS-{index:02d}",
+            f"Contexte du match {index}",
+            f"https://example.com/context-{index}",
+            (
+                "Ararat-Armenia (ARM)"
+                if index % 2
+                else "Shamrock Rovers (IRL)"
+            ),
+        )
+        for index in range(1, 13)
+    ]
+    groq_calls = 0
+
+    # Ce faux préparateur fournit douze articles déjà extraits sans accès réseau.
+    async def fake_get_prepared_articles(match_id, match):
+        return articles, "fingerprint-fast-summary", False
+
+    # Ce faux analyseur interdit l'ancien traitement Groq de chaque fragment.
+    async def forbidden_summarize_articles(selected_articles):
+        raise AssertionError("Le résumé ne doit plus résumer les fragments avec Groq.")
+
+    # Ce faux client vérifie qu'un seul prompt final contient les douze sources.
+    async def fake_groq_completion(messages, **kwargs):
+        nonlocal groq_calls
+        groq_calls += 1
+        prompt = messages[0]["content"]
+        assert prompt.count("SOURCE_ID: NEWS-") == 12
+        assert kwargs["max_completion_tokens"] == 900
+        return {
+            "answer": (
+                "Les deux équipes préparent la rencontre avec des informations "
+                "encore partielles [NEWS-01] [NEWS-02]."
+            )
+        }
+
+    monkeypatch.setattr(
+        "app.services.match_news_chatbot_service.get_prepared_news_chatbot_articles",
+        fake_get_prepared_articles,
+    )
+    monkeypatch.setattr(
+        "app.services.match_news_chatbot_service.summarize_news_chatbot_articles",
+        forbidden_summarize_articles,
+    )
+    monkeypatch.setattr(
+        "app.services.match_news_chatbot_service.request_groq_chatbot_completion",
+        fake_groq_completion,
+    )
+
+    response = asyncio.run(
+        build_match_news_chatbot_response(
+            match_id=459,
+            match=FAKE_MATCH,
+            mode=NewsChatbotMode.SUMMARY,
+        )
+    )
+
+    assert groq_calls == 1
+    assert response["source_articles_count"] == 12
+    assert response["analyzed_articles_count"] == 12
+    assert response["analyzed_chunks_count"] == 12
+    assert [source["article_id"] for source in response["sources"]] == [
+        "NEWS-01",
+        "NEWS-02",
+    ]
+
+
+# Cette fonction vérifie que le prompt question impose un style direct sans champs techniques.
+def test_news_chatbot_question_prompt_requests_natural_answer() -> None:
+    article = build_chatbot_article(
+        "NEWS-01",
+        "Article fiable",
+        "https://example.com/one",
+        "Ararat-Armenia (ARM)",
+    )
+    messages = build_news_chatbot_messages(
+        match=FAKE_MATCH,
+        mode=NewsChatbotMode.QUESTION,
+        question="Qui va gagner ?",
+        article_digests=[build_article_digest(article)],
+    )
+    prompt = messages[0]["content"]
+
+    assert "deux ou trois phrases naturelles et conversationnelles" in prompt
+    assert "Compétition:" in prompt
+    assert "n'affiche jamais" in prompt
+    assert "actualités seules" in prompt
+    assert "garantir un vainqueur" in prompt
+
+
+# Cette fonction vérifie qu'une citation invalide déclenche un repli local réellement sourcé.
+def test_match_news_chatbot_response_recovers_missing_citations_from_digests(
     monkeypatch,
 ) -> None:
     clear_news_chatbot_cache()
@@ -1163,12 +1513,104 @@ def test_match_news_chatbot_response_marks_missing_citations_as_insufficient(
 
     assert response["status"] == "partial"
     assert response["insufficient_data"] is True
-    assert response["sources"] == []
+    assert [source["article_id"] for source in response["sources"]] == ["NEWS-01"]
+    assert "[NEWS-01]" in response["answer"]
     assert any(
-        "citation" in limitation.lower()
+        "reconstruite" in limitation.lower()
         for limitation in response["limitations"]
     )
     assert "NEWS-99" not in response["answer"]
+
+
+# Cette fonction vérifie qu'une panne de génération finale conserve une synthèse locale citée.
+def test_match_news_chatbot_response_uses_local_fallback_when_final_generation_fails(
+    monkeypatch,
+) -> None:
+    clear_news_chatbot_cache()
+    articles = [
+        build_chatbot_article(
+            "NEWS-01",
+            "Préparation du match",
+            "https://example.com/preparation",
+            "Ararat-Armenia (ARM)",
+        )
+    ]
+
+    # Ce faux préparateur fournit un article déjà téléchargé.
+    async def fake_get_prepared_articles(match_id, match):
+        return articles, "fingerprint-final-failure", False
+
+    # Ce faux analyseur fournit un digest exploitable avant la génération finale.
+    async def fake_summarize_articles(selected_articles):
+        return [build_article_digest(articles[0])], 0
+
+    # Ce faux client reproduit un refus Groq sur la dernière étape.
+    async def fake_groq_completion(messages, **kwargs):
+        raise GroqChatbotError(
+            code="GROQ_REQUEST_REJECTED",
+            public_message="Refus fournisseur.",
+            status_code=502,
+        )
+
+    monkeypatch.setattr(
+        "app.services.match_news_chatbot_service.get_prepared_news_chatbot_articles",
+        fake_get_prepared_articles,
+    )
+    monkeypatch.setattr(
+        "app.services.match_news_chatbot_service.summarize_news_chatbot_articles",
+        fake_summarize_articles,
+    )
+    monkeypatch.setattr(
+        "app.services.match_news_chatbot_service.request_groq_chatbot_completion",
+        fake_groq_completion,
+    )
+
+    response = asyncio.run(
+        build_match_news_chatbot_response(
+            match_id=457,
+            match=FAKE_MATCH,
+            mode=NewsChatbotMode.SUMMARY,
+        )
+    )
+
+    assert response["status"] == "partial"
+    assert response["insufficient_data"] is True
+    assert "[NEWS-01]" in response["answer"]
+    assert [source["article_id"] for source in response["sources"]] == ["NEWS-01"]
+
+
+# Cette fonction vérifie qu'un article entièrement refusé par Groq conserve un extrait local non mis en cache.
+def test_summarize_article_builds_local_digest_when_all_chunks_fail(monkeypatch) -> None:
+    clear_news_chatbot_article_digest_cache()
+    article = build_chatbot_article(
+        "NEWS-01",
+        "Article avec extrait local",
+        "https://example.com/local-digest",
+        "Ararat-Armenia (ARM)",
+        content="Le groupe prépare le match à domicile avec prudence.",
+    )
+
+    # Ce faux client refuse chaque fragment afin d'activer le repli extractif.
+    async def fake_groq_completion(messages, **kwargs):
+        raise GroqChatbotError(
+            code="GROQ_REQUEST_REJECTED",
+            public_message="Refus fournisseur.",
+            status_code=502,
+        )
+
+    monkeypatch.setattr(
+        "app.services.news_chatbot_summarization_service.request_groq_chatbot_completion",
+        fake_groq_completion,
+    )
+
+    digest, from_cache = asyncio.run(summarize_news_chatbot_article(article))
+
+    assert from_cache is False
+    assert digest is not None
+    assert digest["article_id"] == "NEWS-01"
+    assert digest["complete_analysis"] is False
+    assert digest["source_ids"] == ["NEWS-01"]
+    assert digest["summary"]
 
 
 # Cette fonction vérifie le décodage JSON et le rejet d'une réponse Groq non structurée.
@@ -1288,6 +1730,45 @@ def test_groq_client_uses_gpt_oss_and_retries_after_429(monkeypatch) -> None:
         == "rubybets_test_response"
     )
     assert 2.0 in sleeps
+
+
+# Cette fonction vérifie que le mode texte final n'envoie aucun format JSON au fournisseur.
+def test_groq_client_text_mode_returns_plain_answer_without_response_format(monkeypatch) -> None:
+    clear_groq_rate_limit_state()
+    monkeypatch.setattr(settings, "groq_api_key", "test-key")
+    monkeypatch.setattr(settings, "groq_max_retries", 0)
+    requests: list[dict] = []
+
+    # Ce transport conserve le payload puis renvoie un texte cité simple.
+    def handler(request: httpx.Request) -> httpx.Response:
+        requests.append(json.loads(request.content.decode("utf-8")))
+        return httpx.Response(
+            200,
+            json={
+                "choices": [
+                    {"message": {"content": "Information vérifiée [NEWS-01]."}}
+                ],
+                "usage": {"prompt_tokens": 10, "completion_tokens": 8},
+            },
+            request=request,
+        )
+
+    # Cette coroutine exécute l'appel texte avec un transport local simulé.
+    async def execute_test() -> dict:
+        async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+            return await request_groq_chatbot_completion(
+                [{"role": "user", "content": "Réponds avec une citation."}],
+                max_completion_tokens=64,
+                response_format_mode="text",
+                structured_retry_limit=0,
+                client=client,
+            )
+
+    result = asyncio.run(execute_test())
+
+    assert result["answer"] == "Information vérifiée [NEWS-01]."
+    assert "response_format" not in requests[0]
+    assert requests[0]["tool_choice"] == "none"
 
 
 # Cette fonction vérifie qu'un long prompt structuré reçoit immédiatement un budget de sortie suffisant.
@@ -1475,6 +1956,104 @@ def test_groq_client_retries_tool_use_failed_without_tools(monkeypatch) -> None:
     assert requests[1]["parallel_tool_calls"] is False
     assert requests[1]["temperature"] == 0.0
     assert requests[1]["max_completion_tokens"] == 1024
+
+
+# Cette fonction vérifie le repli JSON simple après deux échecs structurés successifs.
+def test_groq_client_falls_back_to_json_object_after_structured_failures(monkeypatch) -> None:
+    clear_groq_rate_limit_state()
+    monkeypatch.setattr(settings, "groq_api_key", "test-key")
+    monkeypatch.setattr(settings, "groq_model", "openai/gpt-oss-120b")
+    monkeypatch.setattr(settings, "groq_max_retries", 2)
+    requests: list[dict] = []
+
+    # Ce transport reproduit tool_use_failed, json_validate_failed puis une réponse JSON valide.
+    def handler(request: httpx.Request) -> httpx.Response:
+        requests.append(json.loads(request.content.decode("utf-8")))
+
+        if len(requests) == 1:
+            return httpx.Response(
+                400,
+                json={
+                    "error": {
+                        "message": "Failed to call a tool.",
+                        "type": "invalid_request_error",
+                        "code": "tool_use_failed",
+                    }
+                },
+                request=request,
+            )
+
+        if len(requests) == 2:
+            return httpx.Response(
+                400,
+                json={
+                    "error": {
+                        "message": "Failed to generate JSON.",
+                        "type": "invalid_request_error",
+                        "code": "json_validate_failed",
+                    }
+                },
+                request=request,
+            )
+
+        return httpx.Response(
+            200,
+            json={
+                "choices": [
+                    {
+                        "message": {
+                            "content": '{"answer":"OK","source_ids":[],"insufficient_data":false,"limitations":[]}'
+                        }
+                    }
+                ],
+                "usage": {"prompt_tokens": 10, "completion_tokens": 10},
+            },
+            request=request,
+        )
+
+    # Cette fonction évite toute attente réelle pendant les reprises simulées.
+    async def fake_sleep(_seconds: float) -> None:
+        return None
+
+    # Cette coroutine exécute le scénario complet avec un transport HTTP local.
+    async def execute_test() -> dict:
+        async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+            return await request_groq_chatbot_completion(
+                [{"role": "user", "content": "Retourne uniquement un objet JSON valide."}],
+                max_completion_tokens=420,
+                response_schema={
+                    "type": "object",
+                    "properties": {
+                        "answer": {"type": "string"},
+                        "source_ids": {"type": "array", "items": {"type": "string"}},
+                        "insufficient_data": {"type": "boolean"},
+                        "limitations": {"type": "array", "items": {"type": "string"}},
+                    },
+                    "required": [
+                        "answer",
+                        "source_ids",
+                        "insufficient_data",
+                        "limitations",
+                    ],
+                    "additionalProperties": False,
+                },
+                response_schema_name="rubybets_fallback_test",
+                client=client,
+                sleep_func=fake_sleep,
+            )
+
+    result = asyncio.run(execute_test())
+
+    assert result["answer"] == "OK"
+    assert len(requests) == 3
+    assert requests[0]["response_format"]["type"] == "json_schema"
+    assert requests[1]["response_format"]["type"] == "json_schema"
+    assert requests[2]["response_format"] == {"type": "json_object"}
+    assert requests[0]["max_completion_tokens"] == 420
+    assert requests[1]["max_completion_tokens"] == 1024
+    assert requests[2]["max_completion_tokens"] == 2048
+    assert requests[2]["tool_choice"] == "none"
+    assert requests[2]["parallel_tool_calls"] is False
 
 
 # Cette fonction vérifie le contrat public de la route avec un service entièrement simulé.

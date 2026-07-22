@@ -6,6 +6,9 @@ from datetime import datetime
 from typing import Any
 
 from app.services.database_service import get_database_connection
+from app.v19.domain.decision_contracts import DecisionResultV1
+from app.v19.domain.decision_enums import DecisionStatus
+from app.v19.explainability.explanation_builder import build_public_explanation
 
 
 # Cette fonction produit une justification publique sans métrique ou détail interne.
@@ -614,6 +617,288 @@ def build_archive_justification(
     )
 
 
+V19_ARCHIVE_RESPONSIBLE_NOTE = (
+    "Décision analytique expérimentale avant-match. "
+    "RubyBets ne garantit aucun résultat sportif et ne permet aucune prise de pari."
+)
+
+
+# Cette fonction normalise un niveau V19 pour respecter les contraintes PostgreSQL des archives.
+def normalize_v19_archive_level(value: Any) -> str | None:
+    normalized_value = str(value or "").strip().lower()
+
+    if normalized_value in {"low", "medium", "high"}:
+        return normalized_value
+
+    return None
+
+
+# Cette fonction traduit les marchés V19 vers les libellés déjà utilisés par l'écran Archives.
+def normalize_v19_archive_market_type(value: Any) -> str:
+    market_map = {
+        "STRICT_1X2": "1X2",
+        "DOUBLE_CHANCE": "DOUBLE_CHANCE",
+        "OVER_1_5": "OVER_1_5",
+        "BTTS": "BTTS",
+    }
+    normalized_value = str(getattr(value, "value", value) or "").strip().upper()
+    return market_map.get(normalized_value, normalized_value)
+
+
+# Cette fonction construit une justification V19 publique à partir de l'explication déjà validée.
+def build_v19_archive_justification(result: DecisionResultV1) -> str:
+    explanation = build_public_explanation(
+        result=result,
+        responsible_note=V19_ARCHIVE_RESPONSIBLE_NOTE,
+    )
+    summary = str(explanation.get("summary") or "").strip()
+    supporting_factors = explanation.get("supporting_factors") or []
+
+    first_factor = ""
+    if isinstance(supporting_factors, list) and supporting_factors:
+        first_factor = str(supporting_factors[0] or "").strip()
+
+    if summary and first_factor:
+        return f"{summary} {first_factor}"
+
+    if summary:
+        return summary
+
+    return (
+        "Décision V19 archivée à partir des données disponibles "
+        "au moment de l’analyse."
+    )
+
+
+# Cette fonction transforme une décision V19 RECOMMEND en une ligne d'archive unique.
+def build_v19_archived_prediction_payload(
+    result: DecisionResultV1,
+) -> dict[str, Any] | None:
+    candidate = result.selected_candidate
+
+    if result.status is not DecisionStatus.RECOMMEND or candidate is None:
+        return None
+
+    metadata = dict(result.metadata)
+    home_team_name = str(
+        metadata.get("archive_home_team_name") or "Équipe domicile"
+    )
+    away_team_name = str(
+        metadata.get("archive_away_team_name") or "Équipe extérieure"
+    )
+
+    return {
+        "rubybets_match_id": str(result.match_id),
+        "source_match_id": metadata.get("archive_source_match_id"),
+        "competition_name": metadata.get("archive_competition_name"),
+        "home_team_name": home_team_name,
+        "away_team_name": away_team_name,
+        "home_team_logo_url": metadata.get("archive_home_team_logo_url"),
+        "away_team_logo_url": metadata.get("archive_away_team_logo_url"),
+        "home_team_country_code": metadata.get(
+            "archive_home_team_country_code"
+        ),
+        "away_team_country_code": metadata.get(
+            "archive_away_team_country_code"
+        ),
+        "match_date": normalize_archive_datetime(
+            metadata.get("archive_match_date")
+        ),
+        "market_type": normalize_v19_archive_market_type(
+            candidate.market_type
+        ),
+        "predicted_value": str(
+            candidate.recommendation_value or "UNKNOWN"
+        ),
+        "confidence_level": normalize_v19_archive_level(
+            candidate.confidence_level
+        ),
+        "risk_level": normalize_v19_archive_level(
+            candidate.local_risk_level
+        ),
+        "justification": build_v19_archive_justification(result),
+        "engine_version": str(result.engine_version),
+        "final_home_score": None,
+        "final_away_score": None,
+        "match_status": str(
+            metadata.get("archive_match_status") or "SCHEDULED"
+        ),
+        "verdict": "pending",
+        "checked_at": None,
+    }
+
+
+# Cette fonction supprime une ancienne décision V19 encore en attente lorsque le moteur s'abstient désormais.
+def delete_pending_v19_archive(result: DecisionResultV1) -> int:
+    query = """
+        DELETE FROM archived_predictions
+        WHERE rubybets_match_id = %(rubybets_match_id)s
+          AND engine_version = %(engine_version)s
+          AND verdict = 'pending';
+    """
+    params = {
+        "rubybets_match_id": str(result.match_id),
+        "engine_version": str(result.engine_version),
+    }
+
+    with get_database_connection() as connection:
+        with connection.cursor() as cursor:
+            cursor.execute(query, params)
+            removed_count = max(0, int(cursor.rowcount or 0))
+
+        connection.commit()
+
+    return removed_count
+
+
+# Cette fonction insère ou remplace l'unique décision V19 active d'un match et d'une version moteur.
+def upsert_v19_archived_prediction(payload: dict[str, Any]) -> int:
+    select_query = """
+        SELECT id
+        FROM archived_predictions
+        WHERE rubybets_match_id = %(rubybets_match_id)s
+          AND engine_version = %(engine_version)s
+        ORDER BY id DESC
+        LIMIT 1;
+    """
+
+    update_query = """
+        UPDATE archived_predictions
+        SET
+            source_match_id = %(source_match_id)s,
+            competition_name = %(competition_name)s,
+            home_team_name = %(home_team_name)s,
+            away_team_name = %(away_team_name)s,
+            home_team_logo_url = %(home_team_logo_url)s,
+            away_team_logo_url = %(away_team_logo_url)s,
+            home_team_country_code = %(home_team_country_code)s,
+            away_team_country_code = %(away_team_country_code)s,
+            match_date = %(match_date)s,
+            prediction_date = CURRENT_TIMESTAMP,
+            market_type = %(market_type)s,
+            predicted_value = %(predicted_value)s,
+            confidence_level = %(confidence_level)s,
+            risk_level = %(risk_level)s,
+            justification = %(justification)s,
+            final_home_score = %(final_home_score)s,
+            final_away_score = %(final_away_score)s,
+            match_status = %(match_status)s,
+            verdict = %(verdict)s,
+            checked_at = %(checked_at)s,
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = %(id)s;
+    """
+
+    insert_query = """
+        INSERT INTO archived_predictions (
+            rubybets_match_id,
+            source_match_id,
+            competition_name,
+            home_team_name,
+            away_team_name,
+            home_team_logo_url,
+            away_team_logo_url,
+            home_team_country_code,
+            away_team_country_code,
+            match_date,
+            market_type,
+            predicted_value,
+            confidence_level,
+            risk_level,
+            justification,
+            engine_version,
+            final_home_score,
+            final_away_score,
+            match_status,
+            verdict,
+            checked_at
+        )
+        VALUES (
+            %(rubybets_match_id)s,
+            %(source_match_id)s,
+            %(competition_name)s,
+            %(home_team_name)s,
+            %(away_team_name)s,
+            %(home_team_logo_url)s,
+            %(away_team_logo_url)s,
+            %(home_team_country_code)s,
+            %(away_team_country_code)s,
+            %(match_date)s,
+            %(market_type)s,
+            %(predicted_value)s,
+            %(confidence_level)s,
+            %(risk_level)s,
+            %(justification)s,
+            %(engine_version)s,
+            %(final_home_score)s,
+            %(final_away_score)s,
+            %(match_status)s,
+            %(verdict)s,
+            %(checked_at)s
+        );
+    """
+
+    with get_database_connection() as connection:
+        with connection.cursor() as cursor:
+            cursor.execute(select_query, payload)
+            existing_archive = cursor.fetchone()
+
+            if existing_archive:
+                cursor.execute(
+                    update_query,
+                    {
+                        **payload,
+                        "id": existing_archive[0],
+                    },
+                )
+            else:
+                cursor.execute(insert_query, payload)
+
+        connection.commit()
+
+    return 1
+
+
+# Cette fonction archive la décision officielle V19 sans bloquer la réponse produit en cas d'indisponibilité PostgreSQL.
+def archive_v19_decision(
+    result: DecisionResultV1,
+) -> dict[str, Any]:
+    try:
+        if result.status is not DecisionStatus.RECOMMEND:
+            removed_count = delete_pending_v19_archive(result)
+            return {
+                "status": "removed" if removed_count else "skipped",
+                "archived_count": 0,
+                "removed_count": removed_count,
+            }
+
+        payload = build_v19_archived_prediction_payload(result)
+        if payload is None:
+            return {
+                "status": "skipped",
+                "archived_count": 0,
+                "removed_count": 0,
+            }
+
+        archived_count = upsert_v19_archived_prediction(payload)
+        return {
+            "status": "archived",
+            "archived_count": archived_count,
+            "removed_count": 0,
+        }
+
+    except Exception:
+        return {
+            "status": "unavailable",
+            "archived_count": 0,
+            "removed_count": 0,
+            "message": (
+                "Archive V19 persistence failed without blocking "
+                "the prediction response."
+            ),
+        }
+
+
 # Cette fonction transforme une réponse ML nationale en lignes prêtes à archiver.
 def build_archived_prediction_payloads(
     inference_response: dict[str, Any],
@@ -838,7 +1123,7 @@ def archive_national_dynamic_predictions(
 
 
 # Schéma de communication :
-# backend/app/api/experimental_ml_national_v18_3_3.py
+# backend/app/api/experimental_ml_v19.py / experimental_ml_national_v18_3_3.py
 #     ↓
 # archives_service.py
 #     ↓

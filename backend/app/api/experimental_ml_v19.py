@@ -6,8 +6,10 @@ from __future__ import annotations
 from typing import Any
 from uuid import uuid4
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, BackgroundTasks, HTTPException
 from pydantic import BaseModel, Field
+
+from app.services.archives_service import archive_v19_decision
 
 from app.v19.application.v19_selection_service import (
     V19ExcludedMatchV1,
@@ -325,7 +327,10 @@ def build_v19_product_api_response(
 
 # Retourne la décision produit V19 d'un match réel tout en conservant l'abstention comme sortie HTTP normale.
 @router.get("/rubybets-matches/{match_id}")
-async def get_v19_rubybets_match_prediction(match_id: int) -> dict[str, Any]:
+async def get_v19_rubybets_match_prediction(
+    match_id: int,
+    background_tasks: BackgroundTasks,
+) -> dict[str, Any]:
     request_id = build_request_id(match_id)
 
     try:
@@ -370,6 +375,8 @@ async def get_v19_rubybets_match_prediction(match_id: int) -> dict[str, Any]:
                 "match_id": match_id,
             },
         ) from exc
+
+    background_tasks.add_task(archive_v19_decision, result)
 
     return build_v19_product_api_response(
         match_id=match_id,
@@ -438,6 +445,7 @@ async def create_v19_selection(
 #   -> appelle v19_prediction_service.py pour une décision individuelle
 #   -> appelle v19_selection_service.py pour la composition multi-matchs
 #   -> appelle explanation_builder.py pour les projections publiques
+#   -> programme archives_service.py après une décision individuelle
 #   -> projette uniquement le contrat public sans diagnostics internes
 #   -> est enregistré dans backend/app/main.py
 #   -> n'expose jamais score brut, odds, bookmaker ou payload fournisseur

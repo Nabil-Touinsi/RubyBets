@@ -72,6 +72,7 @@ function App() {
   // Références techniques empêchant les doubles chargements initiaux et les réponses obsolètes.
   const initialLoadStarted = useRef<boolean>(false);
   const matchLoadRequestId = useRef<number>(0);
+  const selectedMatchLoadRequestId = useRef<number>(0);
 
   // États liés au match sélectionné.
   const [selectedMatchDetails, setSelectedMatchDetails] =
@@ -191,6 +192,7 @@ function App() {
 
   // Réinitialise les données qui dépendent de la compétition active.
   function resetCompetitionDependentState() {
+    selectedMatchLoadRequestId.current += 1;
     setSelectedMatchDetails(null);
     setSelectedMatchContext(null);
     setSelectedMatchAnalysis(null);
@@ -356,11 +358,45 @@ function App() {
     void loadMatchesForCompetition(competitionCode, competitions);
   }
 
-  // Charge les données d’un match sélectionné sans bloquer tout l’affichage si un appel API échoue.
+  // Vérifie qu’une réponse API appartient toujours au dernier match demandé.
+  function isCurrentSelectedMatchRequest(requestId: number): boolean {
+    return selectedMatchLoadRequestId.current === requestId;
+  }
+
+  // Construit un détail provisoire depuis la liste afin d’afficher immédiatement l’en-tête du match.
+  function buildOptimisticMatchDetails(matchId: number): MatchDetailsResponse | null {
+    const selectedMatch = matches.find((match) => match.id === matchId);
+
+    if (!selectedMatch) {
+      return null;
+    }
+
+    const lastUpdated = selectedMatch.last_updated ?? null;
+
+    return {
+      source: "matches-list",
+      match: selectedMatch,
+      data_freshness: {
+        source: "matches-list",
+        provider: "RubyBets",
+        from_cache: true,
+        updated_at: lastUpdated,
+        last_updated: lastUpdated,
+        ttl_minutes: 0,
+      },
+    };
+  }
+
+  // Charge chaque bloc du match indépendamment pour afficher la fiche sans attendre l’appel le plus lent.
   function handleSelectMatch(matchId: number) {
+    const requestId = selectedMatchLoadRequestId.current + 1;
+    const competitionCode = selectedCompetition;
+    const optimisticMatchDetails = buildOptimisticMatchDetails(matchId);
+
+    selectedMatchLoadRequestId.current = requestId;
     setCurrentScreen("match-details");
 
-    setSelectedMatchDetails(null);
+    setSelectedMatchDetails(optimisticMatchDetails);
     setSelectedMatchContext(null);
     setSelectedMatchAnalysis(null);
     setSelectedMatchPredictions(null);
@@ -380,108 +416,175 @@ function App() {
     setV19H2HStatus("Chargement de l’analyse H2H V19...");
     setV19ProductStatus("Chargement de la décision produit V19...");
 
-    Promise.allSettled([
-      getMatchDetails(matchId),
-      getMatchContext(matchId),
-      getMatchAnalysis(matchId),
-      getMatchPredictions(matchId),
-      getMatchLineups(matchId),
-      getMatchNewsContext(matchId),
-      getNationalDynamicPredictionByRubyBetsMatchId(matchId),
-      getMatchTeamHistory(matchId),
-      getV19H2HAnalysis(matchId, selectedCompetition),
-      getV19ProductPrediction(matchId),
-    ]).then(
-      ([
-        detailsResult,
-        contextResult,
-        analysisResult,
-        predictionsResult,
-        lineupsResult,
-        newsContextResult,
-        nationalMlPredictionResult,
-        teamHistoryResult,
-        v19H2HResult,
-        v19ProductResult,
-      ]) => {
-        if (detailsResult.status === "fulfilled") {
-          setSelectedMatchDetails(detailsResult.value);
-          setMatchDetailsStatus("Détail du match chargé");
-        } else {
+    void getMatchDetails(matchId)
+      .then((data) => {
+        if (!isCurrentSelectedMatchRequest(requestId)) {
+          return;
+        }
+
+        setSelectedMatchDetails(data);
+        setMatchDetailsStatus("Détail du match chargé");
+      })
+      .catch(() => {
+        if (!isCurrentSelectedMatchRequest(requestId)) {
+          return;
+        }
+
+        if (!optimisticMatchDetails) {
           setSelectedMatchDetails(null);
-          setMatchDetailsStatus("Impossible de charger le détail du match");
+        }
+        setMatchDetailsStatus("Impossible de charger le détail complet du match");
+      });
+
+    void getMatchContext(matchId)
+      .then((data) => {
+        if (!isCurrentSelectedMatchRequest(requestId)) {
+          return;
         }
 
-        if (contextResult.status === "fulfilled") {
-          setSelectedMatchContext(contextResult.value);
-          setMatchContextStatus("Contexte avant-match chargé");
-        } else {
-          setSelectedMatchContext(null);
-          setMatchContextStatus("Impossible de charger le contexte avant-match");
+        setSelectedMatchContext(data);
+        setMatchContextStatus("Contexte avant-match chargé");
+      })
+      .catch(() => {
+        if (!isCurrentSelectedMatchRequest(requestId)) {
+          return;
         }
 
-        if (analysisResult.status === "fulfilled") {
-          setSelectedMatchAnalysis(analysisResult.value);
-          setMatchAnalysisStatus("Analyse pré-match chargée");
-        } else {
-          setSelectedMatchAnalysis(null);
-          setMatchAnalysisStatus("Impossible de charger l’analyse pré-match");
+        setSelectedMatchContext(null);
+        setMatchContextStatus("Impossible de charger le contexte avant-match");
+      });
+
+    void getMatchAnalysis(matchId)
+      .then((data) => {
+        if (!isCurrentSelectedMatchRequest(requestId)) {
+          return;
         }
 
-        if (predictionsResult.status === "fulfilled") {
-          setSelectedMatchPredictions(predictionsResult.value);
-          setMatchPredictionsStatus("Prédictions chargées");
-        } else {
-          setSelectedMatchPredictions(null);
-          setMatchPredictionsStatus("Impossible de charger les prédictions");
+        setSelectedMatchAnalysis(data);
+        setMatchAnalysisStatus("Analyse pré-match chargée");
+      })
+      .catch(() => {
+        if (!isCurrentSelectedMatchRequest(requestId)) {
+          return;
         }
 
-        if (lineupsResult.status === "fulfilled") {
-          setSelectedMatchLineups(lineupsResult.value);
-          setMatchLineupsStatus("Compositions chargées");
-        } else {
-          setSelectedMatchLineups(null);
-          setMatchLineupsStatus("Impossible de charger les compositions");
+        setSelectedMatchAnalysis(null);
+        setMatchAnalysisStatus("Impossible de charger l’analyse pré-match");
+      });
+
+    void getMatchPredictions(matchId)
+      .then((data) => {
+        if (!isCurrentSelectedMatchRequest(requestId)) {
+          return;
         }
 
-        if (newsContextResult.status === "fulfilled") {
-          setSelectedMatchNewsContext(newsContextResult.value);
-          setMatchNewsContextStatus("Actualités contextuelles chargées");
-        } else {
-          setSelectedMatchNewsContext(null);
-          setMatchNewsContextStatus("Impossible de charger les actualités contextuelles");
+        setSelectedMatchPredictions(data);
+        setMatchPredictionsStatus("Prédictions chargées");
+      })
+      .catch(() => {
+        if (!isCurrentSelectedMatchRequest(requestId)) {
+          return;
         }
 
-        if (nationalMlPredictionResult.status === "fulfilled") {
-          setSelectedNationalMlPrediction(nationalMlPredictionResult.value);
-        } else {
+        setSelectedMatchPredictions(null);
+        setMatchPredictionsStatus("Impossible de charger les prédictions");
+      });
+
+    void getMatchLineups(matchId)
+      .then((data) => {
+        if (!isCurrentSelectedMatchRequest(requestId)) {
+          return;
+        }
+
+        setSelectedMatchLineups(data);
+        setMatchLineupsStatus("Compositions chargées");
+      })
+      .catch(() => {
+        if (!isCurrentSelectedMatchRequest(requestId)) {
+          return;
+        }
+
+        setSelectedMatchLineups(null);
+        setMatchLineupsStatus("Impossible de charger les compositions");
+      });
+
+    void getMatchNewsContext(matchId)
+      .then((data) => {
+        if (!isCurrentSelectedMatchRequest(requestId)) {
+          return;
+        }
+
+        setSelectedMatchNewsContext(data);
+        setMatchNewsContextStatus("Actualités contextuelles chargées");
+      })
+      .catch(() => {
+        if (!isCurrentSelectedMatchRequest(requestId)) {
+          return;
+        }
+
+        setSelectedMatchNewsContext(null);
+        setMatchNewsContextStatus("Impossible de charger les actualités contextuelles");
+      });
+
+    void getNationalDynamicPredictionByRubyBetsMatchId(matchId)
+      .then((data) => {
+        if (isCurrentSelectedMatchRequest(requestId)) {
+          setSelectedNationalMlPrediction(data);
+        }
+      })
+      .catch(() => {
+        if (isCurrentSelectedMatchRequest(requestId)) {
           setSelectedNationalMlPrediction(null);
         }
+      });
 
-        if (teamHistoryResult.status === "fulfilled") {
-          setSelectedTeamHistory(teamHistoryResult.value);
-        } else {
+    void getMatchTeamHistory(matchId)
+      .then((data) => {
+        if (isCurrentSelectedMatchRequest(requestId)) {
+          setSelectedTeamHistory(data);
+        }
+      })
+      .catch(() => {
+        if (isCurrentSelectedMatchRequest(requestId)) {
           setSelectedTeamHistory(null);
         }
+      });
 
-
-        if (v19H2HResult.status === "fulfilled") {
-          setSelectedV19H2HAnalysis(v19H2HResult.value);
-          setV19H2HStatus("Analyse H2H V19 chargée");
-        } else {
-          setSelectedV19H2HAnalysis(null);
-          setV19H2HStatus("Analyse H2H V19 indisponible pour ce match");
+    void getV19H2HAnalysis(matchId, competitionCode)
+      .then((data) => {
+        if (!isCurrentSelectedMatchRequest(requestId)) {
+          return;
         }
 
-        if (v19ProductResult.status === "fulfilled") {
-          setSelectedV19ProductPrediction(v19ProductResult.value);
-          setV19ProductStatus("Décision produit V19 chargée");
-        } else {
-          setSelectedV19ProductPrediction(null);
-          setV19ProductStatus("Décision produit V19 indisponible pour ce match");
+        setSelectedV19H2HAnalysis(data);
+        setV19H2HStatus("Analyse H2H V19 chargée");
+      })
+      .catch(() => {
+        if (!isCurrentSelectedMatchRequest(requestId)) {
+          return;
         }
-      }
-    );
+
+        setSelectedV19H2HAnalysis(null);
+        setV19H2HStatus("Analyse H2H V19 indisponible pour ce match");
+      });
+
+    void getV19ProductPrediction(matchId)
+      .then((data) => {
+        if (!isCurrentSelectedMatchRequest(requestId)) {
+          return;
+        }
+
+        setSelectedV19ProductPrediction(data);
+        setV19ProductStatus("Décision produit V19 chargée");
+      })
+      .catch(() => {
+        if (!isCurrentSelectedMatchRequest(requestId)) {
+          return;
+        }
+
+        setSelectedV19ProductPrediction(null);
+        setV19ProductStatus("Décision produit V19 indisponible pour ce match");
+      });
   }
 
   // Génère une sélection V19 à partir des identifiants des matchs actuellement chargés.
@@ -701,6 +804,7 @@ export default App;
 // ├── peut transmettre StatusPanel.tsx à AppShell.tsx uniquement en mode debug
 // ├── affiche les écrans du dossier screens/ selon l’écran actif
 // ├── sélectionne automatiquement la première compétition disposant de matchs lorsque la compétition demandée est vide
-// ├── ignore les réponses de chargement devenues obsolètes lors d’un changement rapide de compétition
+// ├── ignore les réponses devenues obsolètes lors d’un changement rapide de compétition ou de match
+// ├── affiche immédiatement le match depuis la liste puis hydrate chaque bloc API indépendamment
 // ├── branche l’écran Sélection sur la route publique V19 à partir des matchs déjà chargés
 // └── affiche l’écran Archives avec données mockées avant création du backend dédié

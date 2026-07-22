@@ -13,6 +13,7 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 from app.api import experimental_ml_v19 as v19_product_api
+from app.services import archives_service
 from app.main import app as main_app
 from app.v19.application.v19_prediction_service import (
     V19_PRODUCT_SERVICE_VERSION,
@@ -52,17 +53,22 @@ def build_target_match() -> dict[str, Any]:
         "source": "flashscore_rapidapi",
         "status": "SCHEDULED",
         "utcDate": "2026-07-14T18:00:00Z",
+        "competition": {
+            "name": "Champions League - Qualification",
+        },
         "homeTeam": {
             "id": 101,
             "sourceTeamId": HOME_TEAM_ID,
             "sourceEventParticipantId": HOME_EVENT_PARTICIPANT_ID,
             "name": "Home FC",
+            "crest": "https://example.invalid/home.png",
         },
         "awayTeam": {
             "id": 202,
             "sourceTeamId": AWAY_TEAM_ID,
             "sourceEventParticipantId": AWAY_EVENT_PARTICIPANT_ID,
             "name": "Away FC",
+            "crest": "https://example.invalid/away.png",
         },
     }
 
@@ -383,6 +389,12 @@ def test_v19_product_api_hides_internal_decision_diagnostics(monkeypatch) -> Non
     expected_result = run_product_service(
         odds_payload=build_market_payload(1.10, 10.0, 10.0),
     )
+    archived_results = []
+
+    # Simule l'archivage d'arrière-plan sans ouvrir de connexion PostgreSQL.
+    def fake_archive_v19_decision(result):
+        archived_results.append(result)
+        return {"status": "archived", "archived_count": 1}
 
     # Retourne une décision contrôlée et reporte l'identifiant de requête transmis par la route.
     async def fake_build_v19_prediction_for_match(**kwargs):
@@ -398,6 +410,11 @@ def test_v19_product_api_hides_internal_decision_diagnostics(monkeypatch) -> Non
         v19_product_api,
         "build_v19_prediction_for_match",
         fake_build_v19_prediction_for_match,
+    )
+    monkeypatch.setattr(
+        v19_product_api,
+        "archive_v19_decision",
+        fake_archive_v19_decision,
     )
     monkeypatch.setattr(
         v19_product_api,
@@ -427,6 +444,92 @@ def test_v19_product_api_hides_internal_decision_diagnostics(monkeypatch) -> Non
     assert "odds" not in serialized
     assert "bookmaker test" not in serialized
     assert "ne garantit aucun résultat sportif" in payload["responsible_note"]
+    assert len(archived_results) == 1
+    assert archived_results[0].match_id == expected_result.match_id
+    assert archived_results[0].status is expected_result.status
+
+
+# Vérifie qu'une décision V19 RECOMMEND produit un payload d'archive unique et responsable.
+def test_v19_recommendation_builds_archive_payload() -> None:
+    result = run_product_service(
+        odds_payload=build_market_payload(1.10, 10.0, 10.0),
+    )
+
+    payload = archives_service.build_v19_archived_prediction_payload(result)
+
+    assert payload is not None
+    assert payload["rubybets_match_id"] == str(MATCH_ID)
+    assert payload["source_match_id"] == "AbC123"
+    assert payload["competition_name"] == "Champions League - Qualification"
+    assert payload["home_team_name"] == "Home FC"
+    assert payload["away_team_name"] == "Away FC"
+    assert payload["market_type"] == "1X2"
+    assert payload["predicted_value"] == "HOME_WIN"
+    assert payload["verdict"] == "pending"
+    assert payload["match_status"] == "SCHEDULED"
+    assert payload["match_date"] == datetime(2026, 7, 14, 18, 0)
+
+    public_justification = payload["justification"].lower()
+    assert "probabilité" not in public_justification
+    assert "raw_score" not in public_justification
+    assert "odds" not in public_justification
+    assert "bookmaker" not in public_justification
+
+
+# Vérifie que l'archivage V19 remplace la décision active sans dépendre du marché précédent.
+def test_archive_v19_recommendation_uses_single_upsert(monkeypatch) -> None:
+    result = run_product_service(
+        odds_payload=build_market_payload(1.10, 10.0, 10.0),
+    )
+    captured_payloads = []
+
+    # Capture le payload sans ouvrir de connexion PostgreSQL.
+    def fake_upsert(payload):
+        captured_payloads.append(payload)
+        return 1
+
+    monkeypatch.setattr(
+        archives_service,
+        "upsert_v19_archived_prediction",
+        fake_upsert,
+    )
+
+    archive_status = archives_service.archive_v19_decision(result)
+
+    assert archive_status == {
+        "status": "archived",
+        "archived_count": 1,
+        "removed_count": 0,
+    }
+    assert len(captured_payloads) == 1
+    assert captured_payloads[0]["engine_version"] == result.engine_version
+
+
+# Vérifie qu'une abstention V19 retire seulement une ancienne décision encore en attente.
+def test_archive_v19_abstention_removes_pending_decision(monkeypatch) -> None:
+    result = run_product_service(odds_payload=None)
+    removed_results = []
+
+    # Simule la suppression d'une ancienne recommandation devenue obsolète avant le match.
+    def fake_delete_pending(archived_result):
+        removed_results.append(archived_result)
+        return 1
+
+    monkeypatch.setattr(
+        archives_service,
+        "delete_pending_v19_archive",
+        fake_delete_pending,
+    )
+
+    archive_status = archives_service.archive_v19_decision(result)
+
+    assert result.status is DecisionStatus.ABSTAIN
+    assert archive_status == {
+        "status": "removed",
+        "archived_count": 0,
+        "removed_count": 1,
+    }
+    assert removed_results == [result]
 
 
 # Vérifie la traduction HTTP stable des erreurs applicatives du pipeline produit V19.
@@ -534,5 +637,5 @@ def test_product_pipeline_rejects_started_match_before_downstream_calls() -> Non
 #   -> injecte match, odds et historiques contrôlés dans v19_prediction_service.py
 #   -> valide les quatre experts, l'orchestrateur et les cas RECOMMEND / ABSTAIN
 #   -> vérifie le rejet avant appel aval des matchs déjà commencés
-#   -> teste experimental_ml_v19.py et l'enregistrement dans main.py
+#   -> teste experimental_ml_v19.py, l'archivage V19 et l'enregistrement dans main.py
 #   -> interdit tout appel réseau réel et toute exposition des diagnostics, odds ou payloads fournisseurs

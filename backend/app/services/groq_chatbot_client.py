@@ -23,6 +23,7 @@ _GROQ_LONG_STRUCTURED_PROMPT_CHARACTERS = 5000
 _GROQ_LONG_STRUCTURED_OUTPUT_TOKENS = 1024
 _GROQ_JSON_RETRY_OUTPUT_TOKENS = 2048
 _GROQ_STRUCTURED_RETRY_CODES = {"json_validate_failed", "tool_use_failed"}
+_GROQ_JSON_OBJECT_RESPONSE_FORMAT = {"type": "json_object"}
 _GROQ_TOKEN_EVENTS: deque[tuple[float, int]] = deque()
 _GROQ_TOKEN_EVENTS_LOCK = Lock()
 
@@ -212,12 +213,40 @@ def build_groq_response_format(
     }
 
 
-# Cette fonction appelle Groq sans outil externe et impose un contrat JSON Schema strict.
+# Cette fonction prépare une nouvelle tentative structurée sans revenir vers un format plus strict.
+def apply_groq_structured_output_recovery(
+    payload: dict[str, Any],
+    structured_failure_count: int,
+) -> str:
+    payload["max_completion_tokens"] = min(
+        max(
+            int(payload["max_completion_tokens"]) * 2,
+            _GROQ_LONG_STRUCTURED_OUTPUT_TOKENS,
+        ),
+        _GROQ_JSON_RETRY_OUTPUT_TOKENS,
+    )
+    payload["temperature"] = 0.0
+    payload["tool_choice"] = "none"
+    payload["parallel_tool_calls"] = False
+    current_format = str(
+        (payload.get("response_format") or {}).get("type") or ""
+    )
+
+    if current_format == "json_object" or structured_failure_count >= 2:
+        payload["response_format"] = dict(_GROQ_JSON_OBJECT_RESPONSE_FORMAT)
+        return "json_object"
+
+    return "json_schema"
+
+
+# Cette fonction appelle Groq sans outil externe en JSON contrôlé ou en texte simple selon le besoin.
 async def request_groq_chatbot_completion(
     messages: list[dict[str, str]],
     max_completion_tokens: int | None = None,
     response_schema: dict[str, Any] | None = None,
     response_schema_name: str = "rubybets_chatbot_response",
+    response_format_mode: str | None = None,
+    structured_retry_limit: int | None = None,
     client: httpx.AsyncClient | None = None,
     sleep_func: Callable[[float], Awaitable[Any]] = asyncio.sleep,
 ) -> dict[str, Any]:
@@ -237,28 +266,45 @@ async def request_groq_chatbot_completion(
         completion_tokens=requested_completion_tokens,
         response_schema=response_schema,
     )
+    normalized_response_format_mode = response_format_mode or (
+        "json_schema" if response_schema else "json_object"
+    )
+
+    if normalized_response_format_mode not in {"json_schema", "json_object", "text"}:
+        raise ValueError("Unsupported Groq response format mode.")
+
     payload = {
         "model": settings.groq_model,
         "messages": messages,
         "temperature": 0.2,
         "max_completion_tokens": completion_tokens,
-        "response_format": (
-            build_groq_response_format(response_schema_name, response_schema)
-            if response_schema
-            else {"type": "json_object"}
-        ),
         "reasoning_format": "hidden",
         "reasoning_effort": "low",
         "tool_choice": "none",
         "parallel_tool_calls": False,
         "stream": False,
     }
+
+    if normalized_response_format_mode == "json_schema":
+        if not response_schema:
+            raise ValueError("A response schema is required for JSON Schema mode.")
+        payload["response_format"] = build_groq_response_format(
+            response_schema_name,
+            response_schema,
+        )
+    elif normalized_response_format_mode == "json_object":
+        payload["response_format"] = dict(_GROQ_JSON_OBJECT_RESPONSE_FORMAT)
     owns_client = client is None
     active_client = client or httpx.AsyncClient(
         timeout=httpx.Timeout(settings.groq_timeout_seconds)
     )
     started_at = perf_counter()
-    structured_generation_retry_used = False
+    structured_generation_failure_count = 0
+    structured_retry_budget = (
+        max(0, settings.groq_max_retries)
+        if structured_retry_limit is None
+        else max(0, structured_retry_limit)
+    )
 
     try:
         for attempt in range(max(0, settings.groq_max_retries) + 1):
@@ -277,9 +323,45 @@ async def request_groq_chatbot_completion(
                 response.raise_for_status()
 
                 response_payload = response.json()
-                parsed_content = parse_groq_json_content(
-                    extract_groq_message_content(response_payload)
-                )
+
+                message_content = extract_groq_message_content(response_payload)
+
+                if normalized_response_format_mode == "text":
+                    clean_message_content = str(message_content or "").strip()
+                    if not clean_message_content:
+                        raise GroqChatbotError(
+                            code="GROQ_INVALID_RESPONSE",
+                            public_message="Le chatbot a retourné une réponse vide.",
+                            status_code=502,
+                        )
+                    parsed_content = {"answer": clean_message_content}
+                else:
+                    try:
+                        parsed_content = parse_groq_json_content(message_content)
+                    except GroqChatbotError as error:
+                        can_retry = attempt < max(0, settings.groq_max_retries)
+                        can_retry_structured = (
+                            can_retry
+                            and structured_generation_failure_count < structured_retry_budget
+                        )
+
+                        if error.code == "GROQ_INVALID_RESPONSE" and can_retry_structured:
+                            structured_generation_failure_count += 1
+                            recovery_mode = apply_groq_structured_output_recovery(
+                                payload,
+                                structured_generation_failure_count,
+                            )
+                            LOGGER.warning(
+                                "Groq chatbot invalid JSON retry: model=%s mode=%s attempt=%s max_completion_tokens=%s",
+                                settings.groq_model,
+                                recovery_mode,
+                                attempt + 1,
+                                payload["max_completion_tokens"],
+                            )
+                            continue
+
+                        raise
+
                 usage = response_payload.get("usage") or {}
 
                 LOGGER.info(
@@ -308,27 +390,27 @@ async def request_groq_chatbot_completion(
                     round((perf_counter() - started_at) * 1000),
                 )
 
+                can_retry_structured = (
+                    can_retry
+                    and normalized_response_format_mode != "text"
+                    and structured_generation_failure_count < structured_retry_budget
+                )
                 if (
                     status_code == 400
                     and provider_code in _GROQ_STRUCTURED_RETRY_CODES
-                    and can_retry
-                    and not structured_generation_retry_used
+                    and can_retry_structured
                 ):
-                    structured_generation_retry_used = True
-                    payload["max_completion_tokens"] = min(
-                        max(
-                            int(payload["max_completion_tokens"]) * 2,
-                            _GROQ_LONG_STRUCTURED_OUTPUT_TOKENS,
-                        ),
-                        _GROQ_JSON_RETRY_OUTPUT_TOKENS,
+                    structured_generation_failure_count += 1
+                    recovery_mode = apply_groq_structured_output_recovery(
+                        payload,
+                        structured_generation_failure_count,
                     )
-                    payload["temperature"] = 0.0
-                    payload["tool_choice"] = "none"
-                    payload["parallel_tool_calls"] = False
                     LOGGER.info(
-                        "Groq structured output retry: model=%s code=%s max_completion_tokens=%s",
+                        "Groq structured output retry: model=%s code=%s mode=%s attempt=%s max_completion_tokens=%s",
                         settings.groq_model,
                         provider_code,
+                        recovery_mode,
+                        attempt + 1,
                         payload["max_completion_tokens"],
                     )
                     continue
@@ -411,5 +493,5 @@ async def request_groq_chatbot_completion(
 # groq_chatbot_client.py
 #     ↓ HTTPS + GROQ_API_KEY depuis config.py + Retry-After
 # API Groq / openai/gpt-oss-120b
-#     ↓ JSON Schema strict validé sans outils externes ni raisonnement exposé
+#     ↓ JSON simple pour les fragments ou texte cité pour la réponse finale
 # route news_chatbot.py

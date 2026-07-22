@@ -1,6 +1,6 @@
 # Rôle du fichier :
-# Ce service découpe chaque article complet en fragments analysables par l'offre gratuite Groq.
-# Il résume tous les fragments séquentiellement et met en cache un digest fidèle par article.
+# Ce service prépare les digests d'articles utilisés par le chatbot RubyBets.
+# Il conserve le chemin historique par fragments et fournit des digests locaux rapides pour les résumés et questions.
 
 from __future__ import annotations
 
@@ -11,11 +11,20 @@ import logging
 from typing import Any
 
 from app.core.config import settings
-from app.services.groq_chatbot_client import request_groq_chatbot_completion
+from app.services.groq_chatbot_client import (
+    GroqChatbotError,
+    request_groq_chatbot_completion,
+)
 
 
 LOGGER = logging.getLogger(__name__)
 _ARTICLE_DIGEST_CACHE: dict[str, dict[str, Any]] = {}
+_RECOVERABLE_CHUNK_ERROR_CODES = {
+    "GROQ_INVALID_RESPONSE",
+    "GROQ_NETWORK_ERROR",
+    "GROQ_PROVIDER_ERROR",
+    "GROQ_REQUEST_REJECTED",
+}
 
 ARTICLE_CHUNK_DIGEST_SCHEMA: dict[str, Any] = {
     "type": "object",
@@ -38,6 +47,105 @@ def clear_news_chatbot_article_digest_cache() -> None:
 # Cette fonction normalise les espaces pour comparer les textes sans modifier leur contenu sémantique.
 def normalize_chatbot_text(value: str | None) -> str:
     return " ".join(str(value or "").split())
+
+
+# Cette fonction limite un extrait local sans couper brutalement le dernier mot.
+def limit_fast_question_digest_text(value: str | None, max_characters: int) -> str:
+    clean_value = normalize_chatbot_text(value)
+
+    if len(clean_value) <= max_characters:
+        return clean_value
+
+    truncated_value = clean_value[:max_characters].rstrip()
+    last_space_index = truncated_value.rfind(" ")
+
+    if last_space_index >= max_characters // 2:
+        truncated_value = truncated_value[:last_space_index].rstrip()
+
+    return truncated_value + "..."
+
+
+# Cette fonction construit un digest local compact pour répondre rapidement à une question libre.
+def build_fast_question_article_digest(
+    article: dict[str, Any],
+    max_characters: int = 1400,
+) -> dict[str, Any] | None:
+    article_id = str(article.get("article_id") or "").strip()
+    title = normalize_chatbot_text(article.get("title"))
+    description = normalize_chatbot_text(article.get("description"))
+    content = normalize_chatbot_text(article.get("content"))
+
+    if not article_id or not (description or content or title):
+        return None
+
+    summary_parts: list[str] = []
+
+    if description:
+        summary_parts.append(description)
+
+    if content and content not in summary_parts:
+        remaining_characters = max(300, max_characters - len(" ".join(summary_parts)))
+        content_excerpt = limit_fast_question_digest_text(
+            content,
+            remaining_characters,
+        )
+        if content_excerpt and content_excerpt not in summary_parts:
+            summary_parts.append(content_excerpt)
+
+    if not summary_parts:
+        summary_parts.append(title)
+
+    summary = limit_fast_question_digest_text(
+        " ".join(summary_parts),
+        max_characters,
+    )
+
+    return {
+        "article_id": article_id,
+        "title": title or "Article sans titre",
+        "source_name": article.get("source_name"),
+        "published_at": article.get("published_at"),
+        "content_status": article.get("content_status") or "unavailable",
+        "citation_eligible": article.get("citation_eligible") is not False,
+        "summary": summary,
+        "key_facts": [],
+        "limitations": [],
+        "source_ids": [article_id],
+        "chunks_analyzed": 1,
+        "chunks_expected": 1,
+        "chunks_failed": 0,
+        "complete_analysis": True,
+        "fast_local_digest": True,
+    }
+
+
+# Cette fonction prépare localement les digests des articles retenus sans appel Groq intermédiaire.
+def build_fast_question_article_digests(
+    articles: list[dict[str, Any]],
+    max_characters: int = 1400,
+) -> list[dict[str, Any]]:
+    digests: list[dict[str, Any]] = []
+
+    for article in articles:
+        digest = build_fast_question_article_digest(
+            article,
+            max_characters=max_characters,
+        )
+        if digest:
+            digests.append(digest)
+
+    return digests
+
+
+# Cette fonction prépare tous les articles du résumé en extraits locaux compacts, sans analyse Groq par fragment.
+def build_fast_summary_article_digests(
+    articles: list[dict[str, Any]],
+    max_characters: int = 1100,
+) -> list[dict[str, Any]]:
+    return build_fast_question_article_digests(
+        articles,
+        max_characters=max_characters,
+    )
 
 
 # Cette fonction découpe un segment trop long sans perdre les mots qui le composent.
@@ -210,6 +318,7 @@ def combine_article_chunk_digests(
     article: dict[str, Any],
     chunk_digests: list[dict[str, Any]],
     chunk_count: int,
+    failed_chunk_indices: list[int] | None = None,
 ) -> dict[str, Any]:
     article_id = str(article.get("article_id") or "")
     summaries = [
@@ -235,6 +344,12 @@ def combine_article_chunk_digests(
         for source_id in digest.get("source_ids", [])
         if source_id == article_id
     ))
+    failed_chunks = list(dict.fromkeys(failed_chunk_indices or []))
+
+    if failed_chunks:
+        limitations.append(
+            f"{len(failed_chunks)} fragment(s) de cet article n'ont pas pu être analysés."
+        )
 
     return {
         "article_id": article_id,
@@ -252,8 +367,53 @@ def combine_article_chunk_digests(
         "source_ids": source_ids,
         "chunks_analyzed": len(chunk_digests),
         "chunks_expected": chunk_count,
-        "complete_analysis": len(chunk_digests) == chunk_count,
+        "chunks_failed": len(failed_chunks),
+        "complete_analysis": not failed_chunks and len(chunk_digests) == chunk_count,
     }
+
+
+# Cette fonction construit un digest extractif minimal lorsqu'un article ne peut pas être résumé par Groq.
+def build_local_article_digest_fallback(
+    article: dict[str, Any],
+    chunk_count: int,
+    failed_chunk_indices: list[int],
+) -> dict[str, Any] | None:
+    article_id = str(article.get("article_id") or "").strip()
+    title = normalize_chatbot_text(article.get("title"))
+    description = normalize_chatbot_text(article.get("description"))
+    content = normalize_chatbot_text(article.get("content"))
+    extractive_text = description or content[:700] or title
+
+    if not article_id or not extractive_text:
+        return None
+
+    if len(extractive_text) > 700:
+        extractive_text = extractive_text[:697].rstrip() + "..."
+
+    return {
+        "article_id": article_id,
+        "title": title or "Article sans titre",
+        "source_name": article.get("source_name"),
+        "published_at": article.get("published_at"),
+        "content_status": article.get("content_status") or "unavailable",
+        "citation_eligible": article.get("citation_eligible") is not False,
+        "summary": extractive_text,
+        "key_facts": [],
+        "limitations": [
+            "Cet article a été conservé sous forme d'extrait car son résumé automatique n'a pas abouti."
+        ],
+        "source_ids": [article_id],
+        "chunks_analyzed": 0,
+        "chunks_expected": chunk_count,
+        "chunks_failed": len(failed_chunk_indices),
+        "complete_analysis": False,
+        "local_fallback": True,
+    }
+
+
+# Cette fonction indique si une erreur Groq locale peut être isolée sans masquer un problème de quota ou de configuration.
+def is_recoverable_news_chatbot_chunk_error(error: GroqChatbotError) -> bool:
+    return error.code in _RECOVERABLE_CHUNK_ERROR_CODES
 
 
 # Cette fonction analyse séquentiellement tous les fragments d'un article et cache son digest complet.
@@ -278,19 +438,35 @@ async def summarize_news_chatbot_article(
         return None, False
 
     chunk_digests: list[dict[str, Any]] = []
+    failed_chunk_indices: list[int] = []
 
     for chunk_index, chunk in enumerate(chunks, start=1):
-        payload = await request_groq_chatbot_completion(
-            build_article_chunk_digest_messages(
-                article=article,
-                chunk=chunk,
-                chunk_index=chunk_index,
-                chunk_count=len(chunks),
-            ),
-            max_completion_tokens=settings.news_chatbot_chunk_summary_tokens,
-            response_schema=ARTICLE_CHUNK_DIGEST_SCHEMA,
-            response_schema_name="rubybets_article_chunk_digest",
-        )
+        try:
+            payload = await request_groq_chatbot_completion(
+                build_article_chunk_digest_messages(
+                    article=article,
+                    chunk=chunk,
+                    chunk_index=chunk_index,
+                    chunk_count=len(chunks),
+                ),
+                max_completion_tokens=settings.news_chatbot_chunk_summary_tokens,
+                response_format_mode="json_object",
+                structured_retry_limit=0,
+            )
+        except GroqChatbotError as error:
+            if not is_recoverable_news_chatbot_chunk_error(error):
+                raise
+
+            failed_chunk_indices.append(chunk_index)
+            LOGGER.warning(
+                "News chatbot chunk skipped: article_id=%s chunk=%s/%s code=%s",
+                article_id,
+                chunk_index,
+                len(chunks),
+                error.code,
+            )
+            continue
+
         chunk_digests.append(
             normalize_article_chunk_digest(
                 payload=payload,
@@ -299,22 +475,41 @@ async def summarize_news_chatbot_article(
             )
         )
 
+    if not chunk_digests:
+        fallback_digest = build_local_article_digest_fallback(
+            article=article,
+            chunk_count=len(chunks),
+            failed_chunk_indices=failed_chunk_indices,
+        )
+        LOGGER.warning(
+            "News chatbot article local fallback: article_id=%s all_chunks_failed=%s fallback=%s",
+            article_id,
+            len(failed_chunk_indices),
+            bool(fallback_digest),
+        )
+        return fallback_digest, False
+
     digest = combine_article_chunk_digests(
         article=article,
         chunk_digests=chunk_digests,
         chunk_count=len(chunks),
+        failed_chunk_indices=failed_chunk_indices,
     )
-    _ARTICLE_DIGEST_CACHE[cache_key] = {
-        "expires_at": datetime.now(UTC)
-        + timedelta(minutes=settings.news_chatbot_article_summary_cache_ttl_minutes),
-        "digest": dict(digest),
-    }
+
+    if digest["complete_analysis"]:
+        _ARTICLE_DIGEST_CACHE[cache_key] = {
+            "expires_at": datetime.now(UTC)
+            + timedelta(minutes=settings.news_chatbot_article_summary_cache_ttl_minutes),
+            "digest": dict(digest),
+        }
 
     LOGGER.info(
-        "News chatbot article summarized: article_id=%s chunks=%s cache_key=%s",
+        "News chatbot article summarized: article_id=%s analyzed=%s expected=%s failed=%s complete=%s",
         article_id,
-        len(chunks),
-        cache_key[:12],
+        digest["chunks_analyzed"],
+        digest["chunks_expected"],
+        digest["chunks_failed"],
+        digest["complete_analysis"],
     )
     return digest, False
 
@@ -341,7 +536,8 @@ async def summarize_news_chatbot_articles(
 #     ↓ articles complets déjà sélectionnés par RubyBets
 # news_chatbot_summarization_service.py
 #     ├── découpage intégral en fragments
-#     ├── appels Groq séquentiels avec JSON Schema strict sous quota gratuit
-#     └── cache du digest par empreinte de contenu
+#     ├── mode résumé : appels Groq séquentiels par fragments et cache du digest
+#     ├── mode question : digest local compact sans appel Groq intermédiaire
+#     └── repli extractif local si un article échoue entièrement
 #     ↓
 # digests sourcés -> synthèse finale du chatbot

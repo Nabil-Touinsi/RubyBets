@@ -274,10 +274,95 @@ def build_public_market_quality_flags(
     return ",".join(values) or None
 
 
+# Cette fonction transforme une valeur facultative en texte propre pour les métadonnées d'archive.
+def normalize_archive_metadata_text(value: Any) -> str | None:
+    if value is None:
+        return None
+
+    cleaned_value = str(value).strip()
+    return cleaned_value or None
+
+
+# Cette fonction extrait du match cible les champs nécessaires à l'archive V19 sans conserver le payload fournisseur.
+def build_target_match_archive_metadata(
+    *,
+    match_data: dict[str, Any],
+    source_match_id: str | None,
+) -> tuple[tuple[str, str | int | float | bool | None], ...]:
+    competition = match_data.get("competition")
+    home_team = match_data.get("homeTeam")
+    away_team = match_data.get("awayTeam")
+
+    if not isinstance(competition, dict):
+        competition = {}
+    if not isinstance(home_team, dict):
+        home_team = {}
+    if not isinstance(away_team, dict):
+        away_team = {}
+
+    return (
+        (
+            "archive_source_match_id",
+            normalize_archive_metadata_text(
+                source_match_id or match_data.get("id")
+            ),
+        ),
+        (
+            "archive_competition_name",
+            normalize_archive_metadata_text(competition.get("name")),
+        ),
+        (
+            "archive_home_team_name",
+            normalize_archive_metadata_text(home_team.get("name")),
+        ),
+        (
+            "archive_away_team_name",
+            normalize_archive_metadata_text(away_team.get("name")),
+        ),
+        (
+            "archive_home_team_logo_url",
+            normalize_archive_metadata_text(
+                home_team.get("crest") or home_team.get("logo")
+            ),
+        ),
+        (
+            "archive_away_team_logo_url",
+            normalize_archive_metadata_text(
+                away_team.get("crest") or away_team.get("logo")
+            ),
+        ),
+        (
+            "archive_home_team_country_code",
+            normalize_archive_metadata_text(
+                home_team.get("country_code")
+                or home_team.get("countryCode")
+            ),
+        ),
+        (
+            "archive_away_team_country_code",
+            normalize_archive_metadata_text(
+                away_team.get("country_code")
+                or away_team.get("countryCode")
+            ),
+        ),
+        (
+            "archive_match_date",
+            normalize_archive_metadata_text(match_data.get("utcDate")),
+        ),
+        (
+            "archive_match_status",
+            normalize_archive_metadata_text(match_data.get("status"))
+            or "SCHEDULED",
+        ),
+    )
+
+
 # Construit les métadonnées scalaires du pipeline sans exposer le payload odds ni les bookmakers.
 def build_decision_metadata(
     *,
     request_id: str | None,
+    match_data: dict[str, Any],
+    source_match_id: str | None,
     target_match_metadata: dict[str, Any],
     market_metadata: dict[str, Any],
     market_status: MarketModuleStatus,
@@ -299,6 +384,10 @@ def build_decision_metadata(
         ("history_data_status", str(history_metadata.get("data_status") or "unknown")),
         ("history_source_used", str(history_metadata.get("source_used") or "unknown")),
         ("team_feature_builder", BUILDER_SOURCE),
+        *build_target_match_archive_metadata(
+            match_data=match_data,
+            source_match_id=source_match_id,
+        ),
     )
 
 
@@ -368,6 +457,8 @@ async def build_v19_prediction_for_match(
         feature_versions=(market_snapshot.feature_set_version,),
         metadata=build_decision_metadata(
             request_id=request_id,
+            match_data=match_data,
+            source_match_id=source_match_id,
             target_match_metadata=target_match_metadata,
             market_metadata=market_metadata,
             market_status=market_snapshot.status,
@@ -387,3 +478,5 @@ async def build_v19_prediction_for_match(
 #   -> arbitre les candidats et retourne DecisionResultV1
 # experimental_ml_v19.py
 #   <- sérialise le résultat sans exposer les odds, les bookmakers ou les payloads fournisseurs
+# archives_service.py
+#   <- utilise uniquement les métadonnées de match minimales intégrées à DecisionResultV1
