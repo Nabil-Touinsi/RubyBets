@@ -24,11 +24,19 @@ function getCompetitionShortLabel(competition: Competition) {
     .replace("Primera Division", "Primera División");
 }
 
-// Cette fonction repère les emblèmes sombres nécessitant un traitement visuel renforcé.
-function requiresHighContrastLogo(competition: Competition) {
+// Cette fonction choisit le traitement de contraste adapté à chaque emblème officiel.
+function getCompetitionLogoVariant(competition: Competition) {
   const searchableValue = `${competition.code} ${competition.name}`.toLowerCase();
 
-  return searchableValue.includes("champions") || competition.code === "CL";
+  if (searchableValue.includes("champions") || competition.code === "CL") {
+    return "high-contrast";
+  }
+
+  if (searchableValue.includes("premier league") || competition.code === "PL") {
+    return "premier-league";
+  }
+
+  return "default";
 }
 
 // Ce composant affiche une page de ligues à la fois et permet de basculer vers les suivantes.
@@ -119,8 +127,7 @@ function CompetitionsSection({
             {visibleCompetitions.map((competition, competitionIndex) => {
               const isSelected =
                 competition.code === selectedCompetition;
-              const highContrastLogo =
-                requiresHighContrastLogo(competition);
+              const logoVariant = getCompetitionLogoVariant(competition);
 
               return (
                 <button
@@ -141,11 +148,7 @@ function CompetitionsSection({
                 >
                   {competition.emblem ? (
                     <span
-                      className={
-                        highContrastLogo
-                          ? "rb-competition-chip__logo rb-competition-chip__logo--high-contrast"
-                          : "rb-competition-chip__logo"
-                      }
+                      className={`rb-competition-chip__logo rb-competition-chip__logo--${logoVariant}`}
                     >
                       <img
                         src={competition.emblem}

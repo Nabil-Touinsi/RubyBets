@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import "./App.css";
+import "./styles/MatchDetailsScreen.css";
 import {
   getCompetitions,
   getGlossary,

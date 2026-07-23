@@ -1855,3 +1855,101 @@
   filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.46));
   transform: none;
 }
+
+/* Finitions v6.1 : emblèmes officiels lisibles sans altérer les autres éléments validés. */
+.rb-matches-screen--prototype-one .rb-competition-chip__logo--premier-league {
+  width: 27px;
+  height: 27px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 38% 32%,
+    rgba(255, 225, 255, 0.14),
+    rgba(113, 25, 119, 0.15) 48%,
+    rgba(3, 16, 23, 0.04) 76%
+  );
+}
+
+.rb-matches-screen--prototype-one .rb-competition-chip__logo--premier-league img {
+  width: 25px;
+  height: 25px;
+  filter: brightness(2.15) saturate(1.5) contrast(1.08)
+    drop-shadow(0 0 4px rgba(229, 96, 235, 0.38));
+  transform: scale(1.05);
+}
+
+.rb-matches-screen--prototype-one
+  .rb-competition-chip:hover
+  .rb-competition-chip__logo--premier-league
+  img,
+.rb-matches-screen--prototype-one
+  .rb-competition-chip--active
+  .rb-competition-chip__logo--premier-league
+  img {
+  filter: brightness(2.35) saturate(1.62) contrast(1.1)
+    drop-shadow(0 0 6px rgba(240, 117, 245, 0.52));
+  transform: scale(1.1);
+}
+
+.rb-matches-screen--prototype-one .rb-match-competition-logo {
+  width: 29px;
+  height: 29px;
+  overflow: hidden;
+  border: 1px solid rgba(109, 150, 160, 0.42);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 38% 30%,
+    rgba(255, 255, 255, 0.09),
+    rgba(12, 39, 47, 0.78) 55%,
+    rgba(3, 15, 21, 0.96) 100%
+  );
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.018),
+    0 0 8px rgba(34, 213, 197, 0.08),
+    inset 0 0 8px rgba(255, 255, 255, 0.035);
+}
+
+.rb-matches-screen--prototype-one .rb-match-competition-logo > span {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: transparent;
+  color: #9dd9d4;
+  font-size: 0.5rem;
+}
+
+.rb-matches-screen--prototype-one .rb-match-competition-logo img {
+  inset: 4px;
+  width: calc(100% - 8px);
+  height: calc(100% - 8px);
+  object-fit: contain;
+  filter: saturate(1.06) brightness(1.08) contrast(1.05)
+    drop-shadow(0 1px 2px rgba(0, 0, 0, 0.34));
+}
+
+.rb-matches-screen--prototype-one .rb-match-competition-logo--high-contrast img {
+  filter: brightness(0) invert(1)
+    drop-shadow(0 0 4px rgba(220, 255, 251, 0.46));
+}
+
+.rb-matches-screen--prototype-one .rb-match-competition-logo--premier-league {
+  border-color: rgba(190, 89, 196, 0.34);
+  background: radial-gradient(
+    circle at 38% 30%,
+    rgba(246, 191, 250, 0.12),
+    rgba(91, 21, 98, 0.19) 52%,
+    rgba(3, 15, 21, 0.96) 100%
+  );
+}
+
+.rb-matches-screen--prototype-one .rb-match-competition-logo--premier-league img {
+  filter: brightness(2.05) saturate(1.48) contrast(1.08)
+    drop-shadow(0 0 3px rgba(225, 91, 232, 0.4));
+}
+
+.rb-matches-screen--prototype-one .rb-match-row:hover .rb-match-competition-logo {
+  border-color: rgba(75, 207, 196, 0.62);
+  box-shadow:
+    0 0 0 1px rgba(32, 225, 207, 0.05),
+    0 0 11px rgba(32, 225, 207, 0.13),
+    inset 0 0 8px rgba(255, 255, 255, 0.045);
+}

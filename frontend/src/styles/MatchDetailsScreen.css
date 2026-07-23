@@ -1,0 +1,2138 @@
+/* Ce fichier porte le rendu premium de l’écran Détail match et isole ses styles du reste de l’application. */
+
+.rb-detail-premium,
+.rb-detail-premium * {
+  box-sizing: border-box;
+}
+
+section.rb-screen-container:has(.rb-detail-premium) {
+  width: min(1500px, calc(100% - 32px)) !important;
+  max-width: 1500px !important;
+  padding-top: 24px !important;
+}
+
+.rb-detail-premium {
+  --detail-bg: #061011;
+  --detail-panel: rgba(9, 25, 34, 0.92);
+  --detail-panel-strong: rgba(10, 28, 39, 0.98);
+  --detail-panel-soft: rgba(10, 24, 36, 0.78);
+  --detail-line: rgba(120, 164, 180, 0.18);
+  --detail-line-strong: rgba(45, 212, 191, 0.34);
+  --detail-teal: #2dd4bf;
+  --detail-teal-soft: #8cf5e7;
+  --detail-white: #f7fbfd;
+  --detail-muted: #90a7b2;
+  --detail-red: #fb7185;
+  --detail-amber: #f4c24d;
+  display: grid;
+  gap: 18px;
+  width: 100%;
+  color: var(--detail-white);
+  isolation: isolate;
+}
+
+.rb-detail-premium::before {
+  content: "";
+  position: fixed;
+  inset: 72px 0 0;
+  z-index: -2;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 8% 4%, rgba(13, 148, 136, 0.16), transparent 28%),
+    radial-gradient(circle at 92% 62%, rgba(8, 145, 178, 0.08), transparent 26%),
+    linear-gradient(180deg, rgba(4, 15, 17, 0.97), rgba(4, 12, 14, 1));
+}
+
+.rb-detail-premium button {
+  font: inherit;
+}
+
+.rb-detail-premium .rb-detail-v2-topbar {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 22px;
+  min-height: 42px;
+  padding: 0 2px;
+}
+
+.rb-detail-premium .rb-detail-v2-topbar > div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-width: 0;
+  color: #a4b7c3;
+  font-size: 0.8rem;
+  font-weight: 760;
+}
+
+.rb-detail-premium .rb-detail-v2-topbar > div span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rb-detail-premium .rb-detail-v2-topbar strong {
+  color: var(--detail-teal);
+  font-size: 0.7rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.rb-detail-premium .rb-detail-v2-topbar button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 0 15px;
+  border: 1px solid rgba(45, 212, 191, 0.22);
+  border-radius: 999px;
+  background: rgba(3, 17, 20, 0.72);
+  color: #e8f5f6;
+  font-size: 0.76rem;
+  font-weight: 820;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035);
+  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
+}
+
+.rb-detail-premium .rb-detail-v2-topbar button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(45, 212, 191, 0.58);
+  background: rgba(13, 148, 136, 0.13);
+  box-shadow: 0 8px 24px rgba(2, 30, 32, 0.28);
+}
+
+.rb-detail-premium .rb-detail-v2-hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(270px, 0.72fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 26px;
+  min-height: 310px;
+  overflow: hidden;
+  padding: 34px 50px;
+  border: 1px solid rgba(106, 152, 170, 0.24);
+  border-radius: 22px;
+  background:
+    linear-gradient(90deg, rgba(2, 10, 16, 0.88), rgba(2, 15, 21, 0.34) 48%, rgba(2, 10, 16, 0.88)),
+    linear-gradient(180deg, rgba(3, 12, 18, 0.22), rgba(2, 9, 14, 0.88)),
+    url("../assets/detail/match-detail-stadium.webp") center 48% / cover no-repeat;
+  box-shadow:
+    0 28px 78px rgba(0, 0, 0, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.rb-detail-premium .rb-detail-v2-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 32%, rgba(45, 212, 191, 0.14), transparent 26%),
+    linear-gradient(180deg, transparent 45%, rgba(0, 13, 18, 0.38));
+}
+
+.rb-detail-premium .rb-detail-v2-hero__glow {
+  position: absolute;
+  inset: auto 18% -34% 18%;
+  height: 78%;
+  border-radius: 50%;
+  background: rgba(37, 210, 196, 0.08);
+  filter: blur(52px);
+}
+
+.rb-detail-premium .rb-detail-v2-hero__pitch {
+  position: absolute;
+  left: 50%;
+  bottom: -122px;
+  width: 76%;
+  aspect-ratio: 2.2;
+  border: 1px solid rgba(45, 212, 191, 0.16);
+  border-radius: 50%;
+  transform: translateX(-50%);
+  box-shadow:
+    0 -34px 0 -33px rgba(45, 212, 191, 0.22),
+    0 -72px 0 -71px rgba(45, 212, 191, 0.12);
+}
+
+.rb-detail-premium .rb-detail-v2-team,
+.rb-detail-premium .rb-detail-v2-hero-center {
+  position: relative;
+  z-index: 2;
+}
+
+.rb-detail-premium .rb-detail-v2-team {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  min-width: 0;
+}
+
+.rb-detail-premium .rb-detail-v2-team--home {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.rb-detail-premium .rb-detail-v2-team--away {
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.rb-detail-premium .rb-detail-v2-team > div {
+  min-width: 0;
+}
+
+.rb-detail-premium .rb-detail-v2-team p {
+  margin: 0;
+  color: var(--detail-teal);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.rb-detail-premium .rb-detail-v2-team h2 {
+  margin: 10px 0 7px;
+  color: #fff;
+  font-size: clamp(1.7rem, 2.45vw, 2.65rem);
+  font-weight: 920;
+  line-height: 0.98;
+  letter-spacing: -0.055em;
+  text-shadow: 0 8px 32px rgba(0, 0, 0, 0.42);
+}
+
+.rb-detail-premium .rb-detail-v2-team > div > span {
+  color: #a4b4bc;
+  font-size: 0.77rem;
+  font-weight: 720;
+}
+
+.rb-detail-premium .rb-detail-v2-team-logo {
+  position: relative;
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 112px;
+  height: 112px;
+  overflow: visible;
+  border: 1px solid rgba(45, 212, 191, 0.34);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 20%, rgba(45, 212, 191, 0.19), transparent 52%),
+    linear-gradient(145deg, rgba(5, 23, 31, 0.98), rgba(1, 9, 15, 0.96));
+  box-shadow:
+    0 22px 48px rgba(0, 0, 0, 0.42),
+    inset 0 0 0 10px rgba(255, 255, 255, 0.018),
+    0 0 34px rgba(24, 169, 159, 0.11);
+}
+
+.rb-detail-premium .rb-detail-v2-team-logo__ring {
+  position: absolute;
+  inset: -8px;
+  border: 1px solid rgba(45, 212, 191, 0.11);
+  border-radius: 50%;
+}
+
+.rb-detail-premium .rb-detail-v2-team-logo__fallback {
+  color: #91f5e7 !important;
+  font-size: 0.76rem;
+  font-weight: 900;
+}
+
+.rb-detail-premium .rb-detail-v2-team-logo img {
+  position: absolute;
+  inset: 18px;
+  width: calc(100% - 36px);
+  height: calc(100% - 36px);
+  object-fit: contain;
+  filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.42));
+}
+
+.rb-detail-premium .rb-detail-v2-hero-center {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.rb-detail-premium .rb-detail-v2-hero-center p {
+  margin: 0;
+  color: #d0dcdf;
+  font-size: 0.84rem;
+  font-weight: 790;
+}
+
+.rb-detail-premium .rb-detail-v2-hero-center strong {
+  color: #fff;
+  font-size: clamp(3.4rem, 6.5vw, 5.4rem);
+  font-weight: 950;
+  line-height: 0.88;
+  letter-spacing: -0.075em;
+  text-shadow: 0 12px 44px rgba(0, 0, 0, 0.58);
+}
+
+.rb-detail-premium .rb-detail-v2-hero-center > span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 0 13px;
+  border: 1px solid rgba(45, 212, 191, 0.3);
+  border-radius: 999px;
+  background: rgba(18, 121, 111, 0.28);
+  color: #9ff7eb !important;
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: lowercase;
+  box-shadow: 0 0 26px rgba(45, 212, 191, 0.1);
+}
+
+.rb-detail-premium .rb-detail-v2-hero-center small {
+  max-width: 360px;
+  color: #93aab5;
+  font-size: 0.72rem;
+  font-weight: 720;
+  line-height: 1.5;
+}
+
+.rb-detail-premium .rb-detail-v2-tabs {
+  position: sticky;
+  top: 72px;
+  z-index: 18;
+  display: flex;
+  gap: 4px;
+  min-width: 0;
+  overflow-x: auto;
+  border-bottom: 1px solid rgba(121, 157, 170, 0.15);
+  background: rgba(5, 16, 18, 0.91);
+  backdrop-filter: blur(18px);
+  scrollbar-width: none;
+}
+
+.rb-detail-premium .rb-detail-v2-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.rb-detail-premium .rb-detail-v2-tab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  flex: 0 0 auto;
+  min-height: 56px;
+  margin: 0;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #82959e;
+  font-size: 0.78rem;
+  font-weight: 820;
+  box-shadow: none;
+  transition: color 180ms ease, background 180ms ease;
+}
+
+.rb-detail-premium .rb-detail-v2-tab::after {
+  content: "";
+  position: absolute;
+  right: 18px;
+  bottom: -1px;
+  left: 18px;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--detail-teal);
+  opacity: 0;
+  transform: scaleX(0.55);
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.rb-detail-premium .rb-detail-v2-tab:hover {
+  transform: none;
+  background: rgba(45, 212, 191, 0.04);
+  color: #d7e6e8;
+}
+
+.rb-detail-premium .rb-detail-v2-tab--active {
+  color: var(--detail-teal);
+}
+
+.rb-detail-premium .rb-detail-v2-tab--active::after {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
+.rb-detail-premium .rb-detail-v2-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 330px;
+  gap: 22px;
+  min-height: 0;
+}
+
+.rb-detail-premium .rb-detail-v2-main-column,
+.rb-detail-premium .rb-detail-v2-side-column {
+  display: grid;
+  align-content: start;
+  gap: 16px;
+  min-width: 0;
+}
+
+.rb-detail-premium .rb-detail-v2-main-column > * {
+  animation: rb-detail-premium-rise 420ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.rb-detail-premium .rb-detail-v2-main-column > *:nth-child(2) {
+  animation-delay: 55ms;
+}
+
+.rb-detail-premium .rb-detail-v2-main-column > *:nth-child(3) {
+  animation-delay: 100ms;
+}
+
+.rb-detail-premium .rb-detail-v2-main-column > *:nth-child(4) {
+  animation-delay: 145ms;
+}
+
+.rb-detail-premium .rb-detail-v2-side-column {
+  position: sticky;
+  top: 144px;
+  height: fit-content;
+}
+
+.rb-detail-premium .rb-detail-v2-card,
+.rb-detail-premium .rb-detail-v2-side-card,
+.rb-detail-premium .rb-detail-v2-responsible-card,
+.rb-detail-premium .rb-detail-v2-watch-card,
+.rb-detail-premium .rb-detail-v2-empty-state {
+  border: 1px solid var(--detail-line);
+  background:
+    linear-gradient(145deg, rgba(12, 29, 43, 0.98), rgba(7, 29, 36, 0.9)),
+    var(--detail-panel);
+  box-shadow:
+    0 24px 58px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.025);
+}
+
+.rb-detail-premium .rb-detail-v2-card {
+  display: grid;
+  gap: 18px;
+  padding: 22px;
+  border-radius: 20px;
+}
+
+.rb-detail-premium .rb-detail-v2-section-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.rb-detail-premium .rb-detail-v2-section-header p {
+  margin: 0;
+  color: var(--detail-teal) !important;
+  font-size: 0.68rem;
+  font-weight: 950;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.rb-detail-premium .rb-detail-v2-section-header h3 {
+  margin: 5px 0 0;
+  color: #fff;
+  font-size: 1.12rem;
+  font-weight: 900;
+  line-height: 1.12;
+  letter-spacing: -0.035em;
+}
+
+.rb-detail-premium .rb-detail-v2-section-header > span {
+  color: #81969f;
+  font-size: 0.68rem;
+  font-weight: 760;
+  white-space: nowrap;
+}
+
+.rb-detail-premium .rb-detail-v2-insight-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.rb-detail-premium .rb-detail-v2-insight-card {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  min-width: 0;
+  min-height: 190px;
+  padding: 17px;
+  overflow: hidden;
+  border: 1px solid rgba(117, 151, 166, 0.16);
+  border-radius: 16px;
+  background:
+    linear-gradient(155deg, rgba(11, 30, 45, 0.9), rgba(6, 21, 32, 0.78));
+  transition: transform 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
+}
+
+.rb-detail-premium .rb-detail-v2-insight-card::before {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(45, 212, 191, 0.54), transparent);
+  opacity: 0;
+  transition: opacity 200ms ease;
+}
+
+.rb-detail-premium .rb-detail-v2-insight-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(45, 212, 191, 0.32);
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.23);
+}
+
+.rb-detail-premium .rb-detail-v2-insight-card:hover::before {
+  opacity: 1;
+}
+
+.rb-detail-premium .rb-detail-v2-insight-card__icon,
+.rb-detail-premium .rb-detail-v2-metric-card__icon {
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(45, 212, 191, 0.24);
+  border-radius: 12px;
+  background: rgba(13, 148, 136, 0.13);
+  color: var(--detail-teal) !important;
+}
+
+.rb-detail-premium .rb-detail-v2-insight-card--red .rb-detail-v2-insight-card__icon {
+  border-color: rgba(251, 113, 133, 0.25);
+  background: rgba(190, 24, 93, 0.12);
+  color: #fb7185 !important;
+}
+
+.rb-detail-premium .rb-detail-v2-insight-card--amber .rb-detail-v2-insight-card__icon {
+  border-color: rgba(244, 194, 77, 0.26);
+  background: rgba(180, 121, 14, 0.13);
+  color: #f4c24d !important;
+}
+
+.rb-detail-premium .rb-detail-v2-insight-card--blue .rb-detail-v2-insight-card__icon {
+  border-color: rgba(56, 189, 248, 0.25);
+  background: rgba(2, 132, 199, 0.12);
+  color: #38bdf8 !important;
+}
+
+.rb-detail-premium .rb-detail-v2-insight-card > div {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+}
+
+.rb-detail-premium .rb-detail-v2-insight-card p {
+  margin: 0;
+  color: #91a8b3 !important;
+  font-size: 0.68rem;
+  font-weight: 760;
+}
+
+.rb-detail-premium .rb-detail-v2-insight-card h4 {
+  margin: 0;
+  color: #fff;
+  font-size: 0.94rem;
+  font-weight: 900;
+  line-height: 1.18;
+}
+
+.rb-detail-premium .rb-detail-v2-insight-card small {
+  color: #a9bbc3;
+  font-size: 0.74rem;
+  font-weight: 560;
+  line-height: 1.58;
+}
+
+.rb-detail-premium .rb-detail-v2-comparison-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 16px;
+  padding: 0 4px 14px;
+  border-bottom: 1px solid rgba(117, 151, 166, 0.16);
+}
+
+.rb-detail-premium .rb-detail-v2-comparison-heading > div {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.rb-detail-premium .rb-detail-v2-comparison-heading > div:last-child {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.rb-detail-premium .rb-detail-v2-comparison-heading .rb-detail-v2-team-logo,
+.rb-detail-premium .rb-detail-v2-recent-team .rb-detail-v2-team-logo {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.28);
+}
+
+.rb-detail-premium .rb-detail-v2-comparison-heading .rb-detail-v2-team-logo__ring,
+.rb-detail-premium .rb-detail-v2-recent-team .rb-detail-v2-team-logo__ring {
+  inset: -3px;
+}
+
+.rb-detail-premium .rb-detail-v2-comparison-heading .rb-detail-v2-team-logo img,
+.rb-detail-premium .rb-detail-v2-recent-team .rb-detail-v2-team-logo img {
+  inset: 6px;
+  width: calc(100% - 12px);
+  height: calc(100% - 12px);
+}
+
+.rb-detail-premium .rb-detail-v2-comparison-heading strong {
+  color: #f6fbfc;
+  font-size: 0.83rem;
+  font-weight: 850;
+}
+
+.rb-detail-premium .rb-detail-v2-comparison-heading > span {
+  color: #879ca5;
+  font-size: 0.68rem;
+  font-weight: 720;
+}
+
+.rb-detail-premium .rb-detail-v2-metric-grid {
+  display: grid;
+  gap: 0;
+}
+
+.rb-detail-premium .rb-detail-v2-metric-card {
+  display: grid;
+  grid-template-columns: minmax(190px, 1fr) minmax(170px, 0.86fr) minmax(190px, 1fr);
+  align-items: center;
+  gap: 18px;
+  min-width: 0;
+  padding: 15px 8px;
+  border: 0;
+  border-bottom: 1px solid rgba(117, 151, 166, 0.13);
+  border-radius: 0;
+  background: transparent;
+}
+
+.rb-detail-premium .rb-detail-v2-metric-card:last-child {
+  border-bottom: 0;
+}
+
+.rb-detail-premium .rb-detail-v2-metric-side {
+  display: grid;
+  grid-template-columns: auto minmax(50px, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.rb-detail-premium .rb-detail-v2-metric-side--away {
+  grid-template-columns: auto minmax(50px, 1fr) auto;
+}
+
+.rb-detail-premium .rb-detail-v2-metric-side strong {
+  min-width: 52px;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 900;
+}
+
+.rb-detail-premium .rb-detail-v2-metric-side small {
+  color: #8da2ab;
+  font-size: 0.64rem;
+  font-weight: 800;
+}
+
+.rb-detail-premium .rb-detail-v2-metric-side > span {
+  position: relative;
+  display: block;
+  height: 5px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(104, 133, 145, 0.18);
+}
+
+.rb-detail-premium .rb-detail-v2-metric-side > span::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--home-width);
+  border-radius: inherit;
+  background: linear-gradient(90deg, #1fc9b5, #5eead4);
+  box-shadow: 0 0 12px rgba(45, 212, 191, 0.28);
+}
+
+.rb-detail-premium .rb-detail-v2-metric-side--away > span::after {
+  right: 0;
+  left: auto;
+  width: var(--away-width);
+  background: linear-gradient(90deg, #fb7185, #fda4af);
+  box-shadow: 0 0 12px rgba(251, 113, 133, 0.2);
+}
+
+.rb-detail-premium .rb-detail-v2-metric-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-width: 0;
+  text-align: left;
+}
+
+.rb-detail-premium .rb-detail-v2-metric-card__header > div {
+  min-width: 0;
+}
+
+.rb-detail-premium .rb-detail-v2-metric-card__header h4 {
+  margin: 0;
+  color: #f1f7f8;
+  font-size: 0.75rem;
+  font-weight: 850;
+}
+
+.rb-detail-premium .rb-detail-v2-metric-card__header > div > span {
+  color: #8298a2;
+  font-size: 0.61rem;
+  font-weight: 650;
+}
+
+.rb-detail-premium .rb-detail-v2-recent-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0;
+  overflow: hidden;
+  border: 1px solid rgba(117, 151, 166, 0.14);
+  border-radius: 16px;
+  background: rgba(4, 16, 25, 0.3);
+}
+
+.rb-detail-premium .rb-detail-v2-recent-team {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+  padding: 17px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.rb-detail-premium .rb-detail-v2-recent-team + .rb-detail-v2-recent-team {
+  border-left: 1px solid rgba(117, 151, 166, 0.14);
+}
+
+.rb-detail-premium .rb-detail-v2-recent-team__heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.rb-detail-premium .rb-detail-v2-recent-team__heading > div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.rb-detail-premium .rb-detail-v2-recent-team__heading strong {
+  overflow: hidden;
+  color: #f5fafb;
+  font-size: 0.84rem;
+  font-weight: 860;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rb-detail-premium .rb-detail-v2-recent-team__heading > span {
+  padding: 5px 8px;
+  border: 1px solid rgba(45, 212, 191, 0.15);
+  border-radius: 999px;
+  background: rgba(13, 148, 136, 0.08);
+  color: #9fded7;
+  font-size: 0.61rem;
+  font-weight: 820;
+  white-space: nowrap;
+}
+
+.rb-detail-premium .rb-detail-v2-recent-list {
+  display: grid;
+}
+
+.rb-detail-premium .rb-detail-v2-recent-row {
+  display: grid;
+  grid-template-columns: 84px minmax(0, 1fr) 54px 25px;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+  min-height: 39px;
+  border-bottom: 1px solid rgba(117, 151, 166, 0.11);
+}
+
+.rb-detail-premium .rb-detail-v2-recent-row:last-child {
+  border-bottom: 0;
+}
+
+.rb-detail-premium .rb-detail-v2-recent-row time,
+.rb-detail-premium .rb-detail-v2-recent-row span {
+  overflow: hidden;
+  color: #94a8b1;
+  font-size: 0.66rem;
+  font-style: normal;
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rb-detail-premium .rb-detail-v2-recent-row strong {
+  color: #e9f1f3;
+  font-size: 0.7rem;
+  font-weight: 850;
+  text-align: right;
+}
+
+.rb-detail-premium .rb-detail-v2-result {
+  display: inline-grid;
+  place-items: center;
+  width: 23px;
+  height: 23px;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 0.6rem;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.rb-detail-premium .rb-detail-v2-result--w {
+  background: rgba(13, 148, 136, 0.82);
+}
+
+.rb-detail-premium .rb-detail-v2-result--d {
+  background: rgba(180, 121, 14, 0.8);
+}
+
+.rb-detail-premium .rb-detail-v2-result--l {
+  background: rgba(75, 94, 106, 0.88);
+}
+
+.rb-detail-premium .rb-detail-v2-recent-empty {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 92px;
+  color: #8fa3ac;
+}
+
+.rb-detail-premium .rb-detail-v2-recent-empty p {
+  margin: 0;
+  font-size: 0.72rem;
+  line-height: 1.5;
+}
+
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-recent-team > .rb-detail-v2-recent-list {
+  display: grid;
+  flex-wrap: nowrap;
+  gap: 0;
+}
+
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-recent-team > .rb-detail-v2-recent-list .rb-detail-v2-recent-row span {
+  display: block;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  line-height: normal;
+}
+
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-recent-team > .rb-detail-v2-recent-empty {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 10px;
+}
+
+.rb-detail-premium .rb-detail-v2-watch-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 20px;
+  border-radius: 18px;
+}
+
+.rb-detail-premium .rb-detail-v2-watch-card > span {
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border: 1px solid rgba(45, 212, 191, 0.28);
+  border-radius: 50%;
+  background: rgba(13, 148, 136, 0.16);
+  color: var(--detail-teal);
+  box-shadow: 0 0 24px rgba(45, 212, 191, 0.1);
+}
+
+.rb-detail-premium .rb-detail-v2-watch-card strong {
+  color: #f3f9fa;
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.rb-detail-premium .rb-detail-v2-watch-card p {
+  margin: 5px 0 0;
+  color: #9db0b8;
+  font-size: 0.72rem;
+  line-height: 1.55;
+}
+
+.rb-detail-premium .rb-detail-v2-side-card,
+.rb-detail-premium .rb-detail-v2-responsible-card {
+  display: grid;
+  gap: 15px;
+  padding: 18px;
+  border-radius: 18px;
+}
+
+.rb-detail-premium .rb-detail-v2-side-card h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  color: #fff;
+  font-size: 0.96rem;
+  font-weight: 900;
+  letter-spacing: -0.025em;
+}
+
+.rb-detail-premium .rb-detail-v2-side-card h3 > span {
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid rgba(45, 212, 191, 0.18);
+  border-radius: 10px;
+  background: rgba(13, 148, 136, 0.1);
+  color: var(--detail-teal);
+}
+
+.rb-detail-premium .rb-detail-v2-info-list {
+  display: grid;
+}
+
+.rb-detail-premium .rb-detail-v2-info-line {
+  display: grid;
+  grid-template-columns: 30px 82px minmax(0, 1fr);
+  align-items: center;
+  gap: 9px;
+  min-height: 44px;
+  margin: 0;
+  border-bottom: 1px solid rgba(117, 151, 166, 0.12);
+}
+
+.rb-detail-premium .rb-detail-v2-info-line:last-child {
+  border-bottom: 0;
+}
+
+.rb-detail-premium .rb-detail-v2-info-line > span {
+  display: inline-grid;
+  place-items: center;
+  width: 27px;
+  height: 27px;
+  border: 1px solid rgba(45, 212, 191, 0.18);
+  border-radius: 50%;
+  background: rgba(13, 148, 136, 0.08);
+  color: var(--detail-teal);
+}
+
+.rb-detail-premium .rb-detail-v2-info-line small {
+  color: #8499a3;
+  font-size: 0.64rem;
+  font-weight: 760;
+}
+
+.rb-detail-premium .rb-detail-v2-info-line strong {
+  overflow: hidden;
+  color: #e7eff1;
+  font-size: 0.67rem;
+  font-weight: 830;
+  line-height: 1.35;
+  text-align: right;
+  text-overflow: ellipsis;
+}
+
+.rb-detail-premium .rb-detail-v2-h2h-summary {
+  display: grid;
+  justify-items: center;
+  gap: 3px;
+  padding: 5px 0 2px;
+}
+
+.rb-detail-premium .rb-detail-v2-h2h-summary strong {
+  color: #fff;
+  font-size: 2.25rem;
+  font-weight: 950;
+  line-height: 1;
+}
+
+.rb-detail-premium .rb-detail-v2-h2h-summary span {
+  color: #9bb0b8;
+  font-size: 0.67rem;
+  font-weight: 700;
+}
+
+.rb-detail-premium .rb-detail-v2-h2h-match {
+  display: grid;
+  grid-template-columns: 78px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 10px;
+  border: 1px solid rgba(117, 151, 166, 0.14);
+  border-radius: 12px;
+  background: rgba(4, 16, 25, 0.35);
+}
+
+.rb-detail-premium .rb-detail-v2-h2h-match time,
+.rb-detail-premium .rb-detail-v2-h2h-match span {
+  overflow: hidden;
+  color: #91a5ad;
+  font-size: 0.62rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rb-detail-premium .rb-detail-v2-h2h-match strong {
+  color: #f1f7f8;
+  font-size: 0.66rem;
+  font-weight: 850;
+}
+
+.rb-detail-premium .rb-detail-v2-side-card button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 36px;
+  width: 100%;
+  border: 1px solid rgba(45, 212, 191, 0.22);
+  border-radius: 11px;
+  background: rgba(13, 148, 136, 0.1);
+  color: #baf6ee;
+  font-size: 0.7rem;
+  font-weight: 850;
+}
+
+.rb-detail-premium .rb-detail-v2-context-list {
+  display: grid;
+  gap: 10px;
+  padding: 0;
+  list-style: none;
+}
+
+.rb-detail-premium .rb-detail-v2-context-list li {
+  position: relative;
+  padding-left: 16px;
+  color: #a5b7be;
+  font-size: 0.69rem;
+  font-weight: 620;
+  line-height: 1.5;
+}
+
+.rb-detail-premium .rb-detail-v2-context-list li::before {
+  content: "";
+  position: absolute;
+  top: 0.58em;
+  left: 0;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--detail-teal);
+  box-shadow: 0 0 10px rgba(45, 212, 191, 0.35);
+}
+
+.rb-detail-premium .rb-detail-v2-responsible-card {
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: flex-start;
+  border-color: rgba(45, 212, 191, 0.3);
+  background:
+    linear-gradient(145deg, rgba(4, 46, 44, 0.58), rgba(4, 27, 30, 0.9));
+}
+
+.rb-detail-premium .rb-detail-v2-responsible-card > span {
+  display: inline-grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba(45, 212, 191, 0.32);
+  border-radius: 12px;
+  background: rgba(13, 148, 136, 0.14);
+  color: var(--detail-teal);
+}
+
+.rb-detail-premium .rb-detail-v2-responsible-card strong {
+  color: #9df4e9;
+  font-size: 0.76rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.rb-detail-premium .rb-detail-v2-responsible-card p {
+  margin: 7px 0 0;
+  color: #b4c7cc;
+  font-size: 0.7rem;
+  line-height: 1.55;
+}
+
+.rb-detail-premium .rb-detail-v2-footer-note {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 48px;
+  margin: 0;
+  padding: 0 18px;
+  border: 1px solid rgba(117, 151, 166, 0.16);
+  border-radius: 14px;
+  background: rgba(8, 24, 31, 0.74);
+  color: #8fa4ad;
+  font-size: 0.68rem;
+  font-weight: 650;
+  text-align: center;
+}
+
+.rb-detail-premium .rb-detail-v2-footer-note svg {
+  color: #a9b9c0;
+}
+
+.rb-detail-premium .rb-detail-v2-empty-mini {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #91a5ad;
+}
+
+.rb-detail-premium .rb-detail-v2-empty-mini p {
+  margin: 0;
+  font-size: 0.7rem;
+  line-height: 1.5;
+}
+
+@keyframes rb-detail-premium-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 1240px) {
+  .rb-detail-premium .rb-detail-v2-hero {
+    grid-template-columns: minmax(0, 1fr) minmax(220px, 0.62fr) minmax(0, 1fr);
+    padding: 32px 28px;
+  }
+
+  .rb-detail-premium .rb-detail-v2-team-logo {
+    width: 96px;
+    height: 96px;
+  }
+
+  .rb-detail-premium .rb-detail-v2-layout {
+    grid-template-columns: minmax(0, 1fr) 300px;
+  }
+
+  .rb-detail-premium .rb-detail-v2-insight-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 980px) {
+  section.rb-screen-container:has(.rb-detail-premium) {
+    width: min(100% - 20px, 900px) !important;
+  }
+
+  .rb-detail-premium .rb-detail-v2-topbar {
+    grid-template-columns: auto 1fr auto;
+  }
+
+  .rb-detail-premium .rb-detail-v2-topbar > div {
+    display: none;
+  }
+
+  .rb-detail-premium .rb-detail-v2-hero {
+    grid-template-columns: 1fr 1fr;
+    min-height: 420px;
+    padding: 26px;
+  }
+
+  .rb-detail-premium .rb-detail-v2-hero-center {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+
+  .rb-detail-premium .rb-detail-v2-team--home,
+  .rb-detail-premium .rb-detail-v2-team--away {
+    justify-content: center;
+  }
+
+  .rb-detail-premium .rb-detail-v2-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .rb-detail-premium .rb-detail-v2-side-column {
+    position: static;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .rb-detail-premium .rb-detail-v2-metric-card {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .rb-detail-premium .rb-detail-v2-metric-card__header {
+    grid-row: 1;
+  }
+}
+
+@media (max-width: 680px) {
+  .rb-detail-premium {
+    gap: 13px;
+  }
+
+  .rb-detail-premium .rb-detail-v2-topbar button span {
+    display: none;
+  }
+
+  .rb-detail-premium .rb-detail-v2-topbar button {
+    width: 40px;
+    padding: 0;
+  }
+
+  .rb-detail-premium .rb-detail-v2-hero {
+    grid-template-columns: 1fr;
+    min-height: 560px;
+    gap: 14px;
+    padding: 26px 18px;
+  }
+
+  .rb-detail-premium .rb-detail-v2-hero-center,
+  .rb-detail-premium .rb-detail-v2-team {
+    grid-column: 1;
+  }
+
+  .rb-detail-premium .rb-detail-v2-team--home,
+  .rb-detail-premium .rb-detail-v2-team--away {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .rb-detail-premium .rb-detail-v2-team--home {
+    flex-direction: column-reverse;
+  }
+
+  .rb-detail-premium .rb-detail-v2-team--away {
+    flex-direction: column;
+  }
+
+  .rb-detail-premium .rb-detail-v2-team-logo {
+    width: 82px;
+    height: 82px;
+  }
+
+  .rb-detail-premium .rb-detail-v2-insight-grid,
+  .rb-detail-premium .rb-detail-v2-recent-grid,
+  .rb-detail-premium .rb-detail-v2-side-column {
+    grid-template-columns: 1fr;
+  }
+
+  .rb-detail-premium .rb-detail-v2-recent-team + .rb-detail-v2-recent-team {
+    border-top: 1px solid rgba(117, 151, 166, 0.14);
+    border-left: 0;
+  }
+
+  .rb-detail-premium .rb-detail-v2-comparison-heading {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .rb-detail-premium .rb-detail-v2-comparison-heading > span {
+    display: none;
+  }
+
+  .rb-detail-premium .rb-detail-v2-card {
+    padding: 17px;
+  }
+
+  .rb-detail-premium .rb-detail-v2-section-header > span {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rb-detail-premium *,
+  .rb-detail-premium *::before,
+  .rb-detail-premium *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/*
+Flux :
+App.tsx
+  └── screens/MatchDetailsScreen.tsx
+        ├── styles/MatchDetailsScreen.css
+        ├── assets/detail/match-detail-stadium.webp
+        ├── models/rubybets.ts
+        └── components/RubyNewsChat.tsx
+*/
+
+/*
+  Correctif d’isolation premium — Vue d’ensemble Détail match.
+  Ce bloc neutralise les propriétés résiduelles de l’ancien App.css et garantit
+  que le nouveau composant conserve sa grille, ses proportions et ses animations.
+*/
+.rb-detail-premium.rb-detail-v2--premium {
+  --detail-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  gap: 20px;
+  min-width: 0;
+  font-synthesis: none;
+}
+
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-topbar,
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-hero,
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-tabs,
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-layout,
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-footer-note {
+  animation: rb-detail-premium-rise 620ms var(--detail-ease) both;
+}
+
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-hero {
+  min-height: 318px !important;
+  padding: 38px 52px !important;
+  border-color: rgba(95, 214, 201, 0.25) !important;
+  background:
+    linear-gradient(90deg, rgba(1, 8, 14, 0.95), rgba(1, 14, 19, 0.40) 48%, rgba(1, 8, 14, 0.95)),
+    linear-gradient(180deg, rgba(0, 8, 13, 0.08), rgba(0, 8, 13, 0.80)),
+    url("../assets/detail/match-detail-stadium.webp") center 52% / cover no-repeat !important;
+  box-shadow:
+    0 34px 90px rgba(0, 0, 0, 0.44),
+    0 0 0 1px rgba(45, 212, 191, 0.035),
+    inset 0 1px 0 rgba(255, 255, 255, 0.055),
+    inset 0 -48px 90px rgba(0, 9, 14, 0.48) !important;
+}
+
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    url("../assets/home/home-light-particles.webp") center / cover no-repeat,
+    radial-gradient(circle at 18% 42%, rgba(45, 212, 191, 0.18), transparent 23%),
+    radial-gradient(circle at 82% 42%, rgba(56, 189, 248, 0.13), transparent 23%);
+  opacity: 0.38;
+  mix-blend-mode: screen;
+  animation: rb-detail-particles-drift 16s ease-in-out infinite alternate;
+}
+
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-hero::after {
+  z-index: 0;
+  background:
+    radial-gradient(circle at 50% 36%, rgba(85, 238, 220, 0.16), transparent 25%),
+    linear-gradient(180deg, transparent 40%, rgba(0, 11, 16, 0.52)) !important;
+}
+
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-team,
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-hero-center,
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-hero__pitch,
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-hero__glow {
+  z-index: 2;
+}
+
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-team-logo {
+  transition:
+    transform 320ms var(--detail-ease),
+    border-color 320ms ease,
+    box-shadow 320ms ease;
+}
+
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-team:hover .rb-detail-v2-team-logo {
+  transform: translateY(-4px) scale(1.035);
+  border-color: rgba(94, 234, 212, 0.52);
+  box-shadow:
+    0 26px 58px rgba(0, 0, 0, 0.5),
+    inset 0 0 0 10px rgba(255, 255, 255, 0.025),
+    0 0 42px rgba(45, 212, 191, 0.19);
+}
+
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-hero-center strong {
+  text-shadow:
+    0 10px 42px rgba(0, 0, 0, 0.62),
+    0 0 38px rgba(94, 234, 212, 0.10);
+}
+
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-tabs {
+  position: sticky;
+  top: 72px;
+  z-index: 20;
+  min-height: 58px;
+  padding: 0 8px;
+  overflow-x: auto;
+  border: 1px solid rgba(117, 151, 166, 0.12);
+  border-radius: 15px;
+  background: rgba(2, 13, 17, 0.86);
+  box-shadow:
+    0 18px 42px rgba(0, 0, 0, 0.26),
+    inset 0 1px 0 rgba(255, 255, 255, 0.025);
+  backdrop-filter: blur(18px);
+}
+
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-tab {
+  position: relative;
+  min-height: 56px;
+  transition:
+    color 180ms ease,
+    background 180ms ease,
+    transform 180ms var(--detail-ease);
+}
+
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-tab:hover {
+  transform: translateY(-1px);
+}
+
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-tab--active {
+  background: linear-gradient(180deg, rgba(45, 212, 191, 0.095), transparent 88%);
+  text-shadow: 0 0 20px rgba(45, 212, 191, 0.20);
+}
+
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-layout {
+  grid-template-columns: minmax(0, 1fr) 330px !important;
+  gap: 22px !important;
+}
+
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-main-column,
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-side-column {
+  gap: 18px !important;
+}
+
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-main-column > *,
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-side-column > * {
+  animation: rb-detail-card-enter 560ms var(--detail-ease) both;
+}
+
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-main-column > *:nth-child(2),
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-side-column > *:nth-child(2) {
+  animation-delay: 70ms;
+}
+
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-main-column > *:nth-child(3),
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-side-column > *:nth-child(3) {
+  animation-delay: 130ms;
+}
+
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-main-column > *:nth-child(4),
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-side-column > *:nth-child(4) {
+  animation-delay: 190ms;
+}
+
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-card,
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-side-card,
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-responsible-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-color: rgba(116, 160, 178, 0.19) !important;
+  background:
+    linear-gradient(155deg, rgba(11, 30, 43, 0.96), rgba(5, 20, 29, 0.91)) !important;
+  box-shadow:
+    0 24px 58px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.035) !important;
+  backdrop-filter: blur(12px);
+}
+
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-card::before,
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-side-card::before,
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-responsible-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: -1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(94, 234, 212, 0.42), transparent);
+  opacity: 0.7;
+}
+
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-card {
+  padding: 24px !important;
+}
+
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-side-card,
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-responsible-card {
+  padding: 20px !important;
+  transition:
+    transform 220ms var(--detail-ease),
+    border-color 220ms ease,
+    box-shadow 220ms ease;
+}
+
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-side-card:hover,
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-responsible-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(45, 212, 191, 0.32) !important;
+  box-shadow:
+    0 30px 66px rgba(0, 0, 0, 0.34),
+    0 0 28px rgba(45, 212, 191, 0.045) !important;
+}
+
+/* Neutralisation complète de l’ancienne grille 5 colonnes d’App.css. */
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-metric-grid {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-auto-flow: row !important;
+  gap: 0 !important;
+  min-width: 0;
+}
+
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-metric-card {
+  display: grid !important;
+  grid-template-columns: minmax(180px, 1fr) minmax(180px, 0.9fr) minmax(180px, 1fr) !important;
+  align-items: center !important;
+  gap: 22px !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  padding: 17px 8px !important;
+  border: 0 !important;
+  border-bottom: 1px solid rgba(117, 151, 166, 0.13) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-metric-card:last-child {
+  border-bottom: 0 !important;
+}
+
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-metric-side {
+  display: grid !important;
+  grid-template-columns: auto minmax(72px, 1fr) auto !important;
+  align-items: center !important;
+  gap: 12px !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-metric-side--away {
+  grid-template-columns: auto minmax(72px, 1fr) auto !important;
+}
+
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-metric-side strong {
+  display: block !important;
+  min-width: 62px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: #f8fcfd !important;
+  font-size: 1.02rem !important;
+  line-height: 1.1 !important;
+}
+
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-metric-side small {
+  display: block !important;
+  min-width: 34px;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: #7f959f !important;
+  font-size: 0.62rem !important;
+  line-height: 1 !important;
+}
+
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-metric-side > span {
+  display: block !important;
+  min-height: 5px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background: rgba(104, 133, 145, 0.18) !important;
+  overflow: hidden !important;
+}
+
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-metric-side > span::after {
+  transform: scaleX(0);
+  transform-origin: left center;
+  animation: rb-detail-bar-grow 780ms var(--detail-ease) 220ms forwards;
+}
+
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-metric-side--away > span::after {
+  transform-origin: right center;
+}
+
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-metric-card__header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 11px !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  text-align: left !important;
+}
+
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-metric-card__header h4,
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-metric-card__header span {
+  display: block !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+/* Neutralisation des anciens styles génériques appliqués à tous les div/span des équipes récentes. */
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-recent-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 0 !important;
+}
+
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-recent-team {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  align-content: start !important;
+  gap: 15px !important;
+  min-width: 0 !important;
+  padding: 20px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-recent-team div {
+  flex-wrap: nowrap !important;
+}
+
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-recent-team__heading {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 14px !important;
+  min-width: 0 !important;
+}
+
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-recent-team__heading > div {
+  display: flex !important;
+  align-items: center !important;
+  flex-wrap: nowrap !important;
+  gap: 11px !important;
+  min-width: 0 !important;
+}
+
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-recent-team__heading strong {
+  display: block !important;
+  overflow: hidden !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-recent-team__heading > span {
+  display: inline-flex !important;
+  flex: 0 0 auto !important;
+  min-height: 0 !important;
+  padding: 6px 9px !important;
+  border: 1px solid rgba(45, 212, 191, 0.18) !important;
+  border-radius: 999px !important;
+  background: rgba(13, 148, 136, 0.10) !important;
+  color: #a6e5dd !important;
+  font-size: 0.62rem !important;
+  line-height: 1 !important;
+}
+
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-recent-list {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: 0 !important;
+  min-width: 0 !important;
+}
+
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-recent-row {
+  display: grid !important;
+  grid-template-columns: 92px minmax(0, 1fr) 58px 26px !important;
+  align-items: center !important;
+  gap: 10px !important;
+  min-width: 0 !important;
+  min-height: 42px !important;
+}
+
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-recent-row time,
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-recent-row span {
+  display: block !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  line-height: 1.25 !important;
+}
+
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-footer-note {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 10px !important;
+  width: min(100%, 820px) !important;
+  padding: 11px 18px !important;
+  border-radius: 14px !important;
+  background: linear-gradient(90deg, rgba(4, 19, 27, 0.76), rgba(7, 28, 37, 0.9), rgba(4, 19, 27, 0.76)) !important;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.22) !important;
+}
+
+@keyframes rb-detail-premium-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes rb-detail-card-enter {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.992);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes rb-detail-bar-grow {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes rb-detail-particles-drift {
+  from {
+    transform: translate3d(-0.7%, -0.4%, 0) scale(1.01);
+  }
+  to {
+    transform: translate3d(0.8%, 0.5%, 0) scale(1.035);
+  }
+}
+
+@media (max-width: 1180px) {
+  .rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-layout {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-side-column {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-metric-card {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 12px !important;
+  }
+
+  .rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-metric-card__header {
+    grid-row: 1;
+    justify-content: flex-start !important;
+  }
+
+  .rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-recent-grid,
+  .rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-side-column {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-recent-team + .rb-detail-v2-recent-team {
+    border-top: 1px solid rgba(117, 151, 166, 0.14) !important;
+    border-left: 0 !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-hero {
+    min-height: 570px !important;
+    padding: 28px 18px !important;
+  }
+
+  .rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-tabs {
+    top: 64px;
+    border-radius: 12px;
+  }
+
+  .rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-card {
+    padding: 18px !important;
+  }
+
+  .rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-recent-row {
+    grid-template-columns: 82px minmax(0, 1fr) 48px 24px !important;
+    gap: 7px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rb-detail-premium.rb-detail-v2--premium *,
+  .rb-detail-premium.rb-detail-v2--premium *::before,
+  .rb-detail-premium.rb-detail-v2--premium *::after {
+    animation: none !important;
+    transform: none !important;
+  }
+}
+
+/*
+Flux du correctif d’isolation :
+App.tsx
+  ├── charge App.css (historique)
+  └── charge ensuite styles/MatchDetailsScreen.css (prioritaire)
+        └── MatchDetailsScreen.tsx utilise uniquement les sélecteurs rb-detail-premium pour le rendu final
+*/
+
+/* Correctif final : fond stadium réaliste et séparation nette logo/nom dans les derniers matchs. */
+.rb-detail-premium .rb-detail-v2-hero {
+  background:
+    linear-gradient(90deg, rgba(1, 8, 13, 0.74), rgba(1, 16, 22, 0.17) 44%, rgba(1, 16, 22, 0.17) 56%, rgba(1, 8, 13, 0.74)),
+    linear-gradient(180deg, rgba(1, 8, 13, 0.08), rgba(1, 9, 14, 0.50)),
+    url("../assets/detail/match-detail-stadium.webp") center 58% / cover no-repeat;
+}
+
+.rb-detail-premium .rb-detail-v2-hero::after {
+  background:
+    radial-gradient(circle at 50% 42%, rgba(45, 212, 191, 0.13), transparent 31%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.02) 38%, rgba(0, 10, 15, 0.30) 100%);
+}
+
+.rb-detail-premium .rb-detail-v2-team-logo--has-crest .rb-detail-v2-team-logo__fallback {
+  display: none !important;
+}
+
+.rb-detail-premium .rb-detail-v2-recent-team__heading > div {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  align-items: center;
+  column-gap: 13px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.rb-detail-premium .rb-detail-v2-recent-team__heading .rb-detail-v2-team-logo {
+  grid-column: 1;
+  width: 36px !important;
+  height: 36px !important;
+  min-width: 36px;
+  margin: 0;
+}
+
+.rb-detail-premium .rb-detail-v2-recent-team__heading strong {
+  grid-column: 2;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  line-height: 1.25;
+}
+
+.rb-detail-premium .rb-detail-v2-recent-team__heading .rb-detail-v2-team-logo img {
+  inset: 6px !important;
+  width: calc(100% - 12px) !important;
+  height: calc(100% - 12px) !important;
+}
+
+@media (max-width: 720px) {
+  .rb-detail-premium .rb-detail-v2-hero {
+    background-position: center 54%;
+  }
+
+  .rb-detail-premium .rb-detail-v2-recent-team__heading > div {
+    grid-template-columns: 32px minmax(0, 1fr);
+    column-gap: 10px;
+  }
+
+  .rb-detail-premium .rb-detail-v2-recent-team__heading .rb-detail-v2-team-logo {
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px;
+  }
+}
+
+/* Correctif final 2 : lueur premium au changement d’onglet et suppression du bandeau footer. */
+.rb-detail-premium .rb-detail-v2-main-column {
+  position: relative;
+}
+
+.rb-detail-premium .rb-detail-v2-tab-switch {
+  position: relative;
+  isolation: isolate;
+  animation: rb-detail-tab-panel-enter 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.rb-detail-premium .rb-detail-v2-tab-switch__glow {
+  position: absolute;
+  inset: -18px 6% auto;
+  height: 180px;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at center, rgba(45, 212, 191, 0.18), rgba(45, 212, 191, 0.08) 34%, transparent 72%);
+  filter: blur(28px);
+  opacity: 0;
+  pointer-events: none;
+  z-index: -1;
+  animation: rb-detail-tab-glow 560ms ease-out 80ms forwards;
+}
+
+.rb-detail-premium .rb-detail-v2-tabs {
+  position: sticky;
+}
+
+.rb-detail-premium .rb-detail-v2-tab {
+  position: relative;
+  overflow: hidden;
+  transition:
+    color 180ms ease,
+    border-color 180ms ease,
+    background-color 220ms ease,
+    box-shadow 240ms ease,
+    transform 180ms ease;
+}
+
+.rb-detail-premium .rb-detail-v2-tab::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    linear-gradient(120deg, transparent 18%, rgba(255, 255, 255, 0.12) 50%, transparent 78%);
+  transform: translateX(-160%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.rb-detail-premium .rb-detail-v2-tab:hover::before,
+.rb-detail-premium .rb-detail-v2-tab:focus-visible::before {
+  opacity: 1;
+  animation: rb-detail-tab-shimmer 620ms ease;
+}
+
+.rb-detail-premium .rb-detail-v2-tab--active {
+  box-shadow:
+    inset 0 0 0 1px rgba(45, 212, 191, 0.16),
+    0 0 0 1px rgba(45, 212, 191, 0.08),
+    0 10px 30px rgba(8, 56, 64, 0.24),
+    0 0 22px rgba(45, 212, 191, 0.16);
+}
+
+.rb-detail-premium .rb-detail-v2-tab--active::before {
+  opacity: 1;
+  animation: rb-detail-tab-shimmer 760ms ease;
+}
+
+@keyframes rb-detail-tab-panel-enter {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.988);
+  }
+  55% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes rb-detail-tab-glow {
+  0% {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  45% {
+    opacity: 0.95;
+  }
+  100% {
+    opacity: 0.42;
+    transform: scale(1);
+  }
+}
+
+@keyframes rb-detail-tab-shimmer {
+  0% {
+    transform: translateX(-160%);
+  }
+  100% {
+    transform: translateX(160%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rb-detail-premium .rb-detail-v2-tab-switch,
+  .rb-detail-premium .rb-detail-v2-tab-switch__glow,
+  .rb-detail-premium .rb-detail-v2-tab::before {
+    animation: none !important;
+    opacity: 1;
+    transform: none !important;
+  }
+
+  .rb-detail-premium .rb-detail-v2-tab-switch__glow {
+    opacity: 0.18;
+  }
+}
+
+/* Correctif final 3 : transition lumineuse sans modifier la grille et footer recentré. */
+.rb-detail-premium .rb-detail-v2-main-column {
+  position: relative;
+  isolation: isolate;
+  animation: rb-detail-safe-panel-enter 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.rb-detail-premium .rb-detail-v2-main-column::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  top: -22px;
+  left: 8%;
+  width: 84%;
+  height: 170px;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at center, rgba(45, 212, 191, 0.20), rgba(45, 212, 191, 0.08) 38%, transparent 72%);
+  filter: blur(30px);
+  opacity: 0;
+  pointer-events: none;
+  animation: rb-detail-safe-panel-glow 620ms ease-out 40ms forwards;
+}
+
+.rb-detail-premium .rb-detail-v2-main-column > * {
+  position: relative;
+  z-index: 1;
+}
+
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-footer-note {
+  position: relative;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: min(760px, calc(100% - 40px)) !important;
+  min-height: 52px;
+  margin: 28px auto 8px !important;
+  padding: 13px 22px !important;
+  overflow: hidden;
+  border: 1px solid rgba(45, 212, 191, 0.38) !important;
+  border-radius: 16px !important;
+  background:
+    linear-gradient(90deg, rgba(5, 24, 31, 0.90), rgba(8, 38, 45, 0.96), rgba(5, 24, 31, 0.90)) !important;
+  color: #afc3ca !important;
+  box-shadow:
+    0 18px 48px rgba(0, 0, 0, 0.30),
+    0 0 30px rgba(45, 212, 191, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.045) !important;
+}
+
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-footer-note::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(115deg, transparent 18%, rgba(82, 231, 215, 0.15) 48%, transparent 78%);
+  transform: translateX(-150%);
+  animation: rb-detail-footer-shimmer 4.8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-footer-note::after {
+  content: "";
+  position: absolute;
+  left: 16%;
+  right: 16%;
+  bottom: -18px;
+  height: 34px;
+  border-radius: 999px;
+  background: rgba(45, 212, 191, 0.22);
+  filter: blur(22px);
+  pointer-events: none;
+}
+
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-footer-note svg,
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-footer-note span {
+  position: relative;
+  z-index: 1;
+}
+
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-footer-note svg {
+  flex: 0 0 auto;
+  color: #47e5d4 !important;
+  filter: drop-shadow(0 0 8px rgba(45, 212, 191, 0.48));
+}
+
+@keyframes rb-detail-safe-panel-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes rb-detail-safe-panel-glow {
+  0% {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  45% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0.26;
+    transform: scale(1);
+  }
+}
+
+@keyframes rb-detail-footer-shimmer {
+  0%,
+  70% {
+    transform: translateX(-150%);
+  }
+  100% {
+    transform: translateX(150%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rb-detail-premium .rb-detail-v2-main-column,
+  .rb-detail-premium .rb-detail-v2-main-column::before,
+  .rb-detail-premium.rb-detail-v2--premium .rb-detail-v2-footer-note::before {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .rb-detail-premium .rb-detail-v2-main-column::before {
+    opacity: 0.14;
+  }
+}

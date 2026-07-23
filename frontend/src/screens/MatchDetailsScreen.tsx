@@ -2,6 +2,33 @@
 
 import { useMemo, useState } from "react";
 import type { CSSProperties, ReactNode } from "react";
+import type { LucideIcon } from "lucide-react";
+import {
+  Activity,
+  ArrowLeft,
+  ArrowRight,
+  BarChart3,
+  Calendar,
+  CircleDot,
+  Clock,
+  Compass,
+  Database,
+  Eye,
+  Gauge,
+  Info,
+  LayoutGrid,
+  Newspaper,
+  RefreshCw,
+  Scale,
+  Share2,
+  Shield,
+  ShieldCheck,
+  Swords,
+  Target,
+  TrendingUp,
+  Trophy,
+  Users,
+} from "lucide-react";
 import type {
   HeadToHeadMatch,
   Match,
@@ -24,9 +51,7 @@ import type {
 import type { AppScreen } from "../types/navigation";
 import MatchNewsContextSection from "../components/MatchNewsContextSection";
 import RubyNewsChat from "../components/RubyNewsChat";
-import V19ProductDecisionCard from "../components/V19ProductDecisionCard";
 import {
-  formatDateTime,
   formatMatchStatus,
   getTeamDisplayName,
   getTeamInitials,
@@ -63,12 +88,12 @@ type DetailTabKey =
 
 type DetailTab = {
   key: DetailTabKey;
-  icon: string;
+  icon: LucideIcon;
   label: string;
 };
 
 type InfoLine = {
-  icon: string;
+  icon: LucideIcon;
   label: string;
   value: string;
 };
@@ -118,12 +143,12 @@ type HeadToHeadSummaryCard = {
 };
 
 const DETAIL_TABS: DetailTab[] = [
-  { key: "overview", icon: "▦", label: "Vue d’ensemble" },
-  { key: "analysis", icon: "↗", label: "Analyse détaillée" },
-  { key: "form", icon: "⌁", label: "Forme & tendances" },
-  { key: "lineup", icon: "◌", label: "Compo probable" },
-  { key: "headToHead", icon: "◇", label: "Face à face" },
-  { key: "context", icon: "◈", label: "Contexte" },
+  { key: "overview", icon: LayoutGrid, label: "Vue d’ensemble" },
+  { key: "analysis", icon: BarChart3, label: "Analyse détaillée" },
+  { key: "form", icon: Activity, label: "Forme & tendances" },
+  { key: "lineup", icon: Users, label: "Compo probable" },
+  { key: "headToHead", icon: Swords, label: "Face à face" },
+  { key: "context", icon: Newspaper, label: "Contexte" },
 ];
 
 // Cette fonction récupère le match disponible depuis le détail ou le contexte.
@@ -185,7 +210,24 @@ function getFreshnessLabel(
     matchContext?.match.last_updated ??
     null;
 
-  return value ? formatDateTime(value) : "Non datée";
+  return value ? getCompactFreshnessLabel(value) : "Non datée";
+}
+
+// Cette fonction simplifie l’horodatage de fraîcheur pour la lecture publique.
+function getCompactFreshnessLabel(value: string) {
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return new Intl.DateTimeFormat("fr-FR", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
 }
 
 // Cette fonction récupère le classement disponible d’une équipe.
@@ -714,12 +756,16 @@ function hasUsableHistoryBlock(historyBlock: TeamHistoryBlock | null) {
   return Boolean(historyBlock?.form_summary && historyBlock.form_summary.matches_count > 0);
 }
 
-// Ce composant affiche un logo d’équipe avec un fallback texte.
+// Ce composant affiche un logo d’équipe sur un support circulaire premium avec fallback texte.
 function TeamLogo({ team }: { team: Team }) {
   const teamLabel = getTeamDisplayName(team);
 
   return (
-    <span className="rb-detail-v2-team-logo" aria-label={`Logo ${teamLabel}`}>
+    <span
+      className={`rb-detail-v2-team-logo${team.crest ? " rb-detail-v2-team-logo--has-crest" : ""}`}
+      aria-label={`Logo ${teamLabel}`}
+    >
+      <span className="rb-detail-v2-team-logo__ring" aria-hidden="true" />
       <span className="rb-detail-v2-team-logo__fallback">
         {getTeamInitials(team)}
       </span>
@@ -737,7 +783,7 @@ function TeamLogo({ team }: { team: Team }) {
   );
 }
 
-// Ce composant affiche la ligne supérieure de contexte de la fiche match.
+// Ce composant affiche la ligne supérieure de contexte et les actions principales de la fiche match.
 function DetailTopbar({
   match,
   onNavigate,
@@ -748,7 +794,8 @@ function DetailTopbar({
   return (
     <header className="rb-detail-v2-topbar">
       <button type="button" onClick={() => onNavigate("matches")}>
-        ← Retour aux matchs
+        <ArrowLeft size={16} aria-hidden="true" />
+        <span>Retour aux matchs</span>
       </button>
 
       <div>
@@ -757,13 +804,14 @@ function DetailTopbar({
       </div>
 
       <button type="button" onClick={copyCurrentPageLink}>
-        Partager le match
+        <Share2 size={16} aria-hidden="true" />
+        <span>Partager le match</span>
       </button>
     </header>
   );
 }
 
-// Ce composant affiche le hero principal du match sélectionné.
+// Ce composant affiche le hero stadium premium du match sélectionné.
 function MatchHero({
   match,
   matchContext,
@@ -777,12 +825,12 @@ function MatchHero({
       <span className="rb-detail-v2-hero__pitch" aria-hidden="true" />
 
       <div className="rb-detail-v2-team rb-detail-v2-team--home">
-        <TeamLogo team={match.home_team} />
         <div>
           <p>Domicile</p>
           <h2>{getTeamDisplayName(match.home_team)}</h2>
           <span>{getStandingLabel(matchContext, "home")}</span>
         </div>
+        <TeamLogo team={match.home_team} />
       </div>
 
       <div className="rb-detail-v2-hero-center">
@@ -814,26 +862,30 @@ function DetailTabs({
 }) {
   return (
     <nav className="rb-detail-v2-tabs" aria-label="Navigation interne détail match">
-      {DETAIL_TABS.map((tab) => (
-        <button
-          key={tab.key}
-          type="button"
-          className={
-            activeTab === tab.key
-              ? "rb-detail-v2-tab rb-detail-v2-tab--active"
-              : "rb-detail-v2-tab"
-          }
-          onClick={() => onSelectTab(tab.key)}
-        >
-          <span>{tab.icon}</span>
-          {tab.label}
-        </button>
-      ))}
+      {DETAIL_TABS.map((tab) => {
+        const TabIcon = tab.icon;
+
+        return (
+          <button
+            key={tab.key}
+            type="button"
+            className={
+              activeTab === tab.key
+                ? "rb-detail-v2-tab rb-detail-v2-tab--active"
+                : "rb-detail-v2-tab"
+            }
+            onClick={() => onSelectTab(tab.key)}
+          >
+            <TabIcon size={16} strokeWidth={1.8} aria-hidden="true" />
+            {tab.label}
+          </button>
+        );
+      })}
     </nav>
   );
 }
 
-// Cette fonction prépare les cartes d’analyse synthétique selon les données disponibles.
+// Cette fonction prépare une lecture rapide, lisible et prudente à partir des données disponibles.
 function buildInsightCards(
   match: Match,
   matchContext: MatchContextResponse | null,
@@ -843,8 +895,9 @@ function buildInsightCards(
   const awayStanding = getStanding(matchContext, "away");
   const homeFormSummary = getTeamFormSummary(teamHistory, "home");
   const awayFormSummary = getTeamFormSummary(teamHistory, "away");
-
   const hasHistoryForm = Boolean(homeFormSummary && awayFormSummary);
+  const homeShortName = getTeamShortName(match.home_team);
+  const awayShortName = getTeamShortName(match.away_team);
 
   const homeGoalsForAvg = hasHistoryForm
     ? homeFormSummary?.avg_goals_for ?? null
@@ -866,45 +919,76 @@ function buildInsightCards(
     : awayStanding
       ? getAveragePerGame(awayStanding.goals_against, awayStanding.played_games)
       : null;
+  const homeFormRate = getRecentFormRate(homeFormSummary);
+  const awayFormRate = getRecentFormRate(awayFormSummary);
+  const formGap =
+    homeFormRate !== null && awayFormRate !== null
+      ? Math.abs(homeFormRate - awayFormRate)
+      : null;
+  const formLeader =
+    homeFormRate !== null && awayFormRate !== null
+      ? homeFormRate >= awayFormRate
+        ? homeShortName
+        : awayShortName
+      : null;
+  const attackLeader =
+    homeGoalsForAvg !== null && awayGoalsForAvg !== null
+      ? homeGoalsForAvg >= awayGoalsForAvg
+        ? homeShortName
+        : awayShortName
+      : null;
+  const defenseLeader =
+    homeGoalsAgainstAvg !== null && awayGoalsAgainstAvg !== null
+      ? homeGoalsAgainstAvg <= awayGoalsAgainstAvg
+        ? homeShortName
+        : awayShortName
+      : null;
+  const headToHeadCount = teamHistory?.head_to_head.length ?? 0;
 
   return [
     {
-      icon: "⌁",
+      icon: "form",
       tone: "teal",
-      title: "État de forme",
+      title:
+        formGap !== null && formGap <= 8
+          ? "Équilibrée"
+          : formLeader
+            ? `${formLeader} plus régulier`
+            : "Lecture limitée",
       description: hasHistoryForm
-        ? `${getTeamShortName(match.home_team)} : ${formatRecentFormRecord(homeFormSummary)} ; ${getTeamShortName(match.away_team)} : ${formatRecentFormRecord(awayFormSummary)}.`
-        : homeStanding && awayStanding
-          ? `${getTeamShortName(match.home_team)} ${homeStanding.position}e, ${getTeamShortName(match.away_team)} ${awayStanding.position}e : première lecture du rapport de forces.`
-          : "La source confirme l’affiche, mais ne fournit pas encore de forme exploitable.",
-      badge: hasHistoryForm ? "Forme récente" : "Lecture limitée",
+        ? `${homeShortName} : ${formatRecentFormRecord(homeFormSummary)} · ${awayShortName} : ${formatRecentFormRecord(awayFormSummary)}.`
+        : "Les données de forme disponibles ne suffisent pas encore à dégager une tendance nette.",
+      badge: "Forme récente",
     },
     {
-      icon: "◎",
+      icon: "attack",
       tone: "red",
-      title: "Attaque",
-      description: homeGoalsForAvg !== null && awayGoalsForAvg !== null
-        ? `${getTeamShortName(match.home_team)} marque ${formatHistoryAverage(homeGoalsForAvg)} but/match, contre ${formatHistoryAverage(awayGoalsForAvg)} pour ${getTeamShortName(match.away_team)}.`
-        : "Les moyennes offensives ne sont pas encore entièrement disponibles.",
-      badge: "Buts marqués",
+      title: attackLeader ? `Avantage ${attackLeader}` : "Signal à confirmer",
+      description:
+        homeGoalsForAvg !== null && awayGoalsForAvg !== null
+          ? `${homeShortName} marque ${formatHistoryAverage(homeGoalsForAvg)} but/match, contre ${formatHistoryAverage(awayGoalsForAvg)} pour ${awayShortName}.`
+          : "Les moyennes offensives ne sont pas encore entièrement disponibles.",
+      badge: "Dynamique offensive",
     },
     {
-      icon: "◷",
+      icon: "defense",
       tone: "amber",
-      title: "Défense",
-      description: homeGoalsAgainstAvg !== null && awayGoalsAgainstAvg !== null
-        ? `${getTeamShortName(match.home_team)} encaisse ${formatHistoryAverage(homeGoalsAgainstAvg)} but/match, contre ${formatHistoryAverage(awayGoalsAgainstAvg)} pour ${getTeamShortName(match.away_team)}.`
-        : "La lecture défensive reste dépendante des données disponibles.",
-      badge: "Buts encaissés",
+      title: defenseLeader ? `${defenseLeader} plus solide` : "Écart limité",
+      description:
+        homeGoalsAgainstAvg !== null && awayGoalsAgainstAvg !== null
+          ? `${homeShortName} encaisse ${formatHistoryAverage(homeGoalsAgainstAvg)} but/match, contre ${formatHistoryAverage(awayGoalsAgainstAvg)} pour ${awayShortName}.`
+          : "La lecture défensive reste dépendante des données réellement disponibles.",
+      badge: "Solidité défensive",
     },
     {
-      icon: "◇",
+      icon: "context",
       tone: "blue",
-      title: "Contexte",
-      description: hasHistoryForm
-        ? `${match.competition.name} · ${getMatchdayLabel(match)}. Historique récent toutes compétitions confondues lorsque la source le permet.`
-        : `${match.competition.name} · ${getMatchdayLabel(match)}. Analyse limitée aux données gratuites disponibles.`,
-      badge: formatMatchStatus(match.status),
+      title: headToHeadCount > 1 ? "Historique disponible" : "Lecture ouverte",
+      description:
+        headToHeadCount > 0
+          ? `${headToHeadCount} confrontation${headToHeadCount > 1 ? "s" : ""} directe${headToHeadCount > 1 ? "s" : ""} disponible${headToHeadCount > 1 ? "s" : ""}. Cet historique reste un contexte, pas une certitude.`
+          : `${match.competition.name} · ${getMatchdayLabel(match)}. Prudence recommandée faute d’historique direct significatif.`,
+      badge: "Contexte",
     },
   ];
 }
@@ -1008,11 +1092,49 @@ function buildMetricCards(
   ];
 }
 
-// Ce composant affiche une carte d’analyse synthétique.
+// Cette fonction associe chaque famille de signal à une icône homogène.
+function getInsightIcon(card: InsightCard): LucideIcon {
+  if (card.icon === "attack" || card.badge === "Buts marqués") {
+    return Target;
+  }
+
+  if (card.icon === "defense" || card.badge === "Buts encaissés") {
+    return ShieldCheck;
+  }
+
+  if (card.icon === "context" || card.badge === "Contexte") {
+    return Compass;
+  }
+
+  return TrendingUp;
+}
+
+// Cette fonction associe chaque indicateur comparatif à une icône métier.
+function getMetricIcon(metric: MetricCard): LucideIcon {
+  if (metric.label.includes("Buts marqués")) {
+    return Target;
+  }
+
+  if (metric.label.includes("Buts encaissés")) {
+    return ShieldCheck;
+  }
+
+  if (metric.label.includes("Différence")) {
+    return Scale;
+  }
+
+  return Gauge;
+}
+
+// Ce composant affiche une carte d’analyse synthétique avec une iconographie premium.
 function AnalysisInsightCard({ card }: { card: InsightCard }) {
+  const InsightIcon = getInsightIcon(card);
+
   return (
     <article className={`rb-detail-v2-insight-card rb-detail-v2-insight-card--${card.tone}`}>
-      <span>{card.icon}</span>
+      <span className="rb-detail-v2-insight-card__icon">
+        <InsightIcon size={18} strokeWidth={1.8} aria-hidden="true" />
+      </span>
       <div>
         <p>{card.badge}</p>
         <h4>{card.title}</h4>
@@ -1022,7 +1144,7 @@ function AnalysisInsightCard({ card }: { card: InsightCard }) {
   );
 }
 
-// Ce composant affiche un indicateur comparatif entre les deux équipes.
+// Ce composant affiche une ligne comparative premium entre les deux équipes.
 function MetricComparisonCard({
   metric,
   homeTeam,
@@ -1036,41 +1158,44 @@ function MetricComparisonCard({
     "--home-width": `${metric.homeBar}%`,
     "--away-width": `${metric.awayBar}%`,
   } as CSSProperties;
+  const MetricIcon = getMetricIcon(metric);
 
   return (
     <article className={`rb-detail-v2-metric-card rb-detail-v2-metric-card--${metric.accent}`} style={style}>
-      <div className="rb-detail-v2-metric-card__header">
-        <h4>{metric.label}</h4>
-        <span>{metric.note}</span>
+      <div className="rb-detail-v2-metric-side rb-detail-v2-metric-side--home">
+        <strong>{metric.homeValue}</strong>
+        <span aria-hidden="true" />
+        <small>{getTeamShortName(homeTeam)}</small>
       </div>
 
-      <div className="rb-detail-v2-metric-card__values">
-        <p>
-          <small>{getTeamShortName(homeTeam)}</small>
-          <strong>{metric.homeValue}</strong>
-          <span aria-hidden="true" />
-        </p>
-        <p>
-          <small>{getTeamShortName(awayTeam)}</small>
-          <strong>{metric.awayValue}</strong>
-          <span aria-hidden="true" />
-        </p>
+      <div className="rb-detail-v2-metric-card__header">
+        <span className="rb-detail-v2-metric-card__icon">
+          <MetricIcon size={18} strokeWidth={1.8} aria-hidden="true" />
+        </span>
+        <div>
+          <h4>{metric.label}</h4>
+          <span>{metric.note}</span>
+        </div>
+      </div>
+
+      <div className="rb-detail-v2-metric-side rb-detail-v2-metric-side--away">
+        <small>{getTeamShortName(awayTeam)}</small>
+        <span aria-hidden="true" />
+        <strong>{metric.awayValue}</strong>
       </div>
     </article>
   );
 }
 
-// Ce composant affiche les cartes d’analyse pré-match.
+// Ce composant affiche la lecture rapide du match en quatre signaux prioritaires.
 function PreMatchAnalysisSection({
   match,
   matchContext,
   teamHistory,
-  onNavigate,
 }: {
   match: Match;
   matchContext: MatchContextResponse | null;
   teamHistory: TeamHistoryResponse | null;
-  onNavigate: (screen: AppScreen) => void;
 }) {
   const insightCards = useMemo(
     () => buildInsightCards(match, matchContext, teamHistory),
@@ -1081,24 +1206,22 @@ function PreMatchAnalysisSection({
     <section className="rb-detail-v2-card rb-detail-v2-analysis-card">
       <div className="rb-detail-v2-section-header">
         <div>
-          <p>Analyse pré-match</p>
-          <h3>Lecture synthétique de la rencontre</h3>
+          <p>Lecture rapide du match</p>
+          <h3>Les signaux essentiels avant le coup d’envoi</h3>
         </div>
-        <button type="button" onClick={() => onNavigate("analysis")}>
-          Voir l’analyse complète →
-        </button>
+        <span>Lecture prudente</span>
       </div>
 
       <div className="rb-detail-v2-insight-grid">
         {insightCards.map((card) => (
-          <AnalysisInsightCard key={card.title} card={card} />
+          <AnalysisInsightCard key={card.badge} card={card} />
         ))}
       </div>
     </section>
   );
 }
 
-// Ce composant affiche les indicateurs clés comparatifs.
+// Ce composant affiche les indicateurs clés sous forme de comparaison centrale.
 function KeyIndicatorsSection({
   match,
   matchContext,
@@ -1120,7 +1243,19 @@ function KeyIndicatorsSection({
           <p>Indicateurs clés</p>
           <h3>Comparaison avant-match</h3>
         </div>
-        <span>Données source</span>
+        <span>Données disponibles</span>
+      </div>
+
+      <div className="rb-detail-v2-comparison-heading">
+        <div>
+          <TeamLogo team={match.home_team} />
+          <strong>{getTeamDisplayName(match.home_team)}</strong>
+        </div>
+        <span>Comparaison des signaux</span>
+        <div>
+          <strong>{getTeamDisplayName(match.away_team)}</strong>
+          <TeamLogo team={match.away_team} />
+        </div>
       </div>
 
       <div className="rb-detail-v2-metric-grid">
@@ -1137,16 +1272,59 @@ function KeyIndicatorsSection({
   );
 }
 
-// Ce composant affiche une ligne de match récent dans la fiche détail.
+// Cette fonction formate une date compacte pour les listes de matchs récents.
+function formatCompactRecentDate(value: string | null) {
+  if (!value) {
+    return "Date à confirmer";
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "Date à confirmer";
+  }
+
+  return new Intl.DateTimeFormat("fr-FR", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  }).format(date);
+}
+
+// Cette fonction récupère l’adversaire d’une équipe dans un match récent normalisé.
+function getRecentOpponent(recentMatch: TeamRecentMatch) {
+  return recentMatch.is_home
+    ? recentMatch.away_team ?? "Adversaire"
+    : recentMatch.home_team ?? "Adversaire";
+}
+
+// Cette fonction transforme le résultat d’un match récent en code français compact.
+function getRecentResultCode(result: TeamRecentMatch["team_result"]) {
+  if (result === "W") {
+    return "V";
+  }
+
+  if (result === "D") {
+    return "N";
+  }
+
+  return "D";
+}
+
+// Ce composant affiche une ligne de match récent compacte et scannable.
 function RecentMatchRow({ recentMatch }: { recentMatch: TeamRecentMatch }) {
+  const resultCode = getRecentResultCode(recentMatch.team_result);
+  const resultLabel = getRecentResultLabel(recentMatch.team_result);
+
   return (
-    <span>
-      {formatRecentMatchDate(recentMatch.utc_date)} ·{" "}
-      {recentMatch.home_team ?? "Équipe domicile"} vs{" "}
-      {recentMatch.away_team ?? "Équipe extérieure"} ·{" "}
-      {formatRecentScore(recentMatch)} ·{" "}
-      {getRecentResultLabel(recentMatch.team_result)}
-    </span>
+    <div className="rb-detail-v2-recent-row">
+      <time>{formatCompactRecentDate(recentMatch.utc_date)}</time>
+      <span>{getRecentOpponent(recentMatch)}</span>
+      <strong>{formatRecentScore(recentMatch)}</strong>
+      <i className={`rb-detail-v2-result rb-detail-v2-result--${recentMatch.team_result.toLowerCase()}`} title={resultLabel}>
+        {resultCode}
+      </i>
+    </div>
   );
 }
 
@@ -1164,18 +1342,20 @@ function RecentTeamHistoryCard({
   return (
     <article className="rb-detail-v2-recent-team">
       <div className="rb-detail-v2-recent-team__heading">
-        <TeamLogo team={team} />
-        <strong>{getTeamDisplayName(team)}</strong>
+        <div>
+          <TeamLogo team={team} />
+          <strong>{getTeamDisplayName(team)}</strong>
+        </div>
+        <span>
+          {formSummary
+            ? `${formSummary.wins}V · ${formSummary.draws}N · ${formSummary.losses}D`
+            : "Bilan non calculé"}
+        </span>
       </div>
 
       {recentMatches.length ? (
-        <div>
-          <span>
-            {formSummary
-              ? `${formSummary.wins}V · ${formSummary.draws}N · ${formSummary.losses}D`
-              : "Bilan non calculé"}
-          </span>
-          {recentMatches.map((recentMatch) => (
+        <div className="rb-detail-v2-recent-list">
+          {recentMatches.slice(0, 5).map((recentMatch) => (
             <RecentMatchRow
               key={`${recentMatch.match_id ?? recentMatch.utc_date}-${recentMatch.team_result}`}
               recentMatch={recentMatch}
@@ -1183,10 +1363,9 @@ function RecentTeamHistoryCard({
           ))}
         </div>
       ) : (
-        <div>
-          <span>Historique indisponible</span>
-          <span>Aucun match récent exploitable dans les sources gratuites actuelles.</span>
-          <span>Donnée non inventée par RubyBets</span>
+        <div className="rb-detail-v2-recent-empty">
+          <Info size={18} aria-hidden="true" />
+          <p>Aucun match récent exploitable n’est disponible pour cette équipe.</p>
         </div>
       )}
     </article>
@@ -1625,16 +1804,15 @@ function RecentMatchesSection({
 }) {
   const homeHistory = getTeamHistoryBlock(teamHistory, "home");
   const awayHistory = getTeamHistoryBlock(teamHistory, "away");
-  const sourceLabel = teamHistory?.data_freshness.source_label ?? "Source en attente";
 
   return (
     <section className="rb-detail-v2-card rb-detail-v2-recent-card">
       <div className="rb-detail-v2-section-header">
         <div>
           <p>Derniers matchs</p>
-          <h3>Forme récente</h3>
+          <h3>Forme récente des équipes</h3>
         </div>
-        <span>{sourceLabel}</span>
+        <span>Historique disponible</span>
       </div>
 
       <div className="rb-detail-v2-recent-grid">
@@ -1651,11 +1829,39 @@ function RecentMatchesSection({
   );
 }
 
-// Ce composant affiche une carte simple de la sidebar.
-function SidebarCard({ title, children }: { title: string; children: ReactNode }) {
+// Ce composant affiche le cadre de prudence de la vue d’ensemble.
+function WatchPointsSection() {
+  return (
+    <section className="rb-detail-v2-watch-card">
+      <span>
+        <Eye size={20} strokeWidth={1.8} aria-hidden="true" />
+      </span>
+      <div>
+        <strong>Points de vigilance</strong>
+        <p>
+          Les indicateurs proviennent de sources publiques et peuvent évoluer. Les compositions, la météo ou l’état des joueurs peuvent encore modifier la lecture avant le coup d’envoi.
+        </p>
+      </div>
+    </section>
+  );
+}
+
+// Ce composant affiche une carte simple de la sidebar avec une icône homogène.
+function SidebarCard({
+  title,
+  icon: Icon,
+  children,
+}: {
+  title: string;
+  icon: LucideIcon;
+  children: ReactNode;
+}) {
   return (
     <article className="rb-detail-v2-side-card">
-      <h3>{title}</h3>
+      <h3>
+        <span><Icon size={17} strokeWidth={1.8} aria-hidden="true" /></span>
+        {title}
+      </h3>
       {children}
     </article>
   );
@@ -1663,9 +1869,11 @@ function SidebarCard({ title, children }: { title: string; children: ReactNode }
 
 // Ce composant affiche une ligne d’information match.
 function MatchInfoLine({ line }: { line: InfoLine }) {
+  const LineIcon = line.icon;
+
   return (
     <p className="rb-detail-v2-info-line">
-      <span>{line.icon}</span>
+      <span><LineIcon size={15} strokeWidth={1.8} aria-hidden="true" /></span>
       <small>{line.label}</small>
       <strong>{line.value}</strong>
     </p>
@@ -1681,16 +1889,15 @@ function MatchInfoCard({
   freshnessLabel: string;
 }) {
   const infoLines: InfoLine[] = [
-    { icon: "▦", label: "Compétition", value: match.competition.name },
-    { icon: "◌", label: "Journée", value: getMatchdayLabel(match) },
-    { icon: "◷", label: "Date", value: formatShortDate(match.utc_date) },
-    { icon: "⌚", label: "Heure", value: formatKickoffTime(match.utc_date) },
-    { icon: "●", label: "Statut", value: formatMatchStatus(match.status) },
-    { icon: "↻", label: "Fraîcheur", value: freshnessLabel },
+    { icon: Trophy, label: "Compétition", value: match.competition.name },
+    { icon: Calendar, label: "Date", value: formatShortDate(match.utc_date) },
+    { icon: Clock, label: "Heure", value: formatKickoffTime(match.utc_date) },
+    { icon: CircleDot, label: "Statut", value: formatMatchStatus(match.status) },
+    { icon: RefreshCw, label: "Fraîcheur", value: freshnessLabel },
   ];
 
   return (
-    <SidebarCard title="Informations match">
+    <SidebarCard title="Informations match" icon={Database}>
       <div className="rb-detail-v2-info-list">
         {infoLines.map((line) => (
           <MatchInfoLine key={line.label} line={line} />
@@ -1703,42 +1910,59 @@ function MatchInfoCard({
 // Ce composant affiche les confrontations directes disponibles entre les deux équipes.
 function HeadToHeadCard({
   teamHistory,
+  onOpen,
 }: {
   teamHistory: TeamHistoryResponse | null;
+  onOpen: () => void;
 }) {
   const headToHeadMatches = teamHistory?.head_to_head ?? [];
+  const firstMatch = headToHeadMatches[0] ?? null;
 
   return (
-    <SidebarCard title="Face à face">
-      {headToHeadMatches.length ? (
+    <SidebarCard title="Face à face" icon={Swords}>
+      {firstMatch ? (
         <>
-          <ul className="rb-detail-v2-context-list">
-            {headToHeadMatches.map((headToHeadMatch) => (
-              <li key={`${headToHeadMatch.match_id ?? headToHeadMatch.utc_date}`}>
-                {formatRecentMatchDate(headToHeadMatch.utc_date)} · {" "}
-                {formatHeadToHeadTeams(headToHeadMatch)} · {" "}
-                {formatHeadToHeadScore(headToHeadMatch)}
-                {headToHeadMatch.competition_name ? (
-                  <> · {headToHeadMatch.competition_name}</>
-                ) : null}
-              </li>
-            ))}
-          </ul>
-          <button type="button">
-            {headToHeadMatches.length} confrontation{headToHeadMatches.length > 1 ? "s" : ""} directe{headToHeadMatches.length > 1 ? "s" : ""}
+          <div className="rb-detail-v2-h2h-summary">
+            <strong>{headToHeadMatches.length}</strong>
+            <span>confrontation{headToHeadMatches.length > 1 ? "s" : ""} directe{headToHeadMatches.length > 1 ? "s" : ""}</span>
+          </div>
+          <div className="rb-detail-v2-h2h-match">
+            <time>{formatCompactRecentDate(firstMatch.utc_date)}</time>
+            <span>{formatHeadToHeadTeams(firstMatch)}</span>
+            <strong>{formatHeadToHeadScore(firstMatch)}</strong>
+          </div>
+          <button type="button" onClick={onOpen}>
+            Voir le détail
+            <ArrowRight size={15} aria-hidden="true" />
           </button>
         </>
       ) : (
-        <>
-          <div className="rb-detail-v2-empty-mini">
-            <span>◇</span>
-            <p>Aucune confrontation directe récente n’est disponible dans la source actuelle.</p>
-          </div>
-          <button type="button">Historique non fourni</button>
-        </>
+        <div className="rb-detail-v2-empty-mini">
+          <Swords size={20} aria-hidden="true" />
+          <p>Aucune confrontation directe récente n’est disponible.</p>
+        </div>
       )}
     </SidebarCard>
   );
+}
+
+// Cette fonction reformule les faits techniques en informations publiques compréhensibles.
+function getPublicContextFact(item: string) {
+  const normalized = item.toLocaleLowerCase("fr-FR");
+
+  if (normalized.includes("classement")) {
+    return "Le classement de compétition n’est pas disponible pour cette rencontre.";
+  }
+
+  if (normalized.includes("flashscore") || normalized.includes("source")) {
+    return "Données issues de sources publiques disponibles.";
+  }
+
+  if (normalized.includes("coup d'envoi") || normalized.includes("coup d’envoi")) {
+    return "Match analysé avant le coup d’envoi.";
+  }
+
+  return item;
 }
 
 // Ce composant affiche les enjeux et limites utiles dans la sidebar.
@@ -1749,17 +1973,20 @@ function ContextIssuesCard({
   match: Match;
   matchContext: MatchContextResponse | null;
 }) {
-  const facts = matchContext?.context.summary.main_facts ?? [];
-  const items = facts.length
-    ? facts.slice(0, 3)
-    : [
-        "Rencontre suivie dans le périmètre avant-match RubyBets.",
-        `${match.competition.name} · ${getMatchdayLabel(match)}.`,
-        "Les données partielles sont affichées avec prudence.",
-      ];
+  const rawFacts = matchContext?.context.summary.main_facts ?? [];
+  const items = Array.from(new Set(
+    (rawFacts.length
+      ? rawFacts.map(getPublicContextFact)
+      : [
+          "Match analysé avant le coup d’envoi.",
+          `Rencontre de ${match.competition.name}.`,
+          "Les données incomplètes sont signalées avec prudence.",
+        ]
+    ).slice(0, 4),
+  ));
 
   return (
-    <SidebarCard title="Contexte & enjeux">
+    <SidebarCard title="Contexte & enjeux" icon={Compass}>
       <ul className="rb-detail-v2-context-list">
         {items.map((item) => (
           <li key={item}>{item}</li>
@@ -1773,9 +2000,9 @@ function ContextIssuesCard({
 function ResponsibleNoticeCard() {
   return (
     <article className="rb-detail-v2-responsible-card">
-      <span>◇</span>
+      <span><Shield size={19} strokeWidth={1.8} aria-hidden="true" /></span>
       <div>
-        <strong>RubyBets est un outil d’aide à la décision.</strong>
+        <strong>RubyBets : aide à la décision</strong>
         <p>
           Les analyses reposent sur des données réelles, mais ne garantissent aucun résultat sportif.
         </p>
@@ -2404,33 +2631,22 @@ function PendingTabContent({ activeTab }: { activeTab: DetailTabKey }) {
   );
 }
 
-// Ce composant affiche le contenu de la vue d’ensemble.
+// Ce composant affiche la vue d’ensemble premium sans exposer les noms de versions internes.
 function OverviewTabContent({
   match,
   matchContext,
   teamHistory,
-  v19ProductPrediction,
-  v19ProductStatus,
-  onNavigate,
 }: {
   match: Match;
   matchContext: MatchContextResponse | null;
   teamHistory: TeamHistoryResponse | null;
-  v19ProductPrediction: V19ProductPredictionResponse | null;
-  v19ProductStatus: string;
-  onNavigate: (screen: AppScreen) => void;
 }) {
   return (
     <>
-      <V19ProductDecisionCard
-        prediction={v19ProductPrediction}
-        statusMessage={v19ProductStatus}
-      />
       <PreMatchAnalysisSection
         match={match}
         matchContext={matchContext}
         teamHistory={teamHistory}
-        onNavigate={onNavigate}
       />
       <KeyIndicatorsSection
         match={match}
@@ -2438,6 +2654,7 @@ function OverviewTabContent({
         teamHistory={teamHistory}
       />
       <RecentMatchesSection match={match} teamHistory={teamHistory} />
+      <WatchPointsSection />
     </>
   );
 }
@@ -2451,14 +2668,12 @@ function MatchDetailsScreen({
   matchNewsContext,
   teamHistory,
   v19H2HAnalysis,
-  v19ProductPrediction,
   matchDetailsStatus,
   matchContextStatus,
   matchAnalysisStatus,
   matchLineupsStatus,
   matchNewsContextStatus,
   v19H2HStatus,
-  v19ProductStatus,
   onNavigate,
 }: MatchDetailsScreenProps) {
   const [activeTab, setActiveTab] = useState<DetailTabKey>("overview");
@@ -2468,7 +2683,7 @@ function MatchDetailsScreen({
 
   if (!selectedMatch) {
     return (
-      <div className="rb-detail-v2 rb-detail-v2--premium">
+      <div className="rb-detail-v2 rb-detail-v2--premium rb-detail-premium">
         <article className="rb-detail-v2-empty-state">
           <p>Détail match</p>
           <h2>Aucun match sélectionné</h2>
@@ -2483,7 +2698,7 @@ function MatchDetailsScreen({
 
   if (!hasKnownTeams(selectedMatch)) {
     return (
-      <div className="rb-detail-v2 rb-detail-v2--premium">
+      <div className="rb-detail-v2 rb-detail-v2--premium rb-detail-premium">
         <DetailTopbar match={selectedMatch} onNavigate={onNavigate} />
         <article className="rb-detail-v2-empty-state">
           <p>Analyse limitée</p>
@@ -2500,21 +2715,21 @@ function MatchDetailsScreen({
   }
 
   return (
-    <div className="rb-detail-v2 rb-detail-v2--premium">
+    <div className="rb-detail-v2 rb-detail-v2--premium rb-detail-premium">
       <DetailTopbar match={selectedMatch} onNavigate={onNavigate} />
       <MatchHero match={selectedMatch} matchContext={matchContext} />
       <DetailTabs activeTab={activeTab} onSelectTab={setActiveTab} />
 
       <main className="rb-detail-v2-layout">
-        <section className="rb-detail-v2-main-column">
+        <section
+          key={activeTab}
+          className={`rb-detail-v2-main-column rb-detail-v2-main-column--${activeTab}`}
+        >
           {activeTab === "overview" ? (
             <OverviewTabContent
               match={selectedMatch}
               matchContext={matchContext}
               teamHistory={teamHistory}
-              v19ProductPrediction={v19ProductPrediction}
-              v19ProductStatus={v19ProductStatus}
-              onNavigate={onNavigate}
             />
           ) : null}
 
@@ -2571,7 +2786,7 @@ function MatchDetailsScreen({
           {activeTab !== "context" ? (
             <>
               <MatchInfoCard match={selectedMatch} freshnessLabel={freshnessLabel} />
-              <HeadToHeadCard teamHistory={teamHistory} />
+              <HeadToHeadCard teamHistory={teamHistory} onOpen={() => setActiveTab("headToHead")} />
               <ContextIssuesCard match={selectedMatch} matchContext={matchContext} />
               <ResponsibleNoticeCard />
             </>
@@ -2580,7 +2795,8 @@ function MatchDetailsScreen({
       </main>
 
       <p className="rb-detail-v2-footer-note">
-        Outil d’aide à la décision avant-match. RubyBets ne permet aucun pari réel et ne promet aucun résultat sportif.
+        <Shield size={16} strokeWidth={1.8} aria-hidden="true" />
+        <span>Outil d’aide à la décision avant-match. RubyBets ne permet aucun pari réel et ne promet aucun résultat sportif.</span>
       </p>
     </div>
   );
@@ -2590,7 +2806,7 @@ export default MatchDetailsScreen;
 
 // Schéma de communication du fichier :
 // MatchDetailsScreen.tsx
-// ├── reçoit aussi la décision produit V19 depuis App.tsx et l’affiche au début de la Vue d’ensemble
+// ├── conserve les contrats V19 reçus depuis App.tsx sans exposer leur nom interne dans la Vue d’ensemble
 // ├── utilise aussi V19H2HResponse de models/rubybets.ts pour afficher le catalogue v19.h2h.core.1
 // ├── affiche RubyNewsChat.tsx dans la colonne droite uniquement lorsque l’onglet Contexte est actif
 // ├── utilise les helpers d’affichage de helpers/displayText.ts
@@ -2602,4 +2818,4 @@ export default MatchDetailsScreen;
 // ├── affiche les derniers matchs disponibles uniquement dans la Vue d’ensemble via teamHistory.recent_matches_overview
 // ├── affiche les confrontations directes disponibles via teamHistory.head_to_head
 // ├── déclenche la navigation vers Matchs, Analyse et Prédictions via onNavigate
-// └── utilise V19ProductDecisionCard.tsx et les classes rb-v19-decision-card-* définies dans App.css
+// └── charge styles/MatchDetailsScreen.css et assets/detail/match-detail-stadium.webp pour le rendu premium

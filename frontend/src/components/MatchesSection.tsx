@@ -180,27 +180,56 @@ function MatchInformationLight({
   );
 }
 
-// Cette fonction retrouve l’emblème de la compétition correspondant à la ligne affichée.
-function getCompetitionEmblem(match: Match, competitions: Competition[]) {
-  const normalizedMatchCompetitionName = match.competition.name
+// Cette fonction normalise un nom de compétition pour rapprocher les libellés Football-Data et FlashScore.
+function normalizeCompetitionName(value: string | null | undefined) {
+  return (value ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
     .replace(/^europe:\s*/, "")
     .replace(/uefa\s+/g, "")
+    .replace(/[^a-z0-9]+/g, " ")
     .trim();
+}
 
-  return competitions.find((competition) => {
-    const normalizedCompetitionName = competition.name
-      .toLowerCase()
-      .replace(/^europe:\s*/, "")
-      .replace(/uefa\s+/g, "")
-      .trim();
+// Cette fonction retrouve la compétition officielle afin d’utiliser son véritable emblème dans le tableau.
+function resolveMatchCompetition(
+  match: Match,
+  competitions: Competition[],
+  selectedCompetition: string,
+) {
+  const matchCode = match.competition.code?.trim().toUpperCase();
+  const matchName = normalizeCompetitionName(match.competition.name);
+
+  const directCodeMatch = competitions.find(
+    (competition) =>
+      competition.code?.trim().toUpperCase() === matchCode &&
+      matchCode !== "FS",
+  );
+
+  if (directCodeMatch) {
+    return directCodeMatch;
+  }
+
+  const nameMatch = competitions.find((competition) => {
+    const competitionName = normalizeCompetitionName(competition.name);
 
     return (
-      competition.code === match.competition.code ||
-      normalizedCompetitionName.includes(normalizedMatchCompetitionName) ||
-      normalizedMatchCompetitionName.includes(normalizedCompetitionName)
+      competitionName === matchName ||
+      competitionName.includes(matchName) ||
+      matchName.includes(competitionName)
     );
-  })?.emblem;
+  });
+
+  if (nameMatch) {
+    return nameMatch;
+  }
+
+  return competitions.find(
+    (competition) =>
+      competition.code?.trim().toUpperCase() ===
+      selectedCompetition.trim().toUpperCase(),
+  );
 }
 
 // Ce composant affiche le logo d’une équipe avec un fallback propre.
@@ -238,14 +267,18 @@ function CompetitionLogo({
 }) {
   const normalizedCode = code.trim().toUpperCase();
   const needsLightLogo = normalizedCode === "CL";
+  const isPremierLeague = normalizedCode === "PL";
+  const logoClassName = [
+    "rb-match-competition-logo",
+    needsLightLogo ? "rb-match-competition-logo--high-contrast" : "",
+    isPremierLeague ? "rb-match-competition-logo--premier-league" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <span
-      className={
-        needsLightLogo
-          ? "rb-match-competition-logo rb-match-competition-logo--high-contrast"
-          : "rb-match-competition-logo"
-      }
+      className={logoClassName}
       aria-hidden="true"
     >
       <span>{code.slice(0, 2)}</span>
@@ -270,17 +303,26 @@ function MatchRow({
   competitions,
   onSelectMatch,
   informationLoading,
+  selectedCompetition,
 }: {
   match: Match;
   competitions: Competition[];
   onSelectMatch: (matchId: number) => void;
   informationLoading: boolean;
+  selectedCompetition: string;
 }) {
   const analysisAvailable = isAnalysisAvailable(match);
   const homeTeamLabel = getTeamDisplayName(match.home_team);
   const awayTeamLabel = getTeamDisplayName(match.away_team);
   const statusLabel = getReadableStatusLabel(match);
-  const competitionEmblem = getCompetitionEmblem(match, competitions);
+  const resolvedCompetition = resolveMatchCompetition(
+    match,
+    competitions,
+    selectedCompetition,
+  );
+  const competitionEmblem = resolvedCompetition?.emblem;
+  const competitionCode =
+    resolvedCompetition?.code ?? match.competition.code ?? selectedCompetition;
   const informationStatus = getMatchInformationStatus(
     match,
     informationLoading,
@@ -296,7 +338,7 @@ function MatchRow({
       <div className="rb-match-row__competition">
         <CompetitionLogo
           emblem={competitionEmblem}
-          code={match.competition.code}
+          code={competitionCode}
         />
         <div>
           <strong>{match.competition.name}</strong>
@@ -394,6 +436,7 @@ function MatchesSection({
               competitions={competitions}
               onSelectMatch={onSelectMatch}
               informationLoading={informationLoading}
+              selectedCompetition={selectedCompetition}
             />
           ))}
         </div>
