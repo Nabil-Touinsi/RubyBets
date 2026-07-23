@@ -4,11 +4,19 @@
 from datetime import UTC, datetime
 from typing import Any
 import hashlib
+import re
 import unicodedata
 
 import httpx
 
 from app.core.config import settings
+from app.services.cache_service import (
+    build_cache_name,
+    build_data_freshness,
+    is_cache_fresh,
+    load_cache,
+    save_cache,
+)
 
 
 FLASHSCORE_FOOTBALL_SPORT_ID = 1
@@ -16,6 +24,7 @@ FLASHSCORE_DEFAULT_TIMEZONE = "Europe/Berlin"
 FLASHSCORE_RESULTS_PAGE_SIZE_LIMIT = 20
 FLASHSCORE_MAX_RESULTS_PAGES = 3
 FLASHSCORE_H2H_LIMIT = 5
+FLASHSCORE_MATCH_STATS_CACHE_TTL_MINUTES = 30 * 24 * 60
 FLASHSCORE_SOURCE = "flashscore_rapidapi"
 FLASHSCORE_ID_ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 FLASHSCORE_ID_MAX_LENGTH = 8
@@ -647,6 +656,295 @@ def get_normalized_flashscore_match_details(
     }
 
 
+FLASHSCORE_STAT_NAME_ALIASES = {
+    "expected goals xg": "expected_goals",
+    "xg on target xgot": "xg_on_target",
+    "ball possession": "ball_possession",
+    "total shots": "total_shots",
+    "shots on target": "shots_on_target",
+    "shots off target": "shots_off_target",
+    "blocked shots": "blocked_shots",
+    "shots inside the box": "shots_inside_box",
+    "shots outside the box": "shots_outside_box",
+    "hit the woodwork": "hit_woodwork",
+    "big chances": "big_chances",
+    "corner kicks": "corner_kicks",
+    "touches in opposition box": "touches_in_opposition_box",
+    "accurate through passes": "accurate_through_passes",
+    "offsides": "offsides",
+    "free kicks": "free_kicks",
+    "passes": "passes",
+    "long passes": "long_passes",
+    "passes in final third": "passes_in_final_third",
+    "crosses": "crosses",
+    "expected assists xa": "expected_assists",
+    "throw ins": "throw_ins",
+    "fouls": "fouls",
+    "yellow cards": "yellow_cards",
+    "red cards": "red_cards",
+    "tackles": "tackles",
+    "duels won": "duels_won",
+    "clearances": "clearances",
+    "interceptions": "interceptions",
+    "errors leading to shot": "errors_leading_to_shot",
+    "errors leading to goal": "errors_leading_to_goal",
+    "goalkeeper saves": "goalkeeper_saves",
+    "xgot faced": "xgot_faced",
+    "goals prevented": "goals_prevented",
+}
+
+
+# Cette fonction normalise le libellé d'une statistique FlashScore vers une clé métier stable.
+def normalize_flashscore_stat_name(name: str | None) -> str:
+    normalized_name = normalize_flashscore_text(name)
+    normalized_name = re.sub(r"[^a-z0-9]+", " ", normalized_name)
+    normalized_name = " ".join(normalized_name.split())
+
+    if normalized_name in FLASHSCORE_STAT_NAME_ALIASES:
+        return FLASHSCORE_STAT_NAME_ALIASES[normalized_name]
+
+    return normalized_name.replace(" ", "_")
+
+
+# Cette fonction conserve un entier quand la valeur est entière, sinon un nombre décimal.
+def normalize_flashscore_numeric_scalar(value: float) -> int | float:
+    return int(value) if float(value).is_integer() else float(value)
+
+
+# Cette fonction transforme une valeur FlashScore en nombre, pourcentage et volumes exploitables.
+def normalize_flashscore_stat_value(value: Any) -> dict[str, Any] | None:
+    if isinstance(value, bool) or value is None:
+        return None
+
+    if isinstance(value, (int, float)):
+        numeric_value = normalize_flashscore_numeric_scalar(float(value))
+        return {
+            "raw": value,
+            "value": numeric_value,
+            "percentage": None,
+            "successful": None,
+            "attempted": None,
+            "value_type": "number",
+        }
+
+    if not isinstance(value, str):
+        return None
+
+    clean_value = value.strip()
+
+    if not clean_value:
+        return None
+
+    percentage_ratio_match = re.fullmatch(
+        r"([+-]?\d+(?:[.,]\d+)?)\s*%\s*\(\s*(\d+)\s*/\s*(\d+)\s*\)",
+        clean_value,
+    )
+
+    if percentage_ratio_match:
+        percentage = float(percentage_ratio_match.group(1).replace(",", "."))
+        successful = int(percentage_ratio_match.group(2))
+        attempted = int(percentage_ratio_match.group(3))
+        return {
+            "raw": value,
+            "value": normalize_flashscore_numeric_scalar(percentage),
+            "percentage": normalize_flashscore_numeric_scalar(percentage),
+            "successful": successful,
+            "attempted": attempted,
+            "value_type": "percentage_ratio",
+        }
+
+    percentage_match = re.fullmatch(r"([+-]?\d+(?:[.,]\d+)?)\s*%", clean_value)
+
+    if percentage_match:
+        percentage = float(percentage_match.group(1).replace(",", "."))
+        normalized_percentage = normalize_flashscore_numeric_scalar(percentage)
+        return {
+            "raw": value,
+            "value": normalized_percentage,
+            "percentage": normalized_percentage,
+            "successful": None,
+            "attempted": None,
+            "value_type": "percentage",
+        }
+
+    numeric_match = re.fullmatch(r"[+-]?\d+(?:[.,]\d+)?", clean_value)
+
+    if numeric_match:
+        numeric_value = float(clean_value.replace(",", "."))
+        normalized_numeric_value = normalize_flashscore_numeric_scalar(numeric_value)
+        return {
+            "raw": value,
+            "value": normalized_numeric_value,
+            "percentage": None,
+            "successful": None,
+            "attempted": None,
+            "value_type": "number",
+        }
+
+    return None
+
+
+# Cette fonction extrait uniquement la section match des statistiques FlashScore.
+def extract_flashscore_match_stats_section(data: Any) -> list[dict[str, Any]] | None:
+    if isinstance(data, dict):
+        match_section = data.get("match")
+
+        if isinstance(match_section, list):
+            return [item for item in match_section if isinstance(item, dict)]
+
+        nested_data = data.get("data")
+
+        if isinstance(nested_data, dict) and isinstance(nested_data.get("match"), list):
+            return [item for item in nested_data.get("match", []) if isinstance(item, dict)]
+
+    return None
+
+
+# Cette fonction normalise et déduplique les statistiques d'un match sans moyenner les incohérences.
+def normalize_and_deduplicate_flashscore_stats(
+    stats: list[dict[str, Any]],
+) -> tuple[dict[str, dict[str, Any]], list[dict[str, Any]]]:
+    normalized_stats: dict[str, dict[str, Any]] = {}
+    limitations: list[dict[str, Any]] = []
+
+    for index, stat in enumerate(stats):
+        source_name = stat.get("name")
+        metric_name = normalize_flashscore_stat_name(source_name)
+
+        if not metric_name:
+            continue
+
+        home_value = normalize_flashscore_stat_value(stat.get("home_team"))
+        away_value = normalize_flashscore_stat_value(stat.get("away_team"))
+
+        if home_value is None and away_value is None:
+            continue
+
+        normalized_entry = {
+            "name": metric_name,
+            "label": source_name,
+            "home_team": home_value,
+            "away_team": away_value,
+            "source_index": index,
+        }
+        previous_entry = normalized_stats.get(metric_name)
+
+        if previous_entry is None:
+            normalized_stats[metric_name] = normalized_entry
+            continue
+
+        if (
+            previous_entry.get("home_team") == normalized_entry.get("home_team")
+            and previous_entry.get("away_team") == normalized_entry.get("away_team")
+        ):
+            continue
+
+        limitations.append(
+            {
+                "code": "conflicting_duplicate_stat",
+                "metric": metric_name,
+                "message": (
+                    "Plusieurs valeurs différentes portent le même nom ; "
+                    "la dernière valeur valide de la section match est conservée."
+                ),
+                "kept_source_index": index,
+                "discarded_source_index": previous_entry.get("source_index"),
+            }
+        )
+        normalized_stats[metric_name] = normalized_entry
+
+    return normalized_stats, limitations
+
+
+# Cette fonction construit la clé de cache individuelle d'un match terminé.
+def build_flashscore_match_stats_cache_name(flashscore_match_id: str) -> str:
+    return build_cache_name("flashscore_match_stats", flashscore_match_id, "match", "v1")
+
+
+# Cette fonction récupère, normalise et met en cache les statistiques détaillées d'un match terminé.
+def get_flashscore_match_stats(
+    flashscore_match_id: str | None,
+) -> tuple[dict[str, Any] | None, dict[str, Any]]:
+    if not flashscore_match_id:
+        return None, {
+            "provider": FLASHSCORE_SOURCE,
+            "status": "missing_match_id",
+            "endpoint": "/matches/match/stats",
+        }
+
+    clean_match_id = str(flashscore_match_id).strip()
+    cache_name = build_flashscore_match_stats_cache_name(clean_match_id)
+    cached_payload = load_cache(cache_name)
+
+    if cached_payload and is_cache_fresh(
+        cached_payload,
+        ttl_minutes=FLASHSCORE_MATCH_STATS_CACHE_TTL_MINUTES,
+    ):
+        return cached_payload.get("data", {}), {
+            "provider": FLASHSCORE_SOURCE,
+            "status": "success",
+            "endpoint": "/matches/match/stats",
+            "match_id": clean_match_id,
+            "data_freshness": build_data_freshness(
+                cache_payload=cached_payload,
+                from_cache=True,
+                ttl_minutes=FLASHSCORE_MATCH_STATS_CACHE_TTL_MINUTES,
+            ),
+        }
+
+    data = get_rapidapi_flashscore_data(
+        "/matches/match/stats",
+        {"match_id": clean_match_id},
+    )
+
+    if is_flashscore_error_response(data):
+        return None, {
+            "provider": FLASHSCORE_SOURCE,
+            "status": "error",
+            "endpoint": "/matches/match/stats",
+            "match_id": clean_match_id,
+            "message": data.get("message"),
+            "status_code": data.get("status_code"),
+        }
+
+    match_section = extract_flashscore_match_stats_section(data)
+
+    if match_section is None:
+        return None, {
+            "provider": FLASHSCORE_SOURCE,
+            "status": "unexpected_response",
+            "endpoint": "/matches/match/stats",
+            "match_id": clean_match_id,
+        }
+
+    metrics, limitations = normalize_and_deduplicate_flashscore_stats(match_section)
+    normalized_payload = {
+        "match_id": clean_match_id,
+        "section": "match",
+        "metrics": metrics,
+        "limitations": limitations,
+        "raw_items_count": len(match_section),
+        "normalized_metrics_count": len(metrics),
+    }
+    saved_payload = save_cache(
+        cache_name=cache_name,
+        data=normalized_payload,
+        source=FLASHSCORE_SOURCE,
+    )
+
+    return normalized_payload, {
+        "provider": FLASHSCORE_SOURCE,
+        "status": "success" if metrics else "empty",
+        "endpoint": "/matches/match/stats",
+        "match_id": clean_match_id,
+        "data_freshness": build_data_freshness(
+            cache_payload=saved_payload,
+            from_cache=False,
+            ttl_minutes=FLASHSCORE_MATCH_STATS_CACHE_TTL_MINUTES,
+        ),
+    }
+
+
 # Cette fonction calcule le paramètre day attendu par /matches/list à partir de la date du match RubyBets.
 def build_flashscore_day_offset(target_utc_date: str | None) -> int | None:
     target_datetime = parse_rubybets_utc_datetime(target_utc_date)
@@ -875,8 +1173,11 @@ def get_flashscore_team_results_page(
 
 # Cette fonction normalise une équipe FlashScore dans un format proche de Football-Data.
 def normalize_flashscore_team(team: dict[str, Any]) -> dict[str, Any]:
+    source_team_id = team.get("team_id") or team.get("id")
+
     return {
-        "id": team.get("team_id"),
+        "id": source_team_id,
+        "sourceTeamId": source_team_id,
         "name": team.get("name"),
         "shortName": team.get("short_name"),
         "tla": team.get("short_name"),
@@ -896,8 +1197,11 @@ def normalize_flashscore_result_match(match: dict[str, Any]) -> dict[str, Any] |
 
     tournament = match.get("_flashscore_tournament", {}) or {}
 
+    source_match_id = match.get("match_id") or match.get("id")
+
     return {
-        "id": f"flashscore_{match.get('match_id')}",
+        "id": f"flashscore_{source_match_id}",
+        "sourceMatchId": source_match_id,
         "utcDate": utc_date,
         "status": "FINISHED",
         "competition": {
@@ -1188,5 +1492,7 @@ def get_flashscore_histories_for_match(
 # ├── appelle FlashScore via /matches/details pour préparer les fiches match
 # ├── appelle FlashScore via /teams/results pour récupérer les résultats récents
 # ├── appelle FlashScore via /matches/h2h pour récupérer les confrontations directes
+# ├── appelle /matches/match/stats et met en cache 30 jours la section match normalisée
 # ├── fournit des matchs normalisés aux futures routes /api/matches et /api/matches/{match_id}
-# └── fournit des historiques réels à l'API /api/matches/{match_id}/team-history
+# ├── fournit des historiques réels à l'API /api/matches/{match_id}/team-history
+# └── fournit les statistiques normalisées à match_advanced_stats_service.py

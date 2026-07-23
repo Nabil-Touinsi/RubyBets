@@ -981,9 +981,79 @@ export type ArchivedPredictionsResponse = {
   message?: string;
 };
 
+
+// Ce type décrit une métrique avancée agrégée uniquement sur les matchs où la donnée existe réellement.
+export type MatchAdvancedStatsMetric = {
+  value: number;
+  unit: string;
+  matches_used: number;
+  matches_requested: number;
+  coverage: number;
+  aggregation?: string;
+  successful?: number;
+  attempted?: number;
+  numerator_total?: number;
+  denominator_total?: number;
+  formula?: string;
+};
+
+// Ce type décrit les statistiques avancées agrégées pour une équipe du match futur.
+export type MatchAdvancedStatsTeam = {
+  team_id: string | number | null;
+  team_name: string;
+  matches_requested: number;
+  matches_found: number;
+  matches_with_stats: number;
+  metrics: Record<string, MatchAdvancedStatsMetric>;
+};
+
+// Ce type décrit une limite de qualité remontée sans masquer les données encore exploitables.
+export type MatchAdvancedStatsLimitation = {
+  code: string;
+  message: string;
+  team?: "home" | "away" | string;
+  match_id?: string;
+  status?: string;
+  metrics?: string[];
+  [key: string]: unknown;
+};
+
+// Ce type décrit la réponse publique de la route /advanced-stats utilisée par l'onglet Analyse détaillée.
+export type MatchAdvancedStatsResponse = {
+  match_id: number;
+  status: "available" | "partial" | "unavailable" | string;
+  sample_size_requested: number;
+  home_team: MatchAdvancedStatsTeam;
+  away_team: MatchAdvancedStatsTeam;
+  data_quality: {
+    status: "available" | "partial" | "unavailable" | string;
+    limitations: MatchAdvancedStatsLimitation[];
+    metric_coverage: {
+      home_team: Record<string, {
+        matches_used: number;
+        matches_requested: number;
+        coverage: number;
+      }>;
+      away_team: Record<string, {
+        matches_used: number;
+        matches_requested: number;
+        coverage: number;
+      }>;
+    };
+  };
+  data_freshness: {
+    source: string;
+    generated_at: string;
+    match_stats_cache_ttl_minutes: number;
+    match_stats_requests: number;
+    match_stats_from_cache: number;
+    updated_at_values: string[];
+  };
+};
+
 // Schéma de communication du fichier :
 // rubybets.ts
 // ├── utilisé par api.ts pour typer les réponses backend
 // ├── utilisé par App.tsx pour stocker les données dans les states React
-// ├── utilisé par les composants frontend pour afficher matchs, historiques d'équipes, compositions probables, actualités contextuelles, Ruby, analyses, prédictions, recommandations et archives
+// ├── utilisé par les composants frontend pour afficher matchs, historiques d'équipes, compositions probables, statistiques avancées, actualités contextuelles, Ruby, analyses, prédictions, recommandations et archives
 // └── prépare aussi les contrats publics V19 de prédiction individuelle et de sélection multi-matchs, sans exposer les données internes

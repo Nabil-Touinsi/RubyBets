@@ -7,6 +7,7 @@ import {
   getCompetitions,
   getGlossary,
   getHealth,
+  getMatchAdvancedStats,
   getMatchAnalysis,
   getMatchContext,
   getMatchDetails,
@@ -25,6 +26,7 @@ import type {
   Competition,
   GlossaryResponse,
   Match,
+  MatchAdvancedStatsResponse,
   MatchAnalysisResponse,
   MatchContextResponse,
   MatchDetailsResponse,
@@ -100,6 +102,9 @@ function App() {
   const [selectedTeamHistory, setSelectedTeamHistory] =
     useState<TeamHistoryResponse | null>(null);
 
+  const [selectedMatchAdvancedStats, setSelectedMatchAdvancedStats] =
+    useState<MatchAdvancedStatsResponse | null>(null);
+
 
   const [selectedV19H2HAnalysis, setSelectedV19H2HAnalysis] =
     useState<V19H2HResponse | null>(null);
@@ -165,6 +170,10 @@ function App() {
     "Aucune actualité contextuelle chargée"
   );
 
+  const [matchAdvancedStatsStatus, setMatchAdvancedStatsStatus] = useState<string>(
+    "Statistiques avancées non chargées"
+  );
+
 
   const [v19H2HStatus, setV19H2HStatus] = useState<string>(
     "Aucune analyse H2H V19 chargée"
@@ -202,6 +211,7 @@ function App() {
     setSelectedMatchNewsContext(null);
     setSelectedNationalMlPrediction(null);
     setSelectedTeamHistory(null);
+    setSelectedMatchAdvancedStats(null);
     setSelectedV19H2HAnalysis(null);
     setSelectedV19ProductPrediction(null);
     setMultiMatchRecommendation(null);
@@ -212,6 +222,7 @@ function App() {
     setMatchPredictionsStatus("Aucune prédiction chargée");
     setMatchLineupsStatus("Aucune composition chargée");
     setMatchNewsContextStatus("Aucune actualité contextuelle chargée");
+    setMatchAdvancedStatsStatus("Statistiques avancées non chargées");
     setV19H2HStatus("Aucune analyse H2H V19 chargée");
     setV19ProductStatus("Aucune décision produit V19 chargée");
     setMultiMatchStatus("Aucune recommandation multi-matchs générée");
@@ -429,6 +440,7 @@ function App() {
     setSelectedMatchNewsContext(null);
     setSelectedNationalMlPrediction(null);
     setSelectedTeamHistory(null);
+    setSelectedMatchAdvancedStats(null);
     setSelectedV19H2HAnalysis(null);
     setSelectedV19ProductPrediction(null);
 
@@ -438,6 +450,7 @@ function App() {
     setMatchPredictionsStatus("Chargement des prédictions...");
     setMatchLineupsStatus("Chargement des compositions probables...");
     setMatchNewsContextStatus("Chargement des actualités contextuelles...");
+    setMatchAdvancedStatsStatus("Statistiques avancées prêtes à être chargées");
     setV19H2HStatus("Chargement de l’analyse H2H V19...");
     setV19ProductStatus("Chargement de la décision produit V19...");
 
@@ -612,6 +625,43 @@ function App() {
       });
   }
 
+  // Charge les statistiques avancées uniquement lorsque l’utilisateur ouvre l’onglet Analyse détaillée.
+  function handleLoadMatchAdvancedStats(matchId: number) {
+    if (
+      selectedMatchAdvancedStats?.match_id === matchId ||
+      matchAdvancedStatsStatus === "Chargement des statistiques avancées..."
+    ) {
+      return;
+    }
+
+    const requestId = selectedMatchLoadRequestId.current;
+    setMatchAdvancedStatsStatus("Chargement des statistiques avancées...");
+
+    void getMatchAdvancedStats(matchId)
+      .then((data) => {
+        if (!isCurrentSelectedMatchRequest(requestId)) {
+          return;
+        }
+
+        setSelectedMatchAdvancedStats(data);
+        setMatchAdvancedStatsStatus(
+          data.status === "partial"
+            ? "Statistiques avancées partielles chargées"
+            : data.status === "unavailable"
+              ? "Statistiques avancées indisponibles"
+              : "Statistiques avancées chargées"
+        );
+      })
+      .catch(() => {
+        if (!isCurrentSelectedMatchRequest(requestId)) {
+          return;
+        }
+
+        setSelectedMatchAdvancedStats(null);
+        setMatchAdvancedStatsStatus("Impossible de charger les statistiques avancées");
+      });
+  }
+
   // Génère une sélection V19 à partir des identifiants des matchs actuellement chargés.
   function handleGenerateMultiMatchRecommendation() {
     const matchIds = matches.map((match) => match.id);
@@ -703,6 +753,7 @@ function App() {
           matchDetails={selectedMatchDetails}
           matchContext={selectedMatchContext}
           matchAnalysis={selectedMatchAnalysis}
+          matchAdvancedStats={selectedMatchAdvancedStats}
           matchLineups={selectedMatchLineups}
           matchNewsContext={selectedMatchNewsContext}
           teamHistory={selectedTeamHistory}
@@ -711,10 +762,12 @@ function App() {
           matchDetailsStatus={matchDetailsStatus}
           matchContextStatus={matchContextStatus}
           matchAnalysisStatus={matchAnalysisStatus}
+          matchAdvancedStatsStatus={matchAdvancedStatsStatus}
           matchLineupsStatus={matchLineupsStatus}
           matchNewsContextStatus={matchNewsContextStatus}
           v19H2HStatus={v19H2HStatus}
           v19ProductStatus={v19ProductStatus}
+          onRequestAdvancedStats={handleLoadMatchAdvancedStats}
           onNavigate={setCurrentScreen}
         />
       );
@@ -823,7 +876,7 @@ export default App;
 // Schéma de communication du fichier :
 // App.tsx
 // ├── appelle services/api.ts pour récupérer les données backend
-// ├── charge aussi /analysis, /lineups, /news-context, /team-history, le H2H V19, la décision produit V19 et le modèle national
+// ├── charge aussi /analysis, /advanced-stats à la demande, /lineups, /news-context, /team-history, le H2H V19, la décision produit V19 et le modèle national
 // ├── transmet la décision produit V19 à MatchDetailsScreen.tsx et PredictionsScreen.tsx sans exposer les données internes de marché
 // ├── pilote la navigation via currentScreen
 // ├── utilise AppShell.tsx pour structurer l’application

@@ -32,6 +32,8 @@ import {
 import type {
   HeadToHeadMatch,
   Match,
+  MatchAdvancedStatsMetric,
+  MatchAdvancedStatsResponse,
   MatchAnalysisResponse,
   MatchContextResponse,
   MatchLineupPlayer,
@@ -63,6 +65,7 @@ type MatchDetailsScreenProps = {
   matchDetails: MatchDetailsResponse | null;
   matchContext: MatchContextResponse | null;
   matchAnalysis: MatchAnalysisResponse | null;
+  matchAdvancedStats: MatchAdvancedStatsResponse | null;
   matchLineups: MatchLineupsResponse | null;
   matchNewsContext: MatchNewsContextResponse | null;
   teamHistory: TeamHistoryResponse | null;
@@ -71,10 +74,12 @@ type MatchDetailsScreenProps = {
   matchDetailsStatus: string;
   matchContextStatus: string;
   matchAnalysisStatus: string;
+  matchAdvancedStatsStatus: string;
   matchLineupsStatus: string;
   matchNewsContextStatus: string;
   v19H2HStatus: string;
   v19ProductStatus: string;
+  onRequestAdvancedStats: (matchId: number) => void;
   onNavigate: (screen: AppScreen) => void;
 };
 
@@ -142,6 +147,18 @@ type HeadToHeadSummaryCard = {
   badge: string;
 };
 
+type AdvancedMetricDefinition = {
+  key: string;
+  label: string;
+  compactLabel: string;
+  lowerIsBetter?: boolean;
+};
+
+type AdvancedSummaryDefinition = AdvancedMetricDefinition & {
+  icon: LucideIcon;
+  tone: "teal" | "red" | "amber" | "blue";
+};
+
 const DETAIL_TABS: DetailTab[] = [
   { key: "overview", icon: LayoutGrid, label: "Vue d’ensemble" },
   { key: "analysis", icon: BarChart3, label: "Analyse détaillée" },
@@ -149,6 +166,50 @@ const DETAIL_TABS: DetailTab[] = [
   { key: "lineup", icon: Users, label: "Compo probable" },
   { key: "headToHead", icon: Swords, label: "Face à face" },
   { key: "context", icon: Newspaper, label: "Contexte" },
+];
+
+const ADVANCED_SUMMARY_METRICS: AdvancedSummaryDefinition[] = [
+  { key: "goals_for", label: "Production offensive", compactLabel: "Buts marqués", icon: TrendingUp, tone: "teal" },
+  { key: "total_shots", label: "Volume offensif", compactLabel: "Tirs", icon: Target, tone: "red" },
+  { key: "shot_accuracy", label: "Précision des tirs", compactLabel: "Tirs cadrés / tirs", icon: CircleDot, tone: "amber" },
+  { key: "ball_possession", label: "Contrôle du ballon", compactLabel: "Possession", icon: Gauge, tone: "blue" },
+  { key: "goals_against", label: "Solidité défensive", compactLabel: "Buts encaissés", icon: ShieldCheck, tone: "teal", lowerIsBetter: true },
+];
+
+const ADVANCED_OFFENSIVE_METRICS: AdvancedMetricDefinition[] = [
+  { key: "goals_for", label: "Buts marqués", compactLabel: "Moyenne / match" },
+  { key: "expected_goals_for", label: "Expected goals (xG)", compactLabel: "Moyenne / match" },
+  { key: "xgot_for", label: "xG cadré (xGOT)", compactLabel: "Moyenne / match" },
+  { key: "total_shots", label: "Tirs", compactLabel: "Moyenne / match" },
+  { key: "shots_on_target", label: "Tirs cadrés", compactLabel: "Moyenne / match" },
+  { key: "shot_conversion", label: "Conversion des tirs", compactLabel: "Buts / tirs" },
+  { key: "shot_accuracy", label: "Précision des tirs", compactLabel: "Tirs cadrés / tirs" },
+  { key: "big_chances", label: "Grandes occasions", compactLabel: "Moyenne / match" },
+  { key: "touches_in_opposition_box", label: "Touches dans la surface adverse", compactLabel: "Moyenne / match" },
+  { key: "expected_assists", label: "Expected assists (xA)", compactLabel: "Moyenne / match" },
+];
+
+const ADVANCED_DEFENSIVE_METRICS: AdvancedMetricDefinition[] = [
+  { key: "goals_against", label: "Buts encaissés", compactLabel: "Moyenne / match", lowerIsBetter: true },
+  { key: "expected_goals_against", label: "xG subi", compactLabel: "Moyenne / match", lowerIsBetter: true },
+  { key: "xgot_against", label: "xGOT subi", compactLabel: "Moyenne / match", lowerIsBetter: true },
+  { key: "shots_conceded", label: "Tirs concédés", compactLabel: "Moyenne / match", lowerIsBetter: true },
+  { key: "shots_on_target_conceded", label: "Tirs cadrés concédés", compactLabel: "Moyenne / match", lowerIsBetter: true },
+  { key: "goalkeeper_saves", label: "Arrêts du gardien", compactLabel: "Moyenne / match" },
+  { key: "clearances", label: "Dégagements", compactLabel: "Moyenne / match" },
+  { key: "interceptions", label: "Interceptions", compactLabel: "Moyenne / match" },
+  { key: "errors_leading_to_shot", label: "Erreurs menant à un tir", compactLabel: "Moyenne / match", lowerIsBetter: true },
+  { key: "errors_leading_to_goal", label: "Erreurs menant à un but", compactLabel: "Moyenne / match", lowerIsBetter: true },
+];
+
+const ADVANCED_CONTROL_METRICS: AdvancedMetricDefinition[] = [
+  { key: "ball_possession", label: "Possession", compactLabel: "Moyenne disponible" },
+  { key: "pass_accuracy", label: "Précision des passes", compactLabel: "Réussites / tentatives" },
+  { key: "final_third_pass_accuracy", label: "Passes dans le dernier tiers", compactLabel: "Réussites / tentatives" },
+  { key: "long_pass_accuracy", label: "Précision des passes longues", compactLabel: "Réussites / tentatives" },
+  { key: "tackle_success", label: "Réussite des tacles", compactLabel: "Réussites / tentatives" },
+  { key: "duels_won", label: "Duels gagnés", compactLabel: "Moyenne / match" },
+  { key: "corner_kicks", label: "Corners", compactLabel: "Moyenne / match" },
 ];
 
 // Cette fonction récupère le match disponible depuis le détail ou le contexte.
@@ -352,40 +413,6 @@ function buildLineupsAvailabilityItems(matchLineups: MatchLineupsResponse | null
       value: matchLineups?.data_used.odds_used ? "utilisées" : "non utilisées",
     },
   ];
-}
-
-// Cette fonction transforme une valeur d’indicateur en texte lisible, même si la source retourne un objet partiel.
-function formatAnalysisFactorValue(value: unknown): string {
-  if (value === null || value === undefined || value === "") {
-    return "Non fourni";
-  }
-
-  if (typeof value === "number") {
-    return Number.isInteger(value) ? String(value) : value.toFixed(2);
-  }
-
-  if (typeof value === "string" || typeof value === "boolean") {
-    return String(value);
-  }
-
-  if (Array.isArray(value)) {
-    return value.length
-      ? value.map((item: unknown) => formatAnalysisFactorValue(item)).join(" · ")
-      : "Non fourni";
-  }
-
-  if (typeof value === "object") {
-    const entries: string[] = Object.entries(value as Record<string, unknown>)
-      .filter(([, entryValue]) => entryValue !== null && entryValue !== undefined)
-      .map(
-        ([key, entryValue]) =>
-          `${key} : ${formatAnalysisFactorValue(entryValue)}`
-      );
-
-    return entries.length ? entries.join(" · ") : "Non fourni";
-  }
-
-  return "Non fourni";
 }
 
 // Cette fonction prépare le libellé de journée.
@@ -776,6 +803,9 @@ function TeamLogo({ team }: { team: Team }) {
           loading="lazy"
           onError={(event) => {
             event.currentTarget.style.display = "none";
+            event.currentTarget
+              .closest(".rb-detail-v2-team-logo")
+              ?.classList.remove("rb-detail-v2-team-logo--has-crest");
           }}
         />
       ) : null}
@@ -2011,95 +2041,537 @@ function ResponsibleNoticeCard() {
   );
 }
 
-// Ce composant affiche l’onglet Analyse détaillée à partir de la route /analysis.
-function AnalysisDetailTabContent({
+// Cette fonction récupère une métrique avancée pour l'équipe demandée sans créer de valeur de remplacement.
+function getAdvancedMetric(
+  advancedStats: MatchAdvancedStatsResponse | null,
+  side: "home" | "away",
+  metricKey: string,
+): MatchAdvancedStatsMetric | null {
+  const team = side === "home" ? advancedStats?.home_team : advancedStats?.away_team;
+  return team?.metrics[metricKey] ?? null;
+}
+
+// Cette fonction formate une valeur avancée selon son unité réelle.
+function formatAdvancedMetricValue(metric: MatchAdvancedStatsMetric | null) {
+  if (!metric) {
+    return "—";
+  }
+
+  const formattedValue = new Intl.NumberFormat("fr-FR", {
+    minimumFractionDigits: Number.isInteger(metric.value) ? 0 : 1,
+    maximumFractionDigits: 2,
+  }).format(metric.value);
+
+  return metric.unit === "percent" ? `${formattedValue}%` : formattedValue;
+}
+
+// Cette fonction affiche la couverture d'une métrique sous une forme compacte et non ambiguë.
+function formatAdvancedMetricCoverage(metric: MatchAdvancedStatsMetric | null) {
+  if (!metric) {
+    return "Couverture : indisponible";
+  }
+
+  return `Couverture : ${metric.matches_used}/${metric.matches_requested}`;
+}
+
+// Cette fonction affiche uniquement la fraction de couverture dans les cartes compactes.
+function formatAdvancedMetricCoverageCompact(metric: MatchAdvancedStatsMetric | null) {
+  if (!metric) {
+    return "—";
+  }
+
+  return `${metric.matches_used}/${metric.matches_requested}`;
+}
+
+// Cette fonction explique précisément à quoi correspond la couverture d'une statistique.
+function getAdvancedMetricCoverageDescription(metric: MatchAdvancedStatsMetric | null) {
+  if (!metric) {
+    return "Statistique non disponible sur les cinq derniers matchs analysés.";
+  }
+
+  const matchLabel = metric.matches_used > 1 ? "matchs" : "match";
+  return `Statistique disponible sur ${metric.matches_used} ${matchLabel} parmi les ${metric.matches_requested} derniers analysés.`;
+}
+
+// Cette fonction limite une largeur de barre entre 4 % et 100 % lorsque la valeur existe.
+function getAdvancedMetricBarWidth(
+  metric: MatchAdvancedStatsMetric | null,
+  comparisonMetric: MatchAdvancedStatsMetric | null,
+) {
+  if (!metric) {
+    return 0;
+  }
+
+  const maximum = Math.max(metric.value, comparisonMetric?.value ?? 0);
+
+  if (maximum <= 0) {
+    return metric.value === 0 ? 4 : 0;
+  }
+
+  return Math.max(4, Math.min(100, (metric.value / maximum) * 100));
+}
+
+// Cette fonction conserve uniquement les définitions alimentées par au moins une vraie valeur.
+function getVisibleAdvancedMetrics(
+  advancedStats: MatchAdvancedStatsResponse,
+  definitions: AdvancedMetricDefinition[],
+) {
+  return definitions.filter(
+    (definition) =>
+      getAdvancedMetric(advancedStats, "home", definition.key) ||
+      getAdvancedMetric(advancedStats, "away", definition.key),
+  );
+}
+
+// Cette fonction transforme le statut de qualité en libellé public prudent.
+function getAdvancedStatsStatusLabel(advancedStats: MatchAdvancedStatsResponse | null) {
+  if (advancedStats?.status === "available") {
+    return "Données disponibles";
+  }
+
+  if (advancedStats?.status === "partial") {
+    return "Données partielles";
+  }
+
+  if (advancedStats?.status === "unavailable") {
+    return "Données indisponibles";
+  }
+
+  return "Chargement en attente";
+}
+
+// Cette fonction construit une lecture factuelle à partir d'une comparaison directe entre deux valeurs réelles.
+function buildAdvancedComparisonFact({
+  match,
+  advancedStats,
+  definition,
+  favorableVerb,
+}: {
+  match: Match;
+  advancedStats: MatchAdvancedStatsResponse;
+  definition: AdvancedMetricDefinition;
+  favorableVerb: string;
+}) {
+  const homeMetric = getAdvancedMetric(advancedStats, "home", definition.key);
+  const awayMetric = getAdvancedMetric(advancedStats, "away", definition.key);
+
+  if (!homeMetric || !awayMetric) {
+    return null;
+  }
+
+  const difference = homeMetric.value - awayMetric.value;
+  const tolerance = Math.max(Math.abs(homeMetric.value), Math.abs(awayMetric.value), 1) * 0.03;
+  const homeName = getTeamShortName(match.home_team);
+  const awayName = getTeamShortName(match.away_team);
+
+  if (Math.abs(difference) <= tolerance) {
+    return `${definition.label} proche : ${formatAdvancedMetricValue(homeMetric)} pour ${homeName} contre ${formatAdvancedMetricValue(awayMetric)} pour ${awayName}.`;
+  }
+
+  const homeLeads = definition.lowerIsBetter ? difference < 0 : difference > 0;
+  const leadingName = homeLeads ? homeName : awayName;
+  const leadingMetric = homeLeads ? homeMetric : awayMetric;
+  const trailingMetric = homeLeads ? awayMetric : homeMetric;
+
+  return `${leadingName} ${favorableVerb} sur ${definition.label.toLowerCase()} : ${formatAdvancedMetricValue(leadingMetric)} contre ${formatAdvancedMetricValue(trailingMetric)}.`;
+}
+
+// Cette fonction sélectionne quelques tendances directement observables sans créer de score composite.
+function buildAdvancedTrendFacts(
+  match: Match,
+  advancedStats: MatchAdvancedStatsResponse,
+) {
+  const candidates = [
+    buildAdvancedComparisonFact({
+      match,
+      advancedStats,
+      definition: ADVANCED_OFFENSIVE_METRICS.find((item) => item.key === "total_shots")!,
+      favorableVerb: "produit davantage",
+    }),
+    buildAdvancedComparisonFact({
+      match,
+      advancedStats,
+      definition: ADVANCED_DEFENSIVE_METRICS.find((item) => item.key === "goals_against")!,
+      favorableVerb: "encaisse moins",
+    }),
+    buildAdvancedComparisonFact({
+      match,
+      advancedStats,
+      definition: ADVANCED_OFFENSIVE_METRICS.find((item) => item.key === "shot_accuracy")!,
+      favorableVerb: "affiche la valeur la plus élevée",
+    }),
+    buildAdvancedComparisonFact({
+      match,
+      advancedStats,
+      definition: ADVANCED_CONTROL_METRICS.find((item) => item.key === "ball_possession")!,
+      favorableVerb: "contrôle davantage le ballon",
+    }),
+    buildAdvancedComparisonFact({
+      match,
+      advancedStats,
+      definition: ADVANCED_OFFENSIVE_METRICS.find((item) => item.key === "expected_goals_for")!,
+      favorableVerb: "présente le xG moyen le plus élevé",
+    }),
+  ].filter((item): item is string => Boolean(item));
+
+  return candidates.slice(0, 3);
+}
+
+// Ce composant affiche une carte de synthèse alimentée par une seule métrique réelle.
+function AdvancedSummaryCard({
+  advancedStats,
+  definition,
+}: {
+  advancedStats: MatchAdvancedStatsResponse;
+  definition: AdvancedSummaryDefinition;
+}) {
+  const homeMetric = getAdvancedMetric(advancedStats, "home", definition.key);
+  const awayMetric = getAdvancedMetric(advancedStats, "away", definition.key);
+  const Icon = definition.icon;
+
+  return (
+    <article className={`rb-detail-advanced-summary-card rb-detail-advanced-summary-card--${definition.tone}`}>
+      <span className="rb-detail-advanced-summary-card__icon">
+        <Icon size={22} strokeWidth={1.8} aria-hidden="true" />
+      </span>
+      <p>{definition.label}</p>
+      <strong>
+        {formatAdvancedMetricValue(homeMetric)}
+        <small>vs</small>
+        {formatAdvancedMetricValue(awayMetric)}
+      </strong>
+      <div className="rb-detail-advanced-summary-card__coverage">
+        <span title={getAdvancedMetricCoverageDescription(homeMetric)}>
+          {formatAdvancedMetricCoverageCompact(homeMetric)}
+        </span>
+        <small aria-hidden="true">Couverture</small>
+        <span title={getAdvancedMetricCoverageDescription(awayMetric)}>
+          {formatAdvancedMetricCoverageCompact(awayMetric)}
+        </span>
+      </div>
+      <div className="rb-detail-advanced-summary-card__bars" aria-hidden="true">
+        <i style={{ width: `${getAdvancedMetricBarWidth(homeMetric, awayMetric)}%` }} />
+        <i style={{ width: `${getAdvancedMetricBarWidth(awayMetric, homeMetric)}%` }} />
+      </div>
+    </article>
+  );
+}
+
+// Ce composant affiche une métrique comparée avec ses valeurs et sa couverture réelle.
+function AdvancedMetricRow({
+  advancedStats,
+  definition,
+}: {
+  advancedStats: MatchAdvancedStatsResponse;
+  definition: AdvancedMetricDefinition;
+}) {
+  const homeMetric = getAdvancedMetric(advancedStats, "home", definition.key);
+  const awayMetric = getAdvancedMetric(advancedStats, "away", definition.key);
+
+  return (
+    <div className="rb-detail-advanced-metric-row">
+      <div className="rb-detail-advanced-metric-row__value rb-detail-advanced-metric-row__value--home">
+        <strong>{formatAdvancedMetricValue(homeMetric)}</strong>
+        <span title={getAdvancedMetricCoverageDescription(homeMetric)}>
+          {formatAdvancedMetricCoverage(homeMetric)}
+        </span>
+      </div>
+
+      <div className="rb-detail-advanced-metric-row__center">
+        <p>{definition.label}</p>
+        <small>{definition.compactLabel}</small>
+        <div aria-hidden="true">
+          <i style={{ width: `${getAdvancedMetricBarWidth(homeMetric, awayMetric)}%` }} />
+          <i style={{ width: `${getAdvancedMetricBarWidth(awayMetric, homeMetric)}%` }} />
+        </div>
+      </div>
+
+      <div className="rb-detail-advanced-metric-row__value rb-detail-advanced-metric-row__value--away">
+        <strong>{formatAdvancedMetricValue(awayMetric)}</strong>
+        <span title={getAdvancedMetricCoverageDescription(awayMetric)}>
+          {formatAdvancedMetricCoverage(awayMetric)}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+// Ce composant groupe les métriques avancées par domaine d'analyse.
+function AdvancedMetricPanel({
+  title,
+  eyebrow,
+  match,
+  advancedStats,
+  definitions,
+}: {
+  title: string;
+  eyebrow: string;
+  match: Match;
+  advancedStats: MatchAdvancedStatsResponse;
+  definitions: AdvancedMetricDefinition[];
+}) {
+  const visibleDefinitions = getVisibleAdvancedMetrics(advancedStats, definitions);
+
+  if (!visibleDefinitions.length) {
+    return null;
+  }
+
+  return (
+    <section className="rb-detail-v2-card rb-detail-advanced-panel">
+      <div className="rb-detail-v2-section-header">
+        <div>
+          <p>{eyebrow}</p>
+          <h3>{title}</h3>
+        </div>
+        <span>{visibleDefinitions.length} indicateur(s)</span>
+      </div>
+
+      <div className="rb-detail-advanced-team-heading">
+        <div>
+          <TeamLogo team={match.home_team} />
+          <strong>{getTeamShortName(match.home_team)}</strong>
+        </div>
+        <small>Comparaison sur données disponibles</small>
+        <div>
+          <strong>{getTeamShortName(match.away_team)}</strong>
+          <TeamLogo team={match.away_team} />
+        </div>
+      </div>
+
+      <div className="rb-detail-advanced-metric-list">
+        {visibleDefinitions.map((definition) => (
+          <AdvancedMetricRow
+            key={definition.key}
+            advancedStats={advancedStats}
+            definition={definition}
+          />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// Ce composant résume la qualité et la couverture de l'échantillon réellement utilisé.
+function AdvancedDataQualitySection({
+  match,
+  advancedStats,
+}: {
+  match: Match;
+  advancedStats: MatchAdvancedStatsResponse;
+}) {
+  const homeCoverage = advancedStats.sample_size_requested
+    ? (advancedStats.home_team.matches_with_stats / advancedStats.sample_size_requested) * 100
+    : 0;
+  const awayCoverage = advancedStats.sample_size_requested
+    ? (advancedStats.away_team.matches_with_stats / advancedStats.sample_size_requested) * 100
+    : 0;
+  const limitations = advancedStats.data_quality.limitations.slice(0, 4);
+
+  return (
+    <section className="rb-detail-v2-card rb-detail-advanced-quality-card">
+      <div className="rb-detail-v2-section-header">
+        <div>
+          <p>Qualité des données</p>
+          <h3>Couverture de l'analyse avancée</h3>
+        </div>
+        <span>{getAdvancedStatsStatusLabel(advancedStats)}</span>
+      </div>
+
+      <div className="rb-detail-advanced-quality-grid">
+        <article>
+          <div>
+            <TeamLogo team={match.home_team} />
+            <strong>{getTeamShortName(match.home_team)}</strong>
+          </div>
+          <p>{advancedStats.home_team.matches_with_stats}/{advancedStats.sample_size_requested} matchs avec statistiques</p>
+          <i><span style={{ width: `${homeCoverage}%` }} /></i>
+          <small>{Object.keys(advancedStats.home_team.metrics).length} métriques disponibles</small>
+        </article>
+
+        <article>
+          <div>
+            <TeamLogo team={match.away_team} />
+            <strong>{getTeamShortName(match.away_team)}</strong>
+          </div>
+          <p>{advancedStats.away_team.matches_with_stats}/{advancedStats.sample_size_requested} matchs avec statistiques</p>
+          <i><span style={{ width: `${awayCoverage}%` }} /></i>
+          <small>{Object.keys(advancedStats.away_team.metrics).length} métriques disponibles</small>
+        </article>
+      </div>
+
+      <div className="rb-detail-advanced-quality-note">
+        <Info size={18} strokeWidth={1.8} aria-hidden="true" />
+        <p>
+          « Couverture : 1/5 » signifie que la statistique est disponible sur un seul des cinq derniers matchs analysés.
+          Une statistique absente n'est jamais remplacée par zéro.
+        </p>
+      </div>
+
+      {limitations.length ? (
+        <ul className="rb-detail-v2-context-list rb-detail-advanced-limitations">
+          {limitations.map((limitation, index) => (
+            <li key={`${limitation.code}-${limitation.match_id ?? index}`}>
+              {limitation.message}
+            </li>
+          ))}
+        </ul>
+      ) : null}
+    </section>
+  );
+}
+
+// Ce composant conserve la synthèse narrative existante comme complément des statistiques observées.
+function AdvancedNarrativeSection({
   matchAnalysis,
-  matchAnalysisStatus,
 }: {
   matchAnalysis: MatchAnalysisResponse | null;
-  matchAnalysisStatus: string;
 }) {
   if (!matchAnalysis?.analysis) {
-    return (
-      <section className="rb-detail-v2-card rb-detail-v2-pending-tab">
-        <p>Analyse détaillée</p>
-        <h3>Analyse non disponible</h3>
-        <p>{matchAnalysisStatus || "L’analyse pré-match n’a pas encore été chargée pour cette rencontre."}</p>
-      </section>
-    );
+    return null;
   }
 
   const { analysis } = matchAnalysis;
 
   return (
+    <section className="rb-detail-v2-card rb-detail-advanced-narrative-card">
+      <div className="rb-detail-v2-section-header">
+        <div>
+          <p>Lecture explicative</p>
+          <h3>{analysis.title}</h3>
+        </div>
+        <span>{getAnalysisStatusLabel(matchAnalysis)}</span>
+      </div>
+
+      <div className="rb-detail-advanced-narrative-grid">
+        <article>
+          <strong>Faits observés</strong>
+          <ul className="rb-detail-v2-context-list">
+            {analysis.observed_facts.slice(0, 4).map((fact) => (
+              <li key={fact}>{fact}</li>
+            ))}
+          </ul>
+        </article>
+        <article>
+          <strong>Interprétation prudente</strong>
+          <ul className="rb-detail-v2-context-list">
+            {analysis.interpretation.slice(0, 4).map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        </article>
+      </div>
+    </section>
+  );
+}
+
+// Ce composant affiche l'onglet Analyse détaillée à partir de la route réelle /advanced-stats.
+function AnalysisDetailTabContent({
+  match,
+  matchAnalysis,
+  matchAdvancedStats,
+  matchAdvancedStatsStatus,
+}: {
+  match: Match;
+  matchAnalysis: MatchAnalysisResponse | null;
+  matchAdvancedStats: MatchAdvancedStatsResponse | null;
+  matchAdvancedStatsStatus: string;
+}) {
+  if (!matchAdvancedStats) {
+    return (
+      <>
+        <section className="rb-detail-v2-card rb-detail-v2-pending-tab rb-detail-advanced-loading-card">
+          <p>Analyse détaillée</p>
+          <h3>Chargement des statistiques réelles</h3>
+          <p>{matchAdvancedStatsStatus || "Les cinq derniers matchs disponibles sont en cours d'analyse."}</p>
+          <div className="rb-detail-advanced-loading-bars" aria-hidden="true">
+            <i /><i /><i />
+          </div>
+        </section>
+        <AdvancedNarrativeSection matchAnalysis={matchAnalysis} />
+      </>
+    );
+  }
+
+  const summaryDefinitions = ADVANCED_SUMMARY_METRICS.filter(
+    (definition) =>
+      getAdvancedMetric(matchAdvancedStats, "home", definition.key) ||
+      getAdvancedMetric(matchAdvancedStats, "away", definition.key),
+  );
+  const trendFacts = buildAdvancedTrendFacts(match, matchAdvancedStats);
+
+  return (
     <>
-      <section className="rb-detail-v2-card rb-detail-v2-analysis-card">
+      <section className="rb-detail-v2-card rb-detail-advanced-summary-section">
         <div className="rb-detail-v2-section-header">
           <div>
-            <p>Analyse détaillée</p>
-            <h3>{analysis.title}</h3>
+            <p>Résumé analytique</p>
+            <h3>Signaux issus des derniers matchs terminés</h3>
           </div>
-          <span>{getAnalysisStatusLabel(matchAnalysis)}</span>
+          <span>{getAdvancedStatsStatusLabel(matchAdvancedStats)}</span>
         </div>
 
-        <ul className="rb-detail-v2-context-list">
-          {analysis.observed_facts.map((fact) => (
-            <li key={fact}>{fact}</li>
-          ))}
-        </ul>
-      </section>
-
-      <section className="rb-detail-v2-card rb-detail-v2-stats-card">
-        <div className="rb-detail-v2-section-header">
-          <div>
-            <p>Facteurs clés</p>
-            <h3>Signaux utilisés dans la lecture du match</h3>
+        {summaryDefinitions.length ? (
+          <div className="rb-detail-advanced-summary-grid">
+            {summaryDefinitions.map((definition) => (
+              <AdvancedSummaryCard
+                key={definition.key}
+                advancedStats={matchAdvancedStats}
+                definition={definition}
+              />
+            ))}
           </div>
-          <span>Données disponibles</span>
-        </div>
-
-        <div className="rb-detail-v2-insight-grid">
-          {analysis.key_factors.map((factor) => (
-            <article
-              className="rb-detail-v2-insight-card rb-detail-v2-insight-card--blue"
-              key={`${factor.label}-${formatAnalysisFactorValue(factor.value)}`}
-            >
-              <span>◇</span>
-              <div>
-                <p>{factor.label}</p>
-                <h4>{formatAnalysisFactorValue(factor.value)}</h4>
-                <small>{factor.reading}</small>
-              </div>
-            </article>
-          ))}
-        </div>
+        ) : (
+          <p className="rb-detail-advanced-empty-copy">Aucun indicateur synthétique n'est disponible sur cet échantillon.</p>
+        )}
       </section>
 
-      <section className="rb-detail-v2-card rb-detail-v2-recent-card">
-        <div className="rb-detail-v2-section-header">
-          <div>
-            <p>Interprétation</p>
-            <h3>Lecture responsable</h3>
+      <div className="rb-detail-advanced-panels-grid">
+        <AdvancedMetricPanel
+          title="Production et efficacité"
+          eyebrow="Analyse offensive"
+          match={match}
+          advancedStats={matchAdvancedStats}
+          definitions={ADVANCED_OFFENSIVE_METRICS}
+        />
+        <AdvancedMetricPanel
+          title="Résistance et pression subie"
+          eyebrow="Analyse défensive"
+          match={match}
+          advancedStats={matchAdvancedStats}
+          definitions={ADVANCED_DEFENSIVE_METRICS}
+        />
+      </div>
+
+      <AdvancedMetricPanel
+        title="Possession, passes et duels"
+        eyebrow="Contrôle du match"
+        match={match}
+        advancedStats={matchAdvancedStats}
+        definitions={ADVANCED_CONTROL_METRICS}
+      />
+
+      {trendFacts.length ? (
+        <section className="rb-detail-v2-card rb-detail-advanced-trends-card">
+          <div className="rb-detail-v2-section-header">
+            <div>
+              <p>Tendances clés</p>
+              <h3>Écarts directement observés</h3>
+            </div>
+            <span>Aucun score composite</span>
           </div>
-          <span>{analysis.context_trend}</span>
-        </div>
+          <div className="rb-detail-advanced-trends-grid">
+            {trendFacts.map((fact, index) => (
+              <article key={fact}>
+                <span>{index + 1}</span>
+                <p>{fact}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+      ) : null}
 
-        <ul className="rb-detail-v2-context-list">
-          {analysis.interpretation.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-        </ul>
-      </section>
-
-      <section className="rb-detail-v2-card rb-detail-v2-pending-tab">
-        <p>Limites</p>
-        <h3>Cadre d’utilisation</h3>
-        <ul className="rb-detail-v2-context-list">
-          {analysis.limits.map((limit) => (
-            <li key={limit}>{limit}</li>
-          ))}
-        </ul>
-      </section>
+      <AdvancedDataQualitySection match={match} advancedStats={matchAdvancedStats} />
+      <AdvancedNarrativeSection matchAnalysis={matchAnalysis} />
     </>
   );
 }
@@ -2147,6 +2619,9 @@ function LineupPlayerRow({
           }}
           onError={(event) => {
             event.currentTarget.style.display = "none";
+            event.currentTarget
+              .closest(".rb-detail-v2-team-logo")
+              ?.classList.remove("rb-detail-v2-team-logo--has-crest");
           }}
         />
       ) : null}
@@ -2664,22 +3139,33 @@ function MatchDetailsScreen({
   matchDetails,
   matchContext,
   matchAnalysis,
+  matchAdvancedStats,
   matchLineups,
   matchNewsContext,
   teamHistory,
   v19H2HAnalysis,
   matchDetailsStatus,
   matchContextStatus,
-  matchAnalysisStatus,
+  matchAdvancedStatsStatus,
   matchLineupsStatus,
   matchNewsContextStatus,
   v19H2HStatus,
+  onRequestAdvancedStats,
   onNavigate,
 }: MatchDetailsScreenProps) {
   const [activeTab, setActiveTab] = useState<DetailTabKey>("overview");
   const selectedMatch = getSelectedMatch(matchDetails, matchContext);
   const freshnessLabel = getFreshnessLabel(matchDetails, matchContext);
   const statusMessage = matchDetailsStatus || matchContextStatus;
+
+  // Cette fonction active un onglet et déclenche les statistiques avancées uniquement lorsqu'elles sont nécessaires.
+  function handleSelectDetailTab(tabKey: DetailTabKey) {
+    setActiveTab(tabKey);
+
+    if (tabKey === "analysis" && selectedMatch) {
+      onRequestAdvancedStats(selectedMatch.id);
+    }
+  }
 
   if (!selectedMatch) {
     return (
@@ -2718,7 +3204,7 @@ function MatchDetailsScreen({
     <div className="rb-detail-v2 rb-detail-v2--premium rb-detail-premium">
       <DetailTopbar match={selectedMatch} onNavigate={onNavigate} />
       <MatchHero match={selectedMatch} matchContext={matchContext} />
-      <DetailTabs activeTab={activeTab} onSelectTab={setActiveTab} />
+      <DetailTabs activeTab={activeTab} onSelectTab={handleSelectDetailTab} />
 
       <main className="rb-detail-v2-layout">
         <section
@@ -2735,8 +3221,10 @@ function MatchDetailsScreen({
 
           {activeTab === "analysis" ? (
             <AnalysisDetailTabContent
+              match={selectedMatch}
               matchAnalysis={matchAnalysis}
-              matchAnalysisStatus={matchAnalysisStatus}
+              matchAdvancedStats={matchAdvancedStats}
+              matchAdvancedStatsStatus={matchAdvancedStatsStatus}
             />
           ) : null}
 
@@ -2810,7 +3298,8 @@ export default MatchDetailsScreen;
 // ├── utilise aussi V19H2HResponse de models/rubybets.ts pour afficher le catalogue v19.h2h.core.1
 // ├── affiche RubyNewsChat.tsx dans la colonne droite uniquement lorsque l’onglet Contexte est actif
 // ├── utilise les helpers d’affichage de helpers/displayText.ts
-// ├── alimente l’onglet Analyse détaillée avec matchAnalysis.analysis
+// ├── charge à la demande et affiche /advanced-stats dans l’onglet Analyse détaillée
+// ├── conserve matchAnalysis.analysis comme lecture narrative complémentaire
 // ├── alimente l’onglet Compo probable avec matchLineups.lineups sans inventer de joueurs
 // ├── alimente l’onglet Forme & tendances avec une table comparative issue de teamHistory.form_summary
 // ├── alimente l’analyse synthétique avec teamHistory.form_summary quand il est disponible

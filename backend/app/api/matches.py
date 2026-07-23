@@ -21,6 +21,7 @@ from app.services.cache_service import (
     load_cache,
     save_cache,
 )
+from app.services.match_advanced_stats_service import build_match_advanced_stats_response
 from app.services.match_service import (
     clean_params,
     filter_matches_by_team,
@@ -1095,6 +1096,12 @@ async def get_match_team_history(match_id: int) -> dict[str, Any]:
     return await build_team_history_response(match_id)
 
 
+# Cette route retourne les moyennes avancées réelles des cinq derniers matchs terminés de chaque équipe.
+@router.get("/{match_id}/advanced-stats")
+async def get_match_advanced_stats(match_id: int) -> dict[str, Any]:
+    return await build_match_advanced_stats_response(match_id)
+
+
 # Cette fonction construit un résumé de contexte partiel quand le match vient de FlashScore.
 def build_flashscore_context_summary(match: dict[str, Any]) -> dict[str, Any]:
     home_team = match.get("homeTeam", {}).get("name")
@@ -1817,6 +1824,7 @@ async def get_match_predictions(match_id: int) -> dict[str, Any]:
 # ├── utilise cache_service.py pour le cache FlashScore et le fallback Football-Data temporaire
 # ├── utilise match_service.py pour le formatage et le fallback Football-Data temporaire
 # ├── utilise team_history_service.py pour produire les historiques récents, face-à-face, l’analyse et les prédictions FlashScore partielles
+# ├── utilise match_advanced_stats_service.py pour exposer les agrégats FlashScore réels avec leur couverture
 # ├── utilise team_news_context_service.py pour produire les actualités contextuelles publiques par équipe
 # ├── utilise /matches/match/lineups via rapidapi_flashscore_client.py pour les compositions probables et absences
 # ├── utilise analysis_service.py pour générer les synthèses Football-Data et les prédictions explicables

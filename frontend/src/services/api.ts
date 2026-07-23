@@ -7,6 +7,7 @@ import type {
   CompetitionsResponse,
   GlossaryResponse,
   HealthResponse,
+  MatchAdvancedStatsResponse,
   MatchAnalysisResponse,
   MatchContextResponse,
   MatchDetailsResponse,
@@ -239,6 +240,17 @@ export async function getV19MultiMatchSelection(
   );
 }
 
+// Cette fonction récupère les statistiques avancées réelles agrégées sur les cinq derniers matchs disponibles.
+export async function getMatchAdvancedStats(
+  matchId: number
+): Promise<MatchAdvancedStatsResponse> {
+  return fetchJson<MatchAdvancedStatsResponse>(
+    `/api/matches/${matchId}/advanced-stats`,
+    "Erreur lors du chargement des statistiques avancées du match."
+  );
+}
+
+
 // Cette fonction récupère l’analyse explicable avant-match d’un match précis.
 export async function getMatchAnalysis(
   matchId: number
@@ -400,5 +412,5 @@ export async function getResponsibleInfo(): Promise<ResponsibleInfoResponse> {
 // ├── appelle le backend FastAPI RubyBets
 // ├── utilise rubybets.ts pour typer les réponses reçues
 // ├── alimente App.tsx avec des données sécurisées
-// ├── transmet les données aux composants React d’affichage, dont l’historique des équipes, les compositions, les actualités contextuelles et les archives
+// ├── transmet les données aux composants React d’affichage, dont l’historique des équipes, les statistiques avancées, les compositions, les actualités contextuelles et les archives
 // └── expose les décisions produit V19 individuelles et multi-matchs sans transmettre de score brut, odds ou payload fournisseur
