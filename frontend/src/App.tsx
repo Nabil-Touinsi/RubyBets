@@ -352,6 +352,30 @@ function App() {
       });
   }, []);
 
+  // Actualise uniquement les matchs de la compétition active sans recharger toute l’application.
+  async function refreshSelectedCompetitionMatches(): Promise<void> {
+    const requestId = matchLoadRequestId.current + 1;
+    matchLoadRequestId.current = requestId;
+    setMatchesStatus("Actualisation des matchs...");
+
+    try {
+      const data = await getMatches(selectedCompetition);
+
+      if (matchLoadRequestId.current !== requestId) {
+        return;
+      }
+
+      setMatches(data.matches || []);
+      setMatchesStatus("Matchs actualisés");
+    } catch {
+      if (matchLoadRequestId.current !== requestId) {
+        return;
+      }
+
+      setMatchesStatus("Impossible d’actualiser les matchs");
+    }
+  }
+
   // Change la compétition active, applique le fallback et ouvre l’écran Matchs.
   function handleSelectCompetition(competitionCode: string) {
     setCurrentScreen("matches");
@@ -662,6 +686,7 @@ function App() {
           matchesStatus={matchesStatus}
           onSelectCompetition={handleSelectCompetition}
           onSelectMatch={handleSelectMatch}
+          onRefresh={refreshSelectedCompetitionMatches}
           onNavigate={setCurrentScreen}
         />
       );

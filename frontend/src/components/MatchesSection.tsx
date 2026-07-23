@@ -1,23 +1,28 @@
-// Ce composant affiche les matchs à venir dans une table premium avec logos, statut, compte à rebours et action d’ouverture.
+// Ce composant affiche les matchs à venir dans une table premium avec logos, statut et action d’ouverture.
 
-import { BarChart3, ChevronRight, Clock3 } from "lucide-react";
-import type { Match, Team } from "../models/rubybets";
+import { CheckCircle2, ChevronRight, CircleX, Clock3, LoaderCircle } from "lucide-react";
+import type { Competition, Match, Team } from "../models/rubybets";
 import {
   formatMatchStatus,
+  getTeamDisplayName,
   getTeamInitials,
-  getTeamShortName,
   hasKnownTeams,
 } from "../helpers/displayText";
 
 type MatchesSectionProps = {
+  competitions: Competition[];
   selectedCompetition: string;
   matches: Match[];
   onSelectMatch: (matchId: number) => void;
+  informationLoading: boolean;
+  transitionDirection: "forward" | "backward" | "replace";
 };
 
 type TeamLogoProps = {
   team: Team | null | undefined;
 };
+
+type MatchInformationStatus = "available" | "loading" | "unavailable";
 
 // Cette fonction formate la date pour une lecture compacte dans la liste des matchs.
 function formatMatchDate(dateValue: string) {
@@ -106,9 +111,101 @@ function getReadableStatusLabel(match: Match) {
   return "données partielles";
 }
 
+
+// Cette fonction détermine l’état des informations de base disponibles pour une rencontre.
+function getMatchInformationStatus(
+  match: Match,
+  informationLoading: boolean,
+): MatchInformationStatus {
+  if (informationLoading) {
+    return "loading";
+  }
+
+  const status = match.status?.toUpperCase();
+  const unavailableStatuses = new Set([
+    "CANCELLED",
+    "CANCELED",
+    "POSTPONED",
+    "SUSPENDED",
+  ]);
+
+  if (
+    !hasKnownTeams(match) ||
+    (status ? unavailableStatuses.has(status) : false)
+  ) {
+    return "unavailable";
+  }
+
+  if (!status) {
+    return "unavailable";
+  }
+
+  return "available";
+}
+
+// Cette fonction retourne le libellé accessible associé à l’état des informations.
+function getMatchInformationLabel(status: MatchInformationStatus) {
+  const labels: Record<MatchInformationStatus, string> = {
+    available: "Informations disponibles",
+    loading: "Informations en cours de récupération",
+    unavailable: "Informations indisponibles",
+  };
+
+  return labels[status];
+}
+
+// Ce composant affiche une lumière colorée claire pour l’état des informations du match.
+function MatchInformationLight({
+  status,
+}: {
+  status: MatchInformationStatus;
+}) {
+  const label = getMatchInformationLabel(status);
+
+  return (
+    <span
+      className={`rb-match-info-light rb-match-info-light--${status}`}
+      role="img"
+      aria-label={label}
+      title={label}
+    >
+      {status === "available" ? (
+        <CheckCircle2 size={16} aria-hidden="true" />
+      ) : status === "loading" ? (
+        <LoaderCircle size={16} aria-hidden="true" />
+      ) : (
+        <CircleX size={16} aria-hidden="true" />
+      )}
+    </span>
+  );
+}
+
+// Cette fonction retrouve l’emblème de la compétition correspondant à la ligne affichée.
+function getCompetitionEmblem(match: Match, competitions: Competition[]) {
+  const normalizedMatchCompetitionName = match.competition.name
+    .toLowerCase()
+    .replace(/^europe:\s*/, "")
+    .replace(/uefa\s+/g, "")
+    .trim();
+
+  return competitions.find((competition) => {
+    const normalizedCompetitionName = competition.name
+      .toLowerCase()
+      .replace(/^europe:\s*/, "")
+      .replace(/uefa\s+/g, "")
+      .trim();
+
+    return (
+      competition.code === match.competition.code ||
+      normalizedCompetitionName.includes(normalizedMatchCompetitionName) ||
+      normalizedMatchCompetitionName.includes(normalizedCompetitionName)
+    );
+  })?.emblem;
+}
+
 // Ce composant affiche le logo d’une équipe avec un fallback propre.
 function TeamLogo({ team }: TeamLogoProps) {
-  const teamLabel = getTeamShortName(team);
+  const teamLabel = getTeamDisplayName(team);
 
   return (
     <span className="rb-match-team-logo" aria-label={`Logo ${teamLabel}`}>
@@ -121,6 +218,43 @@ function TeamLogo({ team }: TeamLogoProps) {
           src={team.crest}
           alt=""
           loading="lazy"
+          decoding="async"
+          onError={(event) => {
+            event.currentTarget.style.display = "none";
+          }}
+        />
+      ) : null}
+    </span>
+  );
+}
+
+// Ce composant affiche l’emblème de la compétition avec un fallback textuel.
+function CompetitionLogo({
+  emblem,
+  code,
+}: {
+  emblem: string | undefined;
+  code: string;
+}) {
+  const normalizedCode = code.trim().toUpperCase();
+  const needsLightLogo = normalizedCode === "CL";
+
+  return (
+    <span
+      className={
+        needsLightLogo
+          ? "rb-match-competition-logo rb-match-competition-logo--high-contrast"
+          : "rb-match-competition-logo"
+      }
+      aria-hidden="true"
+    >
+      <span>{code.slice(0, 2)}</span>
+      {emblem ? (
+        <img
+          src={emblem}
+          alt=""
+          loading="lazy"
+          decoding="async"
           onError={(event) => {
             event.currentTarget.style.display = "none";
           }}
@@ -133,15 +267,24 @@ function TeamLogo({ team }: TeamLogoProps) {
 // Ce composant affiche une ligne de match avec une action claire vers la fiche d’analyse.
 function MatchRow({
   match,
+  competitions,
   onSelectMatch,
+  informationLoading,
 }: {
   match: Match;
+  competitions: Competition[];
   onSelectMatch: (matchId: number) => void;
+  informationLoading: boolean;
 }) {
   const analysisAvailable = isAnalysisAvailable(match);
-  const homeTeamLabel = getTeamShortName(match.home_team);
-  const awayTeamLabel = getTeamShortName(match.away_team);
+  const homeTeamLabel = getTeamDisplayName(match.home_team);
+  const awayTeamLabel = getTeamDisplayName(match.away_team);
   const statusLabel = getReadableStatusLabel(match);
+  const competitionEmblem = getCompetitionEmblem(match, competitions);
+  const informationStatus = getMatchInformationStatus(
+    match,
+    informationLoading,
+  );
 
   return (
     <article className="rb-match-row" role="listitem">
@@ -151,10 +294,20 @@ function MatchRow({
       </div>
 
       <div className="rb-match-row__competition">
-        <strong>{match.competition.name}</strong>
-        <span>
-          {match.stage ? match.stage : match.matchday ? `Journée ${match.matchday}` : "Phase à confirmer"}
-        </span>
+        <CompetitionLogo
+          emblem={competitionEmblem}
+          code={match.competition.code}
+        />
+        <div>
+          <strong>{match.competition.name}</strong>
+          <span>
+            {match.stage
+              ? match.stage
+              : match.matchday
+                ? `Journée ${match.matchday}`
+                : "Phase à confirmer"}
+          </span>
+        </div>
       </div>
 
       <div className="rb-match-row__fixture">
@@ -173,17 +326,17 @@ function MatchRow({
 
       <div className="rb-match-row__status">
         <span className={getAvailabilityClass(match)}>
-          <Clock3 size={14} aria-hidden="true" />
+          <Clock3 size={13} aria-hidden="true" />
           {statusLabel}
         </span>
         <small>{formatMatchCountdown(match.utc_date)}</small>
       </div>
 
       <div className="rb-match-row__info">
-        <span title="Analyse avant-match disponible selon les données reçues">
-          <BarChart3 size={17} aria-hidden="true" />
-        </span>
+        <MatchInformationLight status={informationStatus} />
+      </div>
 
+      <div className="rb-match-row__action">
         <button
           className={
             analysisAvailable
@@ -195,7 +348,7 @@ function MatchRow({
           aria-label={`Ouvrir l’analyse du match ${homeTeamLabel} contre ${awayTeamLabel}`}
         >
           <span>{analysisAvailable ? "Analyser" : "Voir"}</span>
-          <ChevronRight size={16} aria-hidden="true" />
+          <ChevronRight size={17} aria-hidden="true" />
         </button>
       </div>
     </article>
@@ -204,12 +357,17 @@ function MatchRow({
 
 // Ce composant affiche la liste complète des matchs ou un état vide exploitable.
 function MatchesSection({
+  competitions,
   selectedCompetition,
   matches,
   onSelectMatch,
+  informationLoading,
+  transitionDirection,
 }: MatchesSectionProps) {
   return (
-    <section className="rb-matches-section">
+    <section
+      className={`rb-matches-section rb-matches-section--${transitionDirection}`}
+    >
       {matches.length === 0 ? (
         <div className="rb-matches-empty-state">
           <h3>Aucun match trouvé</h3>
@@ -226,13 +384,16 @@ function MatchesSection({
             <span>Match</span>
             <span>Statut</span>
             <span>Infos</span>
+            <span>Action</span>
           </div>
 
           {matches.map((match) => (
             <MatchRow
               key={match.id}
               match={match}
+              competitions={competitions}
               onSelectMatch={onSelectMatch}
+              informationLoading={informationLoading}
             />
           ))}
         </div>
@@ -245,8 +406,10 @@ export default MatchesSection;
 
 // Schéma de communication du fichier :
 // MatchesSection.tsx
-// ├── reçoit matches depuis MatchesScreen.tsx
-// ├── utilise le type Match défini dans models/rubybets.ts
+// ├── reçoit matches et competitions depuis MatchesScreen.tsx
+// ├── utilise les types Match, Team et Competition de models/rubybets.ts
 // ├── sécurise les équipes inconnues via helpers/displayText.ts
 // ├── déclenche onSelectMatch pour ouvrir la fiche du match
-// └── utilise App.css pour la table premium de l’écran Matchs
+// ├── affiche la disponibilité des informations avec un voyant vert, jaune ou rouge
+// ├── anime le remplacement de la liste selon le sens de navigation
+// └── utilise styles/MatchesScreen.css pour la table premium de l’écran Matchs

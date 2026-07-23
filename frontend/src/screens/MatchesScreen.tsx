@@ -4,12 +4,14 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import {
   CalendarDays,
   Database,
+  RefreshCw,
   RotateCcw,
   Search,
   ShieldCheck,
   SlidersHorizontal,
 } from "lucide-react";
 import type { Competition, Match } from "../models/rubybets";
+import "../styles/MatchesScreen.css";
 import type { AppScreen } from "../types/navigation";
 import {
   getTeamSearchText,
@@ -25,15 +27,17 @@ type MatchesScreenProps = {
   matchesStatus: string;
   onSelectCompetition: (competitionCode: string) => void;
   onSelectMatch: (matchId: number) => void;
+  onRefresh: () => Promise<void>;
   onNavigate: (screen: AppScreen) => void;
 };
 
 type DateFilter = "all" | "today" | "tomorrow" | "7d" | "30d";
 type StatusFilter = "all" | "upcoming" | "live" | "finished";
 type SortMode = "date_asc" | "date_desc" | "competition";
+type MatchTransitionDirection = "forward" | "backward" | "replace";
 
-// Cette constante limite la table à huit matchs pour éviter un long scroll sur desktop.
-const ITEMS_PER_PAGE = 8;
+// Cette constante limite la table à sept matchs pour reproduire la densité de la maquette validée.
+const ITEMS_PER_PAGE = 7;
 
 // Cette fonction vérifie si un statut correspond à un match à venir.
 function isUpcomingStatus(statusValue: string | null | undefined) {
@@ -203,12 +207,16 @@ function MatchesScreen({
   matchesStatus,
   onSelectCompetition,
   onSelectMatch,
+  onRefresh,
 }: MatchesScreenProps) {
   const [dateFilter, setDateFilter] = useState<DateFilter>("all");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [teamSearch, setTeamSearch] = useState("");
   const [sortMode, setSortMode] = useState<SortMode>("date_asc");
   const [currentPage, setCurrentPage] = useState(1);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [matchTransitionDirection, setMatchTransitionDirection] =
+    useState<MatchTransitionDirection>("replace");
   const tablePanelRef = useRef<HTMLElement | null>(null);
 
   const activeCompetition = competitions.find(
@@ -242,8 +250,9 @@ function MatchesScreen({
     tablePanelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
-  // Cette fonction affiche la page précédente sans descendre sous la première page.
+  // Cette fonction affiche la page précédente avec une transition orientée.
   function goToPreviousPage() {
+    setMatchTransitionDirection("backward");
     setCurrentPage((page) => {
       const nextPage = Math.max(1, page - 1);
 
@@ -255,8 +264,9 @@ function MatchesScreen({
     });
   }
 
-  // Cette fonction affiche la page suivante sans dépasser la dernière page calculée.
+  // Cette fonction affiche la page suivante avec une transition orientée.
   function goToNextPage() {
+    setMatchTransitionDirection("forward");
     setCurrentPage((page) => {
       const nextPage = Math.min(totalPages, page + 1);
 
@@ -266,6 +276,33 @@ function MatchesScreen({
 
       return nextPage;
     });
+  }
+
+
+  // Cette fonction change de compétition et prépare une transition fluide de la liste.
+  function selectCompetitionWithTransition(competitionCode: string) {
+    if (competitionCode === selectedCompetition) {
+      return;
+    }
+
+    setMatchTransitionDirection("replace");
+    onSelectCompetition(competitionCode);
+  }
+
+
+  // Cette fonction actualise uniquement les matchs actifs sans recharger toute l’application.
+  async function refreshCurrentCompetition() {
+    if (isRefreshing) {
+      return;
+    }
+
+    setIsRefreshing(true);
+
+    try {
+      await onRefresh();
+    } finally {
+      setIsRefreshing(false);
+    }
   }
 
   // Cette synchronisation ramène la pagination au début dès qu’un filtre ou le tri change.
@@ -289,7 +326,7 @@ function MatchesScreen({
   const latestUpdateLabel = getLatestUpdateLabel(matches);
 
   return (
-    <div className="rb-matches-screen rb-matches-screen--clone">
+    <div className="rb-matches-screen rb-matches-screen--prototype-one">
       <aside className="rb-matches-clone-filters" aria-label="Filtres des matchs">
         <div className="rb-matches-clone-filters__header">
           <div>
@@ -317,7 +354,9 @@ function MatchesScreen({
           <span>Compétition</span>
           <select
             value={selectedCompetition}
-            onChange={(event) => onSelectCompetition(event.target.value)}
+            onChange={(event) =>
+              selectCompetitionWithTransition(event.target.value)
+            }
           >
             {competitions.map((competition) => (
               <option key={competition.id} value={competition.code}>
@@ -430,10 +469,18 @@ function MatchesScreen({
             <strong>{latestUpdateLabel}</strong>
             <button
               type="button"
-              onClick={() => window.location.reload()}
-              aria-label="Actualiser l’application"
+              className="rb-matches-refresh-button"
+              onClick={() => void refreshCurrentCompetition()}
+              disabled={isRefreshing}
+              aria-label="Actualiser les matchs de la compétition active"
+              aria-busy={isRefreshing}
             >
-              Actualiser
+              <RefreshCw
+                size={16}
+                aria-hidden="true"
+                className={isRefreshing ? "rb-matches-refresh-icon rb-matches-refresh-icon--active" : "rb-matches-refresh-icon"}
+              />
+              {isRefreshing ? "Actualisation..." : "Actualiser"}
             </button>
           </div>
         </header>
@@ -447,7 +494,7 @@ function MatchesScreen({
           <CompetitionsSection
             competitions={competitions}
             selectedCompetition={selectedCompetition}
-            onSelectCompetition={onSelectCompetition}
+            onSelectCompetition={selectCompetitionWithTransition}
           />
         </section>
 
@@ -497,9 +544,15 @@ function MatchesScreen({
           </div>
 
           <MatchesSection
+            key={`${selectedCompetition}-${currentPage}`}
+            competitions={competitions}
             selectedCompetition={selectedCompetition}
             matches={paginatedMatches}
             onSelectMatch={onSelectMatch}
+            informationLoading={
+              isRefreshing || matchesStatus.toLowerCase().includes("actualisation")
+            }
+            transitionDirection={matchTransitionDirection}
           />
 
           {filteredMatches.length > 0 ? (
@@ -550,4 +603,5 @@ export default MatchesScreen;
 // ├── sécurise la recherche lorsque les équipes sont inconnues
 // ├── utilise CompetitionsSection.tsx pour les ligues
 // ├── utilise MatchesSection.tsx pour la liste des rencontres
+// ├── anime les changements de compétition et de page
 // └── renvoie la sélection d’un match vers App.tsx via onSelectMatch
