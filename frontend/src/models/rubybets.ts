@@ -494,7 +494,7 @@ export type V19ProductPredictionResponse = {
   scope: string;
   match_id: number;
   request_id: string;
-  status: "RECOMMEND" | "ABSTAIN" | string;
+  status: "RECOMMEND" | "ABSTAIN";
   recommendation: V19ProductRecommendation | null;
   explanation: V19PublicExplanation;
   data_quality: {

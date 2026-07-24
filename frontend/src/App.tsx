@@ -13,13 +13,12 @@ import {
   getMatchDetails,
   getMatchLineups,
   getMatchNewsContext,
-  getMatchPredictions,
-  getNationalDynamicPredictionByRubyBetsMatchId,
   getMatchTeamHistory,
   getV19ProductPrediction,
   getMatches,
   getV19MultiMatchSelection,
   getResponsibleInfo,
+  V19ProductApiError,
 } from "./services/api";
 import type {
   Competition,
@@ -32,8 +31,6 @@ import type {
   MatchLineupsResponse,
   MatchNewsContextLoadState,
   MatchNewsContextResponse,
-  MatchPredictionsResponse,
-  NationalMlPredictionResponse,
   V19SelectionProfile,
   V19SelectionResponse,
   ResponsibleInfoResponse,
@@ -47,13 +44,19 @@ import DashboardScreen from "./screens/DashboardScreen";
 import MatchesScreen from "./screens/MatchesScreen";
 import MatchDetailsScreen from "./screens/MatchDetailsScreen";
 import AnalysisScreen from "./screens/AnalysisScreen";
-import PredictionsScreen from "./screens/PredictionsScreen";
 import RecommendationScreen from "./screens/RecommendationScreen";
 import ArchivesScreen from "./screens/ArchivesScreen";
 import StatusPanel from "./components/StatusPanel";
 import ResourcesScreen from "./screens/ResourcesScreen";
 
 const DEFAULT_COMPETITION_CODE = "PL";
+
+type V19ProductLoadState =
+  | "idle"
+  | "loading"
+  | "success"
+  | "unavailable"
+  | "error";
 
 // Ce composant orchestre le chargement des données, la navigation et le rendu des écrans RubyBets.
 function App() {
@@ -76,6 +79,7 @@ function App() {
   const matchLoadRequestId = useRef<number>(0);
   const selectedMatchLoadRequestId = useRef<number>(0);
   const matchNewsContextAbortRef = useRef<AbortController | null>(null);
+  const v19ProductAbortRef = useRef<AbortController | null>(null);
 
   // États liés au match sélectionné.
   const [selectedMatchDetails, setSelectedMatchDetails] =
@@ -87,9 +91,6 @@ function App() {
   const [selectedMatchAnalysis, setSelectedMatchAnalysis] =
     useState<MatchAnalysisResponse | null>(null);
 
-  const [selectedMatchPredictions, setSelectedMatchPredictions] =
-    useState<MatchPredictionsResponse | null>(null);
-
   const [selectedMatchLineups, setSelectedMatchLineups] =
     useState<MatchLineupsResponse | null>(null);
 
@@ -98,9 +99,6 @@ function App() {
 
   const [matchNewsContextLoadState, setMatchNewsContextLoadState] =
     useState<MatchNewsContextLoadState>("idle");
-
-  const [selectedNationalMlPrediction, setSelectedNationalMlPrediction] =
-    useState<NationalMlPredictionResponse | null>(null);
 
   const [selectedTeamHistory, setSelectedTeamHistory] =
     useState<TeamHistoryResponse | null>(null);
@@ -158,10 +156,6 @@ function App() {
     "Aucune analyse chargée"
   );
 
-  const [matchPredictionsStatus, setMatchPredictionsStatus] = useState<string>(
-    "Aucune prédiction chargée"
-  );
-
   const [matchLineupsStatus, setMatchLineupsStatus] = useState<string>(
     "Aucune composition chargée"
   );
@@ -179,8 +173,11 @@ function App() {
   );
 
 
-  const [v19ProductStatus, setV19ProductStatus] = useState<string>(
-    "Aucune décision produit V19 chargée"
+  const [v19ProductLoadState, setV19ProductLoadState] =
+    useState<V19ProductLoadState>("idle");
+
+  const [v19ProductMessage, setV19ProductMessage] = useState<string>(
+    "La décision sera préparée à l’ouverture de l’onglet Prédictions."
   );
 
   const [multiMatchStatus, setMultiMatchStatus] = useState<string>(
@@ -191,12 +188,9 @@ function App() {
     selectedMatchDetails ||
       selectedMatchContext ||
       selectedMatchAnalysis ||
-      selectedMatchPredictions ||
-      selectedNationalMlPrediction ||
       selectedMatchLineups ||
       selectedMatchNewsContext ||
-      selectedTeamHistory ||
-      selectedV19ProductPrediction
+      selectedTeamHistory
   );
 
   // Réinitialise les données qui dépendent de la compétition active.
@@ -204,14 +198,14 @@ function App() {
     selectedMatchLoadRequestId.current += 1;
     matchNewsContextAbortRef.current?.abort();
     matchNewsContextAbortRef.current = null;
+    v19ProductAbortRef.current?.abort();
+    v19ProductAbortRef.current = null;
     setSelectedMatchDetails(null);
     setSelectedMatchContext(null);
     setSelectedMatchAnalysis(null);
-    setSelectedMatchPredictions(null);
     setSelectedMatchLineups(null);
     setSelectedMatchNewsContext(null);
     setMatchNewsContextLoadState("idle");
-    setSelectedNationalMlPrediction(null);
     setSelectedTeamHistory(null);
     setSelectedMatchAdvancedStats(null);
     setSelectedV19ProductPrediction(null);
@@ -220,12 +214,14 @@ function App() {
     setMatchDetailsStatus("Aucun match sélectionné");
     setMatchContextStatus("Aucun contexte chargé");
     setMatchAnalysisStatus("Aucune analyse chargée");
-    setMatchPredictionsStatus("Aucune prédiction chargée");
     setMatchLineupsStatus("Aucune composition chargée");
     setMatchNewsContextStatus("Actualités disponibles à la demande");
     setTeamHistoryStatus("Aucun historique d’équipe chargé");
     setMatchAdvancedStatsStatus("Statistiques avancées non chargées");
-    setV19ProductStatus("Aucune décision produit V19 chargée");
+    setV19ProductLoadState("idle");
+    setV19ProductMessage(
+      "La décision sera préparée à l’ouverture de l’onglet Prédictions."
+    );
     setMultiMatchStatus("Aucune recommandation multi-matchs générée");
   }
 
@@ -505,16 +501,16 @@ function App() {
     selectedMatchLoadRequestId.current = requestId;
     matchNewsContextAbortRef.current?.abort();
     matchNewsContextAbortRef.current = null;
+    v19ProductAbortRef.current?.abort();
+    v19ProductAbortRef.current = null;
     setCurrentScreen("match-details");
 
     setSelectedMatchDetails(optimisticMatchDetails);
     setSelectedMatchContext(null);
     setSelectedMatchAnalysis(null);
-    setSelectedMatchPredictions(null);
     setSelectedMatchLineups(null);
     setSelectedMatchNewsContext(null);
     setMatchNewsContextLoadState("idle");
-    setSelectedNationalMlPrediction(null);
     setSelectedTeamHistory(null);
     setSelectedMatchAdvancedStats(null);
     setSelectedV19ProductPrediction(null);
@@ -522,12 +518,14 @@ function App() {
     setMatchDetailsStatus("Chargement du détail du match...");
     setMatchContextStatus("Chargement du contexte avant-match...");
     setMatchAnalysisStatus("Chargement de l’analyse pré-match...");
-    setMatchPredictionsStatus("Chargement des prédictions...");
     setMatchLineupsStatus("Chargement des compositions probables...");
     setMatchNewsContextStatus("Actualités disponibles à la demande");
     setTeamHistoryStatus("Chargement de l’historique des équipes...");
     setMatchAdvancedStatsStatus("Statistiques avancées prêtes à être chargées");
-    setV19ProductStatus("Chargement de la décision produit V19...");
+    setV19ProductLoadState("idle");
+    setV19ProductMessage(
+      "La décision sera préparée à l’ouverture de l’onglet Prédictions."
+    );
 
     void getMatchDetails(matchId)
       .then((data) => {
@@ -585,24 +583,6 @@ function App() {
         setMatchAnalysisStatus("Impossible de charger l’analyse pré-match");
       });
 
-    void getMatchPredictions(matchId)
-      .then((data) => {
-        if (!isCurrentSelectedMatchRequest(requestId)) {
-          return;
-        }
-
-        setSelectedMatchPredictions(data);
-        setMatchPredictionsStatus("Prédictions chargées");
-      })
-      .catch(() => {
-        if (!isCurrentSelectedMatchRequest(requestId)) {
-          return;
-        }
-
-        setSelectedMatchPredictions(null);
-        setMatchPredictionsStatus("Impossible de charger les prédictions");
-      });
-
     void getMatchLineups(matchId)
       .then((data) => {
         if (!isCurrentSelectedMatchRequest(requestId)) {
@@ -619,18 +599,6 @@ function App() {
 
         setSelectedMatchLineups(null);
         setMatchLineupsStatus("Impossible de charger les compositions");
-      });
-
-    void getNationalDynamicPredictionByRubyBetsMatchId(matchId)
-      .then((data) => {
-        if (isCurrentSelectedMatchRequest(requestId)) {
-          setSelectedNationalMlPrediction(data);
-        }
-      })
-      .catch(() => {
-        if (isCurrentSelectedMatchRequest(requestId)) {
-          setSelectedNationalMlPrediction(null);
-        }
       });
 
     void getMatchTeamHistory(matchId)
@@ -657,24 +625,107 @@ function App() {
         setTeamHistoryStatus("Impossible de charger l’historique des équipes");
       });
 
-    void getV19ProductPrediction(matchId)
-      .then((data) => {
-        if (!isCurrentSelectedMatchRequest(requestId)) {
-          return;
-        }
-
-        setSelectedV19ProductPrediction(data);
-        setV19ProductStatus("Décision produit V19 chargée");
-      })
-      .catch(() => {
-        if (!isCurrentSelectedMatchRequest(requestId)) {
-          return;
-        }
-
-        setSelectedV19ProductPrediction(null);
-        setV19ProductStatus("Décision produit V19 indisponible pour ce match");
-      });
   }
+
+
+  // Charge la décision RubyBets uniquement lorsque l’onglet Prédictions de la fiche match en a besoin.
+  const handleLoadV19ProductPrediction = useCallback(
+    (matchId: number, forceReload = false) => {
+      if (
+        !forceReload &&
+        (selectedV19ProductPrediction?.match_id === matchId ||
+          v19ProductLoadState !== "idle")
+      ) {
+        return;
+      }
+
+      const requestId = selectedMatchLoadRequestId.current;
+      const controller = new AbortController();
+
+      v19ProductAbortRef.current?.abort();
+      v19ProductAbortRef.current = controller;
+      setSelectedV19ProductPrediction(null);
+      setV19ProductLoadState("loading");
+      setV19ProductMessage(
+        "RubyBets examine les informations disponibles avant de présenter une décision responsable."
+      );
+
+      void getV19ProductPrediction(matchId, controller.signal)
+        .then((data) => {
+          if (
+            controller.signal.aborted ||
+            !isCurrentSelectedMatchRequest(requestId)
+          ) {
+            return;
+          }
+
+          if (data.match_id !== matchId) {
+            setSelectedV19ProductPrediction(null);
+            setV19ProductLoadState("error");
+            setV19ProductMessage(
+              "La décision reçue ne correspond pas au match sélectionné. Tu peux relancer la demande."
+            );
+            return;
+          }
+
+          setSelectedV19ProductPrediction(data);
+          setV19ProductLoadState("success");
+          setV19ProductMessage("Décision RubyBets disponible");
+        })
+        .catch((error: unknown) => {
+          if (
+            controller.signal.aborted ||
+            (error instanceof DOMException && error.name === "AbortError") ||
+            !isCurrentSelectedMatchRequest(requestId)
+          ) {
+            return;
+          }
+
+          setSelectedV19ProductPrediction(null);
+
+          if (
+            error instanceof V19ProductApiError &&
+            (error.status === 404 || error.status === 422)
+          ) {
+            setV19ProductLoadState("unavailable");
+            setV19ProductMessage(
+              "RubyBets ne dispose pas d'assez d'informations pour préparer une décision sur ce match."
+            );
+            return;
+          }
+
+          setV19ProductLoadState("error");
+          setV19ProductMessage(
+            "La décision n'a pas pu être chargée pour le moment. Tu peux réessayer."
+          );
+        })
+        .finally(() => {
+          if (v19ProductAbortRef.current === controller) {
+            v19ProductAbortRef.current = null;
+          }
+        });
+    },
+    [selectedV19ProductPrediction, v19ProductLoadState]
+  );
+
+  // Annule une décision encore active lorsque l’utilisateur quitte l’onglet Prédictions.
+  const handleCancelV19ProductPrediction = useCallback(() => {
+    const activeController = v19ProductAbortRef.current;
+
+    if (!activeController) {
+      return;
+    }
+
+    activeController.abort();
+    v19ProductAbortRef.current = null;
+    setV19ProductLoadState((currentState) =>
+      currentState === "loading" ? "idle" : currentState
+    );
+    setV19ProductMessage(
+      "La décision sera préparée à l’ouverture de l’onglet Prédictions."
+    );
+  }, []);
+
 
   // Charge les statistiques avancées uniquement lorsque l’utilisateur ouvre l’onglet Analyse détaillée.
   function handleLoadMatchAdvancedStats(matchId: number) {
@@ -817,10 +868,13 @@ function App() {
           matchNewsContextStatus={matchNewsContextStatus}
           matchNewsContextLoadState={matchNewsContextLoadState}
           teamHistoryStatus={teamHistoryStatus}
-          v19ProductStatus={v19ProductStatus}
+          v19ProductLoadState={v19ProductLoadState}
+          v19ProductStatus={v19ProductMessage}
           onRequestAdvancedStats={handleLoadMatchAdvancedStats}
           onRequestNewsContext={handleLoadMatchNewsContext}
           onCancelNewsContext={handleCancelMatchNewsContext}
+          onRequestV19ProductPrediction={handleLoadV19ProductPrediction}
+          onCancelV19ProductPrediction={handleCancelV19ProductPrediction}
           onNavigate={setCurrentScreen}
         />
       );
@@ -842,21 +896,7 @@ function App() {
       );
     }
 
-    if (currentScreen === "predictions") {
-      if (!hasSelectedMatch) {
-        return renderMatchRequiredState("Prédictions");
-      }
 
-      return (
-        <PredictionsScreen
-          v19ProductPrediction={selectedV19ProductPrediction}
-          matchDetails={selectedMatchDetails}
-          matchContext={selectedMatchContext}
-          v19ProductStatus={v19ProductStatus}
-          onNavigate={setCurrentScreen}
-        />
-      );
-    }
 
     if (currentScreen === "recommendation") {
       return (
@@ -911,7 +951,7 @@ function App() {
             matchDetailsStatus={matchDetailsStatus}
             matchContextStatus={matchContextStatus}
             matchAnalysisStatus={matchAnalysisStatus}
-            matchPredictionsStatus={matchPredictionsStatus}
+            matchPredictionsStatus={v19ProductMessage}
             multiMatchStatus={multiMatchStatus}
             glossaryStatus={glossaryStatus}
             responsibleInfoStatus={responsibleInfoStatus}
@@ -929,15 +969,15 @@ export default App;
 // Schéma de communication du fichier :
 // App.tsx
 // ├── appelle services/api.ts pour récupérer les données backend
-// ├── charge aussi /analysis, /advanced-stats à la demande, /lineups, /news-context, /team-history, la décision produit V19 et le modèle national
+// ├── charge /analysis, /advanced-stats à la demande, /lineups, /news-context et /team-history pour la fiche match
 // ├── suit séparément le statut /team-history pour distinguer chargement, données partielles, indisponibilité et erreur
-// ├── transmet la décision produit V19 à MatchDetailsScreen.tsx et PredictionsScreen.tsx sans exposer les données internes de marché
+// ├── charge la décision RubyBets uniquement à l’ouverture de l’onglet Prédictions dans MatchDetailsScreen.tsx
 // ├── pilote la navigation via currentScreen
 // ├── utilise AppShell.tsx pour structurer l’application
 // ├── peut transmettre StatusPanel.tsx à AppShell.tsx uniquement en mode debug
 // ├── affiche les écrans du dossier screens/ selon l’écran actif
 // ├── sélectionne automatiquement la première compétition disposant de matchs lorsque la compétition demandée est vide
-// ├── ignore les réponses devenues obsolètes lors d’un changement rapide de compétition ou de match
+// ├── ignore les réponses devenues obsolètes et valide que la décision correspond au match actif
 // ├── affiche immédiatement le match depuis la liste puis hydrate chaque bloc API indépendamment
 // ├── branche l’écran Sélection sur la route publique V19 à partir des matchs déjà chargés
 // └── affiche l’écran Archives avec données mockées avant création du backend dédié

@@ -55,6 +55,11 @@ import type { AppScreen } from "../types/navigation";
 import MatchNewsContextSection from "../components/MatchNewsContextSection";
 import RubyNewsChat from "../components/RubyNewsChat";
 import {
+  MatchPredictionSidebar,
+  MatchPredictionTabContent,
+} from "../components/MatchPredictionTab";
+import type { V19ProductLoadState } from "../components/MatchPredictionTab";
+import {
   formatMatchStatus,
   getTeamDisplayName,
   getTeamInitials,
@@ -79,10 +84,13 @@ type MatchDetailsScreenProps = {
   matchNewsContextStatus: string;
   matchNewsContextLoadState: MatchNewsContextLoadState;
   teamHistoryStatus: string;
+  v19ProductLoadState: V19ProductLoadState;
   v19ProductStatus: string;
   onRequestAdvancedStats: (matchId: number) => void;
   onRequestNewsContext: (matchId: number) => void;
   onCancelNewsContext: () => void;
+  onRequestV19ProductPrediction: (matchId: number, forceReload?: boolean) => void;
+  onCancelV19ProductPrediction: () => void;
   onNavigate: (screen: AppScreen) => void;
 };
 
@@ -92,7 +100,8 @@ type DetailTabKey =
   | "form"
   | "lineup"
   | "headToHead"
-  | "context";
+  | "context"
+  | "prediction";
 
 type DetailTab = {
   key: DetailTabKey;
@@ -187,6 +196,7 @@ const DETAIL_TABS: DetailTab[] = [
   { key: "lineup", icon: Users, label: "Compo probable" },
   { key: "headToHead", icon: Swords, label: "Face à face" },
   { key: "context", icon: Newspaper, label: "Contexte" },
+  { key: "prediction", icon: TrendingUp, label: "Prédictions" },
 ];
 
 const ADVANCED_SUMMARY_METRICS: AdvancedSummaryDefinition[] = [
@@ -4105,6 +4115,7 @@ function MatchDetailsScreen({
   matchLineups,
   matchNewsContext,
   teamHistory,
+  v19ProductPrediction,
   matchDetailsStatus,
   matchContextStatus,
   matchAdvancedStatsStatus,
@@ -4112,9 +4123,13 @@ function MatchDetailsScreen({
   matchNewsContextStatus,
   matchNewsContextLoadState,
   teamHistoryStatus,
+  v19ProductLoadState,
+  v19ProductStatus,
   onRequestAdvancedStats,
   onRequestNewsContext,
   onCancelNewsContext,
+  onRequestV19ProductPrediction,
+  onCancelV19ProductPrediction,
   onNavigate,
 }: MatchDetailsScreenProps) {
   const [activeTab, setActiveTab] = useState<DetailTabKey>("overview");
@@ -4129,15 +4144,29 @@ function MatchDetailsScreen({
       onCancelNewsContext();
     }
 
+    if (activeTab === "prediction" && tabKey !== "prediction") {
+      onCancelV19ProductPrediction();
+    }
+
     setActiveTab(tabKey);
 
     if (tabKey === "analysis" && selectedMatch) {
       onRequestAdvancedStats(selectedMatch.id);
     }
+
+    if (tabKey === "prediction" && selectedMatch) {
+      onRequestV19ProductPrediction(selectedMatch.id);
+    }
   }
 
-  // Cet effet annule une recherche encore active si la fiche Détail match est démontée.
-  useEffect(() => () => onCancelNewsContext(), [onCancelNewsContext]);
+  // Cet effet annule les requêtes à la demande si la fiche Détail match est démontée.
+  useEffect(
+    () => () => {
+      onCancelNewsContext();
+      onCancelV19ProductPrediction();
+    },
+    [onCancelNewsContext, onCancelV19ProductPrediction],
+  );
 
   // Cet effet charge les actualités une seule fois lorsque l'onglet Contexte devient visible.
   useEffect(() => {
@@ -4154,6 +4183,13 @@ function MatchDetailsScreen({
     onRequestNewsContext,
     selectedMatch,
   ]);
+
+  // Cet effet charge la décision uniquement lorsque le sous-onglet Prédictions devient visible.
+  useEffect(() => {
+    if (activeTab === "prediction" && selectedMatch) {
+      onRequestV19ProductPrediction(selectedMatch.id);
+    }
+  }, [activeTab, onRequestV19ProductPrediction, selectedMatch]);
 
   if (!selectedMatch) {
     return (
@@ -4197,7 +4233,7 @@ function MatchDetailsScreen({
       <main
         className={`rb-detail-v2-layout${
           activeTab === "context" ? " rb-detail-context-layout" : ""
-        }`}
+        }${activeTab === "prediction" ? " rb-detail-prediction-layout" : ""}`}
       >
         <section
           key={activeTab}
@@ -4255,7 +4291,18 @@ function MatchDetailsScreen({
             />
           ) : null}
 
-          {activeTab !== "overview" && activeTab !== "analysis" && activeTab !== "form" && activeTab !== "lineup" && activeTab !== "headToHead" && activeTab !== "context" ? (
+          {activeTab === "prediction" ? (
+            <MatchPredictionTabContent
+              prediction={v19ProductPrediction}
+              loadState={v19ProductLoadState}
+              statusMessage={v19ProductStatus}
+              onRetry={() =>
+                onRequestV19ProductPrediction(selectedMatch.id, true)
+              }
+            />
+          ) : null}
+
+          {activeTab !== "overview" && activeTab !== "analysis" && activeTab !== "form" && activeTab !== "lineup" && activeTab !== "headToHead" && activeTab !== "context" && activeTab !== "prediction" ? (
             <PendingTabContent activeTab={activeTab} />
           ) : null}
         </section>
@@ -4277,7 +4324,13 @@ function MatchDetailsScreen({
             }
           />
 
-          {activeTab === "headToHead" ? (
+          {activeTab === "prediction" ? (
+            <MatchPredictionSidebar
+              prediction={v19ProductPrediction}
+              loadState={v19ProductLoadState}
+              onNavigate={onNavigate}
+            />
+          ) : activeTab === "headToHead" ? (
             <HeadToHeadSidebar
               match={selectedMatch}
               teamHistory={teamHistory}
@@ -4314,7 +4367,7 @@ export default MatchDetailsScreen;
 
 // Schéma de communication du fichier :
 // MatchDetailsScreen.tsx
-// ├── conserve les contrats V19 reçus depuis App.tsx sans exposer leur nom interne dans la Vue d’ensemble
+// ├── affiche la décision publique V19 dans un sous-onglet Prédictions chargé à la demande
 // ├── affiche RubyNewsChat.tsx dans la colonne droite uniquement lorsque l’onglet Contexte est actif
 // ├── utilise les helpers d’affichage de helpers/displayText.ts
 // ├── charge à la demande et affiche /advanced-stats dans l’onglet Analyse détaillée
@@ -4326,5 +4379,5 @@ export default MatchDetailsScreen;
 // ├── affiche les derniers matchs disponibles uniquement dans la Vue d’ensemble via teamHistory.recent_matches_overview
 // ├── affiche les confrontations directes via teamHistory.head_to_head avec des états 0, 1 ou plusieurs duels
 // ├── utilise teamHistoryStatus pour distinguer le chargement, l’erreur technique et l’absence réelle de H2H
-// ├── déclenche la navigation vers Matchs, Analyse et Prédictions via onNavigate
+// ├── déclenche la navigation vers Matchs et Ressources via onNavigate
 // └── charge styles/MatchDetailsScreen.css pour le rendu premium et responsive

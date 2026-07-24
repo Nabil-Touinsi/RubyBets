@@ -233,14 +233,112 @@ export async function getV19H2HAnalysis(
   );
 }
 
-// Cette fonction récupère la décision produit V19 d'un match RubyBets réel.
-export async function getV19ProductPrediction(
-  matchId: number
-): Promise<V19ProductPredictionResponse> {
-  return fetchJson<V19ProductPredictionResponse>(
-    `/api/experimental/ml-v19/rubybets-matches/${matchId}`,
-    "Erreur lors du chargement de la décision produit V19."
+// Cette classe conserve le statut HTTP d'une erreur de décision RubyBets afin de distinguer une indisponibilité d'une erreur temporaire.
+export class V19ProductApiError extends Error {
+  status: number;
+
+  // Ce constructeur prépare une erreur exploitable par App.tsx sans exposer le détail technique dans l'interface.
+  constructor(message: string, status: number) {
+    super(message);
+    this.name = "V19ProductApiError";
+    this.status = status;
+  }
+}
+
+// Cette fonction vérifie qu'une valeur inconnue est un tableau de textes.
+function isStringArray(value: unknown): value is string[] {
+  return Array.isArray(value) && value.every((item) => typeof item === "string");
+}
+
+// Cette fonction valide les champs indispensables d'une décision publique avant son affichage.
+function isV19ProductPredictionResponse(
+  payload: unknown
+): payload is V19ProductPredictionResponse {
+  if (!payload || typeof payload !== "object") {
+    return false;
+  }
+
+  const candidate = payload as Partial<V19ProductPredictionResponse>;
+  const explanation = candidate.explanation;
+  const recommendation = candidate.recommendation;
+  const dataQuality = candidate.data_quality;
+  const versions = candidate.versions;
+
+  const hasValidRecommendationShape = Boolean(
+    recommendation &&
+      typeof recommendation.market_type === "string" &&
+      typeof recommendation.value === "string" &&
+      (recommendation.confidence_level === null ||
+        typeof recommendation.confidence_level === "string") &&
+      (recommendation.risk_level === null ||
+        typeof recommendation.risk_level === "string")
   );
+  const hasConsistentDecision =
+    (candidate.status === "RECOMMEND" && hasValidRecommendationShape) ||
+    (candidate.status === "ABSTAIN" && recommendation === null);
+
+  return Boolean(
+    typeof candidate.source === "string" &&
+      typeof candidate.scope === "string" &&
+      typeof candidate.match_id === "number" &&
+      typeof candidate.request_id === "string" &&
+      (candidate.status === "RECOMMEND" || candidate.status === "ABSTAIN") &&
+      hasConsistentDecision &&
+      explanation &&
+      typeof explanation.contract_version === "string" &&
+      typeof explanation.headline === "string" &&
+      typeof explanation.summary === "string" &&
+      isStringArray(explanation.supporting_factors) &&
+      isStringArray(explanation.caution_factors) &&
+      isStringArray(explanation.rejected_alternatives) &&
+      typeof explanation.data_quality_summary === "string" &&
+      typeof explanation.confidence_explanation === "string" &&
+      (explanation.abstention_explanation === null ||
+        typeof explanation.abstention_explanation === "string") &&
+      typeof explanation.source_freshness_summary === "string" &&
+      typeof explanation.responsible_note === "string" &&
+      dataQuality &&
+      typeof dataQuality === "object" &&
+      (dataQuality.target_match_provider_status === null ||
+        typeof dataQuality.target_match_provider_status === "string") &&
+      (dataQuality.market_module_status === null ||
+        typeof dataQuality.market_module_status === "string") &&
+      (dataQuality.history_data_status === null ||
+        typeof dataQuality.history_data_status === "string") &&
+      versions &&
+      typeof versions === "object" &&
+      typeof versions.engine === "string" &&
+      typeof versions.explanation === "string" &&
+      typeof candidate.responsible_note === "string"
+  );
+}
+
+// Cette fonction récupère et valide la décision publique d'un match RubyBets réel.
+export async function getV19ProductPrediction(
+  matchId: number,
+  signal?: AbortSignal
+): Promise<V19ProductPredictionResponse> {
+  const response = await fetch(
+    `${API_BASE_URL}/api/experimental/ml-v19/rubybets-matches/${matchId}`,
+    { signal }
+  );
+  const payload = (await response.json().catch(() => null)) as unknown;
+
+  if (!response.ok) {
+    throw new V19ProductApiError(
+      "La décision RubyBets n'est pas disponible pour le moment.",
+      response.status
+    );
+  }
+
+  if (!isV19ProductPredictionResponse(payload)) {
+    throw new V19ProductApiError(
+      "La décision reçue est incomplète et ne peut pas être affichée.",
+      502
+    );
+  }
+
+  return payload;
 }
 
 // Cette fonction demande au backend de composer une sélection multi-matchs V19 à partir des matchs déjà chargés.

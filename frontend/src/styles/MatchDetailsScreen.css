@@ -7624,3 +7624,886 @@ MatchDetailsScreen.tsx
 }
 
 /* Schéma de communication : MatchDetailsScreen.tsx + MatchNewsContextSection.tsx + RubyNewsChat.tsx -> classes rb-detail-context-* -> onglet Contexte premium, images, sidebar Ruby et discussion responsive. */
+
+/* Sous-onglet Prédictions : composition compacte alignée sur les onglets premium déjà validés. */
+.rb-detail-premium.rb-detail-v2--premium .rb-detail-prediction-layout {
+  grid-template-columns: minmax(0, 1fr) 318px !important;
+  gap: 14px !important;
+  align-items: start;
+}
+
+.rb-detail-premium .rb-detail-v2-main-column--prediction,
+.rb-detail-premium .rb-detail-prediction-main-shell,
+.rb-detail-premium .rb-detail-prediction-layout .rb-detail-v2-side-column {
+  min-width: 0;
+}
+
+.rb-detail-premium .rb-detail-prediction-main-shell {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: 10px !important;
+  width: 100%;
+}
+
+.rb-detail-premium .rb-detail-v2-main-column--prediction section,
+.rb-detail-premium .rb-detail-prediction-side-card {
+  margin-top: 0 !important;
+}
+
+.rb-detail-premium .rb-detail-prediction-overview,
+.rb-detail-premium .rb-detail-prediction-explanations,
+.rb-detail-premium .rb-detail-prediction-side-card,
+.rb-detail-premium .rb-detail-prediction-state {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border: 1px solid rgba(91, 143, 158, 0.23);
+  border-radius: 14px;
+  background:
+    linear-gradient(155deg, rgba(7, 27, 38, 0.98), rgba(3, 18, 27, 0.96));
+  box-shadow:
+    0 18px 44px rgba(0, 0, 0, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.026);
+}
+
+.rb-detail-premium .rb-detail-prediction-overview::before,
+.rb-detail-premium .rb-detail-prediction-explanations::before,
+.rb-detail-premium .rb-detail-prediction-side-card::before,
+.rb-detail-premium .rb-detail-prediction-state::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: -1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(94, 234, 212, 0.45), transparent);
+  opacity: 0.64;
+}
+
+.rb-detail-premium .rb-detail-prediction-overview {
+  animation: rb-detail-prediction-enter 520ms var(--detail-ease) both;
+}
+
+.rb-detail-premium .rb-detail-prediction-decision {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 188px;
+  align-items: center;
+  min-height: 154px;
+  padding: 18px 20px 16px;
+  border-bottom: 1px solid rgba(91, 143, 158, 0.18);
+  background:
+    radial-gradient(circle at 88% 48%, rgba(45, 212, 191, 0.11), transparent 26%),
+    linear-gradient(145deg, rgba(7, 31, 41, 0.88), rgba(3, 18, 27, 0.46));
+}
+
+.rb-detail-premium .rb-detail-prediction-decision::after {
+  content: "";
+  position: absolute;
+  top: -70%;
+  left: -24%;
+  width: 42%;
+  height: 230%;
+  pointer-events: none;
+  background: linear-gradient(100deg, transparent, rgba(118, 255, 239, 0.065), transparent);
+  transform: rotate(8deg) translateX(-150%);
+  animation: rb-detail-prediction-shimmer 1.15s ease 180ms both;
+}
+
+.rb-detail-premium .rb-detail-prediction-decision--abstain {
+  background:
+    radial-gradient(circle at 88% 48%, rgba(244, 194, 77, 0.095), transparent 28%),
+    linear-gradient(145deg, rgba(27, 27, 20, 0.86), rgba(3, 18, 27, 0.5));
+}
+
+.rb-detail-premium .rb-detail-prediction-decision__content {
+  position: relative;
+  z-index: 2;
+  min-width: 0;
+}
+
+.rb-detail-premium .rb-detail-prediction-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0;
+  color: var(--detail-teal);
+  font-size: 0.62rem;
+  font-weight: 950;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.rb-detail-premium .rb-detail-prediction-decision h2 {
+  margin: 8px 0 5px;
+  color: #f8fbfc;
+  font-size: clamp(1.25rem, 1.55vw, 1.72rem);
+  font-weight: 930;
+  line-height: 1.06;
+  letter-spacing: -0.035em;
+}
+
+.rb-detail-premium .rb-detail-prediction-decision__summary {
+  max-width: 720px;
+  margin: 0;
+  color: #9fb2ba;
+  font-size: 0.72rem;
+  line-height: 1.52;
+}
+
+.rb-detail-premium .rb-detail-prediction-decision__bottomline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 11px;
+}
+
+.rb-detail-premium .rb-detail-prediction-decision__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.rb-detail-premium .rb-detail-prediction-decision__badges > span,
+.rb-detail-premium .rb-detail-prediction-decision__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 29px;
+  padding: 0 10px;
+  border: 1px solid rgba(45, 212, 191, 0.24);
+  border-radius: 999px;
+  background: rgba(5, 35, 43, 0.72);
+  color: #d9eaed;
+  font-size: 0.64rem;
+  font-weight: 820;
+  white-space: nowrap;
+}
+
+.rb-detail-premium .rb-detail-prediction-decision__badge--risk {
+  border-color: rgba(244, 194, 77, 0.32) !important;
+  color: #ffd06a !important;
+}
+
+.rb-detail-premium .rb-detail-prediction-decision__status {
+  border-color: rgba(45, 212, 191, 0.34);
+  background: rgba(13, 148, 136, 0.13);
+  color: #67f3df;
+  font-weight: 900;
+  text-transform: none;
+}
+
+.rb-detail-premium .rb-detail-prediction-decision--abstain .rb-detail-prediction-decision__status {
+  border-color: rgba(244, 194, 77, 0.36);
+  background: rgba(126, 88, 4, 0.17);
+  color: #ffd66b;
+}
+
+.rb-detail-premium .rb-detail-prediction-decision__visual {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-width: 0;
+}
+
+.rb-detail-premium .rb-detail-prediction-decision__visual::before,
+.rb-detail-premium .rb-detail-prediction-decision__visual::after {
+  content: "";
+  position: absolute;
+  border: 1px solid rgba(45, 212, 191, 0.13);
+  border-radius: 50%;
+}
+
+.rb-detail-premium .rb-detail-prediction-decision__visual::before {
+  width: 132px;
+  height: 132px;
+}
+
+.rb-detail-premium .rb-detail-prediction-decision__visual::after {
+  width: 98px;
+  height: 98px;
+  box-shadow: 0 0 26px rgba(45, 212, 191, 0.08);
+}
+
+.rb-detail-premium .rb-detail-prediction-decision__visual > span {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  border: 1px solid rgba(45, 212, 191, 0.42);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 40% 28%, rgba(118, 255, 237, 0.24), transparent 48%),
+    rgba(5, 74, 75, 0.74);
+  color: var(--detail-teal);
+  box-shadow:
+    0 0 0 8px rgba(45, 212, 191, 0.03),
+    0 0 30px rgba(45, 212, 191, 0.15);
+  animation: rb-detail-prediction-pulse 4.6s ease-in-out 0.8s infinite;
+}
+
+.rb-detail-premium .rb-detail-prediction-decision--abstain .rb-detail-prediction-decision__visual > span {
+  border-color: rgba(244, 194, 77, 0.42);
+  background: rgba(91, 63, 5, 0.64);
+  color: var(--detail-amber);
+  box-shadow:
+    0 0 0 8px rgba(244, 194, 77, 0.026),
+    0 0 30px rgba(244, 194, 77, 0.1);
+}
+
+.rb-detail-premium .rb-detail-prediction-signals {
+  display: grid;
+  gap: 8px;
+  padding: 10px 12px 11px;
+}
+
+.rb-detail-premium .rb-detail-prediction-section-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--detail-teal);
+}
+
+.rb-detail-premium .rb-detail-prediction-section-title h2 {
+  margin: 0;
+  color: var(--detail-teal);
+  font-size: 0.62rem;
+  font-weight: 950;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.rb-detail-premium .rb-detail-prediction-signal-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.rb-detail-premium .rb-detail-prediction-signal-card {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto minmax(34px, 1fr) auto;
+  gap: 7px;
+  min-width: 0;
+  min-height: 122px;
+  padding: 10px 12px;
+  border: 1px solid rgba(91, 143, 158, 0.2);
+  border-radius: 11px;
+  background: linear-gradient(150deg, rgba(7, 27, 37, 0.92), rgba(3, 17, 25, 0.9));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.022);
+  transition:
+    transform 210ms var(--detail-ease),
+    border-color 210ms ease,
+    box-shadow 210ms ease;
+  animation: rb-detail-prediction-card-enter 480ms var(--detail-ease) both;
+}
+
+.rb-detail-premium .rb-detail-prediction-signal-card:nth-child(2) { animation-delay: 60ms; }
+.rb-detail-premium .rb-detail-prediction-signal-card:nth-child(3) { animation-delay: 110ms; }
+
+.rb-detail-premium .rb-detail-prediction-signal-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(45, 212, 191, 0.34);
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.2);
+}
+
+.rb-detail-premium .rb-detail-prediction-signal-card--retained {
+  border-color: rgba(45, 212, 191, 0.36);
+  background:
+    radial-gradient(circle at 8% 10%, rgba(45, 212, 191, 0.09), transparent 34%),
+    linear-gradient(150deg, rgba(7, 32, 40, 0.96), rgba(3, 17, 25, 0.92));
+}
+
+.rb-detail-premium .rb-detail-prediction-signal-card > header {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.rb-detail-premium .rb-detail-prediction-icon-chip {
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(45, 212, 191, 0.28);
+  border-radius: 10px;
+  background: rgba(7, 54, 59, 0.5);
+  color: var(--detail-teal);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.rb-detail-premium .rb-detail-prediction-signal-card .rb-detail-prediction-icon-chip {
+  width: 39px;
+  height: 39px;
+  border-radius: 50%;
+}
+
+.rb-detail-premium .rb-detail-prediction-signal-card > header > div {
+  min-width: 0;
+}
+
+.rb-detail-premium .rb-detail-prediction-signal-card > header span:not(.rb-detail-prediction-icon-chip) {
+  color: var(--detail-teal);
+  font-size: 0.56rem;
+  font-weight: 900;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.rb-detail-premium .rb-detail-prediction-signal-card h3 {
+  margin: 3px 0 0;
+  color: var(--detail-teal-soft);
+  font-size: 0.88rem;
+  font-weight: 890;
+  line-height: 1.15;
+}
+
+.rb-detail-premium .rb-detail-prediction-signal-card:not(.rb-detail-prediction-signal-card--retained) h3 {
+  color: #aab9bf;
+}
+
+.rb-detail-premium .rb-detail-prediction-signal-card__reason {
+  align-self: start;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #8fa4ad;
+  font-size: 0.62rem;
+  line-height: 1.42;
+}
+
+.rb-detail-premium .rb-detail-prediction-signal-card__footer {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  min-height: 28px;
+  padding-top: 7px;
+  border-top: 1px solid rgba(91, 143, 158, 0.14);
+}
+
+.rb-detail-premium .rb-detail-prediction-signal-card__status {
+  grid-column: 1 / -1;
+  align-self: center;
+  color: #748a94;
+  font-size: 0.58rem;
+  font-weight: 780;
+}
+
+.rb-detail-premium .rb-detail-prediction-level {
+  display: grid;
+  gap: 2px;
+}
+
+.rb-detail-premium .rb-detail-prediction-level > span {
+  color: #6f8791;
+  font-size: 0.54rem;
+  font-weight: 720;
+}
+
+.rb-detail-premium .rb-detail-prediction-level > div {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.rb-detail-premium .rb-detail-prediction-level strong {
+  color: #d4e0e3;
+  font-size: 0.58rem;
+  font-weight: 830;
+}
+
+.rb-detail-premium .rb-detail-prediction-level__steps {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.rb-detail-premium .rb-detail-prediction-level__steps i {
+  width: 8px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(104, 137, 150, 0.2);
+}
+
+.rb-detail-premium .rb-detail-prediction-level--confidence .rb-detail-prediction-level__steps i.is-active {
+  background: var(--detail-teal);
+  box-shadow: 0 0 7px rgba(45, 212, 191, 0.22);
+}
+
+.rb-detail-premium .rb-detail-prediction-level--risk .rb-detail-prediction-level__steps i.is-active {
+  background: var(--detail-amber);
+  box-shadow: 0 0 7px rgba(244, 194, 77, 0.2);
+}
+
+.rb-detail-premium .rb-detail-prediction-explanations {
+  display: grid;
+  gap: 8px;
+  padding: 10px 12px 11px;
+  animation: rb-detail-prediction-enter 520ms var(--detail-ease) 80ms both;
+}
+
+.rb-detail-premium .rb-detail-prediction-explanation-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.rb-detail-premium .rb-detail-prediction-explanation-column,
+.rb-detail-premium .rb-detail-prediction-explanation-column:first-child,
+.rb-detail-premium .rb-detail-prediction-explanation-column:last-child,
+.rb-detail-premium .rb-detail-prediction-explanation-column:nth-child(3) {
+  min-width: 0;
+  min-height: 124px;
+  padding: 10px 11px;
+  border: 1px solid rgba(91, 143, 158, 0.19);
+  border-radius: 10px;
+  background: linear-gradient(150deg, rgba(7, 27, 37, 0.86), rgba(3, 17, 25, 0.82));
+}
+
+.rb-detail-premium .rb-detail-prediction-explanation-column--positive { border-color: rgba(84, 239, 131, 0.22); color: #52ee82; }
+.rb-detail-premium .rb-detail-prediction-explanation-column--caution { border-color: rgba(244, 194, 77, 0.22); color: var(--detail-amber); }
+.rb-detail-premium .rb-detail-prediction-explanation-column--negative { border-color: rgba(245, 101, 101, 0.2); color: #f06d75; }
+.rb-detail-premium .rb-detail-prediction-explanation-column--info { border-color: rgba(167, 139, 250, 0.22); color: #b9a0ff; }
+
+.rb-detail-premium .rb-detail-prediction-explanation-column > header {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 28px;
+}
+
+.rb-detail-premium .rb-detail-prediction-explanation-column > header > span {
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 25px;
+  height: 25px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+}
+
+.rb-detail-premium .rb-detail-prediction-explanation-column h3 {
+  margin: 0;
+  color: currentColor;
+  font-size: 0.58rem;
+  font-weight: 920;
+  line-height: 1.18;
+  letter-spacing: 0.035em;
+  text-transform: none;
+}
+
+.rb-detail-premium .rb-detail-prediction-explanation-column ul {
+  display: grid;
+  gap: 4px;
+  margin: 7px 0 0 !important;
+  padding: 0 0 0 14px !important;
+  list-style: disc !important;
+}
+
+.rb-detail-premium .rb-detail-prediction-explanation-column li,
+.rb-detail-premium .rb-detail-prediction-empty-copy {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: #9eafb6 !important;
+  font-size: 0.57rem !important;
+  line-height: 1.38 !important;
+}
+
+.rb-detail-premium .rb-detail-prediction-empty-copy {
+  margin-top: 7px !important;
+}
+
+.rb-detail-premium .rb-detail-prediction-layout .rb-detail-v2-side-column {
+  position: sticky;
+  top: 88px;
+  display: grid;
+  gap: 10px;
+  align-self: start;
+}
+
+.rb-detail-premium .rb-detail-prediction-side-card {
+  display: grid;
+  gap: 11px;
+  padding: 14px 15px;
+  border-radius: 14px;
+  transition:
+    transform 210ms var(--detail-ease),
+    border-color 210ms ease,
+    box-shadow 210ms ease;
+  animation: rb-detail-prediction-card-enter 480ms var(--detail-ease) both;
+}
+
+.rb-detail-premium .rb-detail-prediction-side-card:nth-child(2) { animation-delay: 60ms; }
+.rb-detail-premium .rb-detail-prediction-side-card:nth-child(3) { animation-delay: 110ms; }
+
+.rb-detail-premium .rb-detail-prediction-side-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(45, 212, 191, 0.31);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+}
+
+.rb-detail-premium .rb-detail-prediction-side-card > header {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.rb-detail-premium .rb-detail-prediction-side-card h2 {
+  margin: 0;
+  color: var(--detail-teal);
+  font-size: 0.62rem;
+  font-weight: 950;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.rb-detail-premium .rb-detail-prediction-side-card p,
+.rb-detail-premium .rb-detail-prediction-side-card small {
+  margin: 0;
+  color: #93a8b0;
+  font-size: 0.63rem;
+  line-height: 1.52;
+}
+
+.rb-detail-premium .rb-detail-prediction-quality-meter-list,
+.rb-detail-premium .rb-detail-prediction-responsible-list {
+  display: grid;
+  gap: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  list-style: none !important;
+}
+
+.rb-detail-premium .rb-detail-prediction-quality-meter-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 31px;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-bottom: 1px solid rgba(91, 143, 158, 0.13) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: #9eb0b7;
+  font-size: 0.58rem;
+  font-weight: 690;
+}
+
+.rb-detail-premium .rb-detail-prediction-quality-meter-list li:last-child {
+  border-bottom: 0 !important;
+}
+
+.rb-detail-premium .rb-detail-prediction-quality-meter {
+  display: inline-flex;
+  gap: 4px;
+  flex: 0 0 auto;
+}
+
+.rb-detail-premium .rb-detail-prediction-quality-meter i {
+  width: 7px;
+  height: 7px;
+  border: 1px solid rgba(99, 132, 145, 0.36);
+  border-radius: 50%;
+  background: transparent;
+}
+
+.rb-detail-premium .rb-detail-prediction-quality-meter.is-good i.is-active {
+  border-color: rgba(45, 212, 191, 0.68);
+  background: var(--detail-teal);
+  box-shadow: 0 0 7px rgba(45, 212, 191, 0.2);
+}
+
+.rb-detail-premium .rb-detail-prediction-quality-meter.is-warning i.is-active {
+  border-color: rgba(244, 194, 77, 0.64);
+  background: var(--detail-amber);
+}
+
+.rb-detail-premium .rb-detail-prediction-side-card--responsible {
+  border-color: rgba(45, 212, 191, 0.27);
+  background:
+    radial-gradient(circle at 92% 10%, rgba(45, 212, 191, 0.075), transparent 28%),
+    linear-gradient(155deg, rgba(7, 31, 39, 0.97), rgba(3, 18, 27, 0.94));
+}
+
+.rb-detail-premium .rb-detail-prediction-responsible-list {
+  gap: 7px;
+}
+
+.rb-detail-premium .rb-detail-prediction-responsible-list li {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  align-items: start;
+  gap: 8px;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: #77919b;
+}
+
+.rb-detail-premium .rb-detail-prediction-responsible-list li > svg {
+  margin-top: 1px;
+  color: #8da6b0;
+}
+
+.rb-detail-premium .rb-detail-prediction-responsible-list div {
+  display: grid;
+  gap: 1px;
+}
+
+.rb-detail-premium .rb-detail-prediction-responsible-list strong {
+  color: #d8e4e7;
+  font-size: 0.59rem;
+  font-weight: 820;
+}
+
+.rb-detail-premium .rb-detail-prediction-responsible-list span {
+  color: #849aa3;
+  font-size: 0.55rem;
+  line-height: 1.35;
+}
+
+.rb-detail-premium .rb-detail-prediction-side-card button,
+.rb-detail-premium .rb-detail-prediction-state button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 35px;
+  padding: 0 12px;
+  border: 1px solid rgba(45, 212, 191, 0.23);
+  border-radius: 9px;
+  background: rgba(6, 39, 46, 0.72);
+  color: #dcf8f4;
+  font-size: 0.61rem;
+  font-weight: 840;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease;
+}
+
+.rb-detail-premium .rb-detail-prediction-side-card button:hover,
+.rb-detail-premium .rb-detail-prediction-state button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(45, 212, 191, 0.54);
+  background: rgba(13, 148, 136, 0.13);
+}
+
+.rb-detail-premium .rb-detail-prediction-state {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 18px;
+  min-height: 190px;
+  padding: 24px;
+}
+
+.rb-detail-premium .rb-detail-prediction-state__icon {
+  display: grid;
+  place-items: center;
+  width: 60px;
+  height: 60px;
+  border: 1px solid rgba(45, 212, 191, 0.32);
+  border-radius: 50%;
+  background: rgba(5, 67, 68, 0.68);
+  color: var(--detail-teal);
+  box-shadow: 0 0 26px rgba(45, 212, 191, 0.1);
+}
+
+.rb-detail-premium .rb-detail-prediction-state--loading .rb-detail-prediction-state__icon,
+.rb-detail-premium .rb-detail-prediction-state--idle .rb-detail-prediction-state__icon {
+  animation: rb-detail-prediction-pulse 2.4s ease-in-out infinite;
+}
+
+.rb-detail-premium .rb-detail-prediction-state h2 {
+  margin: 7px 0 5px;
+  color: #fff;
+  font-size: 1.18rem;
+  font-weight: 900;
+}
+
+.rb-detail-premium .rb-detail-prediction-state p:not(.rb-detail-prediction-eyebrow) {
+  margin: 0;
+  color: #91a6af;
+  font-size: 0.72rem;
+  line-height: 1.55;
+}
+
+.rb-detail-premium .rb-detail-prediction-state button {
+  width: max-content;
+  margin-top: 13px;
+}
+
+@keyframes rb-detail-prediction-enter {
+  from { opacity: 0; transform: translateY(8px) scale(0.995); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes rb-detail-prediction-card-enter {
+  from { opacity: 0; transform: translateY(8px) scale(0.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes rb-detail-prediction-shimmer {
+  from { transform: rotate(8deg) translateX(-150%); }
+  to { transform: rotate(8deg) translateX(380%); }
+}
+
+@keyframes rb-detail-prediction-pulse {
+  0%, 100% { transform: scale(1); filter: brightness(1); }
+  50% { transform: scale(1.03); filter: brightness(1.1); }
+}
+
+@media (max-width: 1240px) {
+  .rb-detail-premium.rb-detail-v2--premium .rb-detail-prediction-layout {
+    grid-template-columns: minmax(0, 1fr) 286px !important;
+  }
+
+  .rb-detail-premium .rb-detail-prediction-decision {
+    grid-template-columns: minmax(0, 1fr) 150px;
+  }
+
+  .rb-detail-premium .rb-detail-prediction-explanation-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 1040px) {
+  .rb-detail-premium.rb-detail-v2--premium .rb-detail-prediction-layout {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .rb-detail-premium .rb-detail-prediction-layout .rb-detail-v2-side-column {
+    position: static;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .rb-detail-premium .rb-detail-prediction-signal-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .rb-detail-premium .rb-detail-prediction-decision {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 17px;
+  }
+
+  .rb-detail-premium .rb-detail-prediction-decision__visual {
+    display: none;
+  }
+
+  .rb-detail-premium .rb-detail-prediction-decision__bottomline {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .rb-detail-premium .rb-detail-prediction-signal-grid,
+  .rb-detail-premium .rb-detail-prediction-explanation-grid,
+  .rb-detail-premium .rb-detail-prediction-layout .rb-detail-v2-side-column {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 520px) {
+  .rb-detail-premium .rb-detail-prediction-decision__badges {
+    display: grid;
+    width: 100%;
+  }
+
+  .rb-detail-premium .rb-detail-prediction-decision__badges > span {
+    width: 100%;
+  }
+
+  .rb-detail-premium .rb-detail-prediction-signal-card__footer {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rb-detail-premium .rb-detail-prediction-overview,
+  .rb-detail-premium .rb-detail-prediction-explanations,
+  .rb-detail-premium .rb-detail-prediction-signal-card,
+  .rb-detail-premium .rb-detail-prediction-side-card,
+  .rb-detail-premium .rb-detail-prediction-decision::after,
+  .rb-detail-premium .rb-detail-prediction-decision__visual > span,
+  .rb-detail-premium .rb-detail-prediction-state__icon {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .rb-detail-premium .rb-detail-prediction-signal-card,
+  .rb-detail-premium .rb-detail-prediction-side-card,
+  .rb-detail-premium .rb-detail-prediction-side-card button,
+  .rb-detail-premium .rb-detail-prediction-state button {
+    transition: none !important;
+  }
+}
+
+/* Schéma de communication : MatchPredictionTab.tsx -> classes rb-detail-prediction-* -> décision, signaux, explications et sidebar de MatchDetailsScreen.tsx. */
+
+/* Correctif final Prédictions : les trois cartes occupent toute la largeur sous leur titre. */
+.rb-detail-premium .rb-detail-prediction-overview > .rb-detail-prediction-signals {
+  display: block !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  padding: 13px 15px 15px !important;
+}
+
+.rb-detail-premium .rb-detail-prediction-overview > .rb-detail-prediction-signals > .rb-detail-prediction-section-title {
+  display: flex !important;
+  width: 100% !important;
+  margin: 0 0 11px !important;
+}
+
+.rb-detail-premium .rb-detail-prediction-overview > .rb-detail-prediction-signals > .rb-detail-prediction-signal-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  gap: 13px !important;
+}
+
+.rb-detail-premium .rb-detail-prediction-overview .rb-detail-prediction-signal-card {
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 140px !important;
+  padding: 13px 15px !important;
+}
+
+.rb-detail-premium .rb-detail-prediction-overview .rb-detail-prediction-signal-card > header {
+  min-width: 0 !important;
+}
+
+.rb-detail-premium .rb-detail-prediction-overview .rb-detail-prediction-signal-card > header > div {
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+@media (max-width: 1040px) {
+  .rb-detail-premium .rb-detail-prediction-overview > .rb-detail-prediction-signals > .rb-detail-prediction-signal-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .rb-detail-premium .rb-detail-prediction-overview > .rb-detail-prediction-signals > .rb-detail-prediction-signal-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
+
+/* Schéma de communication : MatchPredictionTab.tsx -> rb-detail-prediction-signals -> trois cartes pleine largeur dans MatchDetailsScreen.css. */

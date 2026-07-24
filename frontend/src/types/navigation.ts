@@ -21,7 +21,6 @@ export const NAVIGATION_ITEMS: NavigationItem[] = [
   { id: "dashboard", label: "Accueil" },
   { id: "matches", label: "Matchs" },
   { id: "match-details", label: "Détail match", shortLabel: "Détail", requiresMatch: true },
-  { id: "predictions", label: "Prédictions", requiresMatch: true },
   { id: "recommendation", label: "Recommandation", shortLabel: "Sélection" },
   { id: "archives", label: "Archives" },
   { id: "resources", label: "Ressources" },
@@ -31,6 +30,6 @@ export const NAVIGATION_ITEMS: NavigationItem[] = [
 // navigation.ts
 // ├── fournit la liste des écrans disponibles dans RubyBets
 // ├── alimente TopNavigation.tsx pour afficher le menu principal simplifié
-// ├── conserve analysis pour l’accès interne depuis le détail match
+// ├── conserve analysis et predictions comme routes internes non affichées dans le menu principal
 // ├── ajoute archives comme nouvel écran de suivi des prédictions
 // └── regroupe glossaire et informations responsables dans resources
