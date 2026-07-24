@@ -1,8 +1,11 @@
 # Ce fichier vérifie la normalisation des noms et le filtrage du pipeline News RubyBets.
 # Il protège le cas des clubs FlashScore avec suffixe pays, tirets et variantes éditoriales.
 
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime
+import xml.etree.ElementTree as ET
 
+from app.services.google_news_rss_client import parse_google_news_item
+from app.services.news_article_content_service import extract_article_preview_image_url
 from app.services.news_nlp_service import (
     article_mentions_match_date,
     article_mentions_team,
@@ -76,18 +79,17 @@ def test_article_mentions_normalized_team_variants() -> None:
     assert article_mentions_team(article, "Shamrock Rovers (IRL)") is True
 
 
-# Cette fonction vérifie qu'une page de match récente est conservée et qu'une ancienne est rejetée.
-def test_filter_keeps_recent_match_page_and_rejects_old_article() -> None:
+# Cette fonction vérifie qu'une actualité éditoriale récente est conservée et qu'une page de score est rejetée.
+def test_filter_keeps_recent_editorial_news_and_rejects_score_page() -> None:
     recent_article = build_recent_article(
+        "Ararat Armenia squad update before Shamrock Rovers tie"
+    )
+    score_page = build_recent_article(
         "Ararat Armenia vs Shamrock Rovers Box Score - July 21, 2026"
     )
-    old_article = {
-        **build_recent_article("Ararat-Armenia historical fixtures"),
-        "published_at": (datetime.now(UTC) - timedelta(days=90)).isoformat(),
-    }
 
     articles = filter_and_enrich_team_news_articles(
-        articles=[old_article, recent_article],
+        articles=[score_page, recent_article],
         team_name="Ararat-Armenia (ARM)",
         competition_name="Champions League - Qualification - Quarter-finals",
     )
@@ -159,8 +161,8 @@ def test_competition_only_article_is_rejected_for_team() -> None:
     ) is False
 
 
-# Cette fonction vérifie qu'une page de match citant les deux équipes reste exploitable pour chacune.
-def test_match_page_mentioning_both_teams_is_kept() -> None:
+# Cette fonction vérifie qu'une page de score citant les deux équipes est exclue du contexte éditorial.
+def test_score_page_mentioning_both_teams_is_rejected() -> None:
     article = build_recent_article(
         "Ararat-Armenia vs Shamrock Rovers Box Score - July 21, 2026"
     )
@@ -169,10 +171,23 @@ def test_match_page_mentioning_both_teams_is_kept() -> None:
         article,
         team_name="Ararat-Armenia (ARM)",
         competition_name="Champions League - Qualification - Quarter-finals",
-    ) is True
+    ) is False
     assert is_exploitable_team_news_article(
         article,
         team_name="Shamrock Rovers (IRL)",
+        competition_name="Champions League - Qualification - Quarter-finals",
+    ) is False
+
+
+# Cette fonction vérifie qu'une actualité éditoriale liée directement aux deux équipes reste exploitable.
+def test_editorial_match_news_mentioning_both_teams_is_kept() -> None:
+    article = build_recent_article(
+        "Ararat-Armenia prepares for Shamrock Rovers after coach press conference"
+    )
+
+    assert is_exploitable_team_news_article(
+        article,
+        team_name="Ararat-Armenia (ARM)",
         competition_name="Champions League - Qualification - Quarter-finals",
     ) is True
 
@@ -196,7 +211,7 @@ def test_match_date_detection_supports_common_media_formats() -> None:
 # Cette fonction vérifie que l'affiche actuelle passe avant les nouvelles générales et les anciens adversaires.
 def test_current_match_articles_are_ranked_before_team_context() -> None:
     current_match = build_recent_article(
-        "Ararat-Armenia vs Shamrock Rovers Box Score - July 21, 2026"
+        "Ararat-Armenia vs Shamrock Rovers preview - July 21, 2026"
     )
     current_match_without_date = build_recent_article(
         "Ararat-Armenia vs Shamrock Rovers - beIN SPORTS"
@@ -205,7 +220,7 @@ def test_current_match_articles_are_ranked_before_team_context() -> None:
         "Ararat-Armenia prepares for the next Champions League round"
     )
     previous_opponent = build_recent_article(
-        "Riga vs Ararat-Armenia: UEFA Champions League stats and head-to-head"
+        "Riga vs Ararat-Armenia: coach reaction after qualifier"
     )
 
     articles = filter_and_enrich_team_news_articles(
@@ -313,6 +328,40 @@ def test_shared_match_articles_remain_visible_in_both_team_blocks(monkeypatch) -
     assert response["home_team"]["status"] == "available"
     assert response["away_team"]["status"] == "available"
     assert response["status"] == "available"
+    assert response["articles_count"] == 5
+
+
+# Cette fonction vérifie que l'image éventuellement incluse dans le HTML RSS est conservée.
+def test_google_news_item_extracts_rss_image() -> None:
+    item = ET.fromstring(
+        """
+        <item>
+          <title>Dinamo Zagreb squad update</title>
+          <description><![CDATA[<img src="https://cdn.example.com/news.jpg" />Article preview]]></description>
+          <link>https://news.google.com/articles/example</link>
+          <pubDate>Fri, 24 Jul 2026 10:00:00 GMT</pubDate>
+          <source url="https://example.com">Example Sports</source>
+        </item>
+        """
+    )
+
+    article = parse_google_news_item(item)
+
+    assert article["image_url"] == "https://cdn.example.com/news.jpg"
+
+
+# Cette fonction vérifie l'extraction d'une image Open Graph depuis une page éditeur.
+def test_article_preview_extracts_open_graph_image() -> None:
+    html = """
+    <html><head>
+      <meta property="og:image" content="/media/match-preview.webp" />
+    </head><body>Article</body></html>
+    """
+
+    assert extract_article_preview_image_url(
+        html,
+        "https://publisher.example.com/news/story",
+    ) == "https://publisher.example.com/media/match-preview.webp"
 
 
 # Cette fonction vérifie qu'un bloc disponible sans article est normalisé en état vide.

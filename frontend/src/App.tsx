@@ -1,6 +1,6 @@
 // Ce fichier pilote la navigation multi-écrans MVP de RubyBets en conservant les appels API et composants existants.
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import "./App.css";
 import "./styles/MatchDetailsScreen.css";
 import {
@@ -30,6 +30,7 @@ import type {
   MatchContextResponse,
   MatchDetailsResponse,
   MatchLineupsResponse,
+  MatchNewsContextLoadState,
   MatchNewsContextResponse,
   MatchPredictionsResponse,
   NationalMlPredictionResponse,
@@ -74,6 +75,7 @@ function App() {
   const initialLoadStarted = useRef<boolean>(false);
   const matchLoadRequestId = useRef<number>(0);
   const selectedMatchLoadRequestId = useRef<number>(0);
+  const matchNewsContextAbortRef = useRef<AbortController | null>(null);
 
   // États liés au match sélectionné.
   const [selectedMatchDetails, setSelectedMatchDetails] =
@@ -93,6 +95,9 @@ function App() {
 
   const [selectedMatchNewsContext, setSelectedMatchNewsContext] =
     useState<MatchNewsContextResponse | null>(null);
+
+  const [matchNewsContextLoadState, setMatchNewsContextLoadState] =
+    useState<MatchNewsContextLoadState>("idle");
 
   const [selectedNationalMlPrediction, setSelectedNationalMlPrediction] =
     useState<NationalMlPredictionResponse | null>(null);
@@ -197,12 +202,15 @@ function App() {
   // Réinitialise les données qui dépendent de la compétition active.
   function resetCompetitionDependentState() {
     selectedMatchLoadRequestId.current += 1;
+    matchNewsContextAbortRef.current?.abort();
+    matchNewsContextAbortRef.current = null;
     setSelectedMatchDetails(null);
     setSelectedMatchContext(null);
     setSelectedMatchAnalysis(null);
     setSelectedMatchPredictions(null);
     setSelectedMatchLineups(null);
     setSelectedMatchNewsContext(null);
+    setMatchNewsContextLoadState("idle");
     setSelectedNationalMlPrediction(null);
     setSelectedTeamHistory(null);
     setSelectedMatchAdvancedStats(null);
@@ -214,7 +222,7 @@ function App() {
     setMatchAnalysisStatus("Aucune analyse chargée");
     setMatchPredictionsStatus("Aucune prédiction chargée");
     setMatchLineupsStatus("Aucune composition chargée");
-    setMatchNewsContextStatus("Aucune actualité contextuelle chargée");
+    setMatchNewsContextStatus("Actualités disponibles à la demande");
     setTeamHistoryStatus("Aucun historique d’équipe chargé");
     setMatchAdvancedStatsStatus("Statistiques avancées non chargées");
     setV19ProductStatus("Aucune décision produit V19 chargée");
@@ -416,12 +424,87 @@ function App() {
     };
   }
 
+  // Charge les actualités uniquement lorsque l'utilisateur ouvre l'onglet Contexte.
+  const handleLoadMatchNewsContext = useCallback(
+    (matchId: number) => {
+      if (
+        selectedMatchNewsContext?.match_id === matchId ||
+        (matchNewsContextLoadState === "loading" &&
+          matchNewsContextAbortRef.current)
+      ) {
+        return;
+      }
+
+      const requestId = selectedMatchLoadRequestId.current;
+      const controller = new AbortController();
+
+      matchNewsContextAbortRef.current?.abort();
+      matchNewsContextAbortRef.current = controller;
+      setSelectedMatchNewsContext(null);
+      setMatchNewsContextLoadState("loading");
+      setMatchNewsContextStatus("Recherche des actualités utiles au match...");
+
+      void getMatchNewsContext(matchId, controller.signal)
+        .then((data) => {
+          if (
+            controller.signal.aborted ||
+            !isCurrentSelectedMatchRequest(requestId)
+          ) {
+            return;
+          }
+
+          setSelectedMatchNewsContext(data);
+          setMatchNewsContextLoadState("success");
+          setMatchNewsContextStatus("Actualités du match chargées");
+        })
+        .catch((error: unknown) => {
+          if (
+            controller.signal.aborted ||
+            (error instanceof DOMException && error.name === "AbortError") ||
+            !isCurrentSelectedMatchRequest(requestId)
+          ) {
+            return;
+          }
+
+          setSelectedMatchNewsContext(null);
+          setMatchNewsContextLoadState("error");
+          setMatchNewsContextStatus(
+            "La récupération des actualités est temporairement impossible."
+          );
+        })
+        .finally(() => {
+          if (matchNewsContextAbortRef.current === controller) {
+            matchNewsContextAbortRef.current = null;
+          }
+        });
+    },
+    [matchNewsContextLoadState, selectedMatchNewsContext]
+  );
+
+  // Annule uniquement une recherche d'actualités encore active lorsque l'onglet Contexte est quitté.
+  const handleCancelMatchNewsContext = useCallback(() => {
+    const activeController = matchNewsContextAbortRef.current;
+
+    if (!activeController) {
+      return;
+    }
+
+    activeController.abort();
+    matchNewsContextAbortRef.current = null;
+    setMatchNewsContextLoadState((currentState) =>
+      currentState === "loading" ? "idle" : currentState
+    );
+    setMatchNewsContextStatus("Actualités disponibles à la demande");
+  }, []);
+
   // Charge chaque bloc du match indépendamment pour afficher la fiche sans attendre l’appel le plus lent.
   function handleSelectMatch(matchId: number) {
     const requestId = selectedMatchLoadRequestId.current + 1;
     const optimisticMatchDetails = buildOptimisticMatchDetails(matchId);
 
     selectedMatchLoadRequestId.current = requestId;
+    matchNewsContextAbortRef.current?.abort();
+    matchNewsContextAbortRef.current = null;
     setCurrentScreen("match-details");
 
     setSelectedMatchDetails(optimisticMatchDetails);
@@ -430,6 +513,7 @@ function App() {
     setSelectedMatchPredictions(null);
     setSelectedMatchLineups(null);
     setSelectedMatchNewsContext(null);
+    setMatchNewsContextLoadState("idle");
     setSelectedNationalMlPrediction(null);
     setSelectedTeamHistory(null);
     setSelectedMatchAdvancedStats(null);
@@ -440,7 +524,7 @@ function App() {
     setMatchAnalysisStatus("Chargement de l’analyse pré-match...");
     setMatchPredictionsStatus("Chargement des prédictions...");
     setMatchLineupsStatus("Chargement des compositions probables...");
-    setMatchNewsContextStatus("Chargement des actualités contextuelles...");
+    setMatchNewsContextStatus("Actualités disponibles à la demande");
     setTeamHistoryStatus("Chargement de l’historique des équipes...");
     setMatchAdvancedStatsStatus("Statistiques avancées prêtes à être chargées");
     setV19ProductStatus("Chargement de la décision produit V19...");
@@ -535,24 +619,6 @@ function App() {
 
         setSelectedMatchLineups(null);
         setMatchLineupsStatus("Impossible de charger les compositions");
-      });
-
-    void getMatchNewsContext(matchId)
-      .then((data) => {
-        if (!isCurrentSelectedMatchRequest(requestId)) {
-          return;
-        }
-
-        setSelectedMatchNewsContext(data);
-        setMatchNewsContextStatus("Actualités contextuelles chargées");
-      })
-      .catch(() => {
-        if (!isCurrentSelectedMatchRequest(requestId)) {
-          return;
-        }
-
-        setSelectedMatchNewsContext(null);
-        setMatchNewsContextStatus("Impossible de charger les actualités contextuelles");
       });
 
     void getNationalDynamicPredictionByRubyBetsMatchId(matchId)
@@ -749,9 +815,12 @@ function App() {
           matchAdvancedStatsStatus={matchAdvancedStatsStatus}
           matchLineupsStatus={matchLineupsStatus}
           matchNewsContextStatus={matchNewsContextStatus}
+          matchNewsContextLoadState={matchNewsContextLoadState}
           teamHistoryStatus={teamHistoryStatus}
           v19ProductStatus={v19ProductStatus}
           onRequestAdvancedStats={handleLoadMatchAdvancedStats}
+          onRequestNewsContext={handleLoadMatchNewsContext}
+          onCancelNewsContext={handleCancelMatchNewsContext}
           onNavigate={setCurrentScreen}
         />
       );

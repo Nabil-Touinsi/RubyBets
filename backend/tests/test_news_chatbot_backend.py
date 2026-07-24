@@ -31,6 +31,7 @@ from app.services.match_news_chatbot_service import (
     build_news_chatbot_messages,
     clean_local_news_chatbot_candidate,
     clear_news_chatbot_cache,
+    get_prepared_news_chatbot_articles,
     is_news_chatbot_outcome_question,
     merge_team_articles_for_chatbot,
     sanitize_uncited_news_chatbot_factual_claims,
@@ -49,6 +50,7 @@ from app.services.news_article_content_service import (
     limit_article_text,
     resolve_google_news_publisher_url,
 )
+from app.services.team_news_context_service import store_match_news_selected_articles
 from app.services.news_chatbot_summarization_service import (
     build_fast_question_article_digests,
     build_fast_summary_article_digests,
@@ -65,6 +67,61 @@ FAKE_MATCH = {
     "home_team": {"name": "Ararat-Armenia (ARM)"},
     "away_team": {"name": "Shamrock Rovers (IRL)"},
 }
+
+
+# Ce test vérifie que Ruby réutilise la sélection déjà chargée par l'onglet Contexte.
+def test_chatbot_reuses_news_context_selection_cache(monkeypatch) -> None:
+    clear_news_chatbot_cache()
+    selected_article = {
+        "title": "Ararat-Armenia prepares for Shamrock Rovers",
+        "description": "Conference de presse et groupe retenu avant le match.",
+        "url": "https://publisher.example.com/context",
+        "resolved_url": "https://publisher.example.com/context",
+        "source_name": "Publisher",
+        "published_at": "2026-07-20T10:00:00+00:00",
+        "team_detected": "Ararat-Armenia (ARM)",
+        "teams_detected": ["Ararat-Armenia (ARM)"],
+    }
+    store_match_news_selected_articles(42, FAKE_MATCH, [selected_article])
+
+    # Ce faux sélecteur échoue si le chatbot tente malgré tout de relancer Google News.
+    def fail_if_rss_selection_runs(_match):
+        raise AssertionError("Le pipeline RSS ne doit pas être relancé.")
+
+    # Ce faux extracteur simule le contenu public obtenu depuis l'éditeur déjà résolu.
+    async def fake_fetch_content(articles):
+        return [
+            {
+                **article,
+                "content": "Contenu public suffisamment détaillé pour Ruby.",
+                "content_status": "full",
+                "citation_eligible": True,
+            }
+            for article in articles
+        ]
+
+    monkeypatch.setattr(
+        "app.services.match_news_chatbot_service.build_news_chatbot_selected_articles",
+        fail_if_rss_selection_runs,
+    )
+    monkeypatch.setattr(
+        "app.services.match_news_chatbot_service.fetch_chatbot_articles_content",
+        fake_fetch_content,
+    )
+
+    articles, fingerprint, from_prepared_cache = asyncio.run(
+    get_prepared_news_chatbot_articles(
+        42,
+        FAKE_MATCH,
+        )
+    )
+
+    assert from_prepared_cache is False
+    assert len(articles) == 1
+    assert articles[0]["article_id"] == "NEWS-01"
+    assert articles[0]["title"] == selected_article["title"]
+    assert fingerprint
+
 
 
 # Cette fonction construit un article chatbot contrôlé pour les tests unitaires.
@@ -501,6 +558,64 @@ def test_fetch_full_article_content_decodes_google_news_before_extraction(
                     "url": google_url,
                     "team_detected": "Ararat-Armenia (ARM)",
                     "teams_detected": ["Ararat-Armenia (ARM)"],
+                },
+                client=client,
+            )
+
+    result = asyncio.run(execute_test())
+
+    assert result["content_status"] == "full"
+    assert result["resolved_url"] == publisher_url
+    assert "Shamrock Rovers" in result["content"]
+
+
+# Cette fonction vérifie que Ruby réutilise l'URL éditeur déjà résolue par l'onglet Contexte.
+def test_fetch_full_article_content_reuses_preview_resolved_url(monkeypatch) -> None:
+    google_url = "https://news.google.com/rss/articles/AU_yqL-preview?oc=5"
+    publisher_url = "https://publisher.example/sport/ararat-shamrock"
+    article_html = (
+        "<html><body><article><h1>Ararat-Armenia squad update</h1><p>"
+        + (
+            "Ararat-Armenia prépare le match contre Shamrock Rovers "
+            "avec un groupe presque complet. "
+        ) * 20
+        + "</p></article></body></html>"
+    )
+
+    # Ce faux décodeur échoue si le service tente inutilement de décoder à nouveau Google News.
+    def forbidden_decoder(_source_url: str) -> dict:
+        raise AssertionError("Le lien éditeur déjà résolu doit être réutilisé.")
+
+    monkeypatch.setattr(
+        "app.services.news_article_content_service.new_decoderv1",
+        forbidden_decoder,
+    )
+
+    # Ce transport autorise uniquement le téléchargement de la page éditeur déjà connue.
+    def handler(request: httpx.Request) -> httpx.Response:
+        assert str(request.url) == publisher_url
+        return httpx.Response(
+            200,
+            headers={"content-type": "text/html; charset=utf-8"},
+            text=article_html,
+            request=request,
+        )
+
+    # Cette coroutine exécute l'extraction avec le lien éditeur transmis par le contexte.
+    async def execute_test() -> dict:
+        async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+            return await fetch_full_article_content(
+                {
+                    "article_id": "NEWS-01",
+                    "title": "Ararat-Armenia squad update",
+                    "description": "Extrait RSS",
+                    "url": google_url,
+                    "resolved_url": publisher_url,
+                    "team_detected": "Ararat-Armenia (ARM)",
+                    "teams_detected": [
+                        "Ararat-Armenia (ARM)",
+                        "Shamrock Rovers (IRL)",
+                    ],
                 },
                 client=client,
             )

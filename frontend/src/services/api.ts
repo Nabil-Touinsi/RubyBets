@@ -93,11 +93,13 @@ export async function getMatchContext(
 
 // Cette fonction récupère les actualités publiques récentes liées aux deux équipes d'un match.
 export async function getMatchNewsContext(
-  matchId: number
+  matchId: number,
+  signal?: AbortSignal
 ): Promise<MatchNewsContextResponse> {
   return fetchJson<MatchNewsContextResponse>(
     `/api/matches/${matchId}/news-context`,
-    "Erreur lors du chargement des actualités contextuelles du match."
+    "Erreur lors du chargement des actualités contextuelles du match.",
+    { signal }
   );
 }
 
@@ -144,6 +146,24 @@ function getRubyApiErrorDetails(payload: unknown): {
   return { message, code };
 }
 
+// Cette fonction vérifie les champs indispensables d'une réponse Ruby avant son affichage.
+function isNewsChatbotResponse(payload: unknown): payload is NewsChatbotResponse {
+  if (!payload || typeof payload !== "object") {
+    return false;
+  }
+
+  const candidate = payload as Partial<NewsChatbotResponse>;
+  return (
+    typeof candidate.status === "string" &&
+    typeof candidate.match_id === "number" &&
+    (candidate.mode === "summary" || candidate.mode === "question") &&
+    typeof candidate.answer === "string" &&
+    Array.isArray(candidate.sources) &&
+    typeof candidate.generated_at === "string" &&
+    Array.isArray(candidate.limitations)
+  );
+}
+
 // Cette fonction demande à Ruby de résumer les actualités d'un match ou de répondre à une question.
 export async function askRubyAboutMatchNews(
   matchId: number,
@@ -173,7 +193,15 @@ export async function askRubyAboutMatchNews(
     );
   }
 
-  return payload as NewsChatbotResponse;
+  if (!isNewsChatbotResponse(payload)) {
+    throw new RubyNewsChatApiError(
+      "Ruby a reçu une réponse incomplète. Tu peux relancer la demande.",
+      502,
+      "INVALID_RESPONSE"
+    );
+  }
+
+  return payload;
 }
 
 // Cette fonction récupère l'historique récent des deux équipes pour alimenter la fiche détail match.

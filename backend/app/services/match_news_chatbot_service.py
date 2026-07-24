@@ -31,9 +31,11 @@ from app.services.team_news_context_service import (
     build_article_deduplication_key,
     build_match_news_query,
     build_team_news_block,
+    clear_match_news_selection_cache,
     extract_competition_name_from_match,
     extract_match_utc_date_from_match,
     extract_team_name_from_match,
+    get_cached_match_news_selected_articles,
 )
 
 
@@ -76,6 +78,7 @@ def clear_news_chatbot_cache() -> None:
     _CHATBOT_ARTICLE_CACHE.clear()
     _CHATBOT_SUMMARY_CACHE.clear()
     clear_news_chatbot_article_digest_cache()
+    clear_match_news_selection_cache()
 
 
 # Cette fonction construit une clé stable à partir du match et de ses métadonnées utiles.
@@ -215,10 +218,18 @@ async def get_prepared_news_chatbot_articles(
             True,
         )
 
-    selected_articles = await asyncio.to_thread(
-        build_news_chatbot_selected_articles,
-        match,
-    )
+    selected_articles = get_cached_match_news_selected_articles(match_id, match)
+    selection_from_context_cache = selected_articles is not None
+
+    if selected_articles is None:
+        selected_articles = await asyncio.to_thread(
+            build_news_chatbot_selected_articles,
+            match,
+        )
+
+    for index, article in enumerate(selected_articles, start=1):
+        article["article_id"] = f"NEWS-{index:02d}"
+
     prepared_articles = await fetch_chatbot_articles_content(selected_articles)
     fingerprint = build_news_chatbot_articles_fingerprint(prepared_articles)
     expires_at = datetime.now(UTC) + timedelta(
@@ -231,9 +242,10 @@ async def get_prepared_news_chatbot_articles(
     }
 
     LOGGER.info(
-        "News chatbot articles prepared: match_id=%s articles=%s fingerprint=%s",
+        "News chatbot articles prepared: match_id=%s articles=%s context_cache=%s fingerprint=%s",
         match_id,
         len(prepared_articles),
+        selection_from_context_cache,
         fingerprint[:12],
     )
     return prepared_articles, fingerprint, False

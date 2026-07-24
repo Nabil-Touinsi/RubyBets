@@ -146,6 +146,9 @@ export type TeamNewsArticle = {
   title: string | null;
   description: string | null;
   url: string | null;
+  resolved_url?: string | null;
+  image_url?: string | null;
+  preview_status?: "available" | "partial" | "unavailable" | string;
   source_name: string | null;
   source_url: string | null;
   published_at: string | null;
@@ -153,12 +156,14 @@ export type TeamNewsArticle = {
   category_label: string;
   relevance: "low" | "medium" | "high" | string;
   team_detected: string | null;
+  teams_detected?: string[];
 };
 
 // Ce type décrit le bloc d'actualités associé à une équipe.
 export type TeamNewsBlock = {
   name: string | null;
   query: string | null;
+  queries?: string[];
   status: "available" | "partial" | "empty" | "unavailable" | string;
   articles_count: number;
   articles: TeamNewsArticle[];
@@ -174,10 +179,13 @@ export type MatchNewsContextResponse = {
   match_id: number;
   competition: string | null;
   generated_at: string;
+  articles_count?: number;
+  articles?: TeamNewsArticle[];
   home_team: TeamNewsBlock;
   away_team: TeamNewsBlock;
   empty_state: string | null;
   limits: string[];
+  ai_context?: unknown;
   match?: Match;
   data_used?: {
     match_details: boolean;
@@ -191,6 +199,13 @@ export type MatchNewsContextResponse = {
   };
   fallback_available?: boolean;
 };
+
+// Ce type distingue les états visibles du chargement différé des actualités du match.
+export type MatchNewsContextLoadState =
+  | "idle"
+  | "loading"
+  | "success"
+  | "error";
 
 // Ce type décrit les deux actions que Ruby peut envoyer au chatbot d'actualités du backend.
 export type NewsChatbotMode = "summary" | "question";

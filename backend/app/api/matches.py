@@ -40,7 +40,9 @@ from app.services.rapidapi_flashscore_client import (
     get_normalized_flashscore_matches_by_day,
 )
 from app.services.team_history_service import build_team_history_response
-from app.services.team_news_context_service import build_match_news_context_response
+from app.services.team_news_context_service import (
+    build_enriched_match_news_context_response,
+)
 
 
 router = APIRouter(prefix="/api/matches", tags=["Matches"])
@@ -708,7 +710,7 @@ async def get_match_news_context(match_id: int) -> dict[str, Any]:
         match, flashscore_metadata, flashscore_freshness = get_cached_flashscore_match_detail(match_id)
 
         if match and flashscore_metadata.get("status") == "success":
-            news_context = build_match_news_context_response(
+            news_context = await build_enriched_match_news_context_response(
                 match_id=match_id,
                 match=match,
             )
@@ -742,7 +744,7 @@ async def get_match_news_context(match_id: int) -> dict[str, Any]:
     )
     match = data.get("match", data)
 
-    news_context = build_match_news_context_response(
+    news_context = await build_enriched_match_news_context_response(
         match_id=match_id,
         match=match,
     )

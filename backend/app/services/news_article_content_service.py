@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 import asyncio
+from html.parser import HTMLParser
 from ipaddress import ip_address
 import logging
 import re
@@ -63,6 +64,43 @@ ARTICLE_RELEVANCE_STOPWORDS = {
 }
 
 
+class ArticlePreviewMetadataParser(HTMLParser):
+    """Extrait uniquement les métadonnées publiques utiles à l'aperçu d'un article."""
+
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self.image_candidates: list[str] = []
+
+    # Cette méthode collecte les images déclarées dans les métadonnées Open Graph ou Twitter.
+    def handle_starttag(
+        self,
+        tag: str,
+        attrs: list[tuple[str, str | None]],
+    ) -> None:
+        if tag.lower() != "meta":
+            return
+
+        attributes = {
+            str(name or "").lower(): str(value or "").strip()
+            for name, value in attrs
+        }
+        property_name = (
+            attributes.get("property")
+            or attributes.get("name")
+            or ""
+        ).lower()
+        content = attributes.get("content")
+
+        if property_name in {
+            "og:image",
+            "og:image:url",
+            "og:image:secure_url",
+            "twitter:image",
+            "twitter:image:src",
+        } and content:
+            self.image_candidates.append(content)
+
+
 # Cette fonction vérifie qu'une URL publique peut être téléchargée sans cible locale évidente.
 def is_safe_public_article_url(url: str | None) -> bool:
     parsed_url = urlparse(str(url or "").strip())
@@ -87,6 +125,44 @@ def is_safe_public_article_url(url: str | None) -> bool:
         or host_ip.is_reserved
         or host_ip.is_unspecified
     )
+
+
+# Cette fonction transforme une URL d'image relative en URL publique absolue et sûre.
+def normalize_public_preview_image_url(
+    image_url: str | None,
+    page_url: str | None,
+) -> str | None:
+    raw_image_url = str(image_url or "").strip()
+
+    if not raw_image_url:
+        return None
+
+    absolute_image_url = urljoin(str(page_url or ""), raw_image_url)
+
+    if not is_safe_public_article_url(absolute_image_url):
+        return None
+
+    return absolute_image_url
+
+
+# Cette fonction extrait l'image éditoriale principale déclarée dans une page HTML publique.
+def extract_article_preview_image_url(
+    html: str,
+    page_url: str | None = None,
+) -> str | None:
+    parser = ArticlePreviewMetadataParser()
+
+    try:
+        parser.feed(html)
+    except (UnicodeError, ValueError):
+        return None
+
+    for candidate_url in parser.image_candidates:
+        normalized_url = normalize_public_preview_image_url(candidate_url, page_url)
+        if normalized_url:
+            return normalized_url
+
+    return None
 
 
 # Cette fonction indique si une URL appartient au relais public Google News.
@@ -388,12 +464,121 @@ async def fetch_safe_public_response(
     raise ValueError("Nombre maximal de redirections dépassé.")
 
 
+# Cette fonction résout l'éditeur et récupère uniquement l'image principale d'un article sélectionné.
+async def fetch_article_preview_metadata(
+    article: dict[str, Any],
+    client: httpx.AsyncClient,
+) -> dict[str, Any]:
+    article_url = str(article.get("url") or "").strip()
+    rss_image_url = normalize_public_preview_image_url(
+        article.get("image_url"),
+        article_url,
+    )
+
+    if not is_safe_public_article_url(article_url):
+        return {
+            **article,
+            "resolved_url": article_url or None,
+            "image_url": rss_image_url,
+            "preview_status": "partial" if rss_image_url else "unavailable",
+        }
+
+    resolved_article_url = article_url
+
+    try:
+        if is_google_news_article_url(article_url):
+            publisher_url = await resolve_google_news_publisher_url(article_url)
+
+            if publisher_url and is_resolved_article_url_coherent(article, publisher_url):
+                resolved_article_url = publisher_url
+
+        if is_google_intermediary_url(resolved_article_url):
+            return {
+                **article,
+                "resolved_url": article_url,
+                "image_url": rss_image_url,
+                "preview_status": "partial" if rss_image_url else "unavailable",
+            }
+
+        response = await fetch_safe_public_response(client, resolved_article_url)
+        response.raise_for_status()
+        final_url = str(response.url)
+
+        if len(response.content) > NEWS_ARTICLE_MAX_RESPONSE_BYTES:
+            return {
+                **article,
+                "resolved_url": final_url,
+                "image_url": rss_image_url,
+                "preview_status": "partial" if rss_image_url else "unavailable",
+            }
+
+        content_type = response.headers.get("content-type", "").lower()
+        html_image_url = (
+            extract_article_preview_image_url(response.text, final_url)
+            if "html" in content_type or content_type.startswith("text/")
+            else None
+        )
+
+        return {
+            **article,
+            "resolved_url": final_url,
+            "image_url": html_image_url or rss_image_url,
+            "preview_status": "available" if html_image_url or rss_image_url else "partial",
+        }
+
+    except (httpx.HTTPStatusError, httpx.RequestError, UnicodeError, ValueError):
+        LOGGER.info(
+            "Aperçu article non récupéré: domain=%s",
+            urlparse(article_url).hostname,
+        )
+        return {
+            **article,
+            "resolved_url": resolved_article_url,
+            "image_url": rss_image_url,
+            "preview_status": "partial" if rss_image_url else "unavailable",
+        }
+
+
+# Cette fonction enrichit plusieurs articles avec leurs URL éditeur et images sans bloquer la boucle API.
+async def fetch_news_context_article_previews(
+    articles: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    if not articles:
+        return []
+
+    semaphore = asyncio.Semaphore(NEWS_ARTICLE_FETCH_CONCURRENCY)
+
+    async with httpx.AsyncClient(
+        timeout=httpx.Timeout(settings.news_chatbot_article_timeout_seconds),
+        headers={"User-Agent": NEWS_ARTICLE_USER_AGENT},
+    ) as client:
+
+        # Cette fonction interne limite le nombre de pages d'aperçu téléchargées simultanément.
+        async def fetch_with_limit(article: dict[str, Any]) -> dict[str, Any]:
+            async with semaphore:
+                return await fetch_article_preview_metadata(article, client)
+
+        return await asyncio.gather(
+            *(fetch_with_limit(article) for article in articles)
+        )
+
+
 # Cette fonction télécharge puis extrait un article public déjà retenu par le pipeline News.
 async def fetch_full_article_content(
     article: dict[str, Any],
     client: httpx.AsyncClient | None = None,
 ) -> dict[str, Any]:
-    article_url = str(article.get("url") or "").strip()
+    source_article_url = str(article.get("url") or "").strip()
+    preview_resolved_url = str(article.get("resolved_url") or "").strip()
+    article_url = source_article_url
+
+    if (
+        preview_resolved_url
+        and is_safe_public_article_url(preview_resolved_url)
+        and not is_google_intermediary_url(preview_resolved_url)
+        and is_resolved_article_url_coherent(article, preview_resolved_url)
+    ):
+        article_url = preview_resolved_url
 
     if not is_safe_public_article_url(article_url):
         return build_rss_fallback_content(

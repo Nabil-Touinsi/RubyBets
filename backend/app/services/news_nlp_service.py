@@ -98,10 +98,6 @@ RELEVANCE_KEYWORDS = [
     "fixture",
     "match",
     "preview",
-    "live score",
-    "box score",
-    "match stats",
-    "head to head",
     "opponent",
     "qualifying",
     "qualification",
@@ -135,6 +131,23 @@ MATCH_PAGE_KEYWORDS = [
     "match stats",
     "head to head",
     "prediction tips",
+]
+EXCLUDED_LOW_VALUE_PAGE_KEYWORDS = [
+    "box score",
+    "boxscore",
+    "live score",
+    "match stats",
+    "head to head",
+    "scoring stats",
+    "qualifying results",
+    "season results",
+    "fixtures and results",
+    "schedule and results",
+    "standings table",
+    "accreditation",
+    "accreditations",
+    "ticket information",
+    "ticketing",
 ]
 NEWS_MONTH_NUMBERS = {
     "january": 1,
@@ -401,6 +414,15 @@ def is_generic_score_source(article: dict[str, Any]) -> bool:
     )
 
 
+# Cette fonction exclut les pages de score, résultats ou logistique qui répètent les autres onglets.
+def is_low_value_context_page(article: dict[str, Any]) -> bool:
+    article_text = build_article_text(article)
+    return any(
+        normalize_news_text(keyword) in article_text
+        for keyword in EXCLUDED_LOW_VALUE_PAGE_KEYWORDS
+    )
+
+
 # Cette fonction vérifie si l'article est récent selon sa date de publication.
 def is_recent_news_article(article: dict[str, Any]) -> bool:
     published_at = article.get("published_at")
@@ -491,6 +513,9 @@ def is_exploitable_team_news_article(
     if is_generic_score_source(article):
         return False
 
+    if is_low_value_context_page(article):
+        return False
+
     if not is_recent_news_article(article):
         return False
 
@@ -531,6 +556,8 @@ def enrich_news_article(
         "source_name": article.get("source_name"),
         "source_url": article.get("source_url"),
         "published_at": article.get("published_at"),
+        "image_url": article.get("image_url"),
+        "resolved_url": article.get("resolved_url"),
         "category": category,
         "category_label": NEWS_CATEGORY_LABELS.get(category, "Autre"),
         "relevance": relevance,

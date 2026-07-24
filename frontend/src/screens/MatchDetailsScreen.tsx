@@ -1,6 +1,6 @@
 // Ce fichier affiche l’écran Détail match de RubyBets sous forme de fiche premium avant-match.
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { CSSProperties, ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
 import {
@@ -40,6 +40,7 @@ import type {
   MatchLineupReferenceMatch,
   MatchLineupSide,
   MatchLineupsResponse,
+  MatchNewsContextLoadState,
   MatchNewsContextResponse,
   MatchDetailsResponse,
   Team,
@@ -76,9 +77,12 @@ type MatchDetailsScreenProps = {
   matchAdvancedStatsStatus: string;
   matchLineupsStatus: string;
   matchNewsContextStatus: string;
+  matchNewsContextLoadState: MatchNewsContextLoadState;
   teamHistoryStatus: string;
   v19ProductStatus: string;
   onRequestAdvancedStats: (matchId: number) => void;
+  onRequestNewsContext: (matchId: number) => void;
+  onCancelNewsContext: () => void;
   onNavigate: (screen: AppScreen) => void;
 };
 
@@ -4106,8 +4110,11 @@ function MatchDetailsScreen({
   matchAdvancedStatsStatus,
   matchLineupsStatus,
   matchNewsContextStatus,
+  matchNewsContextLoadState,
   teamHistoryStatus,
   onRequestAdvancedStats,
+  onRequestNewsContext,
+  onCancelNewsContext,
   onNavigate,
 }: MatchDetailsScreenProps) {
   const [activeTab, setActiveTab] = useState<DetailTabKey>("overview");
@@ -4118,12 +4125,35 @@ function MatchDetailsScreen({
 
   // Cette fonction active un onglet et déclenche les statistiques avancées uniquement lorsqu'elles sont nécessaires.
   function handleSelectDetailTab(tabKey: DetailTabKey) {
+    if (activeTab === "context" && tabKey !== "context") {
+      onCancelNewsContext();
+    }
+
     setActiveTab(tabKey);
 
     if (tabKey === "analysis" && selectedMatch) {
       onRequestAdvancedStats(selectedMatch.id);
     }
   }
+
+  // Cet effet annule une recherche encore active si la fiche Détail match est démontée.
+  useEffect(() => () => onCancelNewsContext(), [onCancelNewsContext]);
+
+  // Cet effet charge les actualités une seule fois lorsque l'onglet Contexte devient visible.
+  useEffect(() => {
+    if (
+      activeTab === "context" &&
+      selectedMatch &&
+      matchNewsContextLoadState === "idle"
+    ) {
+      onRequestNewsContext(selectedMatch.id);
+    }
+  }, [
+    activeTab,
+    matchNewsContextLoadState,
+    onRequestNewsContext,
+    selectedMatch,
+  ]);
 
   if (!selectedMatch) {
     return (
@@ -4164,7 +4194,11 @@ function MatchDetailsScreen({
       <MatchHero match={selectedMatch} matchContext={matchContext} />
       <DetailTabs activeTab={activeTab} onSelectTab={handleSelectDetailTab} />
 
-      <main className="rb-detail-v2-layout">
+      <main
+        className={`rb-detail-v2-layout${
+          activeTab === "context" ? " rb-detail-context-layout" : ""
+        }`}
+      >
         <section
           key={activeTab}
           className={`rb-detail-v2-main-column rb-detail-v2-main-column--${activeTab}`}
@@ -4212,8 +4246,12 @@ function MatchDetailsScreen({
 
           {activeTab === "context" ? (
             <MatchNewsContextSection
+              key={selectedMatch.id}
+              match={selectedMatch}
               matchNewsContext={matchNewsContext}
               matchNewsContextStatus={matchNewsContextStatus}
+              loadState={matchNewsContextLoadState}
+              onRetry={() => onRequestNewsContext(selectedMatch.id)}
             />
           ) : null}
 
@@ -4227,6 +4265,16 @@ function MatchDetailsScreen({
             key={selectedMatch.id}
             matchId={selectedMatch.id}
             isVisible={activeTab === "context"}
+            availableArticlesCount={
+              matchNewsContext?.articles_count ??
+              matchNewsContext?.articles?.length ??
+              0
+            }
+            newsContextStatus={
+              matchNewsContextLoadState === "loading"
+                ? "loading"
+                : matchNewsContext?.status ?? matchNewsContextLoadState
+            }
           />
 
           {activeTab === "headToHead" ? (

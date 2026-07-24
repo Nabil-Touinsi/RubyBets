@@ -3,7 +3,9 @@
 # Il récupère plusieurs flux RSS par équipe, filtre les articles,
 # prépare une réponse API responsable et ajoute une lecture IA optionnelle.
 
-from datetime import UTC, datetime
+import asyncio
+from concurrent.futures import ThreadPoolExecutor
+from datetime import UTC, datetime, timedelta
 import re
 from typing import Any
 
@@ -11,17 +13,22 @@ from app.services.google_news_rss_client import (
     GOOGLE_NEWS_RSS_SOURCE,
     fetch_google_news_rss_articles,
 )
+from app.core.config import settings
 from app.services.news_context_ai_service import build_match_news_ai_context
+from app.services.news_article_content_service import fetch_news_context_article_previews
 from app.services.news_nlp_service import (
     filter_and_enrich_team_news_articles,
     normalize_news_text,
+    shorten_news_description,
 )
 
 
 TEAM_NEWS_CONTEXT_MAX_ARTICLES_PER_TEAM = 5
+MATCH_NEWS_CONTEXT_MAX_ARTICLES = 5
 TEAM_NEWS_CONTEXT_MAX_RAW_ARTICLES = 12
 TEAM_COUNTRY_SUFFIX_PATTERN = re.compile(r"\s*\([A-Z0-9]{2,4}\)\s*$", re.IGNORECASE)
 TEAM_NAME_SEPARATOR_PATTERN = re.compile(r"[-‐‑‒–—]+")
+_MATCH_NEWS_SELECTION_CACHE: dict[int, dict[str, Any]] = {}
 
 
 # Cette fonction extrait une valeur imbriquée dans un dictionnaire sans casser si une clé manque.
@@ -62,6 +69,56 @@ def extract_match_utc_date_from_match(match: dict[str, Any]) -> str | None:
 def normalize_team_name_for_news(team_name: str | None) -> str:
     cleaned_name = TEAM_COUNTRY_SUFFIX_PATTERN.sub("", str(team_name or "")).strip()
     return " ".join(cleaned_name.split())
+
+
+# Cette fonction construit une signature stable du match pour sécuriser le cache partagé avec Ruby.
+def build_match_news_selection_signature(match: dict[str, Any]) -> tuple[str, str, str, str]:
+    return (
+        str(extract_team_name_from_match(match, "home") or ""),
+        str(extract_team_name_from_match(match, "away") or ""),
+        str(extract_competition_name_from_match(match) or ""),
+        str(extract_match_utc_date_from_match(match) or ""),
+    )
+
+
+# Cette fonction mémorise la sélection éditoriale afin que Ruby ne relance pas les flux RSS.
+def store_match_news_selected_articles(
+    match_id: int,
+    match: dict[str, Any],
+    articles: list[dict[str, Any]],
+) -> None:
+    _MATCH_NEWS_SELECTION_CACHE[match_id] = {
+        "signature": build_match_news_selection_signature(match),
+        "expires_at": datetime.now(UTC)
+        + timedelta(minutes=settings.news_chatbot_cache_ttl_minutes),
+        "articles": [dict(article) for article in articles],
+    }
+
+
+# Cette fonction retourne la sélection déjà chargée par l'onglet Contexte lorsqu'elle reste fraîche.
+def get_cached_match_news_selected_articles(
+    match_id: int,
+    match: dict[str, Any],
+) -> list[dict[str, Any]] | None:
+    cache_entry = _MATCH_NEWS_SELECTION_CACHE.get(match_id)
+
+    if not cache_entry:
+        return None
+
+    if (
+        cache_entry.get("signature") != build_match_news_selection_signature(match)
+        or not isinstance(cache_entry.get("expires_at"), datetime)
+        or cache_entry["expires_at"] <= datetime.now(UTC)
+    ):
+        _MATCH_NEWS_SELECTION_CACHE.pop(match_id, None)
+        return None
+
+    return [dict(article) for article in cache_entry.get("articles") or []]
+
+
+# Cette fonction efface la sélection partagée, notamment pour isoler les tests du chatbot.
+def clear_match_news_selection_cache() -> None:
+    _MATCH_NEWS_SELECTION_CACHE.clear()
 
 
 # Cette fonction produit les variantes utiles d'un nom d'équipe pour couvrir tirets et espaces.
@@ -205,16 +262,109 @@ def deduplicate_raw_articles(articles: list[dict[str, Any]]) -> list[dict[str, A
     return deduplicated_articles
 
 
-# Cette fonction collecte les articles bruts depuis plusieurs requêtes RSS.
-def collect_articles_from_queries(queries: list[str]) -> tuple[list[dict[str, Any]], list[str]]:
+# Cette fonction fusionne les articles des deux équipes pour produire une liste courte au niveau du match.
+def merge_team_articles_for_match_context(
+    home_articles: list[dict[str, Any]],
+    away_articles: list[dict[str, Any]],
+    max_articles: int = MATCH_NEWS_CONTEXT_MAX_ARTICLES,
+) -> list[dict[str, Any]]:
+    merged_articles: list[dict[str, Any]] = []
+    article_indexes_by_key: dict[str, int] = {}
+    max_team_length = max(len(home_articles), len(away_articles), 0)
+
+    for article_index in range(max_team_length):
+        for team_articles in (home_articles, away_articles):
+            if article_index >= len(team_articles):
+                continue
+
+            article = dict(team_articles[article_index])
+            article_key = build_article_deduplication_key(article)
+            detected_team = str(article.get("team_detected") or "").strip()
+
+            if article_key in article_indexes_by_key:
+                existing_index = article_indexes_by_key[article_key]
+                existing_article = dict(merged_articles[existing_index])
+                teams_detected = list(existing_article.get("teams_detected") or [])
+
+                if detected_team and detected_team not in teams_detected:
+                    teams_detected.append(detected_team)
+
+                existing_article["teams_detected"] = teams_detected
+                merged_articles[existing_index] = existing_article
+                continue
+
+            if not article_key:
+                continue
+
+            article["teams_detected"] = [detected_team] if detected_team else []
+            article_indexes_by_key[article_key] = len(merged_articles)
+            merged_articles.append(article)
+
+            if len(merged_articles) >= max_articles:
+                return merged_articles
+
+    return merged_articles
+
+
+# Cette fonction remplace dans les blocs équipe les articles enrichis au niveau global du match.
+def apply_enriched_articles_to_team_blocks(
+    response: dict[str, Any],
+    enriched_articles: list[dict[str, Any]],
+) -> dict[str, Any]:
+    enriched_by_key = {
+        build_article_deduplication_key(article): article
+        for article in enriched_articles
+        if build_article_deduplication_key(article)
+    }
+
+    updated_response = dict(response)
+
+    for block_name in ("home_team", "away_team"):
+        team_block = dict(updated_response.get(block_name) or {})
+        team_articles = []
+
+        for article in team_block.get("articles") or []:
+            article_key = build_article_deduplication_key(article)
+            team_articles.append(enriched_by_key.get(article_key, article))
+
+        team_block["articles"] = team_articles
+        team_block["articles_count"] = len(team_articles)
+        updated_response[block_name] = team_block
+
+    updated_response["articles"] = enriched_articles
+    updated_response["articles_count"] = len(enriched_articles)
+    return updated_response
+
+
+# Cette fonction collecte les requêtes RSS en parallèle et réutilise les réponses communes aux deux équipes.
+def collect_articles_from_queries(
+    queries: list[str],
+    response_cache: dict[str, dict[str, Any]] | None = None,
+) -> tuple[list[dict[str, Any]], list[str]]:
     collected_articles: list[dict[str, Any]] = []
     unavailable_messages: list[str] = []
+    shared_cache = response_cache if response_cache is not None else {}
+    unique_queries = deduplicate_queries(queries)
+    missing_queries = [query for query in unique_queries if query not in shared_cache]
 
-    for query in queries:
-        rss_response = fetch_google_news_rss_articles(
-            query=query,
-            max_articles=TEAM_NEWS_CONTEXT_MAX_RAW_ARTICLES,
+    # Cette fonction interne garde le téléchargement synchrone isolé dans un worker dédié.
+    def fetch_query(query: str) -> tuple[str, dict[str, Any]]:
+        return (
+            query,
+            fetch_google_news_rss_articles(
+                query=query,
+                max_articles=TEAM_NEWS_CONTEXT_MAX_RAW_ARTICLES,
+            ),
         )
+
+    if missing_queries:
+        worker_count = min(4, len(missing_queries))
+        with ThreadPoolExecutor(max_workers=worker_count) as executor:
+            for query, rss_response in executor.map(fetch_query, missing_queries):
+                shared_cache[query] = rss_response
+
+    for query in unique_queries:
+        rss_response = shared_cache.get(query, {})
 
         if rss_response.get("status") == "unavailable":
             message = rss_response.get("message")
@@ -293,6 +443,7 @@ def build_team_news_block(
     match_utc_date: str | None = None,
     max_articles: int = TEAM_NEWS_CONTEXT_MAX_ARTICLES_PER_TEAM,
     description_max_length: int | None = 220,
+    rss_response_cache: dict[str, dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     if not team_name:
         return build_empty_team_news_block(team_name=None)
@@ -302,7 +453,10 @@ def build_team_news_block(
     if match_query:
         queries.append(match_query)
 
-    raw_articles, unavailable_messages = collect_articles_from_queries(queries)
+    raw_articles, unavailable_messages = collect_articles_from_queries(
+        queries,
+        response_cache=rss_response_cache,
+    )
 
     if not raw_articles and unavailable_messages:
         return {
@@ -376,12 +530,14 @@ def build_news_context_empty_state(status: str) -> str | None:
 def build_match_news_context_response(
     match_id: int,
     match: dict[str, Any],
+    description_max_length: int | None = 220,
 ) -> dict[str, Any]:
     home_team_name = extract_team_name_from_match(match, "home")
     away_team_name = extract_team_name_from_match(match, "away")
     competition_name = extract_competition_name_from_match(match)
     match_utc_date = extract_match_utc_date_from_match(match)
     match_query = build_match_news_query(home_team_name, away_team_name)
+    rss_response_cache: dict[str, dict[str, Any]] = {}
 
     home_block = build_team_news_block(
         team_name=home_team_name,
@@ -389,6 +545,8 @@ def build_match_news_context_response(
         match_query=match_query,
         opponent_team_name=away_team_name,
         match_utc_date=match_utc_date,
+        description_max_length=description_max_length,
+        rss_response_cache=rss_response_cache,
     )
     away_block = build_team_news_block(
         team_name=away_team_name,
@@ -396,6 +554,8 @@ def build_match_news_context_response(
         match_query=match_query,
         opponent_team_name=home_team_name,
         match_utc_date=match_utc_date,
+        description_max_length=description_max_length,
+        rss_response_cache=rss_response_cache,
     )
 
     # Les articles communs à l'affiche restent visibles dans les deux colonnes équipe.
@@ -404,6 +564,10 @@ def build_match_news_context_response(
     away_block = normalize_team_news_block_status(away_block)
 
     status = build_news_context_status(home_block, away_block)
+    merged_articles = merge_team_articles_for_match_context(
+        home_block.get("articles", []),
+        away_block.get("articles", []),
+    )
 
     ai_context = build_match_news_ai_context(
         home_team_name=home_team_name or "Équipe domicile",
@@ -421,14 +585,71 @@ def build_match_news_context_response(
         "generated_at": datetime.now(UTC).isoformat(),
         "home_team": home_block,
         "away_team": away_block,
+        "articles_count": len(merged_articles),
+        "articles": merged_articles,
         "empty_state": build_news_context_empty_state(status),
         "limits": build_team_news_context_limits(),
     }
+
+
+# Cette fonction limite uniquement la copie publique des extraits sans altérer le corpus partagé avec Ruby.
+def truncate_news_context_response_descriptions(
+    response: dict[str, Any],
+    max_length: int = 220,
+) -> dict[str, Any]:
+    updated_response = dict(response)
+
+    # Cette fonction interne crée une copie courte d'un article pour l'interface.
+    def truncate_article(article: dict[str, Any]) -> dict[str, Any]:
+        return {
+            **article,
+            "description": shorten_news_description(
+                article.get("description"),
+                max_length=max_length,
+            ),
+        }
+
+    updated_response["articles"] = [
+        truncate_article(article)
+        for article in updated_response.get("articles") or []
+    ]
+
+    for block_name in ("home_team", "away_team"):
+        team_block = dict(updated_response.get(block_name) or {})
+        team_block["articles"] = [
+            truncate_article(article)
+            for article in team_block.get("articles") or []
+        ]
+        updated_response[block_name] = team_block
+
+    return updated_response
+
+
+# Cette fonction exécute le pipeline RSS hors de la boucle FastAPI puis enrichit seulement les articles retenus.
+async def build_enriched_match_news_context_response(
+    match_id: int,
+    match: dict[str, Any],
+) -> dict[str, Any]:
+    base_response = await asyncio.to_thread(
+        build_match_news_context_response,
+        match_id,
+        match,
+        None,
+    )
+    selected_articles = list(base_response.get("articles") or [])
+    enriched_articles = await fetch_news_context_article_previews(selected_articles)
+    store_match_news_selected_articles(match_id, match, enriched_articles)
+    enriched_response = apply_enriched_articles_to_team_blocks(
+        base_response,
+        enriched_articles,
+    )
+    return truncate_news_context_response_descriptions(enriched_response)
 
 
 # Schéma de communication :
 # matches.py -> team_news_context_service.py
 # ├── utilise google_news_rss_client.py pour récupérer plusieurs flux publics par équipe
 # ├── utilise news_nlp_service.py pour filtrer et classer les articles
+# ├── utilise news_article_content_service.py pour résoudre les éditeurs et récupérer les images
 # ├── utilise news_context_ai_service.py pour préparer la lecture contextuelle IA optionnelle
 # └── renvoie une réponse news-context à l'API puis au frontend

@@ -5,7 +5,7 @@ from datetime import UTC, datetime
 from email.utils import parsedate_to_datetime
 from html import unescape
 from typing import Any
-from urllib.parse import quote_plus
+from urllib.parse import quote_plus, urlparse
 import re
 import xml.etree.ElementTree as ET
 
@@ -19,6 +19,59 @@ GOOGLE_NEWS_DEFAULT_COUNTRY = "US"
 GOOGLE_NEWS_DEFAULT_TIMEOUT_SECONDS = 8.0
 GOOGLE_NEWS_DEFAULT_MAX_ARTICLES = 6
 GOOGLE_NEWS_USER_AGENT = "Mozilla/5.0 RubyBets/1.0 ContextNews"
+GOOGLE_NEWS_MEDIA_NAMESPACE = "http://search.yahoo.com/mrss/"
+
+
+# Cette fonction conserve uniquement une URL d'image publique en HTTP(S).
+def normalize_rss_image_url(value: str | None) -> str | None:
+    image_url = unescape(str(value or "")).strip()
+    parsed_url = urlparse(image_url)
+
+    if parsed_url.scheme not in {"http", "https"} or not parsed_url.hostname:
+        return None
+
+    return image_url
+
+
+# Cette fonction extrait la première image publique éventuellement incluse dans un fragment HTML RSS.
+def extract_rss_image_from_html(value: str | None) -> str | None:
+    html_value = unescape(str(value or ""))
+    image_match = re.search(
+        r"<img[^>]+src=[\"']([^\"']+)[\"']",
+        html_value,
+        flags=re.IGNORECASE,
+    )
+
+    if not image_match:
+        return None
+
+    return normalize_rss_image_url(image_match.group(1))
+
+
+# Cette fonction cherche une miniature RSS dans les balises media, enclosure puis description HTML.
+def extract_google_news_image_url(item: ET.Element) -> str | None:
+    media_thumbnail = item.find(f"{{{GOOGLE_NEWS_MEDIA_NAMESPACE}}}thumbnail")
+    media_content = item.find(f"{{{GOOGLE_NEWS_MEDIA_NAMESPACE}}}content")
+    enclosure = item.find("enclosure")
+
+    candidate_urls = [
+        media_thumbnail.attrib.get("url") if media_thumbnail is not None else None,
+        media_content.attrib.get("url") if media_content is not None else None,
+        (
+            enclosure.attrib.get("url")
+            if enclosure is not None
+            and str(enclosure.attrib.get("type") or "").lower().startswith("image/")
+            else None
+        ),
+        extract_rss_image_from_html(item.findtext("description")),
+    ]
+
+    for candidate_url in candidate_urls:
+        normalized_url = normalize_rss_image_url(candidate_url)
+        if normalized_url:
+            return normalized_url
+
+    return None
 
 
 # Cette fonction nettoie un texte RSS en supprimant le HTML et les espaces inutiles.
@@ -80,14 +133,16 @@ def extract_google_news_source(item: ET.Element) -> dict[str, str | None]:
 # Cette fonction transforme un item RSS brut en article normalisé pour RubyBets.
 def parse_google_news_item(item: ET.Element) -> dict[str, Any]:
     source = extract_google_news_source(item)
+    raw_description = item.findtext("description")
 
     return {
         "title": clean_rss_text(item.findtext("title")),
-        "description": clean_rss_text(item.findtext("description")),
+        "description": clean_rss_text(raw_description),
         "url": item.findtext("link"),
         "source_name": source.get("name"),
         "source_url": source.get("url"),
         "published_at": parse_google_news_date(item.findtext("pubDate")),
+        "image_url": extract_google_news_image_url(item),
     }
 
 
