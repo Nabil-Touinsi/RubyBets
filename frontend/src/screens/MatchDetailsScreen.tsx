@@ -77,6 +77,7 @@ type MatchDetailsScreenProps = {
   matchAdvancedStatsStatus: string;
   matchLineupsStatus: string;
   matchNewsContextStatus: string;
+  teamHistoryStatus: string;
   v19H2HStatus: string;
   v19ProductStatus: string;
   onRequestAdvancedStats: (matchId: number) => void;
@@ -121,12 +122,25 @@ type MetricCard = {
   accent: "teal" | "red" | "neutral";
 };
 
+type FormSummaryCard = {
+  icon: LucideIcon;
+  eyebrow: string;
+  title: string;
+  evidence: string;
+  tone: "teal" | "blue" | "amber" | "red";
+};
+
 type FormTrendSignal = {
+  icon: LucideIcon;
   label: string;
-  homeValue: string;
-  awayValue: string;
+  homeDisplay: string;
+  awayDisplay: string;
+  homeNumeric: number | null;
+  awayNumeric: number | null;
+  deltaDisplay: string;
   reading: string;
-  tone: "teal" | "red" | "amber" | "blue";
+  tone: "teal" | "blue" | "amber" | "red";
+  leadingSide: "home" | "away" | "neutral" | "unavailable";
 };
 
 type HeadToHeadHistoricalSummary = {
@@ -755,17 +769,6 @@ function getTeamHistoryStatusLabel(teamHistory: TeamHistoryResponse | null) {
   return "Historique indisponible";
 }
 
-// Cette fonction transforme une série W/D/L en libellés courts compréhensibles.
-function formatRecentSeries(series: TeamFormSummary["recent_series"] | undefined) {
-  if (!series?.length) {
-    return "Série non disponible";
-  }
-
-  return series
-    .map((result) => (result === "W" ? "V" : result === "D" ? "N" : "D"))
-    .join(" · ");
-}
-
 // Cette fonction calcule le pourcentage de points pris sur la période récente analysée.
 function getRecentFormRate(formSummary: TeamFormSummary | null) {
   const points = getRecentFormPoints(formSummary);
@@ -776,11 +779,6 @@ function getRecentFormRate(formSummary: TeamFormSummary | null) {
   }
 
   return Math.round((points / maxPoints) * 100);
-}
-
-// Cette fonction vérifie si un bloc historique contient une forme exploitable.
-function hasUsableHistoryBlock(historyBlock: TeamHistoryBlock | null) {
-  return Boolean(historyBlock?.form_summary && historyBlock.form_summary.matches_count > 0);
 }
 
 // Ce composant affiche un logo d’équipe sur un support circulaire premium avec fallback texte.
@@ -1402,61 +1400,6 @@ function RecentTeamHistoryCard({
   );
 }
 
-// Cette fonction compare deux valeurs numériques et produit une lecture prudente.
-function buildComparativeReading({
-  homeValue,
-  awayValue,
-  homeTeam,
-  awayTeam,
-  higherIsBetter,
-  threshold,
-}: {
-  homeValue: number | null;
-  awayValue: number | null;
-  homeTeam: Team;
-  awayTeam: Team;
-  higherIsBetter: boolean;
-  threshold: number;
-}) {
-  if (homeValue === null || awayValue === null) {
-    return "Lecture limitée : la source ne fournit pas les deux valeurs nécessaires.";
-  }
-
-  const difference = homeValue - awayValue;
-
-  if (Math.abs(difference) <= threshold) {
-    return "Signal proche entre les deux équipes : la donnée ne suffit pas à créer un écart net.";
-  }
-
-  const homeHasAdvantage = higherIsBetter ? difference > 0 : difference < 0;
-  const leadingTeam = homeHasAdvantage ? getTeamShortName(homeTeam) : getTeamShortName(awayTeam);
-  const gapLabel = Math.abs(difference) >= threshold * 2 ? "avantage visible" : "avantage léger";
-
-  return `${leadingTeam} présente un ${gapLabel} sur ce signal, à interpréter avec prudence.`;
-}
-
-// Cette fonction interprète la régularité récente à partir des points pris.
-function buildRegularityReading({
-  homeSummary,
-  awaySummary,
-  homeTeam,
-  awayTeam,
-}: {
-  homeSummary: TeamFormSummary | null;
-  awaySummary: TeamFormSummary | null;
-  homeTeam: Team;
-  awayTeam: Team;
-}) {
-  return buildComparativeReading({
-    homeValue: getRecentFormRate(homeSummary),
-    awayValue: getRecentFormRate(awaySummary),
-    homeTeam,
-    awayTeam,
-    higherIsBetter: true,
-    threshold: 8,
-  });
-}
-
 // Cette fonction interprète la série W/D/L sans prédire le résultat du match.
 function buildSeriesReading(series: TeamFormSummary["recent_series"] | undefined) {
   if (!series?.length) {
@@ -1482,8 +1425,111 @@ function buildSeriesReading(series: TeamFormSummary["recent_series"] | undefined
   return "Dynamique irrégulière : la série alterne entre résultats positifs et négatifs.";
 }
 
-// Cette fonction prépare des cartes d’interprétation non redondantes pour l’onglet Forme & tendances.
-function buildFormDiagnosticCards({
+// Cette fonction renvoie uniquement une synthèse de forme fondée sur au moins un match réel.
+function getUsableFormSummary(historyBlock: TeamHistoryBlock | null) {
+  const formSummary = historyBlock?.form_summary ?? null;
+
+  return formSummary && formSummary.matches_count > 0 ? formSummary : null;
+}
+
+// Cette fonction calcule le taux de victoires sur la période réellement disponible.
+function getRecentWinRate(formSummary: TeamFormSummary | null) {
+  if (!formSummary || formSummary.matches_count <= 0) {
+    return null;
+  }
+
+  return Math.round((formSummary.wins / formSummary.matches_count) * 100);
+}
+
+// Cette fonction identifie l'équipe qui porte le meilleur signal selon la métrique analysée.
+function getFormSignalLeader({
+  homeValue,
+  awayValue,
+  higherIsBetter,
+  threshold,
+}: {
+  homeValue: number | null;
+  awayValue: number | null;
+  higherIsBetter: boolean;
+  threshold: number;
+}): FormTrendSignal["leadingSide"] {
+  if (homeValue === null || awayValue === null) {
+    return "unavailable";
+  }
+
+  const difference = homeValue - awayValue;
+
+  if (Math.abs(difference) <= threshold) {
+    return "neutral";
+  }
+
+  const homeLeads = higherIsBetter ? difference > 0 : difference < 0;
+  return homeLeads ? "home" : "away";
+}
+
+// Cette fonction retourne le nom court de l'équipe associée au meilleur signal.
+function getLeadingTeamLabel(
+  match: Match,
+  leadingSide: FormTrendSignal["leadingSide"],
+) {
+  if (leadingSide === "home") {
+    return getTeamShortName(match.home_team);
+  }
+
+  if (leadingSide === "away") {
+    return getTeamShortName(match.away_team);
+  }
+
+  return null;
+}
+
+// Cette fonction transforme une différence décimale en valeur signée lisible.
+function formatSignedDecimal(value: number | null, digits = 2) {
+  if (value === null) {
+    return "—";
+  }
+
+  const formatted = Math.abs(value).toFixed(digits);
+  return value > 0 ? `+${formatted}` : value < 0 ? `−${formatted}` : formatted;
+}
+
+// Cette fonction construit une phrase courte et factuelle à partir du meilleur signal disponible.
+function buildFormSignalReading({
+  match,
+  leadingSide,
+  metric,
+}: {
+  match: Match;
+  leadingSide: FormTrendSignal["leadingSide"];
+  metric: "regularity" | "attack" | "defense" | "goalDifference";
+}) {
+  if (leadingSide === "unavailable") {
+    return "Comparaison limitée : une des deux valeurs n’est pas disponible.";
+  }
+
+  if (leadingSide === "neutral") {
+    return "Écart limité sur la période analysée.";
+  }
+
+  const teamLabel = getLeadingTeamLabel(match, leadingSide);
+
+  if (metric === "regularity") {
+    return `${teamLabel} affiche la meilleure régularité récente.`;
+  }
+
+  if (metric === "attack") {
+    return `Dynamique offensive supérieure pour ${teamLabel}.`;
+  }
+
+  if (metric === "defense") {
+    return `${teamLabel} concède moins de buts sur la période.`;
+  }
+
+  return `Différentiel de buts récent favorable à ${teamLabel}.`;
+}
+
+// Cette fonction prépare les quatre cartes de synthèse visibles en tête de l'onglet.
+function buildFormSummaryCards({
   match,
   homeSummary,
   awaySummary,
@@ -1493,64 +1539,100 @@ function buildFormDiagnosticCards({
   homeSummary: TeamFormSummary | null;
   awaySummary: TeamFormSummary | null;
   responsibleNote: string | null;
-}): InsightCard[] {
-  const homeGoalsForAvg = homeSummary?.avg_goals_for ?? null;
-  const awayGoalsForAvg = awaySummary?.avg_goals_for ?? null;
-  const homeGoalsAgainstAvg = homeSummary?.avg_goals_against ?? null;
-  const awayGoalsAgainstAvg = awaySummary?.avg_goals_against ?? null;
+}): FormSummaryCard[] {
+  const homeWinRate = getRecentWinRate(homeSummary);
+  const awayWinRate = getRecentWinRate(awaySummary);
+  const regularityLeader = getFormSignalLeader({
+    homeValue: homeWinRate,
+    awayValue: awayWinRate,
+    higherIsBetter: true,
+    threshold: 5,
+  });
+  const attackLeader = getFormSignalLeader({
+    homeValue: homeSummary?.avg_goals_for ?? null,
+    awayValue: awaySummary?.avg_goals_for ?? null,
+    higherIsBetter: true,
+    threshold: 0.15,
+  });
+  const defenseLeader = getFormSignalLeader({
+    homeValue: homeSummary?.avg_goals_against ?? null,
+    awayValue: awaySummary?.avg_goals_against ?? null,
+    higherIsBetter: false,
+    threshold: 0.15,
+  });
+  const regularityTeam = getLeadingTeamLabel(match, regularityLeader);
+  const attackTeam = getLeadingTeamLabel(match, attackLeader);
+  const defenseTeam = getLeadingTeamLabel(match, defenseLeader);
+
+  const regularityEvidence =
+    regularityLeader === "home" && homeSummary && homeWinRate !== null
+      ? `${homeSummary.wins} victoire(s) sur ${homeSummary.matches_count} matchs analysés (${homeWinRate} %).`
+      : regularityLeader === "away" && awaySummary && awayWinRate !== null
+        ? `${awaySummary.wins} victoire(s) sur ${awaySummary.matches_count} matchs analysés (${awayWinRate} %).`
+        : regularityLeader === "neutral"
+          ? "Les taux de victoires récents restent proches sur les périodes disponibles."
+          : "La couverture actuelle ne permet pas de comparer les deux équipes.";
+
+  const attackEvidence =
+    homeSummary && awaySummary
+      ? `${formatHistoryAverage(homeSummary.avg_goals_for)} but(s) marqué(s)/match contre ${formatHistoryAverage(awaySummary.avg_goals_for)}.`
+      : "Une moyenne offensive manque pour établir la comparaison.";
+
+  const defenseEvidence =
+    homeSummary && awaySummary
+      ? `${formatHistoryAverage(homeSummary.avg_goals_against)} but(s) encaissé(s)/match contre ${formatHistoryAverage(awaySummary.avg_goals_against)}.`
+      : "Une moyenne défensive manque pour établir la comparaison.";
 
   return [
     {
-      icon: "⌁",
+      icon: Activity,
+      eyebrow: "Régularité récente",
+      title:
+        regularityLeader === "neutral"
+          ? "Dynamique équilibrée"
+          : regularityTeam
+            ? `Avantage ${regularityTeam}`
+            : "Données partielles",
+      evidence: regularityEvidence,
       tone: "teal",
-      title: "Régularité récente",
-      description: buildRegularityReading({
-        homeSummary,
-        awaySummary,
-        homeTeam: match.home_team,
-        awayTeam: match.away_team,
-      }),
-      badge: "Dynamique",
     },
     {
-      icon: "◎",
+      icon: Target,
+      eyebrow: "Signal offensif",
+      title:
+        attackLeader === "neutral"
+          ? "Niveau offensif proche"
+          : attackTeam
+            ? `Supériorité ${attackTeam}`
+            : "Données partielles",
+      evidence: attackEvidence,
       tone: "blue",
-      title: "Signal offensif",
-      description: buildComparativeReading({
-        homeValue: homeGoalsForAvg,
-        awayValue: awayGoalsForAvg,
-        homeTeam: match.home_team,
-        awayTeam: match.away_team,
-        higherIsBetter: true,
-        threshold: 0.25,
-      }),
-      badge: "Buts marqués",
     },
     {
-      icon: "◷",
+      icon: ShieldCheck,
+      eyebrow: "Vulnérabilité défensive",
+      title:
+        defenseLeader === "neutral"
+          ? "Solidité comparable"
+          : defenseTeam
+            ? `Avantage ${defenseTeam}`
+            : "Données partielles",
+      evidence: defenseEvidence,
       tone: "amber",
-      title: "Vulnérabilité défensive",
-      description: buildComparativeReading({
-        homeValue: homeGoalsAgainstAvg,
-        awayValue: awayGoalsAgainstAvg,
-        homeTeam: match.home_team,
-        awayTeam: match.away_team,
-        higherIsBetter: false,
-        threshold: 0.25,
-      }),
-      badge: "Buts encaissés",
     },
     {
-      icon: "◇",
+      icon: Gauge,
+      eyebrow: "Lecture responsable",
+      title: "Prudence recommandée",
+      evidence:
+        responsibleNote ??
+        "Analyse fondée sur les données disponibles, sans garantie de résultat sportif.",
       tone: "red",
-      title: "Lecture responsable",
-      description: responsibleNote ?? "La forme récente aide à lire une dynamique, mais ne garantit aucun résultat sportif.",
-      badge: "Prudence",
     },
   ];
 }
 
-// Cette fonction prépare les signaux comparatifs de forme sous forme de lignes de tableau, sans reprendre la liste des derniers matchs.
+// Cette fonction prépare les quatre lignes de comparaison avec leurs valeurs et écarts réels.
 function buildFormTrendSignals({
   match,
   homeSummary,
@@ -1560,70 +1642,179 @@ function buildFormTrendSignals({
   homeSummary: TeamFormSummary | null;
   awaySummary: TeamFormSummary | null;
 }): FormTrendSignal[] {
+  const homeWinRate = getRecentWinRate(homeSummary);
+  const awayWinRate = getRecentWinRate(awaySummary);
+  const regularityLeader = getFormSignalLeader({
+    homeValue: homeWinRate,
+    awayValue: awayWinRate,
+    higherIsBetter: true,
+    threshold: 5,
+  });
+  const attackLeader = getFormSignalLeader({
+    homeValue: homeSummary?.avg_goals_for ?? null,
+    awayValue: awaySummary?.avg_goals_for ?? null,
+    higherIsBetter: true,
+    threshold: 0.15,
+  });
+  const defenseLeader = getFormSignalLeader({
+    homeValue: homeSummary?.avg_goals_against ?? null,
+    awayValue: awaySummary?.avg_goals_against ?? null,
+    higherIsBetter: false,
+    threshold: 0.15,
+  });
   const homeGoalDifference = getHistoryGoalDifference(homeSummary);
   const awayGoalDifference = getHistoryGoalDifference(awaySummary);
+  const goalDifferenceLeader = getFormSignalLeader({
+    homeValue: homeGoalDifference,
+    awayValue: awayGoalDifference,
+    higherIsBetter: true,
+    threshold: 2,
+  });
 
   return [
     {
+      icon: Activity,
       label: "Victoires récentes",
-      homeValue: homeSummary ? `${homeSummary.wins}/${homeSummary.matches_count}` : "Non fourni",
-      awayValue: awaySummary ? `${awaySummary.wins}/${awaySummary.matches_count}` : "Non fourni",
-      reading: buildComparativeReading({
-        homeValue: homeSummary?.wins ?? null,
-        awayValue: awaySummary?.wins ?? null,
-        homeTeam: match.home_team,
-        awayTeam: match.away_team,
-        higherIsBetter: true,
-        threshold: 1,
+      homeDisplay:
+        homeSummary && homeWinRate !== null
+          ? `${homeSummary.wins}/${homeSummary.matches_count} (${homeWinRate} %)`
+          : "—",
+      awayDisplay:
+        awaySummary && awayWinRate !== null
+          ? `${awaySummary.wins}/${awaySummary.matches_count} (${awayWinRate} %)`
+          : "—",
+      homeNumeric: homeWinRate,
+      awayNumeric: awayWinRate,
+      deltaDisplay:
+        homeWinRate !== null && awayWinRate !== null
+          ? `${formatSignedMetric(homeWinRate - awayWinRate)} pts`
+          : "—",
+      reading: buildFormSignalReading({
+        match,
+        leadingSide: regularityLeader,
+        metric: "regularity",
       }),
       tone: "teal",
+      leadingSide: regularityLeader,
     },
     {
+      icon: Target,
       label: "Buts marqués / match",
-      homeValue: formatHistoryAverage(homeSummary?.avg_goals_for),
-      awayValue: formatHistoryAverage(awaySummary?.avg_goals_for),
-      reading: buildComparativeReading({
-        homeValue: homeSummary?.avg_goals_for ?? null,
-        awayValue: awaySummary?.avg_goals_for ?? null,
-        homeTeam: match.home_team,
-        awayTeam: match.away_team,
-        higherIsBetter: true,
-        threshold: 0.25,
+      homeDisplay: formatHistoryAverage(homeSummary?.avg_goals_for),
+      awayDisplay: formatHistoryAverage(awaySummary?.avg_goals_for),
+      homeNumeric: homeSummary?.avg_goals_for ?? null,
+      awayNumeric: awaySummary?.avg_goals_for ?? null,
+      deltaDisplay:
+        homeSummary && awaySummary
+          ? formatSignedDecimal(homeSummary.avg_goals_for - awaySummary.avg_goals_for)
+          : "—",
+      reading: buildFormSignalReading({
+        match,
+        leadingSide: attackLeader,
+        metric: "attack",
       }),
       tone: "blue",
+      leadingSide: attackLeader,
     },
     {
+      icon: ShieldCheck,
       label: "Buts encaissés / match",
-      homeValue: formatHistoryAverage(homeSummary?.avg_goals_against),
-      awayValue: formatHistoryAverage(awaySummary?.avg_goals_against),
-      reading: buildComparativeReading({
-        homeValue: homeSummary?.avg_goals_against ?? null,
-        awayValue: awaySummary?.avg_goals_against ?? null,
-        homeTeam: match.home_team,
-        awayTeam: match.away_team,
-        higherIsBetter: false,
-        threshold: 0.25,
+      homeDisplay: formatHistoryAverage(homeSummary?.avg_goals_against),
+      awayDisplay: formatHistoryAverage(awaySummary?.avg_goals_against),
+      homeNumeric: homeSummary?.avg_goals_against ?? null,
+      awayNumeric: awaySummary?.avg_goals_against ?? null,
+      deltaDisplay:
+        homeSummary && awaySummary
+          ? formatSignedDecimal(homeSummary.avg_goals_against - awaySummary.avg_goals_against)
+          : "—",
+      reading: buildFormSignalReading({
+        match,
+        leadingSide: defenseLeader,
+        metric: "defense",
       }),
       tone: "amber",
+      leadingSide: defenseLeader,
     },
     {
+      icon: Scale,
       label: "Écart de buts récent",
-      homeValue: formatSignedMetric(homeGoalDifference),
-      awayValue: formatSignedMetric(awayGoalDifference),
-      reading: buildComparativeReading({
-        homeValue: homeGoalDifference,
-        awayValue: awayGoalDifference,
-        homeTeam: match.home_team,
-        awayTeam: match.away_team,
-        higherIsBetter: true,
-        threshold: 2,
+      homeDisplay: formatSignedMetric(homeGoalDifference),
+      awayDisplay: formatSignedMetric(awayGoalDifference),
+      homeNumeric: homeGoalDifference,
+      awayNumeric: awayGoalDifference,
+      deltaDisplay:
+        homeGoalDifference !== null && awayGoalDifference !== null
+          ? formatSignedMetric(homeGoalDifference - awayGoalDifference)
+          : "—",
+      reading: buildFormSignalReading({
+        match,
+        leadingSide: goalDifferenceLeader,
+        metric: "goalDifference",
       }),
       tone: "red",
+      leadingSide: goalDifferenceLeader,
     },
   ];
 }
 
-// Ce composant affiche les signaux comparés dans un vrai tableau pour éviter la répétition des cartes de la vue d’ensemble.
+// Cette fonction transforme une valeur de comparaison en largeur de barre, sans fabriquer de valeur absente.
+function getFormComparisonBarWidth(
+  value: number | null,
+  homeValue: number | null,
+  awayValue: number | null,
+) {
+  if (value === null) {
+    return 0;
+  }
+
+  const maxValue = Math.max(
+    Math.abs(homeValue ?? 0),
+    Math.abs(awayValue ?? 0),
+  );
+
+  if (maxValue <= 0) {
+    return 0;
+  }
+
+  return Math.min(100, Math.round((Math.abs(value) / maxValue) * 100));
+}
+
+// Ce composant affiche une valeur d'équipe avec une jauge horizontale animée.
+function FormMetricValue({
+  display,
+  value,
+  homeValue,
+  awayValue,
+  side,
+  isLeading,
+}: {
+  display: string;
+  value: number | null;
+  homeValue: number | null;
+  awayValue: number | null;
+  side: "home" | "away";
+  isLeading: boolean;
+}) {
+  const width = getFormComparisonBarWidth(value, homeValue, awayValue);
+  const style = {
+    "--rb-detail-form-bar": `${width}%`,
+  } as CSSProperties;
+
+  return (
+    <div
+      className={`rb-detail-form-metric-value rb-detail-form-metric-value--${side}${
+        isLeading ? " rb-detail-form-metric-value--leading" : ""
+      }${value === null ? " rb-detail-form-metric-value--missing" : ""}`}
+    >
+      <strong>{display}</strong>
+      <span className="rb-detail-form-metric-track" aria-hidden="true">
+        <i style={style} />
+      </span>
+    </div>
+  );
+}
+
+// Ce composant affiche les signaux récents sous forme de table comparative premium et responsive.
 function FormTrendSignalsTable({
   match,
   signals,
@@ -1631,198 +1822,430 @@ function FormTrendSignalsTable({
   match: Match;
   signals: FormTrendSignal[];
 }) {
-  const tableStyle: CSSProperties = {
-    width: "100%",
-    borderCollapse: "separate",
-    borderSpacing: "0 10px",
-  };
-  const headStyle: CSSProperties = {
-    color: "rgba(226, 232, 240, 0.58)",
-    fontSize: "0.72rem",
-    letterSpacing: "0.08em",
-    textTransform: "uppercase",
-    textAlign: "left",
-  };
-  const cellStyle: CSSProperties = {
-    background: "rgba(15, 23, 42, 0.62)",
-    borderTop: "1px solid rgba(148, 163, 184, 0.12)",
-    borderBottom: "1px solid rgba(148, 163, 184, 0.12)",
-    padding: "13px 14px",
-    color: "rgba(226, 232, 240, 0.82)",
-    verticalAlign: "top",
-  };
-  const firstCellStyle: CSSProperties = {
-    ...cellStyle,
-    borderLeft: "1px solid rgba(148, 163, 184, 0.12)",
-    borderTopLeftRadius: "14px",
-    borderBottomLeftRadius: "14px",
-    fontWeight: 800,
-    color: "#f8fafc",
-  };
-  const lastCellStyle: CSSProperties = {
-    ...cellStyle,
-    borderRight: "1px solid rgba(148, 163, 184, 0.12)",
-    borderTopRightRadius: "14px",
-    borderBottomRightRadius: "14px",
-    color: "rgba(203, 213, 225, 0.76)",
-    lineHeight: 1.55,
-  };
-
   return (
-    <div style={{ overflowX: "auto" }}>
-      <table style={tableStyle}>
-        <thead>
-          <tr>
-            <th style={{ ...headStyle, padding: "0 14px" }}>Signal</th>
-            <th style={{ ...headStyle, padding: "0 14px" }}>{getTeamShortName(match.home_team)}</th>
-            <th style={{ ...headStyle, padding: "0 14px" }}>{getTeamShortName(match.away_team)}</th>
-            <th style={{ ...headStyle, padding: "0 14px" }}>Lecture RubyBets</th>
-          </tr>
-        </thead>
-        <tbody>
-          {signals.map((signal) => (
-            <tr key={signal.label}>
-              <td style={firstCellStyle}>{signal.label}</td>
-              <td style={cellStyle}>{signal.homeValue}</td>
-              <td style={cellStyle}>{signal.awayValue}</td>
-              <td style={lastCellStyle}>{signal.reading}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="rb-detail-form-table" role="table" aria-label="Comparaison des tendances récentes">
+      <div className="rb-detail-form-table__head" role="row">
+        <span role="columnheader">Signal</span>
+        <span role="columnheader">{getTeamShortName(match.home_team)}</span>
+        <span role="columnheader">{getTeamShortName(match.away_team)}</span>
+        <span role="columnheader">Écart</span>
+        <span role="columnheader">Lecture RubyBets</span>
+      </div>
+
+      <div className="rb-detail-form-table__body">
+        {signals.map((signal, index) => {
+          const Icon = signal.icon;
+          const rowStyle = {
+            "--rb-detail-form-row-index": index,
+          } as CSSProperties;
+
+          return (
+            <div
+              key={signal.label}
+              className={`rb-detail-form-table__row rb-detail-form-table__row--${signal.tone}`}
+              role="row"
+              style={rowStyle}
+            >
+              <div className="rb-detail-form-table__metric" role="cell">
+                <span>
+                  <Icon size={15} strokeWidth={1.9} aria-hidden="true" />
+                </span>
+                <strong>{signal.label}</strong>
+              </div>
+
+              <div role="cell" data-label={getTeamShortName(match.home_team)}>
+                <FormMetricValue
+                  display={signal.homeDisplay}
+                  value={signal.homeNumeric}
+                  homeValue={signal.homeNumeric}
+                  awayValue={signal.awayNumeric}
+                  side="home"
+                  isLeading={signal.leadingSide === "home"}
+                />
+              </div>
+
+              <div role="cell" data-label={getTeamShortName(match.away_team)}>
+                <FormMetricValue
+                  display={signal.awayDisplay}
+                  value={signal.awayNumeric}
+                  homeValue={signal.homeNumeric}
+                  awayValue={signal.awayNumeric}
+                  side="away"
+                  isLeading={signal.leadingSide === "away"}
+                />
+              </div>
+
+              <div role="cell" data-label="Écart">
+                <span
+                  className={`rb-detail-form-delta rb-detail-form-delta--${signal.leadingSide}`}
+                >
+                  {signal.deltaDisplay}
+                </span>
+              </div>
+
+              <p role="cell" data-label="Lecture RubyBets">
+                {signal.reading}
+              </p>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
 
-// Ce composant décode une série récente sans répéter la liste complète des matchs.
-function SeriesReadingCard({
+// Ce composant affiche un anneau de forme animé calculé à partir des points réellement obtenus.
+function FormRateGauge({
+  rate,
+  record,
+  matchesCount,
+  side,
+}: {
+  rate: number | null;
+  record: string;
+  matchesCount: number | null;
+  side: "home" | "away";
+}) {
+  const safeRate = rate ?? 0;
+  const style = {
+    "--rb-detail-form-gauge-offset": 100 - safeRate,
+  } as CSSProperties;
+
+  return (
+    <div
+      className={`rb-detail-form-gauge rb-detail-form-gauge--${side}${
+        rate === null ? " rb-detail-form-gauge--missing" : ""
+      }`}
+    >
+      <div className="rb-detail-form-gauge__sphere">
+        <svg viewBox="0 0 42 42" aria-hidden="true">
+          <circle className="rb-detail-form-gauge__track" cx="21" cy="21" r="15.9155" />
+          <circle
+            className="rb-detail-form-gauge__value"
+            cx="21"
+            cy="21"
+            r="15.9155"
+            pathLength="100"
+            style={style}
+          />
+        </svg>
+        <strong>{rate === null ? "—" : `${rate}%`}</strong>
+      </div>
+      <span>Indice de forme</span>
+      <small>
+        {rate === null
+          ? "Données insuffisantes"
+          : `${record} · ${matchesCount ?? 0} match(s)`}
+      </small>
+    </div>
+  );
+}
+
+// Ce composant affiche la série récente d'une équipe avec ses pastilles et sa jauge de forme.
+function FormSeriesTeamCard({
   team,
   historyBlock,
+  side,
 }: {
   team: Team;
   historyBlock: TeamHistoryBlock | null;
+  side: "home" | "away";
 }) {
-  const formSummary = historyBlock?.form_summary ?? null;
+  const formSummary = getUsableFormSummary(historyBlock);
+  const series = formSummary?.recent_series ?? [];
+  const [isSeriesExpanded, setIsSeriesExpanded] = useState(false);
+  const previewLimit = 10;
+  const extraResultsCount = Math.max(0, series.length - previewLimit);
+  const displayedSeries = isSeriesExpanded ? series : series.slice(0, previewLimit);
+  const rate = getRecentFormRate(formSummary);
 
   return (
-    <article className="rb-detail-v2-recent-team">
-      <div className="rb-detail-v2-recent-team__heading">
-        <TeamLogo team={team} />
-        <strong>{getTeamDisplayName(team)}</strong>
+    <article className={`rb-detail-form-series-team rb-detail-form-series-team--${side}`}>
+      <div className="rb-detail-form-series-team__header">
+        <div>
+          <TeamLogo team={team} />
+          <strong>{getTeamDisplayName(team)}</strong>
+        </div>
+        <span>
+          {formSummary
+            ? `${formSummary.matches_count} match(s) analysé(s)`
+            : "Historique indisponible"}
+        </span>
       </div>
 
-      <div>
-        <span>Série : {formatRecentSeries(formSummary?.recent_series)}</span>
-        <span>{buildSeriesReading(formSummary?.recent_series)}</span>
-        <span>
-          Bilan utilisé : {formatRecentFormRecord(formSummary)} · {formSummary?.matches_count ?? 0} match(s)
-        </span>
+      <div className="rb-detail-form-series-team__content">
+        <div className="rb-detail-form-series-team__reading">
+          <div className="rb-detail-form-series-chips" aria-label="Série récente">
+            {displayedSeries.length ? (
+              displayedSeries.map((result, index) => {
+                const chipStyle = {
+                  "--rb-detail-form-chip-index": index,
+                } as CSSProperties;
+                const label = result === "W" ? "V" : result === "D" ? "N" : "D";
+
+                return (
+                  <span
+                    key={`${result}-${index}`}
+                    className={`rb-detail-form-series-chip rb-detail-form-series-chip--${result.toLowerCase()}`}
+                    style={chipStyle}
+                    title={result === "W" ? "Victoire" : result === "D" ? "Match nul" : "Défaite"}
+                  >
+                    {label}
+                  </span>
+                );
+              })
+            ) : (
+              <span className="rb-detail-form-series-empty">Série non disponible</span>
+            )}
+
+            {extraResultsCount > 0 ? (
+              <button
+                type="button"
+                className="rb-detail-form-series-chip rb-detail-form-series-chip--more"
+                aria-expanded={isSeriesExpanded}
+                aria-label={
+                  isSeriesExpanded
+                    ? `Réduire la série de ${getTeamDisplayName(team)}`
+                    : `Afficher ${extraResultsCount} résultat(s) supplémentaire(s) de ${getTeamDisplayName(team)}`
+                }
+                title={isSeriesExpanded ? "Réduire la série" : "Afficher toute la série"}
+                onClick={() => setIsSeriesExpanded((currentValue) => !currentValue)}
+              >
+                {isSeriesExpanded ? `−${extraResultsCount}` : `+${extraResultsCount}`}
+              </button>
+            ) : null}
+          </div>
+
+          <p>{buildSeriesReading(formSummary?.recent_series)}</p>
+          <small>
+            {formSummary
+              ? `${isSeriesExpanded ? "Série complète affichée" : "10 derniers résultats affichés"} · bilan complet : ${formatRecentFormRecord(formSummary)}.`
+              : "RubyBets ne remplace jamais une donnée absente par zéro."}
+          </small>
+        </div>
+
+        <FormRateGauge
+          rate={rate}
+          record={formatRecentFormRecord(formSummary)}
+          matchesCount={formSummary?.matches_count ?? null}
+          side={side}
+        />
       </div>
     </article>
   );
 }
 
-// Ce composant affiche l’onglet Forme & tendances comme une lecture comparative, sans répéter la vue d’ensemble.
+// Cette fonction résume la période réellement utilisée pour la comparaison.
+function buildFormComparisonPeriodLabel(
+  homeSummary: TeamFormSummary | null,
+  awaySummary: TeamFormSummary | null,
+) {
+  if (homeSummary && awaySummary && homeSummary.matches_count === awaySummary.matches_count) {
+    return `sur les ${homeSummary.matches_count} derniers matchs analysés`;
+  }
+
+  if (homeSummary && awaySummary) {
+    return `${homeSummary.matches_count} matchs disponibles pour le domicile · ${awaySummary.matches_count} pour l’extérieur`;
+  }
+
+  if (homeSummary) {
+    return `${homeSummary.matches_count} matchs disponibles pour l’équipe à domicile`;
+  }
+
+  if (awaySummary) {
+    return `${awaySummary.matches_count} matchs disponibles pour l’équipe extérieure`;
+  }
+
+  return "période non disponible";
+}
+
+// Ce composant affiche l'état de chargement propre à l'onglet Forme & tendances.
+function FormTrendsLoadingState() {
+  return (
+    <section className="rb-detail-v2-card rb-detail-form-state rb-detail-form-state--loading">
+      <div className="rb-detail-form-state__icon">
+        <RefreshCw size={22} aria-hidden="true" />
+      </div>
+      <div>
+        <p>Forme & tendances</p>
+        <h3>Chargement des dynamiques récentes</h3>
+        <span>RubyBets récupère les historiques réels des deux équipes.</span>
+      </div>
+      <div className="rb-detail-form-skeleton" aria-hidden="true">
+        <i />
+        <i />
+        <i />
+      </div>
+    </section>
+  );
+}
+
+// Ce composant affiche l'onglet Forme & tendances dans la direction visuelle premium validée.
 function FormTrendsTabContent({
   match,
   teamHistory,
+  teamHistoryStatus,
 }: {
   match: Match;
   teamHistory: TeamHistoryResponse | null;
+  teamHistoryStatus: string;
 }) {
   const homeHistory = getTeamHistoryBlock(teamHistory, "home");
   const awayHistory = getTeamHistoryBlock(teamHistory, "away");
-  const homeSummary = homeHistory?.form_summary ?? null;
-  const awaySummary = awayHistory?.form_summary ?? null;
-  const hasHomeHistory = hasUsableHistoryBlock(homeHistory);
-  const hasAwayHistory = hasUsableHistoryBlock(awayHistory);
-  const sourceLabel = teamHistory?.data_freshness.source_label ?? "Source en attente";
+  const homeSummary = getUsableFormSummary(homeHistory);
+  const awaySummary = getUsableFormSummary(awayHistory);
+  const hasHomeHistory = Boolean(homeSummary);
+  const hasAwayHistory = Boolean(awaySummary);
   const limitations = teamHistory?.data_freshness.limitations ?? [];
   const summary = teamHistory?.summary ?? null;
-  const diagnosticCards = buildFormDiagnosticCards({
+  const summaryCards = buildFormSummaryCards({
     match,
     homeSummary,
     awaySummary,
     responsibleNote: summary?.responsible_note ?? null,
   });
   const trendSignals = buildFormTrendSignals({ match, homeSummary, awaySummary });
+  const periodLabel = buildFormComparisonPeriodLabel(homeSummary, awaySummary);
+  const isLoading = !teamHistory && teamHistoryStatus.toLowerCase().includes("chargement");
+
+  if (isLoading) {
+    return <FormTrendsLoadingState />;
+  }
 
   if (!hasHomeHistory && !hasAwayHistory) {
     return (
-      <section className="rb-detail-v2-card rb-detail-v2-pending-tab">
-        <p>Forme & tendances</p>
-        <h3>Lecture comparative indisponible</h3>
-        <p>
-          La source actuelle ne fournit pas encore assez de données récentes pour comparer les dynamiques des deux équipes. RubyBets affiche uniquement les informations réellement disponibles.
-        </p>
+      <section className="rb-detail-v2-card rb-detail-form-state rb-detail-form-state--empty">
+        <div className="rb-detail-form-state__icon">
+          <Info size={22} aria-hidden="true" />
+        </div>
+        <div>
+          <p>Forme & tendances</p>
+          <h3>Lecture comparative indisponible</h3>
+          <span>
+            {teamHistoryStatus ||
+              "La source actuelle ne fournit pas assez de matchs terminés pour comparer les deux équipes."}
+          </span>
+        </div>
       </section>
     );
   }
 
+  const limitationItems = limitations.length
+    ? limitations
+    : [
+        "La forme récente reste un indicateur d’aide à l’analyse, pas une certitude.",
+        "Les données affichées dépendent des informations réellement fournies par la source.",
+        "RubyBets ne permet aucun pari réel et ne promet aucun résultat sportif.",
+      ];
+
   return (
-    <>
-      <section className="rb-detail-v2-card rb-detail-v2-analysis-card">
-        <div className="rb-detail-v2-section-header">
+    <div className="rb-detail-form-shell">
+      <section className="rb-detail-v2-card rb-detail-form-summary-card">
+        <div className="rb-detail-v2-section-header rb-detail-form-section-header">
           <div>
             <p>Forme & tendances</p>
             <h3>Ce que les dynamiques récentes suggèrent</h3>
           </div>
-          <span>{getTeamHistoryStatusLabel(teamHistory)} · {sourceLabel}</span>
         </div>
 
-        <div className="rb-detail-v2-insight-grid">
-          {diagnosticCards.map((card) => (
-            <AnalysisInsightCard key={card.title} card={card} />
-          ))}
+        <div className="rb-detail-form-summary-grid">
+          {summaryCards.map((card, index) => {
+            const Icon = card.icon;
+            const cardStyle = {
+              "--rb-detail-form-card-index": index,
+            } as CSSProperties;
+
+            return (
+              <article
+                key={card.eyebrow}
+                className={`rb-detail-form-summary-item rb-detail-form-summary-item--${card.tone}`}
+                style={cardStyle}
+              >
+                <span className="rb-detail-form-summary-item__icon">
+                  <Icon size={18} strokeWidth={1.8} aria-hidden="true" />
+                </span>
+                <small>{card.eyebrow}</small>
+                <strong>{card.title}</strong>
+                <p>{card.evidence}</p>
+              </article>
+            );
+          })}
         </div>
       </section>
 
-      <section className="rb-detail-v2-card rb-detail-v2-stats-card">
-        <div className="rb-detail-v2-section-header">
+      <section className="rb-detail-v2-card rb-detail-form-comparison-card">
+        <div className="rb-detail-v2-section-header rb-detail-form-section-header">
           <div>
             <p>Comparaison des signaux récents</p>
-            <h3>Table de lecture comparative</h3>
+            <h3>
+              Table de lecture comparative <small>({periodLabel})</small>
+            </h3>
           </div>
-          <span>Interprétation prudente, pas prédiction</span>
+          <span className="rb-detail-form-prudence-badge">Interprétation prudente</span>
         </div>
 
         <FormTrendSignalsTable match={match} signals={trendSignals} />
+
+        <div className="rb-detail-form-coverage-note">
+          <Info size={15} aria-hidden="true" />
+          <span>
+            Toutes compétitions et tous terrains confondus lorsque la source les expose. Une absence de donnée reste affichée par « — ».
+          </span>
+        </div>
       </section>
 
-      <section className="rb-detail-v2-card rb-detail-v2-recent-card">
-        <div className="rb-detail-v2-section-header">
+      <section className="rb-detail-v2-card rb-detail-form-series-card">
+        <div className="rb-detail-v2-section-header rb-detail-form-section-header">
           <div>
-            <p>Séries décodées</p>
-            <h3>Comprendre les enchaînements de résultats</h3>
+            <p>Séries de résultats</p>
+            <h3>Chronologie et indice de forme récent</h3>
           </div>
-          <span>{summary?.comparison_note ?? "Lecture prudente"}</span>
+          <span>{summary?.comparison_note ?? "Lecture prudente des résultats terminés"}</span>
         </div>
 
-        <div className="rb-detail-v2-recent-grid">
-          <SeriesReadingCard team={match.home_team} historyBlock={homeHistory} />
-          <SeriesReadingCard team={match.away_team} historyBlock={awayHistory} />
+        <div className="rb-detail-form-series-grid">
+          <FormSeriesTeamCard
+            team={match.home_team}
+            historyBlock={homeHistory}
+            side="home"
+          />
+          <FormSeriesTeamCard
+            team={match.away_team}
+            historyBlock={awayHistory}
+            side="away"
+          />
         </div>
       </section>
 
-      <section className="rb-detail-v2-card rb-detail-v2-pending-tab">
-        <p>Limites de lecture</p>
-        <h3>Cadre responsable</h3>
-        <ul className="rb-detail-v2-context-list">
-          {(limitations.length
-            ? limitations
-            : [
-                "La forme récente reste un indicateur d’aide à l’analyse, pas une certitude.",
-                "Les données affichées dépendent des informations réellement fournies par la source.",
-                "RubyBets ne permet aucun pari réel et ne promet aucun résultat sportif.",
-              ]
-          ).map((limitation) => (
-            <li key={limitation}>{limitation}</li>
-          ))}
-        </ul>
+      <section className="rb-detail-v2-card rb-detail-form-limits-card">
+        <div className="rb-detail-v2-section-header rb-detail-form-section-header">
+          <div>
+            <p>Limites et cadre responsable</p>
+            <h3>Sources, couverture et prudence de lecture</h3>
+          </div>
+          <ShieldCheck size={19} aria-hidden="true" />
+        </div>
+
+        <div className="rb-detail-form-limits-grid">
+          {limitationItems.map((limitation, index) => {
+            const icons = [Database, Info, ShieldCheck, Compass];
+            const Icon = icons[index % icons.length];
+
+            return (
+              <div key={limitation}>
+                <span>
+                  <Icon size={14} strokeWidth={1.8} aria-hidden="true" />
+                </span>
+                <p>{limitation}</p>
+              </div>
+            );
+          })}
+        </div>
       </section>
-    </>
+    </div>
   );
 }
+
 
 // Ce composant affiche une section compacte pour la forme récente.
 function RecentMatchesSection({
@@ -3149,6 +3572,7 @@ function MatchDetailsScreen({
   matchAdvancedStatsStatus,
   matchLineupsStatus,
   matchNewsContextStatus,
+  teamHistoryStatus,
   v19H2HStatus,
   onRequestAdvancedStats,
   onNavigate,
@@ -3232,6 +3656,7 @@ function MatchDetailsScreen({
             <FormTrendsTabContent
               match={selectedMatch}
               teamHistory={teamHistory}
+              teamHistoryStatus={teamHistoryStatus}
             />
           ) : null}
 
@@ -3301,7 +3726,8 @@ export default MatchDetailsScreen;
 // ├── charge à la demande et affiche /advanced-stats dans l’onglet Analyse détaillée
 // ├── conserve matchAnalysis.analysis comme lecture narrative complémentaire
 // ├── alimente l’onglet Compo probable avec matchLineups.lineups sans inventer de joueurs
-// ├── alimente l’onglet Forme & tendances avec une table comparative issue de teamHistory.form_summary
+// ├── alimente l’onglet Forme & tendances avec des cartes, jauges et séries animées issues uniquement de teamHistory.form_summary
+// ├── utilise teamHistoryStatus pour distinguer chargement, erreur et historique réellement indisponible
 // ├── alimente l’analyse synthétique avec teamHistory.form_summary quand il est disponible
 // ├── alimente la comparaison avant-match avec les points, buts et écarts issus de teamHistory.form_summary
 // ├── affiche les derniers matchs disponibles uniquement dans la Vue d’ensemble via teamHistory.recent_matches_overview

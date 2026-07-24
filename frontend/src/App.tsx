@@ -170,6 +170,10 @@ function App() {
     "Aucune actualité contextuelle chargée"
   );
 
+  const [teamHistoryStatus, setTeamHistoryStatus] = useState<string>(
+    "Aucun historique d’équipe chargé"
+  );
+
   const [matchAdvancedStatsStatus, setMatchAdvancedStatsStatus] = useState<string>(
     "Statistiques avancées non chargées"
   );
@@ -222,6 +226,7 @@ function App() {
     setMatchPredictionsStatus("Aucune prédiction chargée");
     setMatchLineupsStatus("Aucune composition chargée");
     setMatchNewsContextStatus("Aucune actualité contextuelle chargée");
+    setTeamHistoryStatus("Aucun historique d’équipe chargé");
     setMatchAdvancedStatsStatus("Statistiques avancées non chargées");
     setV19H2HStatus("Aucune analyse H2H V19 chargée");
     setV19ProductStatus("Aucune décision produit V19 chargée");
@@ -450,6 +455,7 @@ function App() {
     setMatchPredictionsStatus("Chargement des prédictions...");
     setMatchLineupsStatus("Chargement des compositions probables...");
     setMatchNewsContextStatus("Chargement des actualités contextuelles...");
+    setTeamHistoryStatus("Chargement des dynamiques récentes...");
     setMatchAdvancedStatsStatus("Statistiques avancées prêtes à être chargées");
     setV19H2HStatus("Chargement de l’analyse H2H V19...");
     setV19ProductStatus("Chargement de la décision produit V19...");
@@ -578,14 +584,26 @@ function App() {
 
     void getMatchTeamHistory(matchId)
       .then((data) => {
-        if (isCurrentSelectedMatchRequest(requestId)) {
-          setSelectedTeamHistory(data);
+        if (!isCurrentSelectedMatchRequest(requestId)) {
+          return;
         }
+
+        setSelectedTeamHistory(data);
+        setTeamHistoryStatus(
+          data.data_status === "available"
+            ? "Historique des équipes chargé"
+            : data.data_status === "partial"
+              ? "Historique des équipes partiel"
+              : "Historique des équipes indisponible"
+        );
       })
       .catch(() => {
-        if (isCurrentSelectedMatchRequest(requestId)) {
-          setSelectedTeamHistory(null);
+        if (!isCurrentSelectedMatchRequest(requestId)) {
+          return;
         }
+
+        setSelectedTeamHistory(null);
+        setTeamHistoryStatus("Impossible de charger l’historique des équipes");
       });
 
     void getV19H2HAnalysis(matchId, competitionCode)
@@ -765,6 +783,7 @@ function App() {
           matchAdvancedStatsStatus={matchAdvancedStatsStatus}
           matchLineupsStatus={matchLineupsStatus}
           matchNewsContextStatus={matchNewsContextStatus}
+          teamHistoryStatus={teamHistoryStatus}
           v19H2HStatus={v19H2HStatus}
           v19ProductStatus={v19ProductStatus}
           onRequestAdvancedStats={handleLoadMatchAdvancedStats}
@@ -877,6 +896,7 @@ export default App;
 // App.tsx
 // ├── appelle services/api.ts pour récupérer les données backend
 // ├── charge aussi /analysis, /advanced-stats à la demande, /lineups, /news-context, /team-history, le H2H V19, la décision produit V19 et le modèle national
+// ├── suit séparément le statut /team-history pour distinguer chargement, données partielles, indisponibilité et erreur
 // ├── transmet la décision produit V19 à MatchDetailsScreen.tsx et PredictionsScreen.tsx sans exposer les données internes de marché
 // ├── pilote la navigation via currentScreen
 // ├── utilise AppShell.tsx pour structurer l’application
