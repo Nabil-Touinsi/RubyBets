@@ -239,6 +239,8 @@ export type TeamHistorySourceUsed =
   | "football_data"
   | "api_football"
   | "flashscore"
+  | "flashscore_rapidapi"
+  | "mixed"
   | "unavailable";
 
 // Ce type décrit le statut de disponibilité des données d'historique.
@@ -288,7 +290,7 @@ export type TeamHistoryBlock = {
 
 // Ce type décrit une confrontation directe disponible entre les deux équipes.
 export type HeadToHeadMatch = {
-  match_id: number | null;
+  match_id: number | string | null;
   utc_date: string | null;
   competition_name: string | null;
   home_team: string | null;

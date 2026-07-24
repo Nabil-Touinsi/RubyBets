@@ -48,7 +48,6 @@ import type {
   TeamHistoryResponse,
   TeamRecentMatch,
   TeamStanding,
-  V19H2HResponse,
   V19ProductPredictionResponse,
 } from "../models/rubybets";
 import type { AppScreen } from "../types/navigation";
@@ -70,7 +69,6 @@ type MatchDetailsScreenProps = {
   matchLineups: MatchLineupsResponse | null;
   matchNewsContext: MatchNewsContextResponse | null;
   teamHistory: TeamHistoryResponse | null;
-  v19H2HAnalysis: V19H2HResponse | null;
   v19ProductPrediction: V19ProductPredictionResponse | null;
   matchDetailsStatus: string;
   matchContextStatus: string;
@@ -79,7 +77,6 @@ type MatchDetailsScreenProps = {
   matchLineupsStatus: string;
   matchNewsContextStatus: string;
   teamHistoryStatus: string;
-  v19H2HStatus: string;
   v19ProductStatus: string;
   onRequestAdvancedStats: (matchId: number) => void;
   onNavigate: (screen: AppScreen) => void;
@@ -160,14 +157,11 @@ type HeadToHeadHistoricalSummary = {
   draws: number;
   homeGoals: number;
   awayGoals: number;
-};
-
-type HeadToHeadSummaryCard = {
-  icon: string;
-  tone: "teal" | "red" | "amber" | "blue";
-  title: string;
-  description: string;
-  badge: string;
+  bttsCount: number;
+  overOneFiveCount: number;
+  overTwoFiveCount: number;
+  oldestMeetingDate: string | null;
+  latestMeetingDate: string | null;
 };
 
 type AdvancedMetricDefinition = {
@@ -637,7 +631,16 @@ function isSameHistoricalTeam(candidate: string | null, team: Team) {
     .map((name) => normalizeTeamNameForComparison(name))
     .filter(Boolean);
 
-  return teamNames.some((teamName) => candidateName === teamName || candidateName.includes(teamName) || teamName.includes(candidateName));
+  if (!candidateName) {
+    return false;
+  }
+
+  return teamNames.some(
+    (teamName) =>
+      candidateName === teamName ||
+      candidateName.includes(teamName) ||
+      teamName.includes(candidateName),
+  );
 }
 
 // Cette fonction récupère les buts d’une équipe courante dans une confrontation directe, si la correspondance est possible.
@@ -664,6 +667,39 @@ function getHistoricalGoalsForTeam(
 }
 
 
+// Cette fonction compare deux dates historiques valides sans modifier les données sources.
+function compareHistoricalDates(
+  currentValue: string | null,
+  candidateValue: string | null,
+  mode: "oldest" | "latest",
+) {
+  if (!candidateValue) {
+    return currentValue;
+  }
+
+  const candidateTime = new Date(candidateValue).getTime();
+
+  if (Number.isNaN(candidateTime)) {
+    return currentValue;
+  }
+
+  if (!currentValue) {
+    return candidateValue;
+  }
+
+  const currentTime = new Date(currentValue).getTime();
+
+  if (Number.isNaN(currentTime)) {
+    return candidateValue;
+  }
+
+  if (mode === "oldest") {
+    return candidateTime < currentTime ? candidateValue : currentValue;
+  }
+
+  return candidateTime > currentTime ? candidateValue : currentValue;
+}
+
 // Cette fonction produit une synthèse chiffrée des confrontations directes sans inventer les scores manquants.
 function buildHeadToHeadHistoricalSummary(
   headToHeadMatches: HeadToHeadMatch[],
@@ -671,18 +707,44 @@ function buildHeadToHeadHistoricalSummary(
 ): HeadToHeadHistoricalSummary {
   return headToHeadMatches.reduce<HeadToHeadHistoricalSummary>(
     (summary, headToHeadMatch) => {
-      const homeGoals = getHistoricalGoalsForTeam(headToHeadMatch, match.home_team);
-      const awayGoals = getHistoricalGoalsForTeam(headToHeadMatch, match.away_team);
+      const nextDates = {
+        oldestMeetingDate: compareHistoricalDates(
+          summary.oldestMeetingDate,
+          headToHeadMatch.utc_date,
+          "oldest",
+        ),
+        latestMeetingDate: compareHistoricalDates(
+          summary.latestMeetingDate,
+          headToHeadMatch.utc_date,
+          "latest",
+        ),
+      };
+      const homeGoals = getHistoricalGoalsForTeam(
+        headToHeadMatch,
+        match.home_team,
+      );
+      const awayGoals = getHistoricalGoalsForTeam(
+        headToHeadMatch,
+        match.away_team,
+      );
 
       if (homeGoals === null || awayGoals === null) {
-        return summary;
+        return { ...summary, ...nextDates };
       }
 
+      const totalGoals = homeGoals + awayGoals;
       const nextSummary = {
         ...summary,
+        ...nextDates,
         calculable: summary.calculable + 1,
         homeGoals: summary.homeGoals + homeGoals,
         awayGoals: summary.awayGoals + awayGoals,
+        bttsCount:
+          summary.bttsCount + (homeGoals > 0 && awayGoals > 0 ? 1 : 0),
+        overOneFiveCount:
+          summary.overOneFiveCount + (totalGoals >= 2 ? 1 : 0),
+        overTwoFiveCount:
+          summary.overTwoFiveCount + (totalGoals >= 3 ? 1 : 0),
       };
 
       if (homeGoals > awayGoals) {
@@ -703,74 +765,129 @@ function buildHeadToHeadHistoricalSummary(
       draws: 0,
       homeGoals: 0,
       awayGoals: 0,
+      bttsCount: 0,
+      overOneFiveCount: 0,
+      overTwoFiveCount: 0,
+      oldestMeetingDate: null,
+      latestMeetingDate: null,
     },
   );
 }
 
 // Cette fonction transforme une confrontation directe en lecture courte et responsable.
-function buildHeadToHeadMatchReading(headToHeadMatch: HeadToHeadMatch, match: Match) {
-  const homeGoals = getHistoricalGoalsForTeam(headToHeadMatch, match.home_team);
-  const awayGoals = getHistoricalGoalsForTeam(headToHeadMatch, match.away_team);
+function buildHeadToHeadMatchReading(
+  headToHeadMatch: HeadToHeadMatch,
+  match: Match,
+) {
+  const homeGoals = getHistoricalGoalsForTeam(
+    headToHeadMatch,
+    match.home_team,
+  );
+  const awayGoals = getHistoricalGoalsForTeam(
+    headToHeadMatch,
+    match.away_team,
+  );
 
   if (homeGoals === null || awayGoals === null) {
-    return "Score ou correspondance d’équipe non exploitable.";
+    return "Score non exploitable";
   }
 
   if (homeGoals > awayGoals) {
-    return `Victoire historique ${getTeamShortName(match.home_team)}.`;
+    return `Victoire ${getTeamShortName(match.home_team)}`;
   }
 
   if (awayGoals > homeGoals) {
-    return `Victoire historique ${getTeamShortName(match.away_team)}.`;
+    return `Victoire ${getTeamShortName(match.away_team)}`;
   }
 
-  return "Match nul historique.";
+  return "Match nul";
 }
 
-// Cette fonction prépare les cartes d’interprétation de l’onglet Face à face.
-function buildHeadToHeadSummaryCards(
-  summary: HeadToHeadHistoricalSummary,
-  match: Match,
-  responsibleNote: string | null,
-): HeadToHeadSummaryCard[] {
-  const hasCalculableMatches = summary.calculable > 0;
-  const balanceDescription = hasCalculableMatches
-    ? `${getTeamShortName(match.home_team)} : ${summary.homeWins} victoire(s), ${getTeamShortName(match.away_team)} : ${summary.awayWins} victoire(s), ${summary.draws} nul(s).`
-    : "Les confrontations disponibles ne fournissent pas assez de scores comparables pour établir un bilan chiffré.";
-  const goalsDescription = hasCalculableMatches
-    ? `${summary.homeGoals} but(s) pour ${getTeamShortName(match.home_team)} et ${summary.awayGoals} pour ${getTeamShortName(match.away_team)} sur les matchs exploitables.`
-    : "Les buts cumulés ne sont pas calculés lorsque les scores ou les équipes ne sont pas clairement exploitables.";
+// Cette fonction retrouve l'équipe actuelle correspondant à un nom historique.
+function getHistoricalTeam(match: Match, historicalName: string | null) {
+  if (isSameHistoricalTeam(historicalName, match.home_team)) {
+    return match.home_team;
+  }
 
-  return [
-    {
-      icon: "◇",
-      tone: "teal",
-      title: "Volume historique",
-      description: `${summary.total} confrontation(s) directe(s) trouvée(s), dont ${summary.calculable} avec score exploitable pour le bilan.`,
-      badge: "Disponibilité",
-    },
-    {
-      icon: "▦",
-      tone: "blue",
-      title: "Bilan comparé",
-      description: balanceDescription,
-      badge: "Historique",
-    },
-    {
-      icon: "◎",
-      tone: "amber",
-      title: "Buts cumulés",
-      description: goalsDescription,
-      badge: "Scores",
-    },
-    {
-      icon: "◷",
-      tone: "red",
-      title: "Lecture responsable",
-      description: responsibleNote ?? "Le face-à-face donne un contexte historique, mais ne suffit pas à anticiper le résultat d’un match.",
-      badge: "Prudence",
-    },
-  ];
+  if (isSameHistoricalTeam(historicalName, match.away_team)) {
+    return match.away_team;
+  }
+
+  return null;
+}
+
+// Cette fonction produit des initiales de secours lorsqu'aucun logo d'équipe ne peut être associé.
+function getHistoricalTeamInitials(teamName: string | null) {
+  const words = (teamName ?? "Équipe")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+
+  return words
+    .slice(0, 2)
+    .map((word) => word.charAt(0).toUpperCase())
+    .join("");
+}
+
+// Cette fonction trie les confrontations de la plus récente à la plus ancienne.
+function sortHeadToHeadMatches(headToHeadMatches: HeadToHeadMatch[]) {
+  return [...headToHeadMatches].sort((leftMatch, rightMatch) => {
+    const rawLeftTime = leftMatch.utc_date
+      ? new Date(leftMatch.utc_date).getTime()
+      : Number.NaN;
+    const rawRightTime = rightMatch.utc_date
+      ? new Date(rightMatch.utc_date).getTime()
+      : Number.NaN;
+    const leftTime = Number.isNaN(rawLeftTime)
+      ? Number.NEGATIVE_INFINITY
+      : rawLeftTime;
+    const rightTime = Number.isNaN(rawRightTime)
+      ? Number.NEGATIVE_INFINITY
+      : rawRightTime;
+
+    return rightTime - leftTime;
+  });
+}
+
+// Cette fonction affiche une fréquence H2H avec son dénominateur réel.
+function formatHeadToHeadRate(count: number, total: number) {
+  if (total <= 0) {
+    return "Non calculable";
+  }
+
+  return `${Math.round((count / total) * 100)} % (${count}/${total})`;
+}
+
+// Cette fonction affiche une moyenne de buts H2H sans précision artificielle.
+function formatHeadToHeadAverage(totalGoals: number, total: number) {
+  if (total <= 0) {
+    return "Non calculable";
+  }
+
+  return (totalGoals / total).toLocaleString("fr-FR", {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 2,
+  });
+}
+
+// Cette fonction décrit la période réellement couverte par les confrontations disponibles.
+function formatHeadToHeadPeriod(summary: HeadToHeadHistoricalSummary) {
+  if (!summary.oldestMeetingDate && !summary.latestMeetingDate) {
+    return "Période non datée";
+  }
+
+  if (
+    summary.oldestMeetingDate === summary.latestMeetingDate ||
+    !summary.oldestMeetingDate
+  ) {
+    return formatRecentMatchDate(summary.latestMeetingDate);
+  }
+
+  if (!summary.latestMeetingDate) {
+    return formatRecentMatchDate(summary.oldestMeetingDate);
+  }
+
+  return `${formatRecentMatchDate(summary.oldestMeetingDate)} → ${formatRecentMatchDate(summary.latestMeetingDate)}`;
 }
 
 // Cette fonction récupère le bloc historique correspondant à une équipe.
@@ -863,23 +980,6 @@ function formatSignedMetric(value: number | null) {
   }
 
   return value > 0 ? `+${value}` : String(value);
-}
-
-// Cette fonction affiche le statut de disponibilité de l’historique sous forme lisible.
-function getTeamHistoryStatusLabel(teamHistory: TeamHistoryResponse | null) {
-  if (!teamHistory) {
-    return "Historique en attente";
-  }
-
-  if (teamHistory.data_status === "available") {
-    return "Historique disponible";
-  }
-
-  if (teamHistory.data_status === "partial") {
-    return "Historique partiel";
-  }
-
-  return "Historique indisponible";
 }
 
 // Cette fonction calcule le pourcentage de points pris sur la période récente analysée.
@@ -3410,278 +3510,543 @@ function LineupsTabContent({
   );
 }
 
-// Ce composant affiche un tableau détaillé des confrontations directes avec une lecture courte par match.
-function HeadToHeadMatchesTable({
+// Ce composant affiche une équipe d'un duel historique avec son logo réel lorsqu'il est identifiable.
+function HeadToHeadTeamIdentity({
+  match,
+  teamName,
+  sideLabel,
+}: {
+  match: Match;
+  teamName: string | null;
+  sideLabel: string;
+}) {
+  const team = getHistoricalTeam(match, teamName);
+  const displayName = teamName ?? (team ? getTeamDisplayName(team) : "Équipe non fournie");
+
+  return (
+    <div className="rb-detail-h2h-team-identity">
+      {team ? (
+        <TeamLogo team={team} />
+      ) : (
+        <span className="rb-detail-h2h-team-fallback" aria-hidden="true">
+          {getHistoricalTeamInitials(displayName)}
+        </span>
+      )}
+      <div>
+        <strong>{displayName}</strong>
+        <span>{sideLabel}</span>
+      </div>
+    </div>
+  );
+}
+
+// Ce composant affiche une métrique calculée uniquement sur les confrontations directes exploitables.
+function HeadToHeadMetric({
+  icon: Icon,
+  label,
+  value,
+  detail,
+  tone = "teal",
+}: {
+  icon: LucideIcon;
+  label: string;
+  value: string;
+  detail?: string;
+  tone?: "teal" | "blue" | "amber" | "red";
+}) {
+  return (
+    <article className={`rb-detail-h2h-metric rb-detail-h2h-metric--${tone}`}>
+      <span className="rb-detail-h2h-metric__icon" aria-hidden="true">
+        <Icon size={18} strokeWidth={1.8} />
+      </span>
+      <span>{label}</span>
+      <strong>{value}</strong>
+      {detail ? <small>{detail}</small> : null}
+    </article>
+  );
+}
+
+// Ce composant distingue clairement le chargement, l'erreur et l'absence réelle d'historique direct.
+function HeadToHeadState({
+  kind,
+  title,
+  description,
+  updatedAt,
+}: {
+  kind: "loading" | "error" | "empty";
+  title: string;
+  description: string;
+  updatedAt: string | null;
+}) {
+  const Icon = kind === "loading" ? RefreshCw : kind === "error" ? Info : Database;
+
+  return (
+    <section className={`rb-detail-h2h-state rb-detail-h2h-state--${kind}`}>
+      <span className="rb-detail-h2h-state__icon" aria-hidden="true">
+        <Icon size={34} strokeWidth={1.6} />
+      </span>
+      <div>
+        <p>Confrontations directes</p>
+        <h3>{title}</h3>
+        <span>{description}</span>
+        {updatedAt ? (
+          <small>Dernière vérification : {getCompactFreshnessLabel(updatedAt)}</small>
+        ) : null}
+      </div>
+    </section>
+  );
+}
+
+// Cette fonction transforme le volume d'historique en libellé public simple.
+function getHeadToHeadDepthLabel(count: number) {
+  if (count <= 1) {
+    return "Historique très limité";
+  }
+
+  if (count <= 3) {
+    return "Historique limité";
+  }
+
+  return "Historique disponible";
+}
+
+// Cette fonction calcule la part visuelle d'un résultat dans le bilan H2H.
+function getHeadToHeadShare(value: number, calculable: number) {
+  return calculable > 0 ? Math.max(0, Math.min(100, (value / calculable) * 100)) : 0;
+}
+
+// Ce composant présente une seule confrontation dans un hero compact et premium.
+function HeadToHeadSingleDuel({
+  match,
+  headToHeadMatch,
+  updatedAt,
+}: {
+  match: Match;
+  headToHeadMatch: HeadToHeadMatch;
+  updatedAt: string | null;
+}) {
+  const hasScore =
+    headToHeadMatch.home_score !== null &&
+    headToHeadMatch.away_score !== null;
+  const totalGoals = hasScore
+    ? (headToHeadMatch.home_score ?? 0) + (headToHeadMatch.away_score ?? 0)
+    : null;
+  const bothTeamsScored = hasScore
+    ? (headToHeadMatch.home_score ?? 0) > 0 &&
+      (headToHeadMatch.away_score ?? 0) > 0
+    : null;
+
+  return (
+    <div className="rb-detail-h2h-shell rb-detail-h2h-shell--single">
+      <section className="rb-detail-h2h-single-hero">
+        <header className="rb-detail-h2h-section-heading rb-detail-h2h-section-heading--hero">
+          <div>
+            <p>Dernier duel disponible</p>
+            <h3>Une seule confrontation directe identifiée</h3>
+          </div>
+          <span>Historique très limité</span>
+        </header>
+
+        <div className="rb-detail-h2h-single-hero__stage">
+          <HeadToHeadTeamIdentity
+            match={match}
+            teamName={headToHeadMatch.home_team}
+            sideLabel="Domicile"
+          />
+
+          <div className="rb-detail-h2h-single-hero__score">
+            <span className="rb-detail-h2h-single-hero__score-glow" aria-hidden="true" />
+            <strong>{formatHeadToHeadScore(headToHeadMatch)}</strong>
+            <span>{buildHeadToHeadMatchReading(headToHeadMatch, match)}</span>
+          </div>
+
+          <HeadToHeadTeamIdentity
+            match={match}
+            teamName={headToHeadMatch.away_team}
+            sideLabel="Extérieur"
+          />
+        </div>
+
+        <div className="rb-detail-h2h-single-hero__meta">
+          <span><Calendar size={16} aria-hidden="true" />{formatRecentMatchDate(headToHeadMatch.utc_date)}</span>
+          <span><Trophy size={16} aria-hidden="true" />{headToHeadMatch.competition_name || "Compétition non fournie"}</span>
+        </div>
+
+        <div className="rb-detail-h2h-single-hero__facts">
+          <HeadToHeadMetric
+            icon={Swords}
+            label="Issue du duel"
+            value={buildHeadToHeadMatchReading(headToHeadMatch, match)}
+            tone="blue"
+          />
+          <HeadToHeadMetric
+            icon={Target}
+            label="Buts inscrits"
+            value={totalGoals === null ? "Non calculable" : String(totalGoals)}
+            detail="Total sur cette rencontre"
+            tone="amber"
+          />
+          <HeadToHeadMetric
+            icon={CircleDot}
+            label="Les deux équipes ont marqué"
+            value={bothTeamsScored === null ? "Non calculable" : bothTeamsScored ? "Oui" : "Non"}
+            tone="teal"
+          />
+        </div>
+
+        <footer className="rb-detail-h2h-single-hero__footer">
+          <Shield size={18} strokeWidth={1.7} aria-hidden="true" />
+          <div>
+            <strong>Lecture limitée à un seul duel</strong>
+            <span>Ces indicateurs décrivent uniquement cette rencontre et ne constituent pas une tendance historique.</span>
+          </div>
+          {updatedAt ? <small>Vérification : {getCompactFreshnessLabel(updatedAt)}</small> : null}
+        </footer>
+      </section>
+    </div>
+  );
+}
+
+// Ce composant affiche une équipe dans le bilan principal de plusieurs duels.
+function HeadToHeadOverviewTeam({
+  team,
+  wins,
+  align,
+}: {
+  team: Team;
+  wins: number;
+  align: "home" | "away";
+}) {
+  return (
+    <div className={`rb-detail-h2h-overview-team rb-detail-h2h-overview-team--${align}`}>
+      <TeamLogo team={team} />
+      <div>
+        <strong>{getTeamDisplayName(team)}</strong>
+        <span>{wins} victoire{wins > 1 ? "s" : ""}</span>
+      </div>
+    </div>
+  );
+}
+
+// Ce composant affiche la liste premium des confrontations sans chevauchement.
+function HeadToHeadHistoryList({
   match,
   headToHeadMatches,
 }: {
   match: Match;
   headToHeadMatches: HeadToHeadMatch[];
 }) {
-  const tableStyle: CSSProperties = {
-    width: "100%",
-    borderCollapse: "separate",
-    borderSpacing: "0 10px",
-  };
-  const headStyle: CSSProperties = {
-    color: "rgba(226, 232, 240, 0.58)",
-    fontSize: "0.72rem",
-    letterSpacing: "0.08em",
-    textTransform: "uppercase",
-    textAlign: "left",
-  };
-  const cellStyle: CSSProperties = {
-    background: "rgba(15, 23, 42, 0.62)",
-    borderTop: "1px solid rgba(148, 163, 184, 0.12)",
-    borderBottom: "1px solid rgba(148, 163, 184, 0.12)",
-    padding: "13px 14px",
-    color: "rgba(226, 232, 240, 0.82)",
-    verticalAlign: "top",
-  };
-  const firstCellStyle: CSSProperties = {
-    ...cellStyle,
-    borderLeft: "1px solid rgba(148, 163, 184, 0.12)",
-    borderTopLeftRadius: "14px",
-    borderBottomLeftRadius: "14px",
-    fontWeight: 800,
-    color: "#f8fafc",
-  };
-  const lastCellStyle: CSSProperties = {
-    ...cellStyle,
-    borderRight: "1px solid rgba(148, 163, 184, 0.12)",
-    borderTopRightRadius: "14px",
-    borderBottomRightRadius: "14px",
-    color: "rgba(203, 213, 225, 0.76)",
-    lineHeight: 1.55,
-  };
-
   return (
-    <div style={{ overflowX: "auto" }}>
-      <table style={tableStyle}>
-        <thead>
-          <tr>
-            <th style={{ ...headStyle, padding: "0 14px" }}>Date</th>
-            <th style={{ ...headStyle, padding: "0 14px" }}>Compétition</th>
-            <th style={{ ...headStyle, padding: "0 14px" }}>Match</th>
-            <th style={{ ...headStyle, padding: "0 14px" }}>Score</th>
-            <th style={{ ...headStyle, padding: "0 14px" }}>Lecture</th>
-          </tr>
-        </thead>
-        <tbody>
-          {headToHeadMatches.map((headToHeadMatch, index) => (
-            <tr key={`${headToHeadMatch.match_id ?? headToHeadMatch.utc_date ?? index}`}>
-              <td style={firstCellStyle}>{formatRecentMatchDate(headToHeadMatch.utc_date)}</td>
-              <td style={cellStyle}>{headToHeadMatch.competition_name || "Compétition non fournie"}</td>
-              <td style={cellStyle}>{formatHeadToHeadTeams(headToHeadMatch)}</td>
-              <td style={cellStyle}>{formatHeadToHeadScore(headToHeadMatch)}</td>
-              <td style={lastCellStyle}>{buildHeadToHeadMatchReading(headToHeadMatch, match)}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="rb-detail-h2h-history">
+      {sortHeadToHeadMatches(headToHeadMatches).map((headToHeadMatch, index) => {
+        const historicalHomeTeam = getHistoricalTeam(match, headToHeadMatch.home_team);
+        const historicalAwayTeam = getHistoricalTeam(match, headToHeadMatch.away_team);
+
+        return (
+          <article
+            className="rb-detail-h2h-history-row"
+            key={`${headToHeadMatch.match_id ?? headToHeadMatch.utc_date ?? index}`}
+            style={{ "--rb-h2h-row-delay": `${index * 55 + 80}ms` } as CSSProperties}
+          >
+            <div className="rb-detail-h2h-history-row__meta">
+              <strong>{formatRecentMatchDate(headToHeadMatch.utc_date)}</strong>
+              <span title={headToHeadMatch.competition_name || "Compétition non fournie"}>
+                {headToHeadMatch.competition_name || "Compétition non fournie"}
+              </span>
+            </div>
+
+            <div className="rb-detail-h2h-history-row__team rb-detail-h2h-history-row__team--home">
+              {historicalHomeTeam ? (
+                <TeamLogo team={historicalHomeTeam} />
+              ) : (
+                <span className="rb-detail-h2h-history-row__fallback" aria-hidden="true">
+                  {getHistoricalTeamInitials(headToHeadMatch.home_team)}
+                </span>
+              )}
+              <strong>{headToHeadMatch.home_team || "Équipe domicile"}</strong>
+            </div>
+
+            <strong className="rb-detail-h2h-history-row__score">
+              {formatHeadToHeadScore(headToHeadMatch)}
+            </strong>
+
+            <div className="rb-detail-h2h-history-row__team rb-detail-h2h-history-row__team--away">
+              {historicalAwayTeam ? (
+                <TeamLogo team={historicalAwayTeam} />
+              ) : (
+                <span className="rb-detail-h2h-history-row__fallback" aria-hidden="true">
+                  {getHistoricalTeamInitials(headToHeadMatch.away_team)}
+                </span>
+              )}
+              <strong>{headToHeadMatch.away_team || "Équipe extérieure"}</strong>
+            </div>
+
+            <span className="rb-detail-h2h-history-row__reading">
+              {buildHeadToHeadMatchReading(headToHeadMatch, match)}
+            </span>
+          </article>
+        );
+      })}
     </div>
   );
 }
 
-// Cette fonction récupère une valeur numérique précise dans le catalogue H2H V19.
-function getV19H2HFeatureNumber(
-  analysis: V19H2HResponse,
-  featureName: string,
-): number | null {
-  const feature = analysis.result.features.find(
-    (item) => item.name === featureName,
-  );
-
-  return typeof feature?.value === "number" ? feature.value : null;
-}
-
-// Cette fonction transforme les résultats H2H V19 en résumé compréhensible.
-function buildV19H2HUserSummary(
-  analysis: V19H2HResponse | null,
-  statusMessage: string,
-): string | null {
-  if (!analysis) {
-    return statusMessage.startsWith("Chargement")
-      ? "L’analyse enrichie des confrontations est en cours de chargement."
-      : null;
-  }
-
-  const usableCount =
-    analysis.result.meeting_selection_summary.usable_count;
-
-  if (usableCount <= 0) {
-    return (
-      "Aucune confrontation directe suffisamment fiable n’est disponible " +
-      "pour enrichir l’analyse de ce match."
-    );
-  }
-
-  const totalGoalsAverage = getV19H2HFeatureNumber(
-    analysis,
-    "h2h_total_goals_avg",
-  );
-  const bttsRate = getV19H2HFeatureNumber(
-    analysis,
-    "h2h_btts_rate",
-  );
-  const sentences: string[] = [];
-
-  if (usableCount === 1) {
-    sentences.push(
-      "Une seule confrontation directe exploitable est disponible.",
-    );
-
-    if (totalGoalsAverage !== null) {
-      const roundedGoals = Math.round(totalGoalsAverage);
-
-      sentences.push(
-        `Elle s’est terminée avec ${roundedGoals} but${
-          roundedGoals > 1 ? "s" : ""
-        }.`,
-      );
-    }
-
-    if (bttsRate === 1) {
-      sentences.push("Les deux équipes ont marqué.");
-    } else if (bttsRate === 0) {
-      sentences.push("Les deux équipes n’ont pas marqué.");
-    }
-
-    sentences.push(
-      "Cet historique est trop limité pour influencer fortement " +
-        "l’analyse du prochain match.",
-    );
-
-    return sentences.join(" ");
-  }
-
-  sentences.push(
-    `${usableCount} confrontations directes exploitables sont disponibles.`,
-  );
-
-  if (totalGoalsAverage !== null) {
-    sentences.push(
-      `La moyenne observée est de ${totalGoalsAverage.toLocaleString(
-        "fr-FR",
-        {
-          minimumFractionDigits: 1,
-          maximumFractionDigits: 2,
-        },
-      )} buts par match.`,
-    );
-  }
-
-  if (bttsRate !== null) {
-    sentences.push(
-      `Les deux équipes ont marqué dans ${Math.round(
-        bttsRate * 100,
-      )} % de ces matchs.`,
-    );
-  }
-
-  sentences.push(
-    "Ces résultats apportent un contexte historique, mais restent " +
-      "un signal secondaire.",
-  );
-
-  return sentences.join(" ");
-}
-
-// Ce composant affiche l’onglet Face à face comme un historique détaillé et non comme un résumé de sidebar.
-function HeadToHeadTabContent({
+// Ce composant synthétise plusieurs confrontations dans une composition plus dense et hiérarchisée.
+function HeadToHeadMultipleHistory({
   match,
   teamHistory,
-  v19H2HAnalysis,
-  v19H2HStatus,
+  headToHeadMatches,
+}: {
+  match: Match;
+  teamHistory: TeamHistoryResponse;
+  headToHeadMatches: HeadToHeadMatch[];
+}) {
+  const summary = buildHeadToHeadHistoricalSummary(headToHeadMatches, match);
+  const totalGoals = summary.homeGoals + summary.awayGoals;
+  const homeShare = getHeadToHeadShare(summary.homeWins, summary.calculable);
+  const drawShare = getHeadToHeadShare(summary.draws, summary.calculable);
+  const awayShare = getHeadToHeadShare(summary.awayWins, summary.calculable);
+
+  return (
+    <div className="rb-detail-h2h-shell rb-detail-h2h-shell--multiple">
+      <section className="rb-detail-h2h-overview rb-detail-h2h-overview--premium">
+        <header className="rb-detail-h2h-section-heading rb-detail-h2h-section-heading--hero">
+          <div>
+            <p>Bilan des confrontations directes</p>
+            <h3>{summary.total} duel{summary.total > 1 ? "s" : ""} disponible{summary.total > 1 ? "s" : ""}</h3>
+          </div>
+          <span>{getHeadToHeadDepthLabel(summary.total)}</span>
+        </header>
+
+        <div className="rb-detail-h2h-overview__stage">
+          <HeadToHeadOverviewTeam team={match.home_team} wins={summary.homeWins} align="home" />
+
+          <div className="rb-detail-h2h-overview__center">
+            <strong>{summary.total}</strong>
+            <span>confrontations directes</span>
+            <div
+              className={`rb-detail-h2h-result-bar${summary.calculable === 0 ? " rb-detail-h2h-result-bar--empty" : ""}`}
+              aria-label="Répartition des résultats exploitables"
+            >
+              {summary.calculable > 0 ? (
+                <>
+                  <span className="rb-detail-h2h-result-bar__home" style={{ width: `${homeShare}%` }} />
+                  <span className="rb-detail-h2h-result-bar__draw" style={{ width: `${drawShare}%` }} />
+                  <span className="rb-detail-h2h-result-bar__away" style={{ width: `${awayShare}%` }} />
+                </>
+              ) : null}
+            </div>
+            <small>{summary.draws} nul{summary.draws > 1 ? "s" : ""}</small>
+          </div>
+
+          <HeadToHeadOverviewTeam team={match.away_team} wins={summary.awayWins} align="away" />
+        </div>
+
+        <div className="rb-detail-h2h-overview__badges">
+          <span><Target size={15} aria-hidden="true" />{summary.calculable > 0 ? `${totalGoals} buts cumulés` : "Buts non calculables"}</span>
+          <span><Calendar size={15} aria-hidden="true" />{formatHeadToHeadPeriod(summary)}</span>
+          <span><Database size={15} aria-hidden="true" />{summary.calculable} score{summary.calculable > 1 ? "s" : ""} exploitable{summary.calculable > 1 ? "s" : ""}</span>
+        </div>
+      </section>
+
+      <section className="rb-detail-h2h-trends rb-detail-h2h-trends--compact">
+        <header className="rb-detail-h2h-section-heading">
+          <div>
+            <p>Tendances de cet historique</p>
+            <h3>Indicateurs calculés sur les seuls duels disponibles</h3>
+          </div>
+        </header>
+
+        <div className="rb-detail-h2h-metrics rb-detail-h2h-metrics--compact">
+          <HeadToHeadMetric icon={Gauge} label="Moyenne de buts" value={formatHeadToHeadAverage(totalGoals, summary.calculable)} detail="Par confrontation exploitable" tone="blue" />
+          <HeadToHeadMetric icon={CircleDot} label="Les deux équipes ont marqué" value={formatHeadToHeadRate(summary.bttsCount, summary.calculable)} tone="teal" />
+          <HeadToHeadMetric icon={TrendingUp} label="Plus de 1,5 but" value={formatHeadToHeadRate(summary.overOneFiveCount, summary.calculable)} tone="amber" />
+          <HeadToHeadMetric icon={BarChart3} label="Plus de 2,5 buts" value={formatHeadToHeadRate(summary.overTwoFiveCount, summary.calculable)} tone="red" />
+        </div>
+      </section>
+
+      <section className="rb-detail-h2h-list-card rb-detail-h2h-list-card--premium">
+        <header className="rb-detail-h2h-section-heading">
+          <div>
+            <p>Historique disponible</p>
+            <h3>Liste des confrontations</h3>
+          </div>
+          <span>{headToHeadMatches.length} rencontre{headToHeadMatches.length > 1 ? "s" : ""}</span>
+        </header>
+
+        <HeadToHeadHistoryList match={match} headToHeadMatches={headToHeadMatches} />
+
+        <footer className="rb-detail-h2h-list-card__footer">
+          <Shield size={18} strokeWidth={1.7} aria-hidden="true" />
+          <span>Ces indicateurs décrivent uniquement les confrontations directes affichées et ne garantissent aucun résultat futur.</span>
+          {teamHistory.data_freshness.last_updated_at ? (
+            <small>Vérification : {getCompactFreshnessLabel(teamHistory.data_freshness.last_updated_at)}</small>
+          ) : null}
+        </footer>
+      </section>
+    </div>
+  );
+}
+
+// Ce composant affiche une sidebar synthétique sans répéter le dernier duel du contenu principal.
+function HeadToHeadSidebar({
+  match,
+  teamHistory,
+  teamHistoryStatus,
 }: {
   match: Match;
   teamHistory: TeamHistoryResponse | null;
-  v19H2HAnalysis: V19H2HResponse | null;
-  v19H2HStatus: string;
+  teamHistoryStatus: string;
 }) {
+  const isLoading = teamHistoryStatus.startsWith("Chargement") || (!teamHistory && !teamHistoryStatus.startsWith("Impossible"));
+  const hasError = teamHistoryStatus.startsWith("Impossible");
   const headToHeadMatches = teamHistory?.head_to_head ?? [];
   const summary = buildHeadToHeadHistoricalSummary(headToHeadMatches, match);
-  const sourceLabel = teamHistory?.data_freshness.source_label ?? "Source en attente";
-  const summaryCards = buildHeadToHeadSummaryCards(
-    summary,
-    match,
-    teamHistory?.summary?.head_to_head_note ?? null,
-  );
-  const v19UserSummary = buildV19H2HUserSummary(
-    v19H2HAnalysis,
-    v19H2HStatus,
-  );
+  const lastMeeting = sortHeadToHeadMatches(headToHeadMatches)[0] ?? null;
+  const updatedAt = teamHistory?.data_freshness.last_updated_at ?? null;
 
-  const historicalContent = !headToHeadMatches.length ? (
-    <section className="rb-detail-v2-card rb-detail-v2-pending-tab">
-      <p>Historique d'affichage existant</p>
-      <h3>Aucune confrontation directe disponible</h3>
-      <p>
-        La source historique actuelle ne fournit pas de confrontation directe exploitable pour cette rencontre. RubyBets n’invente pas d’historique absent.
-      </p>
-    </section>
-  ) : (
-    <>
-      <section className="rb-detail-v2-card rb-detail-v2-analysis-card">
-        <div className="rb-detail-v2-section-header">
+  return (
+    <div className="rb-detail-h2h-sidebar">
+      <section className="rb-detail-h2h-sidebar-card rb-detail-h2h-sidebar-card--summary">
+        <header>
+          <span><Swords size={18} aria-hidden="true" /></span>
           <div>
-            <p>Disponibilité des confrontations</p>
-            <h3>Historique direct disponible</h3>
+            <p>Synthèse directe</p>
+            <h3>Face à face</h3>
           </div>
-          <span>{getTeamHistoryStatusLabel(teamHistory)} · {sourceLabel}</span>
-        </div>
+        </header>
 
-        <div className="rb-detail-v2-insight-grid">
-          {summaryCards.map((card) => (
-            <AnalysisInsightCard key={card.title} card={card} />
-          ))}
-        </div>
+        {isLoading ? (
+          <p>Recherche des confrontations disponibles…</p>
+        ) : hasError ? (
+          <p>Les repères directs ne sont pas disponibles pour le moment.</p>
+        ) : (
+          <>
+            <div className="rb-detail-h2h-sidebar-card__headline">
+              <strong>{headToHeadMatches.length}</strong>
+              <span>confrontation{headToHeadMatches.length > 1 ? "s" : ""}</span>
+            </div>
+
+            <span className="rb-detail-h2h-sidebar-card__depth">
+              {getHeadToHeadDepthLabel(headToHeadMatches.length)}
+            </span>
+
+            {summary.calculable > 0 ? (
+              <div className="rb-detail-h2h-sidebar-balance">
+                <span>{getTeamShortName(match.home_team)} <strong>{summary.homeWins}</strong></span>
+                <span>Nuls <strong>{summary.draws}</strong></span>
+                <span>{getTeamShortName(match.away_team)} <strong>{summary.awayWins}</strong></span>
+              </div>
+            ) : null}
+
+            {lastMeeting ? (
+              <div className="rb-detail-h2h-sidebar-last">
+                <span>Dernier duel</span>
+                <strong>{formatRecentMatchDate(lastMeeting.utc_date)}</strong>
+                <small>{formatHeadToHeadScore(lastMeeting)}</small>
+              </div>
+            ) : null}
+          </>
+        )}
       </section>
 
-      <section className="rb-detail-v2-card rb-detail-v2-stats-card">
-        <div className="rb-detail-v2-section-header">
+      <section className="rb-detail-h2h-sidebar-card rb-detail-h2h-sidebar-card--notice">
+        <header>
+          <span><Shield size={18} aria-hidden="true" /></span>
           <div>
-            <p>Résumé historique</p>
-            <h3>{getTeamShortName(match.home_team)} vs {getTeamShortName(match.away_team)}</h3>
+            <p>Lecture responsable</p>
+            <h3>Contexte historique</h3>
           </div>
-          <span>Contexte historique uniquement</span>
-        </div>
-
-        <p className="rb-detail-v2-analysis-lead">
-          {v19UserSummary ??
-            `RubyBets a trouvé ${summary.total} confrontation${
-              summary.total > 1 ? "s" : ""
-            } directe${
-              summary.total > 1 ? "s" : ""
-            } dans les données disponibles. Cet historique sert à contextualiser la rencontre, sans être transformé en certitude sportive.`}
-        </p>
+        </header>
+        <p>Un face-à-face décrit le passé entre deux équipes. Il ne suffit pas à anticiper une prochaine rencontre.</p>
+        {updatedAt ? <small>Vérification : {getCompactFreshnessLabel(updatedAt)}</small> : null}
       </section>
-
-      <section className="rb-detail-v2-card rb-detail-v2-stats-card">
-        <div className="rb-detail-v2-section-header">
-          <div>
-            <p>Confrontations disponibles</p>
-            <h3>Liste détaillée</h3>
-          </div>
-          <span>{summary.calculable} score(s) exploitable(s)</span>
-        </div>
-
-        <HeadToHeadMatchesTable match={match} headToHeadMatches={headToHeadMatches} />
-      </section>
-
-      <section className="rb-detail-v2-card rb-detail-v2-pending-tab">
-        <p>Ce que l’historique peut dire</p>
-        <h3>Limites de lecture</h3>
-        <ul className="rb-detail-v2-context-list">
-          <li>Les confrontations directes donnent un contexte historique, mais ne suffisent pas à anticiper le résultat du match.</li>
-          <li>Les effectifs, la forme récente, les absences et le contexte de compétition peuvent avoir changé.</li>
-          <li>RubyBets affiche uniquement les confrontations réellement disponibles et n’utilise aucune cote FlashScore.</li>
-        </ul>
-      </section>
-    </>
+    </div>
   );
+}
 
-  return historicalContent;
+
+// Ce composant affiche l'onglet Face à face avec un rendu adapté à zéro, une ou plusieurs confrontations.
+function HeadToHeadTabContent({
+  match,
+  teamHistory,
+  teamHistoryStatus,
+}: {
+  match: Match;
+  teamHistory: TeamHistoryResponse | null;
+  teamHistoryStatus: string;
+}) {
+  const isLoading = teamHistoryStatus.startsWith("Chargement") || (!teamHistory && !teamHistoryStatus.startsWith("Impossible"));
+  const hasError = teamHistoryStatus.startsWith("Impossible");
+  const headToHeadMatches = teamHistory?.head_to_head ?? [];
+  const updatedAt = teamHistory?.data_freshness.last_updated_at ?? null;
+
+  if (isLoading) {
+    return (
+      <div className="rb-detail-h2h-shell">
+        <HeadToHeadState
+          kind="loading"
+          title="Recherche des confrontations directes"
+          description="RubyBets vérifie les rencontres historiques réellement disponibles entre ces deux équipes."
+          updatedAt={null}
+        />
+        <div className="rb-detail-h2h-loading-grid" aria-hidden="true">
+          <span /><span /><span />
+        </div>
+      </div>
+    );
+  }
+
+  if (hasError) {
+    return (
+      <div className="rb-detail-h2h-shell">
+        <HeadToHeadState
+          kind="error"
+          title="Les confrontations n'ont pas pu être chargées"
+          description="Cette indisponibilité technique est distincte d'une absence réelle d'historique."
+          updatedAt={null}
+        />
+      </div>
+    );
+  }
+
+  if (headToHeadMatches.length === 0) {
+    return (
+      <div className="rb-detail-h2h-shell">
+        <HeadToHeadState
+          kind="empty"
+          title="Aucune confrontation directe disponible"
+          description="Aucune rencontre directe exploitable n'a été identifiée dans les données actuellement accessibles. RubyBets ne remplace pas cet historique par des statistiques provenant d'autres adversaires."
+          updatedAt={updatedAt}
+        />
+        <section className="rb-detail-h2h-empty-explanation">
+          <Info size={20} aria-hidden="true" />
+          <div>
+            <strong>Aucune tendance H2H calculable</strong>
+            <span>La couverture historique peut être limitée selon les équipes, la compétition ou la période disponible.</span>
+          </div>
+        </section>
+      </div>
+    );
+  }
+
+  if (headToHeadMatches.length === 1) {
+    return (
+      <HeadToHeadSingleDuel
+        match={match}
+        headToHeadMatch={headToHeadMatches[0]}
+        updatedAt={updatedAt}
+      />
+    );
+  }
+
+  return teamHistory ? (
+    <HeadToHeadMultipleHistory
+      match={match}
+      teamHistory={teamHistory}
+      headToHeadMatches={headToHeadMatches}
+    />
+  ) : null;
 }
 
 // Ce composant affiche un état propre pour les onglets non encore détaillés.
@@ -3736,14 +4101,12 @@ function MatchDetailsScreen({
   matchLineups,
   matchNewsContext,
   teamHistory,
-  v19H2HAnalysis,
   matchDetailsStatus,
   matchContextStatus,
   matchAdvancedStatsStatus,
   matchLineupsStatus,
   matchNewsContextStatus,
   teamHistoryStatus,
-  v19H2HStatus,
   onRequestAdvancedStats,
   onNavigate,
 }: MatchDetailsScreenProps) {
@@ -3843,8 +4206,7 @@ function MatchDetailsScreen({
             <HeadToHeadTabContent
               match={selectedMatch}
               teamHistory={teamHistory}
-              v19H2HAnalysis={v19H2HAnalysis}
-              v19H2HStatus={v19H2HStatus}
+              teamHistoryStatus={teamHistoryStatus}
             />
           ) : null}
 
@@ -3867,7 +4229,13 @@ function MatchDetailsScreen({
             isVisible={activeTab === "context"}
           />
 
-          {activeTab === "lineup" ? (
+          {activeTab === "headToHead" ? (
+            <HeadToHeadSidebar
+              match={selectedMatch}
+              teamHistory={teamHistory}
+              teamHistoryStatus={teamHistoryStatus}
+            />
+          ) : activeTab === "lineup" ? (
             <>
               <MatchInfoCard match={selectedMatch} freshnessLabel={freshnessLabel} />
               <HeadToHeadCard teamHistory={teamHistory} onOpen={() => setActiveTab("headToHead")} />
@@ -3899,17 +4267,16 @@ export default MatchDetailsScreen;
 // Schéma de communication du fichier :
 // MatchDetailsScreen.tsx
 // ├── conserve les contrats V19 reçus depuis App.tsx sans exposer leur nom interne dans la Vue d’ensemble
-// ├── utilise aussi V19H2HResponse de models/rubybets.ts pour afficher le catalogue v19.h2h.core.1
 // ├── affiche RubyNewsChat.tsx dans la colonne droite uniquement lorsque l’onglet Contexte est actif
 // ├── utilise les helpers d’affichage de helpers/displayText.ts
 // ├── charge à la demande et affiche /advanced-stats dans l’onglet Analyse détaillée
 // ├── conserve matchAnalysis.analysis comme lecture narrative complémentaire
 // ├── transforme matchLineups en terrains, bancs et repères historiques sans inventer de joueurs
 // ├── alimente l’onglet Forme & tendances avec des cartes, jauges et séries animées issues uniquement de teamHistory.form_summary
-// ├── utilise teamHistoryStatus pour distinguer chargement, erreur et historique réellement indisponible
 // ├── alimente l’analyse synthétique avec teamHistory.form_summary quand il est disponible
 // ├── alimente la comparaison avant-match avec les points, buts et écarts issus de teamHistory.form_summary
 // ├── affiche les derniers matchs disponibles uniquement dans la Vue d’ensemble via teamHistory.recent_matches_overview
-// ├── affiche les confrontations directes disponibles via teamHistory.head_to_head
+// ├── affiche les confrontations directes via teamHistory.head_to_head avec des états 0, 1 ou plusieurs duels
+// ├── utilise teamHistoryStatus pour distinguer le chargement, l’erreur technique et l’absence réelle de H2H
 // ├── déclenche la navigation vers Matchs, Analyse et Prédictions via onNavigate
 // └── charge styles/MatchDetailsScreen.css pour le rendu premium et responsive
