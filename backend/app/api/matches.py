@@ -22,6 +22,7 @@ from app.services.cache_service import (
     save_cache,
 )
 from app.services.match_advanced_stats_service import build_match_advanced_stats_response
+from app.services.match_lineups_service import build_match_lineups_response
 from app.services.match_service import (
     clean_params,
     filter_matches_by_team,
@@ -32,13 +33,11 @@ from app.services.persistence_service import try_persist_matches, try_persist_te
 from app.services.rapidapi_flashscore_client import (
     FLASHSCORE_DEFAULT_TIMEZONE,
     FLASHSCORE_SOURCE,
-    decode_flashscore_match_id,
     filter_flashscore_matches_by_competition,
     filter_flashscore_matches_by_status,
     filter_flashscore_matches_by_team,
     get_normalized_flashscore_match_details,
     get_normalized_flashscore_matches_by_day,
-    get_rapidapi_flashscore_data,
 )
 from app.services.team_history_service import build_team_history_response
 from app.services.team_news_context_service import build_match_news_context_response
@@ -51,7 +50,6 @@ MATCHES_CACHE_TTL_MINUTES = 30
 MATCH_DETAIL_CACHE_TTL_MINUTES = 30
 FLASHSCORE_MATCHES_CACHE_TTL_MINUTES = 30
 FLASHSCORE_MATCH_DETAIL_CACHE_TTL_MINUTES = 30
-FLASHSCORE_LINEUPS_CACHE_TTL_MINUTES = 60
 FLASHSCORE_DEFAULT_UPCOMING_DAYS = 7
 
 
@@ -566,310 +564,6 @@ def get_cached_flashscore_match_detail(
     )
 
 
-# Cette fonction vérifie que la route de compositions FlashScore peut être appelée.
-def is_flashscore_lineups_available() -> bool:
-    return bool(settings.rapidapi_key.strip())
-
-
-# Cette fonction construit un nom de cache stable pour les compositions FlashScore.
-def build_flashscore_lineups_cache_name(match_id: int) -> str:
-    return build_cache_name("flashscore_lineups", match_id)
-
-
-# Cette fonction récupère les compositions FlashScore depuis le cache ou RapidAPI.
-def get_cached_flashscore_lineups(match_id: int) -> tuple[dict[str, Any], dict[str, Any]]:
-    source_match_id = decode_flashscore_match_id(match_id)
-
-    if not source_match_id:
-        return {
-            "source_match_id": None,
-            "lineups": [],
-            "status": "unavailable",
-            "reason": "flashscore_source_match_id_not_found",
-        }, {
-            "source": FLASHSCORE_SOURCE,
-            "from_cache": False,
-            "updated_at": None,
-            "ttl_minutes": FLASHSCORE_LINEUPS_CACHE_TTL_MINUTES,
-        }
-
-    cache_name = build_flashscore_lineups_cache_name(match_id)
-    cached_payload = load_cache(cache_name)
-
-    if cached_payload and is_cache_fresh(
-        cached_payload,
-        ttl_minutes=FLASHSCORE_LINEUPS_CACHE_TTL_MINUTES,
-    ):
-        return cached_payload.get("data", {}), build_data_freshness(
-            cache_payload=cached_payload,
-            from_cache=True,
-            ttl_minutes=FLASHSCORE_LINEUPS_CACHE_TTL_MINUTES,
-        )
-
-    raw_lineups = get_rapidapi_flashscore_data(
-        endpoint="/matches/match/lineups",
-        params={"match_id": source_match_id},
-    )
-
-    if isinstance(raw_lineups, dict) and raw_lineups.get("status") == "error":
-        return {
-            "source_match_id": source_match_id,
-            "lineups": [],
-            "status": "error",
-            "error": raw_lineups,
-        }, {
-            "source": FLASHSCORE_SOURCE,
-            "from_cache": False,
-            "updated_at": None,
-            "ttl_minutes": FLASHSCORE_LINEUPS_CACHE_TTL_MINUTES,
-        }
-
-    saved_payload = save_cache(
-        cache_name=cache_name,
-        data={
-            "source_match_id": source_match_id,
-            "lineups": raw_lineups,
-            "status": "available",
-        },
-        source=FLASHSCORE_SOURCE,
-    )
-
-    return saved_payload.get("data", {}), build_data_freshness(
-        cache_payload=saved_payload,
-        from_cache=False,
-        ttl_minutes=FLASHSCORE_LINEUPS_CACHE_TTL_MINUTES,
-    )
-
-
-# Cette fonction extrait une liste de compositions depuis les différents formats possibles de FlashScore.
-def extract_flashscore_lineups_list(payload: Any) -> list[dict[str, Any]]:
-    if isinstance(payload, list):
-        return [item for item in payload if isinstance(item, dict)]
-
-    if not isinstance(payload, dict):
-        return []
-
-    lineups = payload.get("lineups")
-
-    if isinstance(lineups, list):
-        return [item for item in lineups if isinstance(item, dict)]
-
-    if isinstance(lineups, dict):
-        nested_data = lineups.get("data")
-        if isinstance(nested_data, list):
-            return [item for item in nested_data if isinstance(item, dict)]
-
-    data = payload.get("data")
-
-    if isinstance(data, list):
-        return [item for item in data if isinstance(item, dict)]
-
-    return []
-
-
-# Cette fonction normalise un joueur de composition FlashScore pour l'affichage frontend.
-def normalize_flashscore_lineup_player(player: Any) -> dict[str, Any]:
-    if not isinstance(player, dict):
-        return {}
-
-    return {
-        "name": player.get("name"),
-        "field_name": player.get("fieldName"),
-        "number": player.get("number"),
-        "player_id": player.get("player_id"),
-        "player_url": player.get("player_url"),
-        "image_path": player.get("image_path"),
-        "club_name": player.get("country_name"),
-        "club_logo": player.get("country_image_path"),
-        "reason": player.get("reason"),
-    }
-
-
-# Cette fonction normalise le bloc domicile ou extérieur d'une composition FlashScore.
-def normalize_flashscore_lineup_side(
-    lineup_side: dict[str, Any] | None,
-    side: str,
-) -> dict[str, Any]:
-    safe_side = lineup_side if isinstance(lineup_side, dict) else {}
-    starting_lineups = [
-        normalize_flashscore_lineup_player(player)
-        for player in safe_side.get("startingLineups", [])
-        if isinstance(player, dict)
-    ]
-    substitutes = [
-        normalize_flashscore_lineup_player(player)
-        for player in safe_side.get("substitutes", [])
-        if isinstance(player, dict)
-    ]
-    predicted_lineups = [
-        normalize_flashscore_lineup_player(player)
-        for player in safe_side.get("predictedLineups", [])
-        if isinstance(player, dict)
-    ]
-    missing_players = [
-        normalize_flashscore_lineup_player(player)
-        for player in safe_side.get("missingPlayers", [])
-        if isinstance(player, dict)
-    ]
-    unsure_missing_players = [
-        normalize_flashscore_lineup_player(player)
-        for player in safe_side.get("unsureMissingPlayers", [])
-        if isinstance(player, dict)
-    ]
-
-    official_formation = safe_side.get("formation")
-    predicted_formation = safe_side.get("predictedFormation")
-    official_available = bool(starting_lineups or substitutes or official_formation)
-    predicted_available = bool(predicted_lineups or predicted_formation)
-
-    return {
-        "side": side,
-        "status": (
-            "official_available"
-            if official_available
-            else "predicted_available"
-            if predicted_available
-            else "unavailable"
-        ),
-        "average_rating": safe_side.get("averageRating"),
-        "formation": official_formation or predicted_formation,
-        "official_formation": official_formation,
-        "predicted_formation": predicted_formation,
-        "official_available": official_available,
-        "predicted_available": predicted_available,
-        "starting_lineups": starting_lineups,
-        "substitutes": substitutes,
-        "predicted_lineups": predicted_lineups,
-        "missing_players": missing_players,
-        "unsure_missing_players": unsure_missing_players,
-    }
-
-
-# Cette fonction retrouve le bloc domicile ou extérieur dans la réponse FlashScore.
-def find_flashscore_lineup_side(
-    lineups: list[dict[str, Any]],
-    side: str,
-) -> dict[str, Any] | None:
-    for lineup in lineups:
-        if str(lineup.get("side", "")).lower() == side:
-            return lineup
-
-    return None
-
-
-# Cette fonction construit les limites responsables liées aux compositions et absences.
-def build_lineups_limits() -> list[str]:
-    return [
-        "Les compositions affichées sont probables tant que la composition officielle n'est pas fournie.",
-        "RubyBets n'invente pas de titulaires, de remplaçants, d'absents ou d'effectif complet si la source ne les fournit pas.",
-        "Aucune cote FlashScore n'est utilisée par RubyBets.",
-    ]
-
-
-# Cette fonction construit une réponse indisponible homogène pour les compositions.
-def build_unavailable_lineups_response(
-    match_id: int,
-    empty_state: str,
-) -> dict[str, Any]:
-    return {
-        "source": FLASHSCORE_SOURCE,
-        "source_used": None,
-        "status": "unavailable",
-        "match_id": match_id,
-        "source_match_id": None,
-        "lineups": {
-            "composition_status": "unavailable",
-            "official_available": False,
-            "predicted_available": False,
-            "squad_available": False,
-            "home": normalize_flashscore_lineup_side(None, "home"),
-            "away": normalize_flashscore_lineup_side(None, "away"),
-            "empty_state": empty_state,
-            "limits": build_lineups_limits(),
-        },
-        "data_used": {
-            "flashscore_lineups": False,
-            "official_lineups": False,
-            "predicted_lineups": False,
-            "missing_players": False,
-            "squad": False,
-            "odds_used": False,
-        },
-        "data_freshness": {
-            "source": FLASHSCORE_SOURCE,
-            "from_cache": False,
-            "updated_at": None,
-            "ttl_minutes": FLASHSCORE_LINEUPS_CACHE_TTL_MINUTES,
-        },
-        "fallback_available": False,
-    }
-
-
-# Cette fonction construit la réponse normalisée des compositions pour le frontend.
-def build_normalized_lineups_response(
-    match_id: int,
-    payload: dict[str, Any],
-    data_freshness: dict[str, Any],
-) -> dict[str, Any]:
-    lineups = extract_flashscore_lineups_list(payload)
-    home_lineup = normalize_flashscore_lineup_side(
-        find_flashscore_lineup_side(lineups, "home"),
-        "home",
-    )
-    away_lineup = normalize_flashscore_lineup_side(
-        find_flashscore_lineup_side(lineups, "away"),
-        "away",
-    )
-
-    official_available = home_lineup["official_available"] or away_lineup["official_available"]
-    predicted_available = home_lineup["predicted_available"] or away_lineup["predicted_available"]
-    missing_players_available = bool(
-        home_lineup["missing_players"]
-        or home_lineup["unsure_missing_players"]
-        or away_lineup["missing_players"]
-        or away_lineup["unsure_missing_players"]
-    )
-    status = "available" if official_available or predicted_available or missing_players_available else "unavailable"
-
-    return {
-        "source": FLASHSCORE_SOURCE,
-        "source_used": FLASHSCORE_SOURCE,
-        "status": status,
-        "match_id": match_id,
-        "source_match_id": payload.get("source_match_id"),
-        "lineups": {
-            "composition_status": (
-                "official_available"
-                if official_available
-                else "predicted_available"
-                if predicted_available
-                else "unavailable"
-            ),
-            "official_available": official_available,
-            "predicted_available": predicted_available,
-            "squad_available": False,
-            "home": home_lineup,
-            "away": away_lineup,
-            "empty_state": (
-                None
-                if status == "available"
-                else "Composition probable et effectif complet non disponibles pour cette rencontre."
-            ),
-            "limits": build_lineups_limits(),
-        },
-        "data_used": {
-            "flashscore_lineups": bool(lineups),
-            "official_lineups": official_available,
-            "predicted_lineups": predicted_available,
-            "missing_players": missing_players_available,
-            "squad": False,
-            "odds_used": False,
-        },
-        "data_freshness": data_freshness,
-        "fallback_available": False,
-    }
-
-
 # Cette route retourne les matchs à venir avec FlashScore comme source principale et Football-Data en fallback temporaire.
 @router.get("")
 async def get_matches(
@@ -1072,22 +766,10 @@ async def get_match_news_context(match_id: int) -> dict[str, Any]:
     }
 
 
-# Cette route retourne les compositions probables, officielles et absences disponibles pour un match.
+# Cette route retourne les compositions actuelles puis un fallback historique officiel si la source est vide.
 @router.get("/{match_id}/lineups")
 async def get_match_lineups(match_id: int) -> dict[str, Any]:
-    if not is_flashscore_lineups_available():
-        return build_unavailable_lineups_response(
-            match_id=match_id,
-            empty_state="FlashScore RapidAPI n'est pas configuré dans cet environnement.",
-        )
-
-    payload, data_freshness = get_cached_flashscore_lineups(match_id)
-
-    return build_normalized_lineups_response(
-        match_id=match_id,
-        payload=payload,
-        data_freshness=data_freshness,
-    )
+    return await build_match_lineups_response(match_id)
 
 
 # Cette route retourne l'historique récent des deux équipes et les confrontations directes disponibles.
@@ -1826,7 +1508,7 @@ async def get_match_predictions(match_id: int) -> dict[str, Any]:
 # ├── utilise team_history_service.py pour produire les historiques récents, face-à-face, l’analyse et les prédictions FlashScore partielles
 # ├── utilise match_advanced_stats_service.py pour exposer les agrégats FlashScore réels avec leur couverture
 # ├── utilise team_news_context_service.py pour produire les actualités contextuelles publiques par équipe
-# ├── utilise /matches/match/lineups via rapidapi_flashscore_client.py pour les compositions probables et absences
+# ├── délègue les compositions actuelles et le fallback historique à match_lineups_service.py
 # ├── utilise analysis_service.py pour générer les synthèses Football-Data et les prédictions explicables
 # ├── utilise persistence_service.py uniquement pour le fallback Football-Data temporaire
 # └── renvoie les données formatées à app.main puis au frontend

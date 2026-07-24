@@ -619,55 +619,100 @@ export type MatchLineupPlayer = {
   player_id: string | null;
   player_url: string | null;
   image_path: string | null;
+  country_name: string | null;
+  country_logo: string | null;
   club_name: string | null;
   club_logo: string | null;
   reason: string | null;
 };
 
+// Ce type décrit le match terminé utilisé comme repère pour une composition historique.
+export type MatchLineupReferenceMatch = {
+  match_id: number | string;
+  source_match_id: string | null;
+  utc_date: string | null;
+  competition_name: string | null;
+  home_team: string | null;
+  away_team: string | null;
+  home_score: number | null;
+  away_score: number | null;
+  data_source: string | null;
+};
+
 // Ce type décrit la composition disponible pour une équipe sur un match.
 export type MatchLineupSide = {
   side: "home" | "away" | string;
-  status: "official_available" | "predicted_available" | "unavailable" | string;
+  status:
+    | "official_available"
+    | "predicted_available"
+    | "historical_official_available"
+    | "unavailable"
+    | string;
+  composition_origin: "current_official" | "current_predicted" | "historical_official" | string | null;
   average_rating: number | null;
   formation: string | null;
   official_formation: string | null;
   predicted_formation: string | null;
   official_available: boolean;
   predicted_available: boolean;
+  historical_official_available: boolean;
   starting_lineups: MatchLineupPlayer[];
   substitutes: MatchLineupPlayer[];
   predicted_lineups: MatchLineupPlayer[];
   missing_players: MatchLineupPlayer[];
   unsure_missing_players: MatchLineupPlayer[];
+  reference_match?: MatchLineupReferenceMatch | null;
 };
 
-// Ce type décrit la réponse backend des compositions probables, absences et statuts de disponibilité.
+// Ce type décrit les informations de secours utilisées lorsque la composition actuelle n'est pas publiée.
+export type MatchLineupFallback = {
+  strategy: string;
+  status: "complete" | "partial" | "unavailable" | string;
+  matches_checked_per_team: number;
+  home_reference_match: MatchLineupReferenceMatch | null;
+  away_reference_match: MatchLineupReferenceMatch | null;
+};
+
+// Ce type décrit la réponse backend des compositions, repères historiques et statuts de disponibilité.
 export type MatchLineupsResponse = {
   source: string;
   source_used: string | null;
-  status: "available" | "unavailable" | string;
+  status: "available" | "partial" | "unavailable" | string;
   match_id: number;
   source_match_id: string | null;
   lineups: {
-    composition_status: "official_available" | "predicted_available" | "unavailable" | string;
+    composition_status:
+      | "official_available"
+      | "predicted_available"
+      | "historical_official_fallback_available"
+      | "historical_official_fallback_partial"
+      | "unavailable"
+      | string;
+    composition_origin: "current_official" | "current_predicted" | "historical_official" | string | null;
     official_available: boolean;
     predicted_available: boolean;
+    historical_fallback_available: boolean;
+    historical_fallback_complete: boolean;
     squad_available: boolean;
     home: MatchLineupSide;
     away: MatchLineupSide;
     empty_state: string | null;
+    fallback_label?: string | null;
     limits: string[];
   };
   data_used: {
     flashscore_lineups: boolean;
     official_lineups: boolean;
     predicted_lineups: boolean;
+    historical_official_lineups: boolean;
     missing_players: boolean;
     squad: boolean;
     odds_used: boolean;
   };
-  data_freshness: CacheFreshness;
+  data_freshness: CacheFreshness | Record<string, unknown>;
   fallback_available: boolean;
+  fallback_checked?: boolean;
+  fallback?: MatchLineupFallback | null;
 };
 
 // Ce type décrit une prédiction individuelle affichée dans RubyBets.

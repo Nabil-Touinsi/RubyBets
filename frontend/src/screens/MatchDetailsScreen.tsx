@@ -37,6 +37,7 @@ import type {
   MatchAnalysisResponse,
   MatchContextResponse,
   MatchLineupPlayer,
+  MatchLineupReferenceMatch,
   MatchLineupSide,
   MatchLineupsResponse,
   MatchNewsContextResponse,
@@ -141,6 +142,14 @@ type FormTrendSignal = {
   reading: string;
   tone: "teal" | "blue" | "amber" | "red";
   leadingSide: "home" | "away" | "neutral" | "unavailable";
+};
+
+// Ce type associe un joueur réel à une position visuelle calculée depuis la formation fournie.
+type LineupPitchPlayer = {
+  player: MatchLineupPlayer;
+  left: number;
+  top: number;
+  delay: number;
 };
 
 type HeadToHeadHistoricalSummary = {
@@ -348,26 +357,7 @@ function getAnalysisStatusLabel(matchAnalysis: MatchAnalysisResponse | null) {
   return matchAnalysis ? "Analyse chargée" : "Analyse en attente";
 }
 
-// Cette fonction transforme le statut backend des compositions en libellé lisible.
-function getLineupsStatusLabel(matchLineups: MatchLineupsResponse | null) {
-  const compositionStatus = matchLineups?.lineups.composition_status;
-
-  if (compositionStatus === "official_available") {
-    return "Composition officielle disponible";
-  }
-
-  if (compositionStatus === "predicted_available") {
-    return "Composition probable disponible";
-  }
-
-  if (matchLineups?.status === "unavailable") {
-    return "Composition indisponible";
-  }
-
-  return matchLineups ? "Données composition chargées" : "Composition en attente";
-}
-
-// Cette fonction sélectionne les joueurs à afficher selon la donnée la plus fiable disponible.
+// Cette fonction sélectionne les joueurs à afficher selon la donnée réelle la plus fiable disponible.
 function getDisplayLineupPlayers(lineupSide: MatchLineupSide): MatchLineupPlayer[] {
   if (lineupSide.starting_lineups.length) {
     return lineupSide.starting_lineups;
@@ -380,53 +370,176 @@ function getDisplayLineupPlayers(lineupSide: MatchLineupSide): MatchLineupPlayer
   return [];
 }
 
-// Cette fonction indique si la liste affichée correspond à une composition officielle ou probable.
+// Cette fonction transforme l'origine de la composition en libellé public simple.
 function getLineupModeLabel(lineupSide: MatchLineupSide) {
-  if (lineupSide.starting_lineups.length || lineupSide.official_available) {
+  if (
+    lineupSide.composition_origin === "historical_official" ||
+    lineupSide.historical_official_available ||
+    lineupSide.status === "historical_official_available"
+  ) {
+    return "Dernier onze connu";
+  }
+
+  if (lineupSide.official_available || lineupSide.status === "official_available") {
     return "Composition officielle";
   }
 
-  if (lineupSide.predicted_lineups.length || lineupSide.predicted_available) {
+  if (lineupSide.predicted_available || lineupSide.status === "predicted_available") {
     return "Composition probable";
   }
 
-  return "Composition non disponible";
+  return "Repères non disponibles";
+}
+
+// Cette fonction prépare le message principal selon la disponibilité réelle des compositions.
+function getLineupsBannerCopy(matchLineups: MatchLineupsResponse | null) {
+  const lineups = matchLineups?.lineups;
+
+  if (lineups?.official_available) {
+    return {
+      title: "La composition officielle est disponible.",
+      description: "Les joueurs annoncés pour le match sont affichés ci-dessous.",
+      tone: "official",
+    } as const;
+  }
+
+  if (lineups?.predicted_available) {
+    return {
+      title: "La composition probable est disponible.",
+      description: "Elle peut encore évoluer avant le coup d’envoi.",
+      tone: "predicted",
+    } as const;
+  }
+
+  if (lineups?.historical_fallback_available) {
+    return {
+      title: "La composition du match n’est pas encore publiée.",
+      description: "En attendant, voici les derniers repères connus pour chaque équipe.",
+      tone: "historical",
+    } as const;
+  }
+
+  return {
+    title: "La composition du match n’est pas encore publiée.",
+    description: "RubyBets affichera les informations dès qu’une source disponible les fournira.",
+    tone: "unavailable",
+  } as const;
 }
 
 // Cette fonction sécurise l'affichage du numéro d'un joueur sans inventer de valeur.
 function getPlayerNumberLabel(player: MatchLineupPlayer) {
-  return player.number ? `#${player.number}` : "—";
+  return player.number || "—";
 }
 
-// Cette fonction sécurise l'affichage du club d'un joueur sans inventer de donnée.
-function getPlayerClubLabel(player: MatchLineupPlayer) {
-  return player.club_name || "Club non fourni";
+// Cette fonction choisit le nom court disponible d'un joueur.
+function getLineupPlayerName(player: MatchLineupPlayer) {
+  return player.field_name || player.name || "Joueur";
 }
 
-// Cette fonction prépare les libellés de disponibilité visibles en haut de l'onglet compositions.
-function buildLineupsAvailabilityItems(matchLineups: MatchLineupsResponse | null) {
-  return [
-    {
-      label: "Composition officielle",
-      value: matchLineups?.lineups.official_available ? "disponible" : "non disponible",
-    },
-    {
-      label: "Composition probable",
-      value: matchLineups?.lineups.predicted_available ? "disponible" : "non disponible",
-    },
-    {
-      label: "Absents / incertains",
-      value: matchLineups?.data_used.missing_players ? "disponibles" : "non disponibles",
-    },
-    {
-      label: "Effectif complet",
-      value: matchLineups?.lineups.squad_available ? "disponible" : "non disponible",
-    },
-    {
-      label: "Cotes",
-      value: matchLineups?.data_used.odds_used ? "utilisées" : "non utilisées",
-    },
+// Cette fonction traduit les motifs d'absence courants en libellés simples.
+function getPlayerReasonLabel(reason: string | null, unsure = false) {
+  if (!reason) {
+    return unsure ? "Incertain" : "Indisponible";
+  }
+
+  const normalizedReason = reason.trim().toLowerCase();
+  const reasonLabels: Record<string, string> = {
+    injury: "Blessé",
+    injured: "Blessé",
+    inactive: "Indisponible",
+    suspension: "Suspendu",
+    suspended: "Suspendu",
+    illness: "Malade",
+    doubtful: "Incertain",
+    knock: "Touché",
+    rest: "Repos",
+  };
+
+  return reasonLabels[normalizedReason] || reason;
+}
+
+// Cette fonction répartit horizontalement les joueurs d'une même ligne sur le terrain.
+function getLineupHorizontalPositions(playerCount: number) {
+  if (playerCount <= 1) {
+    return [50];
+  }
+
+  const edge = playerCount >= 5 ? 9 : playerCount === 4 ? 13 : 20;
+  const step = (100 - edge * 2) / (playerCount - 1);
+
+  return Array.from({ length: playerCount }, (_, index) => edge + step * index);
+}
+
+// Cette fonction positionne les onze joueurs depuis la formation fournie, sans créer de joueur.
+function buildPitchPlayers(
+  players: MatchLineupPlayer[],
+  formation: string | null,
+): LineupPitchPlayer[] | null {
+  if (!formation || players.length < 11) {
+    return null;
+  }
+
+  const lines = formation
+    .split("-")
+    .map((value) => Number.parseInt(value, 10))
+    .filter((value) => Number.isFinite(value) && value > 0);
+
+  if (!lines.length || lines.reduce((total, value) => total + value, 0) !== 10) {
+    return null;
+  }
+
+  const selectedPlayers = players.slice(0, 11);
+  const positions: LineupPitchPlayer[] = [
+    { player: selectedPlayers[0], left: 50, top: 87, delay: 0 },
   ];
+  let playerIndex = 1;
+  const firstLineTop = 69;
+  const lastLineTop = 15;
+  const verticalStep = lines.length > 1 ? (firstLineTop - lastLineTop) / (lines.length - 1) : 0;
+
+  lines.forEach((lineSize, lineIndex) => {
+    const horizontalPositions = getLineupHorizontalPositions(lineSize);
+    const top = lines.length === 1 ? 38 : firstLineTop - verticalStep * lineIndex;
+
+    horizontalPositions.forEach((left) => {
+      const player = selectedPlayers[playerIndex];
+
+      if (player) {
+        positions.push({
+          player,
+          left,
+          top,
+          delay: playerIndex * 45,
+        });
+      }
+
+      playerIndex += 1;
+    });
+  });
+
+  return positions.length === 11 ? positions : null;
+}
+
+// Cette fonction récupère le match de référence le plus pertinent du fallback historique.
+function getLineupReferenceMatch(
+  matchLineups: MatchLineupsResponse | null,
+): MatchLineupReferenceMatch | null {
+  return (
+    matchLineups?.fallback?.home_reference_match ??
+    matchLineups?.fallback?.away_reference_match ??
+    matchLineups?.lineups.home.reference_match ??
+    matchLineups?.lineups.away.reference_match ??
+    null
+  );
+}
+
+// Cette fonction formate le score du match de référence uniquement lorsqu'il est complet.
+function getReferenceMatchScore(referenceMatch: MatchLineupReferenceMatch) {
+  if (referenceMatch.home_score === null || referenceMatch.away_score === null) {
+    return "Score non disponible";
+  }
+
+  return `${referenceMatch.home_score} – ${referenceMatch.away_score}`;
 }
 
 // Cette fonction prépare le libellé de journée.
@@ -2999,64 +3112,123 @@ function AnalysisDetailTabContent({
   );
 }
 
-// Ce composant affiche un badge de disponibilité dans l'onglet compositions.
-function LineupsAvailabilityBadge({
-  item,
+// Ce composant place un joueur réel sur le terrain à partir de la formation fournie.
+function LineupPlayerMarker({
+  position,
+  isGoalkeeper,
 }: {
-  item: { label: string; value: string };
+  position: LineupPitchPlayer;
+  isGoalkeeper: boolean;
 }) {
+  const style = {
+    "--rb-lineup-left": `${position.left}%`,
+    "--rb-lineup-top": `${position.top}%`,
+    "--rb-lineup-delay": `${position.delay}ms`,
+  } as CSSProperties;
+
   return (
-    <article className="rb-detail-v2-insight-card rb-detail-v2-insight-card--blue">
-      <span>◌</span>
-      <div>
-        <p>{item.label}</p>
-        <h4>{item.value}</h4>
-        <small>Donnée affichée uniquement si elle est fournie par la source.</small>
-      </div>
-    </article>
+    <div
+      className={`rb-detail-lineup-player${isGoalkeeper ? " rb-detail-lineup-player--goalkeeper" : ""}`}
+      style={style}
+      title={position.player.name || getLineupPlayerName(position.player)}
+    >
+      <span>{getPlayerNumberLabel(position.player)}</span>
+      <strong>{getLineupPlayerName(position.player)}</strong>
+    </div>
   );
 }
 
-// Ce composant affiche une ligne joueur pour une composition ou une absence.
-function LineupPlayerRow({
-  player,
-  showReason = false,
+// Ce composant affiche une liste compacte lorsque la source ne fournit pas une formation exploitable.
+function LineupCompactRoster({
+  players,
 }: {
-  player: MatchLineupPlayer;
-  showReason?: boolean;
+  players: MatchLineupPlayer[];
 }) {
   return (
-    <li>
-      {player.image_path ? (
-        <img
-          src={player.image_path}
-          alt=""
-          loading="lazy"
-          style={{
-            width: 26,
-            height: 26,
-            borderRadius: "999px",
-            objectFit: "cover",
-            marginRight: 8,
-            verticalAlign: "middle",
-          }}
-          onError={(event) => {
-            event.currentTarget.style.display = "none";
-            event.currentTarget
-              .closest(".rb-detail-v2-team-logo")
-              ?.classList.remove("rb-detail-v2-team-logo--has-crest");
-          }}
-        />
-      ) : null}
-      <strong>{getPlayerNumberLabel(player)} · {player.name || "Joueur non nommé"}</strong>
-      <span> · {getPlayerClubLabel(player)}</span>
-      {showReason && player.reason ? <span> · {player.reason}</span> : null}
-    </li>
+    <div className="rb-detail-lineup-roster" aria-label="Joueurs disponibles">
+      {players.map((player, index) => (
+        <div key={`${player.player_id ?? player.name ?? index}-${index}`}>
+          <span>{getPlayerNumberLabel(player)}</span>
+          <strong>{getLineupPlayerName(player)}</strong>
+        </div>
+      ))}
+    </div>
   );
 }
 
-// Ce composant affiche la composition disponible pour une équipe.
-function LineupTeamCard({
+// Ce composant affiche le banc avec un bouton pour dévoiler les remplaçants supplémentaires.
+function LineupBench({
+  substitutes,
+  side,
+}: {
+  substitutes: MatchLineupPlayer[];
+  side: string;
+}) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const visibleSubstitutes = isExpanded ? substitutes : substitutes.slice(0, 6);
+  const remainingCount = Math.max(0, substitutes.length - visibleSubstitutes.length);
+
+  return (
+    <div className="rb-detail-lineup-bench">
+      <p>Banc</p>
+      {substitutes.length ? (
+        <div className="rb-detail-lineup-bench__players">
+          {visibleSubstitutes.map((player, index) => (
+            <span key={`${side}-bench-${player.player_id ?? player.name ?? index}`}>
+              <b>{getPlayerNumberLabel(player)}</b>
+              {getLineupPlayerName(player)}
+            </span>
+          ))}
+          {substitutes.length > 6 ? (
+            <button
+              type="button"
+              aria-expanded={isExpanded}
+              onClick={() => setIsExpanded((currentValue) => !currentValue)}
+            >
+              {isExpanded ? "Réduire" : `+${remainingCount}`}
+            </button>
+          ) : null}
+        </div>
+      ) : (
+        <small>Aucun remplaçant publié.</small>
+      )}
+    </div>
+  );
+}
+
+// Ce composant affiche les absents et incertains fournis pour l'équipe.
+function LineupUnavailablePlayers({
+  lineupSide,
+}: {
+  lineupSide: MatchLineupSide;
+}) {
+  const unavailablePlayers = [
+    ...lineupSide.missing_players.map((player) => ({ player, unsure: false })),
+    ...lineupSide.unsure_missing_players.map((player) => ({ player, unsure: true })),
+  ];
+
+  return (
+    <div className="rb-detail-lineup-absences">
+      <p>Absents / incertains</p>
+      {unavailablePlayers.length ? (
+        <div>
+          {unavailablePlayers.map(({ player, unsure }, index) => (
+            <span key={`${lineupSide.side}-absence-${player.player_id ?? player.name ?? index}`}>
+              <i aria-hidden="true">!</i>
+              <strong>{getLineupPlayerName(player)}</strong>
+              <small>{getPlayerReasonLabel(player.reason, unsure)}</small>
+            </span>
+          ))}
+        </div>
+      ) : (
+        <small>Aucun absent signalé par la source.</small>
+      )}
+    </div>
+  );
+}
+
+// Ce composant affiche le terrain et les repères d'une équipe sans ajouter de joueur absent de la réponse.
+function LineupTeamBoard({
   team,
   lineupSide,
 }: {
@@ -3064,87 +3236,118 @@ function LineupTeamCard({
   lineupSide: MatchLineupSide;
 }) {
   const players = getDisplayLineupPlayers(lineupSide);
+  const pitchPlayers = buildPitchPlayers(players, lineupSide.formation);
+  const modeLabel = getLineupModeLabel(lineupSide);
+  const hasPlayers = players.length > 0;
 
   return (
-    <article className="rb-detail-v2-side-card">
-      <h3>{getTeamDisplayName(team)}</h3>
-      <p className="rb-detail-v2-info-line">
-        <span>◌</span>
-        <small>{getLineupModeLabel(lineupSide)}</small>
-        <strong>{lineupSide.formation || "Formation non fournie"}</strong>
-      </p>
+    <div className="rb-detail-lineup-team-card">
+      <header className="rb-detail-lineup-team-card__header">
+        <div>
+          <TeamLogo team={team} />
+          <span>
+            <strong>{getTeamDisplayName(team)}</strong>
+            <small>{modeLabel}</small>
+          </span>
+        </div>
+        <b>{lineupSide.formation || "Formation non publiée"}</b>
+      </header>
 
-      {players.length ? (
-        <ul className="rb-detail-v2-context-list">
-          {players.map((player) => (
-            <LineupPlayerRow
-              key={`${lineupSide.side}-${player.player_id ?? player.name}`}
-              player={player}
-            />
-          ))}
-        </ul>
+      {hasPlayers ? (
+        pitchPlayers ? (
+          <div className="rb-detail-lineup-pitch" aria-label={`Disposition de ${getTeamDisplayName(team)}`}>
+            <span className="rb-detail-lineup-pitch__halfway" aria-hidden="true" />
+            <span className="rb-detail-lineup-pitch__circle" aria-hidden="true" />
+            <span className="rb-detail-lineup-pitch__box rb-detail-lineup-pitch__box--top" aria-hidden="true" />
+            <span className="rb-detail-lineup-pitch__box rb-detail-lineup-pitch__box--bottom" aria-hidden="true" />
+            {pitchPlayers.map((position, index) => (
+              <LineupPlayerMarker
+                key={`${lineupSide.side}-pitch-${position.player.player_id ?? position.player.name ?? index}`}
+                position={position}
+                isGoalkeeper={index === 0}
+              />
+            ))}
+          </div>
+        ) : (
+          <LineupCompactRoster players={players} />
+        )
       ) : (
-        <p>La source ne fournit pas de composition exploitable pour cette équipe.</p>
+        <div className="rb-detail-lineup-team-card__empty">
+          <Users size={24} aria-hidden="true" />
+          <strong>Aucun onze disponible</strong>
+          <span>Les informations apparaîtront dès leur publication.</span>
+        </div>
       )}
-    </article>
+
+      <LineupBench substitutes={lineupSide.substitutes} side={lineupSide.side} />
+      <LineupUnavailablePlayers lineupSide={lineupSide} />
+    </div>
   );
 }
 
-// Ce composant affiche les absents et les joueurs incertains pour une équipe.
-function MissingPlayersCard({
-  team,
-  lineupSide,
+// Ce composant résume la nature et la couverture des informations affichées.
+function LineupSummaryCards({
+  match,
+  matchLineups,
 }: {
-  team: Team;
-  lineupSide: MatchLineupSide;
+  match: Match;
+  matchLineups: MatchLineupsResponse;
 }) {
-  const missingPlayers = lineupSide.missing_players;
-  const unsurePlayers = lineupSide.unsure_missing_players;
-  const hasUnavailablePlayers = missingPlayers.length || unsurePlayers.length;
+  const homePlayers = getDisplayLineupPlayers(matchLineups.lineups.home).length;
+  const awayPlayers = getDisplayLineupPlayers(matchLineups.lineups.away).length;
+  const isHistorical = matchLineups.lineups.historical_fallback_available;
 
   return (
-    <article className="rb-detail-v2-side-card">
-      <h3>{getTeamShortName(team)}</h3>
-      {hasUnavailablePlayers ? (
-        <>
-          {missingPlayers.length ? (
-            <>
-              <p>Absents confirmés</p>
-              <ul className="rb-detail-v2-context-list">
-                {missingPlayers.map((player) => (
-                  <LineupPlayerRow
-                    key={`missing-${lineupSide.side}-${player.player_id ?? player.name}`}
-                    player={player}
-                    showReason
-                  />
-                ))}
-              </ul>
-            </>
-          ) : null}
-
-          {unsurePlayers.length ? (
-            <>
-              <p>Incertains</p>
-              <ul className="rb-detail-v2-context-list">
-                {unsurePlayers.map((player) => (
-                  <LineupPlayerRow
-                    key={`unsure-${lineupSide.side}-${player.player_id ?? player.name}`}
-                    player={player}
-                    showReason
-                  />
-                ))}
-              </ul>
-            </>
-          ) : null}
-        </>
-      ) : (
-        <p>Aucun absent ou joueur incertain fourni par la source actuelle.</p>
-      )}
-    </article>
+    <section className="rb-detail-lineup-summary-grid">
+      <div>
+        <span><Clock size={21} aria-hidden="true" /></span>
+        <p>
+          <small>{isHistorical ? "Repères récents" : "Informations du match"}</small>
+          <strong>{isHistorical ? "Dernier match disponible" : "Données publiées"}</strong>
+          <em>{isHistorical ? "Basé sur le dernier onze officiel connu" : "Affichage mis à jour avant le coup d’envoi"}</em>
+        </p>
+      </div>
+      <div>
+        <span><Users size={21} aria-hidden="true" /></span>
+        <p>
+          <small>Joueurs affichés</small>
+          <strong>{homePlayers} pour {getTeamShortName(match.home_team)} · {awayPlayers} pour {getTeamShortName(match.away_team)}</strong>
+          <em>Uniquement les joueurs réellement fournis</em>
+        </p>
+      </div>
+      <div>
+        <span><ShieldCheck size={21} aria-hidden="true" /></span>
+        <p>
+          <small>Lecture responsable</small>
+          <strong>Aucune donnée inventée</strong>
+          <em>Les informations peuvent évoluer avant le match</em>
+        </p>
+      </div>
+    </section>
   );
 }
 
-// Ce composant affiche l'onglet Compo probable à partir de la route /lineups.
+// Ce composant affiche dans la colonne droite le match terminé utilisé comme repère.
+function LineupReferenceMatchCard({
+  referenceMatch,
+}: {
+  referenceMatch: MatchLineupReferenceMatch;
+}) {
+  return (
+    <section className="rb-detail-v2-side-card rb-detail-lineup-reference-card">
+      <div className="rb-detail-v2-side-card__title">
+        <Calendar size={18} aria-hidden="true" />
+        <h3>Dernier match pris en compte</h3>
+      </div>
+      <p>{referenceMatch.home_team || "Équipe domicile"}</p>
+      <strong>{getReferenceMatchScore(referenceMatch)}</strong>
+      <p>{referenceMatch.away_team || "Équipe extérieure"}</p>
+      <small>{formatRecentMatchDate(referenceMatch.utc_date)}</small>
+    </section>
+  );
+}
+
+// Ce composant affiche l'onglet Compo probable avec les compositions actuelles ou les derniers repères connus.
 function LineupsTabContent({
   match,
   matchLineups,
@@ -3154,89 +3357,56 @@ function LineupsTabContent({
   matchLineups: MatchLineupsResponse | null;
   matchLineupsStatus: string;
 }) {
-  const availabilityItems = buildLineupsAvailabilityItems(matchLineups);
   const lineups = matchLineups?.lineups;
+  const bannerCopy = getLineupsBannerCopy(matchLineups);
+  const hasAnyPlayers = Boolean(
+    lineups &&
+      (getDisplayLineupPlayers(lineups.home).length ||
+        getDisplayLineupPlayers(lineups.away).length),
+  );
 
-  if (!lineups || matchLineups?.status === "unavailable") {
+  if (!lineups || (!hasAnyPlayers && matchLineups?.status === "unavailable")) {
     return (
-      <section className="rb-detail-v2-card rb-detail-v2-pending-tab">
-        <p>Compositions & effectifs</p>
-        <h3>Composition probable non disponible</h3>
-        <p>
-          {lineups?.empty_state ||
-            matchLineupsStatus ||
-            "La source actuelle ne fournit pas encore de composition probable exploitable pour cette rencontre."}
-        </p>
-        <p>RubyBets n’invente pas de titulaires, de remplaçants ou d’effectif complet.</p>
-      </section>
+      <div className="rb-detail-lineup-shell">
+        <section className={`rb-detail-lineup-banner rb-detail-lineup-banner--${bannerCopy.tone}`}>
+          <Info size={22} aria-hidden="true" />
+          <div>
+            <strong>{bannerCopy.title}</strong>
+            <span>{bannerCopy.description}</span>
+          </div>
+        </section>
+        <section className="rb-detail-lineup-empty-state">
+          <Users size={34} aria-hidden="true" />
+          <h3>Les compositions ne sont pas encore disponibles</h3>
+          <p>{lineups?.empty_state || matchLineupsStatus}</p>
+          <small>RubyBets n’ajoute aucun joueur lorsque la source ne le fournit pas.</small>
+        </section>
+      </div>
     );
   }
 
   return (
-    <>
-      <section className="rb-detail-v2-card rb-detail-v2-analysis-card">
-        <div className="rb-detail-v2-section-header">
-          <div>
-            <p>Compositions & effectifs</p>
-            <h3>{getLineupsStatusLabel(matchLineups)}</h3>
-          </div>
-          <span>{matchLineups?.source_used || "Source non fournie"}</span>
-        </div>
-
-        <div className="rb-detail-v2-insight-grid">
-          {availabilityItems.map((item) => (
-            <LineupsAvailabilityBadge key={item.label} item={item} />
-          ))}
+    <div className="rb-detail-lineup-shell">
+      <section className={`rb-detail-lineup-banner rb-detail-lineup-banner--${bannerCopy.tone}`}>
+        <Info size={22} aria-hidden="true" />
+        <div>
+          <strong>{bannerCopy.title}</strong>
+          <span>{bannerCopy.description}</span>
         </div>
       </section>
 
-      <section className="rb-detail-v2-card rb-detail-v2-recent-card">
-        <div className="rb-detail-v2-section-header">
-          <div>
-            <p>Compositions probables</p>
-            <h3>Lecture équipe par équipe</h3>
-          </div>
-          <span>{lineups.composition_status}</span>
-        </div>
-
-        <div className="rb-detail-v2-recent-grid">
-          <LineupTeamCard team={match.home_team} lineupSide={lineups.home} />
-          <LineupTeamCard team={match.away_team} lineupSide={lineups.away} />
-        </div>
+      <section className="rb-detail-lineup-teams-grid">
+        <LineupTeamBoard team={match.home_team} lineupSide={lineups.home} />
+        <LineupTeamBoard team={match.away_team} lineupSide={lineups.away} />
       </section>
 
-      <section className="rb-detail-v2-card rb-detail-v2-recent-card">
-        <div className="rb-detail-v2-section-header">
-          <div>
-            <p>Disponibilités joueurs</p>
-            <h3>Absents et incertains fournis par la source</h3>
-          </div>
-          <span>Sans donnée inventée</span>
-        </div>
+      <LineupSummaryCards match={match} matchLineups={matchLineups} />
 
-        <div className="rb-detail-v2-recent-grid">
-          <MissingPlayersCard team={match.home_team} lineupSide={lineups.home} />
-          <MissingPlayersCard team={match.away_team} lineupSide={lineups.away} />
-        </div>
+      <section className="rb-detail-lineup-responsible-note">
+        <Shield size={18} aria-hidden="true" />
+        <span>Ces informations peuvent évoluer avant le coup d’envoi.</span>
       </section>
-
-      <section className="rb-detail-v2-card rb-detail-v2-pending-tab">
-        <p>Limites de lecture</p>
-        <h3>Cadre responsable</h3>
-        <ul className="rb-detail-v2-context-list">
-          {(lineups.limits.length
-            ? lineups.limits
-            : [
-                "Les compositions affichées restent probables tant que la composition officielle n’est pas fournie.",
-                "RubyBets n’invente pas les joueurs absents de la source actuelle.",
-                "Aucune cote FlashScore n’est utilisée par RubyBets.",
-              ]
-          ).map((limit) => (
-            <li key={limit}>{limit}</li>
-          ))}
-        </ul>
-      </section>
-    </>
+    </div>
   );
 }
 
@@ -3581,6 +3751,7 @@ function MatchDetailsScreen({
   const selectedMatch = getSelectedMatch(matchDetails, matchContext);
   const freshnessLabel = getFreshnessLabel(matchDetails, matchContext);
   const statusMessage = matchDetailsStatus || matchContextStatus;
+  const lineupReferenceMatch = getLineupReferenceMatch(matchLineups);
 
   // Cette fonction active un onglet et déclenche les statistiques avancées uniquement lorsqu'elles sont nécessaires.
   function handleSelectDetailTab(tabKey: DetailTabKey) {
@@ -3696,7 +3867,15 @@ function MatchDetailsScreen({
             isVisible={activeTab === "context"}
           />
 
-          {activeTab !== "context" ? (
+          {activeTab === "lineup" ? (
+            <>
+              <MatchInfoCard match={selectedMatch} freshnessLabel={freshnessLabel} />
+              <HeadToHeadCard teamHistory={teamHistory} onOpen={() => setActiveTab("headToHead")} />
+              {lineupReferenceMatch ? (
+                <LineupReferenceMatchCard referenceMatch={lineupReferenceMatch} />
+              ) : null}
+            </>
+          ) : activeTab !== "context" ? (
             <>
               <MatchInfoCard match={selectedMatch} freshnessLabel={freshnessLabel} />
               <HeadToHeadCard teamHistory={teamHistory} onOpen={() => setActiveTab("headToHead")} />
@@ -3725,7 +3904,7 @@ export default MatchDetailsScreen;
 // ├── utilise les helpers d’affichage de helpers/displayText.ts
 // ├── charge à la demande et affiche /advanced-stats dans l’onglet Analyse détaillée
 // ├── conserve matchAnalysis.analysis comme lecture narrative complémentaire
-// ├── alimente l’onglet Compo probable avec matchLineups.lineups sans inventer de joueurs
+// ├── transforme matchLineups en terrains, bancs et repères historiques sans inventer de joueurs
 // ├── alimente l’onglet Forme & tendances avec des cartes, jauges et séries animées issues uniquement de teamHistory.form_summary
 // ├── utilise teamHistoryStatus pour distinguer chargement, erreur et historique réellement indisponible
 // ├── alimente l’analyse synthétique avec teamHistory.form_summary quand il est disponible
@@ -3733,4 +3912,4 @@ export default MatchDetailsScreen;
 // ├── affiche les derniers matchs disponibles uniquement dans la Vue d’ensemble via teamHistory.recent_matches_overview
 // ├── affiche les confrontations directes disponibles via teamHistory.head_to_head
 // ├── déclenche la navigation vers Matchs, Analyse et Prédictions via onNavigate
-// └── charge styles/MatchDetailsScreen.css et assets/detail/match-detail-stadium.webp pour le rendu premium
+// └── charge styles/MatchDetailsScreen.css pour le rendu premium et responsive
