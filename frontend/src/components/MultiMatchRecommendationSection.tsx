@@ -1,19 +1,26 @@
-// Ce composant affiche le générateur de sélection multi-matchs fondé sur les décisions publiques RubyBets V19.
+// Ce composant permet de choisir un style puis d’afficher une sélection multi-matchs claire et responsable.
 
+import type { CSSProperties } from "react";
+import {
+  CalendarDays,
+  CheckCircle2,
+  Info,
+  LoaderCircle,
+  ShieldCheck,
+  Sparkles,
+  Trophy,
+} from "lucide-react";
 import type {
   Match,
   V19SelectionDataQuality,
   V19SelectionItem,
   V19SelectionResponse,
 } from "../models/rubybets";
-import {
-  cleanTextItems,
-  getTeamInitials,
-  getTeamShortName,
-} from "../helpers/displayText";
+import { getTeamInitials, getTeamShortName } from "../helpers/displayText";
 
 type SelectionProfileLevel = "low" | "medium" | "high";
 type RecommendationTeam = Match["home_team"];
+type InformationTone = "complete" | "partial" | "limited";
 
 type MultiMatchRecommendationSectionProps = {
   matches: Match[];
@@ -27,27 +34,33 @@ type MultiMatchRecommendationSectionProps = {
   onGenerateRecommendation: () => void;
 };
 
-type QualityPresentation = {
+type InformationPresentation = {
   label: string;
-  detail: string;
-  tone: SelectionProfileLevel;
+  tone: InformationTone;
 };
 
-// Cette fonction détecte l’état de génération à partir du statut existant.
+// Cette fonction détecte l’état de préparation à partir du statut déjà fourni par l’application.
 function isGenerationPending(status: string) {
-  return /génération|generation|chargement|loading/i.test(status);
+  return /^(génération de|generation de|chargement|loading|préparation|preparation)/i.test(
+    status.trim(),
+  );
 }
 
-// Cette fonction formate une date courte pour garder le tableau compact.
+// Cette fonction détecte un message d’erreur sans l’exposer directement à l’utilisateur.
+function hasGenerationError(status: string) {
+  return /erreur|error|échec|echec|indisponible/i.test(status);
+}
+
+// Cette fonction formate la date d’un match dans un format court et lisible.
 function formatShortDate(value: string | null | undefined) {
   if (!value) {
-    return "Date à confirmer";
+    return "Horaire à confirmer";
   }
 
   const date = new Date(value);
 
   if (Number.isNaN(date.getTime())) {
-    return "Date à confirmer";
+    return "Horaire à confirmer";
   }
 
   return new Intl.DateTimeFormat("fr-FR", {
@@ -59,81 +72,64 @@ function formatShortDate(value: string | null | undefined) {
   }).format(date);
 }
 
-// Cette fonction retourne un nom court d’équipe avec un fallback responsable.
+// Cette fonction retourne un nom court d’équipe avec un fallback neutre.
 function getTeamLabel(team: RecommendationTeam | null | undefined) {
   return team ? getTeamShortName(team) : "Équipe à confirmer";
 }
 
-// Cette fonction retourne le libellé public du profil choisi avant la première génération.
-function formatSelectionProfile(profile: SelectionProfileLevel) {
-  const labels: Record<SelectionProfileLevel, string> = {
-    low: "Prudence renforcée",
-    medium: "Équilibre",
-    high: "Ouverture contrôlée",
+// Cette fonction traduit le style interne en libellé utilisateur.
+function formatSelectionStyle(profile: SelectionProfileLevel | string) {
+  const normalizedProfile = profile.toLowerCase();
+  const labels: Record<string, string> = {
+    low: "Prudent",
+    medium: "Équilibré",
+    high: "Ouvert",
   };
 
-  return labels[profile];
+  return labels[normalizedProfile] ?? "Équilibré";
 }
 
-// Cette fonction retourne un libellé de marché clair pour les décisions publiques V19.
-function formatMarketLabel(market: string) {
+// Cette fonction traduit la recommandation reçue en choix simple et lisible.
+function formatSelectedChoice(item: V19SelectionItem) {
+  const prediction = item.recommendation.value.toUpperCase();
   const labels: Record<string, string> = {
-    STRICT_1X2: "1X2",
-    DOUBLE_CHANCE: "Double chance",
+    TEAM_A_WIN: "Victoire à domicile",
+    HOME_WIN: "Victoire à domicile",
+    "1": "Victoire à domicile",
+    TEAM_B_WIN: "Victoire à l’extérieur",
+    AWAY_WIN: "Victoire à l’extérieur",
+    "2": "Victoire à l’extérieur",
+    DRAW: "Match nul",
+    X: "Match nul",
+    DRAW_OR_TEAM_A: "Domicile ou nul",
+    "1X": "Domicile ou nul",
+    DRAW_OR_TEAM_B: "Extérieur ou nul",
+    X2: "Extérieur ou nul",
+    TEAM_A_OR_TEAM_B: "Une équipe gagnante",
+    "12": "Une équipe gagnante",
     OVER_1_5: "Plus de 1,5 but",
     OVER_2_5: "Plus de 2,5 buts",
-    BTTS: "BTTS",
+    YES: "Les deux équipes marquent",
+    NO: "Au moins une équipe ne marque pas",
   };
 
-  return labels[market] ?? market.replaceAll("_", " ");
+  return labels[prediction] ?? "Choix recommandé";
 }
 
-// Cette fonction traduit une recommandation technique V19 en phrase utilisateur.
-function formatSelectedPrediction(
-  item: V19SelectionItem,
-  match: Match | null,
-) {
-  const prediction = item.recommendation.value;
-  const homeName = getTeamLabel(match?.home_team);
-  const awayName = getTeamLabel(match?.away_team);
-
-  const labels: Record<string, string> = {
-    TEAM_A_WIN: `Victoire ${homeName}`,
-    TEAM_B_WIN: `Victoire ${awayName}`,
-    DRAW: "Match nul",
-    DRAW_OR_TEAM_A: `Nul ou ${homeName}`,
-    DRAW_OR_TEAM_B: `Nul ou ${awayName}`,
-    TEAM_A_OR_TEAM_B: `${homeName} ou ${awayName}`,
-    YES: "Oui",
-    NO: "Non",
-  };
-
-  return labels[prediction] ?? prediction.replaceAll("_", " ");
-}
-
-// Cette fonction normalise les alertes de qualité, quel que soit leur format public.
-function normalizeQualityFlags(value: string[] | string | null) {
-  if (Array.isArray(value)) {
-    return cleanTextItems(value);
-  }
-
-  if (typeof value === "string") {
-    return cleanTextItems(value.split(","));
-  }
-
-  return [];
-}
-
-// Cette fonction transforme les statuts publics V19 en lecture simple de qualité des données.
-function getQualityPresentation(
+// Cette fonction transforme les états de disponibilité en libellé simple.
+function getInformationPresentation(
   quality: V19SelectionDataQuality,
-): QualityPresentation {
+): InformationPresentation {
   const targetReady = quality.target_match_provider_status === "success";
   const marketStatus = quality.market_module_status?.toUpperCase() ?? "";
   const historyStatus = quality.history_data_status?.toLowerCase() ?? "";
-  const qualityFlags = normalizeQualityFlags(quality.market_quality_flags);
+  const flags = Array.isArray(quality.market_quality_flags)
+    ? quality.market_quality_flags.filter(Boolean)
+    : quality.market_quality_flags
+      ? [quality.market_quality_flags]
+      : [];
 
-  const historyAcceptable =
+  const historyAvailable =
     historyStatus === "" ||
     historyStatus === "available" ||
     historyStatus === "partial";
@@ -141,75 +137,97 @@ function getQualityPresentation(
   if (
     targetReady &&
     marketStatus === "READY" &&
-    historyAcceptable &&
-    qualityFlags.length === 0
+    historyAvailable &&
+    flags.length === 0
   ) {
-    return {
-      label: "Disponible",
-      detail: "Sources principales disponibles",
-      tone: "low",
-    };
+    return { label: "Complet", tone: "complete" };
   }
 
-  if (
-    targetReady &&
-    (marketStatus === "READY" || marketStatus === "DEGRADED")
-  ) {
-    return {
-      label: "Partielle",
-      detail: "Données suffisantes avec limites",
-      tone: "medium",
-    };
+  if (targetReady && (marketStatus === "READY" || marketStatus === "DEGRADED")) {
+    return { label: "Partiel", tone: "partial" };
   }
 
-  return {
-    label: "À surveiller",
-    detail: "Disponibilité réduite des données",
-    tone: "high",
-  };
+  return { label: "Limité", tone: "limited" };
 }
 
-// Cette fonction choisit une explication publique courte pour la colonne Analyse clé.
-function getAnalysisKey(item: V19SelectionItem) {
-  const supportingFactors = cleanTextItems(
-    item.explanation.supporting_factors,
-  );
-  const cautionFactors = cleanTextItems(item.explanation.caution_factors);
-
-  if (supportingFactors.length > 0) {
-    return supportingFactors[0];
-  }
-
-  if (cautionFactors.length > 0) {
-    return cautionFactors[0];
-  }
-
-  return item.explanation.summary;
-}
-
-// Cette fonction prépare le message affiché quand aucune sélection V19 n’est disponible.
-function getEmptyStateContent(
-  multiMatchRecommendation: V19SelectionResponse | null,
-  multiMatchStatus: string,
+// Cette fonction explique le choix sans afficher de vocabulaire technique.
+function getFriendlyReason(
+  item: V19SelectionItem,
+  information: InformationPresentation,
 ) {
-  if (multiMatchRecommendation?.status === "EMPTY") {
+  const market = item.recommendation.market_type.toUpperCase();
+  const value = item.recommendation.value.toUpperCase();
+
+  if (market === "DOUBLE_CHANCE" || ["1X", "X2", "12"].includes(value)) {
+    return "Deux issues restent cohérentes, ce qui conduit à une lecture plus prudente.";
+  }
+
+  if (market === "OVER_1_5" || value === "OVER_1_5") {
+    return "Les tendances disponibles soutiennent un match avec au moins deux buts.";
+  }
+
+  if (market === "OVER_2_5" || value === "OVER_2_5") {
+    return "Les tendances disponibles vont vers un match plutôt ouvert.";
+  }
+
+  if (market === "BTTS" && value === "YES") {
+    return "Les deux équipes présentent des éléments favorables pour marquer.";
+  }
+
+  if (market === "BTTS" && value === "NO") {
+    return "La lecture actuelle invite à rester prudent sur la capacité des deux équipes à marquer.";
+  }
+
+  if (information.tone === "partial") {
+    return "Le choix reste cohérent, avec quelques informations à considérer avec prudence.";
+  }
+
+  if (information.tone === "limited") {
+    return "Le choix est proposé avec prudence car certaines informations restent limitées.";
+  }
+
+  return "Les informations disponibles vont dans le même sens et rendent ce choix plus lisible.";
+}
+
+// Cette fonction prépare un état vide compréhensible selon la situation actuelle.
+function getEmptyStateContent(
+  response: V19SelectionResponse | null,
+  status: string,
+  isGenerating: boolean,
+) {
+  if (isGenerating) {
     return {
-      title: multiMatchRecommendation.selection_explanation.headline,
-      message: multiMatchRecommendation.selection_explanation.summary,
-      hint:
-        "Modifiez le profil de sélectivité ou relancez la génération lorsque de nouveaux matchs seront disponibles.",
+      title: "Préparation de votre sélection",
+      message: "RubyBets examine les matchs disponibles.",
+      hint: "Quelques instants suffisent généralement.",
+    };
+  }
+
+  if (response?.status === "EMPTY") {
+    return {
+      title: "Aucune proposition pour le moment",
+      message:
+        "Les matchs disponibles ne correspondent pas suffisamment au style choisi.",
+      hint: "Essayez un autre style ou relancez plus tard.",
+    };
+  }
+
+  if (hasGenerationError(status)) {
+    return {
+      title: "La sélection n’a pas pu être préparée",
+      message: "Un problème temporaire a interrompu la préparation.",
+      hint: "Vous pouvez relancer la sélection dans quelques instants.",
     };
   }
 
   return {
-    title: "Aucune sélection affichée",
-    message: multiMatchStatus,
-    hint:
-      "Lancez une génération pour analyser les décisions officielles V19 disponibles.",
+    title: "Votre sélection apparaîtra ici",
+    message: "Choisissez vos préférences puis lancez la sélection.",
+    hint: "Les rencontres trop incertaines pourront être laissées de côté.",
   };
 }
 
-// Ce composant affiche un logo d’équipe avec fallback.
+// Ce composant affiche un logo d’équipe avec un fallback lisible.
 function TeamLogo({
   team,
   label,
@@ -218,8 +236,8 @@ function TeamLogo({
   label: string;
 }) {
   return (
-    <span className="rb-reco-team-logo" aria-label={`Logo ${label}`}>
-      <span className="rb-reco-team-logo__fallback">
+    <span className="rb-selection-team-logo" aria-label={`Logo ${label}`}>
+      <span className="rb-selection-team-logo__fallback">
         {team ? getTeamInitials(team) : "?"}
       </span>
 
@@ -237,7 +255,7 @@ function TeamLogo({
   );
 }
 
-// Ce composant affiche les boutons segmentés du nombre de matchs.
+// Ce composant affiche le choix du nombre de matchs sous forme de boutons accessibles.
 function MatchCountSegments({
   value,
   disabled,
@@ -250,27 +268,29 @@ function MatchCountSegments({
   const options = [2, 3, 4, 5];
 
   return (
-    <div className="rb-reco-segment-group">
-      <span>Nombre de matchs</span>
-      <div>
+    <fieldset className="rb-selection-control-group">
+      <legend>Nombre de matchs</legend>
+      <div className="rb-selection-segments" role="radiogroup" aria-label="Nombre de matchs">
         {options.map((option) => (
           <button
             key={option}
             type="button"
+            role="radio"
+            aria-checked={value === option}
             disabled={disabled}
-            className={value === option ? "rb-reco-segment--active" : ""}
+            className={value === option ? "is-active" : ""}
             onClick={() => onChange(option)}
           >
             {option}
           </button>
         ))}
       </div>
-    </div>
+    </fieldset>
   );
 }
 
-// Ce composant affiche les boutons segmentés du profil de sélectivité V19.
-function SelectionProfileSegments({
+// Ce composant affiche le style de sélection avec des libellés non techniques.
+function SelectionStyleSegments({
   value,
   disabled,
   onChange,
@@ -279,127 +299,117 @@ function SelectionProfileSegments({
   disabled: boolean;
   onChange: (profile: SelectionProfileLevel) => void;
 }) {
-  const options: Array<{
-    value: SelectionProfileLevel;
-    label: string;
-  }> = [
+  const options: Array<{ value: SelectionProfileLevel; label: string }> = [
     { value: "low", label: "Prudent" },
     { value: "medium", label: "Équilibré" },
     { value: "high", label: "Ouvert" },
   ];
 
   return (
-    <div className="rb-reco-segment-group">
-      <span>Profil de sélectivité</span>
-      <div>
+    <fieldset className="rb-selection-control-group">
+      <legend>Style de sélection</legend>
+      <div className="rb-selection-segments" role="radiogroup" aria-label="Style de sélection">
         {options.map((option) => (
           <button
             key={option.value}
             type="button"
+            role="radio"
+            aria-checked={value === option.value}
             disabled={disabled}
-            className={value === option.value ? "rb-reco-segment--active" : ""}
+            className={value === option.value ? "is-active" : ""}
             onClick={() => onChange(option.value)}
           >
             {option.label}
           </button>
         ))}
       </div>
-    </div>
+    </fieldset>
   );
 }
 
-// Ce composant affiche une ligne de sélection issue du contrat public V19.
+// Ce composant affiche une rencontre retenue avec son choix et une explication simple.
 function RecommendationRow({
   item,
   match,
+  index,
 }: {
   item: V19SelectionItem;
   match: Match | null;
+  index: number;
 }) {
   const homeLabel = getTeamLabel(match?.home_team);
   const awayLabel = getTeamLabel(match?.away_team);
-  const quality = getQualityPresentation(item.data_quality);
+  const information = getInformationPresentation(item.data_quality);
+  const style = { "--rb-selection-row-index": index } as CSSProperties;
 
   return (
-    <article className="rb-reco-table-row">
-      <div className="rb-reco-table-cell rb-reco-match-cell">
-        <div className="rb-reco-match-meta">
-          <strong>{match?.competition.name ?? `Match V19 #${item.match_id}`}</strong>
-          <span>{formatShortDate(match?.utc_date)}</span>
+    <div className="rb-selection-result-row" style={style} role="row">
+      <div className="rb-selection-result-cell rb-selection-match-cell" role="cell">
+        <div className="rb-selection-match-context">
+          <span>{match?.competition.name ?? "Compétition"}</span>
+          <span>
+            <CalendarDays size={13} aria-hidden="true" />
+            {formatShortDate(match?.utc_date)}
+          </span>
         </div>
 
-        <div className="rb-reco-fixture">
-          <span className="rb-reco-fixture-team rb-reco-fixture-team--home">
+        <div className="rb-selection-fixture">
+          <span className="rb-selection-fixture__team">
             <TeamLogo team={match?.home_team} label={homeLabel} />
-            <span className="rb-reco-team-name">{homeLabel}</span>
+            <strong>{homeLabel}</strong>
           </span>
 
-          <span className="rb-reco-vs">VS</span>
+          <span className="rb-selection-fixture__versus">VS</span>
 
-          <span className="rb-reco-fixture-team rb-reco-fixture-team--away">
+          <span className="rb-selection-fixture__team">
             <TeamLogo team={match?.away_team} label={awayLabel} />
-            <span className="rb-reco-team-name">{awayLabel}</span>
+            <strong>{awayLabel}</strong>
           </span>
         </div>
       </div>
 
-      <div className="rb-reco-table-cell rb-reco-selection-cell">
-        <div className="rb-reco-selection-card">
-          <span className="rb-reco-market-badge rb-reco-market-badge--solo">
-            {formatMarketLabel(item.recommendation.market_type)}
-          </span>
-          <strong>{formatSelectedPrediction(item, match)}</strong>
-          <p>{item.explanation.summary}</p>
-        </div>
-      </div>
-
-      <div className="rb-reco-table-cell rb-reco-confidence-cell">
-        <span
-          className={`rb-reco-risk-badge rb-reco-risk-badge--${quality.tone}`}
-        >
-          {quality.label}
+      <div className="rb-selection-result-cell rb-selection-choice-cell" role="cell">
+        <span className="rb-selection-choice-chip">
+          <ShieldCheck size={17} aria-hidden="true" />
+          {formatSelectedChoice(item)}
         </span>
-        <small>{quality.detail}</small>
       </div>
 
-      <div className="rb-reco-table-cell">
-        <p>{getAnalysisKey(item)}</p>
+      <div className="rb-selection-result-cell rb-selection-info-cell" role="cell">
+        <span className={`rb-selection-info-status is-${information.tone}`}>
+          <CheckCircle2 size={15} aria-hidden="true" />
+          {information.label}
+        </span>
       </div>
-    </article>
-  );
-}
 
-// Ce composant affiche les exclusions publiques et le rappel responsable sans codes internes détaillés.
-function SelectionNotices({
-  response,
-}: {
-  response: V19SelectionResponse;
-}) {
-  const excludedMessages = cleanTextItems(
-    response.excluded_matches.map((item) => item.summary),
-  );
-  const messages = cleanTextItems([
-    ...excludedMessages,
-    response.responsible_note,
-  ]).slice(0, 3);
-
-  if (messages.length === 0) {
-    return null;
-  }
-
-  return (
-    <div className="rb-reco-limits">
-      {messages.map((message) => (
-        <p key={message}>
-          <span>ⓘ</span>
-          {message}
-        </p>
-      ))}
+      <div className="rb-selection-result-cell rb-selection-reason-cell" role="cell">
+        <p>{getFriendlyReason(item, information)}</p>
+      </div>
     </div>
   );
 }
 
-// Ce composant permet de paramétrer, générer et afficher une sélection multi-matchs V19.
+// Ce composant affiche uniquement les rappels utiles sous la sélection.
+function SelectionNotices({ response }: { response: V19SelectionResponse }) {
+  const hasExcludedMatches = response.excluded_matches.length > 0;
+
+  return (
+    <div className="rb-selection-notices">
+      {hasExcludedMatches ? (
+        <p>
+          <Info size={17} aria-hidden="true" />
+          Certains matchs ont été laissés de côté lorsque la lecture n’était pas assez claire.
+        </p>
+      ) : null}
+      <p>
+        <Info size={17} aria-hidden="true" />
+        RubyBets propose une aide à la décision avant-match, sans garantie de résultat sportif.
+      </p>
+    </div>
+  );
+}
+
+// Ce composant réunit les contrôles, le chargement, l’état vide et les résultats.
 function MultiMatchRecommendationSection({
   matches,
   activeCompetitionLabel,
@@ -420,102 +430,111 @@ function MultiMatchRecommendationSection({
   const emptyStateContent = getEmptyStateContent(
     multiMatchRecommendation,
     multiMatchStatus,
+    isGenerating,
   );
-  const profileLabel = multiMatchRecommendation
-    ? multiMatchRecommendation.profile.label
-    : formatSelectionProfile(recommendationSelectionProfile);
+  const styleLabel = multiMatchRecommendation
+    ? formatSelectionStyle(multiMatchRecommendation.profile.value)
+    : formatSelectionStyle(recommendationSelectionProfile);
 
   return (
-    <section className="rb-reco-generator-panel">
-      <div className="rb-reco-controls-panel">
+    <section className="rb-selection-generator" aria-label="Création de la sélection">
+      <div className="rb-selection-controls-card">
         <MatchCountSegments
           value={recommendationMatchCount}
           disabled={isGenerating}
           onChange={onChangeMatchCount}
         />
 
-        <SelectionProfileSegments
+        <SelectionStyleSegments
           value={recommendationSelectionProfile}
           disabled={isGenerating}
           onChange={onChangeSelectionProfile}
         />
 
-        <div className="rb-reco-action-box">
+        <div className="rb-selection-action">
           <button
             type="button"
+            className="rb-selection-primary-button"
             onClick={onGenerateRecommendation}
             disabled={isGenerating || !canGenerateSelection}
           >
-            {isGenerating
-              ? "Génération en cours..."
-              : "Générer la sélection"}
+            {isGenerating ? (
+              <LoaderCircle className="rb-selection-spinner" size={19} aria-hidden="true" />
+            ) : (
+              <Sparkles size={19} aria-hidden="true" />
+            )}
+            <span>{isGenerating ? "Préparation en cours..." : "Lancer la sélection"}</span>
           </button>
 
-          <p role="status">
-            <span>✧</span>
+          <p className="rb-selection-availability" role="status" aria-live="polite">
+            <Trophy size={15} aria-hidden="true" />
             {canGenerateSelection
-              ? `${activeCompetitionLabel} · ${candidateCount} matchs candidats`
-              : candidateCount === 0
-                ? `${activeCompetitionLabel} · aucun match candidat. Au moins 2 matchs sont nécessaires.`
-                : `${activeCompetitionLabel} · 1 match candidat. Au moins 2 matchs sont nécessaires.`}
+              ? `${activeCompetitionLabel} · ${candidateCount} matchs disponibles`
+              : `${activeCompetitionLabel} · au moins 2 matchs sont nécessaires`}
           </p>
         </div>
       </div>
 
-      <div className="rb-reco-results-panel">
-        <div className="rb-reco-results-header">
+      <div className="rb-selection-results-card">
+        <header className="rb-selection-results-header">
           <div>
-            <p className="rb-reco-kicker">Votre sélection multi-matchs</p>
-            <h3>Sélection analytique V19</h3>
+            <p className="rb-selection-section-kicker">Votre sélection</p>
+            <h2>Sélection proposée</h2>
           </div>
 
-          <div className="rb-reco-results-stats">
-            <p>
-              <span>Sélections</span>
-              <strong>{multiMatchRecommendation?.selected_count ?? "—"}</strong>
-            </p>
-            <p>
-              <span>
-                {multiMatchRecommendation ? "Matchs évalués" : "Candidats"}
-              </span>
-              <strong>
-                {multiMatchRecommendation?.evaluated_count ?? candidateCount}
-              </strong>
-            </p>
-            <p>
-              <span>Profil</span>
-              <strong>{profileLabel}</strong>
-            </p>
-          </div>
-        </div>
+          <dl className="rb-selection-results-stats">
+            <div>
+              <dt>Matchs retenus</dt>
+              <dd>{multiMatchRecommendation?.selected_count ?? "—"}</dd>
+            </div>
+            <div>
+              <dt>Matchs disponibles</dt>
+              <dd>{multiMatchRecommendation?.evaluated_count ?? candidateCount}</dd>
+            </div>
+            <div>
+              <dt>Style</dt>
+              <dd>{styleLabel}</dd>
+            </div>
+          </dl>
+        </header>
 
         {!hasRecommendations ? (
-          <div className="rb-reco-empty-state">
-            <h3>{emptyStateContent.title}</h3>
-            <p>{emptyStateContent.message}</p>
-            <p>{emptyStateContent.hint}</p>
+          <div className={`rb-selection-empty${isGenerating ? " is-loading" : ""}`} aria-live="polite">
+            <span className="rb-selection-empty__icon" aria-hidden="true">
+              {isGenerating ? (
+                <LoaderCircle className="rb-selection-spinner" size={25} />
+              ) : (
+                <Sparkles size={24} />
+              )}
+            </span>
+            <div>
+              <h3>{emptyStateContent.title}</h3>
+              <p>{emptyStateContent.message}</p>
+              <small>{emptyStateContent.hint}</small>
+            </div>
           </div>
         ) : null}
 
         {hasRecommendations && multiMatchRecommendation ? (
           <>
-            <div className="rb-reco-table">
-              <div className="rb-reco-table-head">
-                <span>Match</span>
-                <span>Marché & sélection</span>
-                <span>Qualité des données</span>
-                <span>Analyse clé</span>
+            <div className="rb-selection-results-table" role="table" aria-label="Sélection proposée">
+              <div className="rb-selection-results-head" role="row">
+                <span role="columnheader">Match</span>
+                <span role="columnheader">Choix retenu</span>
+                <span role="columnheader">Infos disponibles</span>
+                <span role="columnheader">Pourquoi ce choix</span>
               </div>
 
-              {multiMatchRecommendation.selections.map((item) => (
-                <RecommendationRow
-                  item={item}
-                  match={
-                    matches.find((match) => match.id === item.match_id) ?? null
-                  }
-                  key={`${item.match_id}-${item.recommendation.market_type}`}
-                />
-              ))}
+              <div className="rb-selection-results-body" role="rowgroup">
+                {multiMatchRecommendation.selections.map((item, index) => (
+                  <RecommendationRow
+                    key={`${item.match_id}-${item.recommendation.market_type}`}
+                    item={item}
+                    match={matches.find((match) => match.id === item.match_id) ?? null}
+                    index={index}
+                  />
+                ))}
+              </div>
             </div>
 
             <SelectionNotices response={multiMatchRecommendation} />
@@ -529,10 +548,7 @@ function MultiMatchRecommendationSection({
 export default MultiMatchRecommendationSection;
 
 // Schéma de communication du fichier :
-// MultiMatchRecommendationSection.tsx
-// ├── reçoit les matchs, la compétition active et la réponse V19 depuis RecommendationScreen.tsx
-// ├── conserve les composants visuels et classes CSS du design Obsidian Teal
-// ├── rapproche chaque sélection publique de son match local grâce au match_id
-// ├── affiche la compétition active, le nombre de candidats et bloque la génération sous deux matchs
-// ├── affiche qualité, profil global, explication et exclusions sans score brut ni probabilité
-// └── ne recalcule aucune décision métier et ne transforme jamais une abstention en recommandation
+// RecommendationScreen.tsx -> MultiMatchRecommendationSection.tsx
+// MultiMatchRecommendationSection.tsx <- Match[] + V19SelectionResponse
+// MultiMatchRecommendationSection.tsx -> helpers/displayText.ts
+// MultiMatchRecommendationSection.tsx -> aucune décision recalculée côté frontend

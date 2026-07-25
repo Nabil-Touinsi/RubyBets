@@ -1,88 +1,98 @@
-// Ce composant affiche la sidebar pédagogique et responsable de l’écran Sélection V19.
+// Ce composant explique simplement la sélection et rappelle le cadre responsable de RubyBets.
 
+import { Check, CircleHelp, ShieldCheck } from "lucide-react";
 import type { V19SelectionResponse } from "../models/rubybets";
 
 type RecommendationSidePanelProps = {
   multiMatchRecommendation: V19SelectionResponse | null;
 };
 
-// Ce composant affiche une ligne courte dans la carte pédagogique.
-function SidePanelItem({ children }: { children: string }) {
+// Ce composant affiche une raison courte et compréhensible.
+function ExplanationItem({ children }: { children: string }) {
   return (
-    <p className="rb-reco-side-item">
-      <span>✓</span>
-      {children}
-    </p>
+    <li className="rb-selection-side-list__item">
+      <span aria-hidden="true">
+        <Check size={16} strokeWidth={2.4} />
+      </span>
+      <p>{children}</p>
+    </li>
   );
 }
 
-// Cette fonction construit la note publique affichée après une génération V19.
-function getSelectionNote(
+// Cette fonction construit un résumé simple à partir des compteurs publics reçus.
+function getSelectionSummary(
   multiMatchRecommendation: V19SelectionResponse | null,
 ) {
   if (!multiMatchRecommendation) {
-    return (
-      "Lancez une génération pour afficher la synthèse publique de la " +
-      "sélection proposée."
-    );
+    return "Lancez la sélection pour afficher une proposition adaptée au style choisi.";
   }
 
-  return `${multiMatchRecommendation.selection_explanation.headline}. ${multiMatchRecommendation.selection_explanation.summary}`;
+  const selectedCount = multiMatchRecommendation.selected_count;
+  const evaluatedCount = multiMatchRecommendation.evaluated_count;
+
+  if (selectedCount === 0) {
+    return "Aucun match n’a été retenu pour le moment. Les rencontres jugées trop incertaines ont été laissées de côté.";
+  }
+
+  return `${selectedCount} match${selectedCount > 1 ? "s ont" : " a"} été retenu${
+    selectedCount > 1 ? "s" : ""
+  } parmi ${evaluatedCount} rencontres examinées. Les choix les moins lisibles ont été laissés de côté.`;
 }
 
-// Ce composant regroupe l’explication publique V19 et le rappel responsable.
+// Ce composant regroupe la lecture simple et le rappel responsable.
 function RecommendationSidePanel({
   multiMatchRecommendation,
 }: RecommendationSidePanelProps) {
   return (
-    <aside className="rb-reco-sidebar">
-      <section className="rb-reco-side-card">
-        <div className="rb-reco-side-card__header">
+    <aside className="rb-selection-sidebar" aria-label="Informations sur la sélection">
+      <section className="rb-selection-side-card rb-selection-side-card--explain">
+        <div className="rb-selection-side-card__heading">
+          <span className="rb-selection-side-card__icon" aria-hidden="true">
+            <CircleHelp size={18} />
+          </span>
           <div>
-            <p className="rb-reco-kicker">Pourquoi cette sélection ?</p>
-            <h3>Lecture explicable</h3>
+            <p className="rb-selection-side-kicker">Pourquoi cette sélection ?</p>
+            <h2>Lecture simple</h2>
           </div>
-          <span>ⓘ</span>
         </div>
 
-        <div className="rb-reco-side-list">
-          <SidePanelItem>
-            Analyse des décisions officielles V19 pour les matchs disponibles.
-          </SidePanelItem>
-          <SidePanelItem>
-            Application du profil de sélectivité choisi sans classement par score brut.
-          </SidePanelItem>
-          <SidePanelItem>
-            Exclusion systématique des abstentions et des décisions incompatibles.
-          </SidePanelItem>
-        </div>
+        <ul className="rb-selection-side-list">
+          <ExplanationItem>
+            Les choix les plus cohérents sont mis en avant.
+          </ExplanationItem>
+          <ExplanationItem>
+            Le style choisi guide le niveau de prudence.
+          </ExplanationItem>
+          <ExplanationItem>
+            Les rencontres trop incertaines ne sont pas retenues.
+          </ExplanationItem>
+        </ul>
 
-        <p className="rb-reco-side-note">
-          {getSelectionNote(multiMatchRecommendation)}
+        <p className="rb-selection-side-summary" aria-live="polite">
+          {getSelectionSummary(multiMatchRecommendation)}
         </p>
-
-        {multiMatchRecommendation ? (
-          <p className="rb-reco-side-note">
-            {multiMatchRecommendation.profile.description}
-          </p>
-        ) : null}
       </section>
 
-      <section className="rb-reco-side-card rb-reco-side-card--responsible">
-        <div className="rb-reco-side-card__header">
+      <section className="rb-selection-side-card rb-selection-side-card--responsible">
+        <div className="rb-selection-side-card__heading">
+          <span className="rb-selection-side-card__icon" aria-hidden="true">
+            <ShieldCheck size={18} />
+          </span>
           <div>
-            <p className="rb-reco-kicker">Rappel responsable</p>
-            <h3>Aide à la décision</h3>
+            <p className="rb-selection-side-kicker">Rappel responsable</p>
+            <h2>Aide à la décision</h2>
           </div>
-          <span>◇</span>
         </div>
 
-        <p>
-          RubyBets structure une lecture analytique avant-match. L’application ne
-          permet pas de parier, ne gère aucune mise et ne promet aucun gain.
+        <p className="rb-selection-responsible-copy">
+          RubyBets accompagne votre lecture avant-match. L’application ne permet
+          pas de parier et ne promet aucun résultat.
         </p>
 
-        <strong>Le contrôle reste à l’utilisateur.</strong>
+        <div className="rb-selection-responsible-callout">
+          <ShieldCheck size={20} aria-hidden="true" />
+          <strong>Le choix final vous appartient</strong>
+        </div>
       </section>
     </aside>
   );
@@ -91,8 +101,6 @@ function RecommendationSidePanel({
 export default RecommendationSidePanel;
 
 // Schéma de communication du fichier :
-// RecommendationSidePanel.tsx
-// ├── reçoit la réponse publique V19 depuis RecommendationScreen.tsx
-// ├── affiche selection_explanation et la description du profil
-// ├── explique l’exclusion des abstentions sans exposer les détails internes
-// └── conserve le rappel responsable sans modifier l’API ni la logique métier
+// RecommendationScreen.tsx -> RecommendationSidePanel.tsx
+// RecommendationSidePanel.tsx <- V19SelectionResponse
+// RecommendationSidePanel.tsx -> aucune route API directe

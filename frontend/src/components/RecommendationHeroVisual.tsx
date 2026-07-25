@@ -1,25 +1,14 @@
-// Ce composant affiche un visuel décoratif inspiré d’un terrain de football
+// Ce composant affiche le décor lumineux du hero de l’écran Sélection.
 
+// Ce composant fournit uniquement une animation visuelle sans donnée métier.
 function RecommendationHeroVisual() {
   return (
-    <div className="rb-reco-visual rb-reco-pitch-visual" aria-hidden="true">
-      <div className="rb-reco-pitch-visual__glow" />
-
-      <div className="rb-reco-pitch-visual__field">
-        <span className="rb-reco-pitch-line rb-reco-pitch-line--outer" />
-        <span className="rb-reco-pitch-line rb-reco-pitch-line--mid" />
-        <span className="rb-reco-pitch-line rb-reco-pitch-line--center-circle" />
-        <span className="rb-reco-pitch-line rb-reco-pitch-line--box-left" />
-        <span className="rb-reco-pitch-line rb-reco-pitch-line--box-right" />
-        <span className="rb-reco-pitch-line rb-reco-pitch-line--goal-left" />
-        <span className="rb-reco-pitch-line rb-reco-pitch-line--goal-right" />
-
-        <span className="rb-reco-pitch-node rb-reco-pitch-node--one" />
-        <span className="rb-reco-pitch-node rb-reco-pitch-node--two" />
-        <span className="rb-reco-pitch-node rb-reco-pitch-node--three" />
-        <span className="rb-reco-pitch-node rb-reco-pitch-node--four" />
-        <span className="rb-reco-pitch-node rb-reco-pitch-node--five" />
-      </div>
+    <div className="rb-selection-hero-visual" aria-hidden="true">
+      <span className="rb-selection-hero-visual__halo" />
+      <span className="rb-selection-hero-visual__scan" />
+      <span className="rb-selection-hero-visual__spark rb-selection-hero-visual__spark--one" />
+      <span className="rb-selection-hero-visual__spark rb-selection-hero-visual__spark--two" />
+      <span className="rb-selection-hero-visual__spark rb-selection-hero-visual__spark--three" />
     </div>
   );
 }
@@ -27,7 +16,5 @@ function RecommendationHeroVisual() {
 export default RecommendationHeroVisual;
 
 // Schéma de communication du fichier :
-// RecommendationHeroVisual.tsx
-// ├── utilisé par RecommendationScreen.tsx
-// ├── fournit uniquement un décor visuel frontend
-// └── ne communique ni avec l’API ni avec le backend
+// RecommendationScreen.tsx -> RecommendationHeroVisual.tsx
+// RecommendationHeroVisual.tsx -> selection-hero-field.png via RecommendationScreen.css

@@ -1,12 +1,10 @@
-// Ce fichier affiche l’écran Sélection multi-matchs V19 avec son hero, son générateur et sa sidebar responsable.
+// Ce fichier compose l’écran Sélection guidée avec son hero, son générateur et ses explications responsables.
 
-import type {
-  Match,
-  V19SelectionResponse,
-} from "../models/rubybets";
+import type { Match, V19SelectionResponse } from "../models/rubybets";
 import MultiMatchRecommendationSection from "../components/MultiMatchRecommendationSection";
 import RecommendationHeroVisual from "../components/RecommendationHeroVisual";
 import RecommendationSidePanel from "../components/RecommendationSidePanel";
+import "../styles/RecommendationScreen.css";
 
 type SelectionProfileLevel = "low" | "medium" | "high";
 
@@ -22,7 +20,7 @@ type RecommendationScreenProps = {
   onGenerateRecommendation: () => void;
 };
 
-// Ce composant structure l’écran Sélection V19 sans modifier son design Obsidian Teal.
+// Ce composant organise l’écran complet sans modifier la logique métier de sélection.
 function RecommendationScreen({
   matches,
   activeCompetitionLabel,
@@ -35,44 +33,39 @@ function RecommendationScreen({
   onGenerateRecommendation,
 }: RecommendationScreenProps) {
   return (
-    <div className="rb-recommendation-screen rb-recommendation-screen--mockup">
-      <section className="rb-reco-hero">
-        <div className="rb-reco-hero__copy">
-          <p className="rb-reco-kicker">Sélection intelligente</p>
-          <h2>Générateur de sélection</h2>
-          <p>
-            Construisez une recommandation analytique à partir des matchs
-            disponibles, du profil de sélectivité choisi et des décisions V19.
+    <div className="rb-selection-screen">
+      <section className="rb-selection-hero" aria-labelledby="selection-title">
+        <div className="rb-selection-hero__copy">
+          <p className="rb-selection-eyebrow">Sélection guidée</p>
+          <h1 id="selection-title">Créez votre sélection</h1>
+          <p className="rb-selection-hero__intro">
+            Choisissez le nombre de matchs et le style souhaité. RubyBets vous
+            aide à composer une sélection claire, prudente et facile à lire.
           </p>
         </div>
 
         <RecommendationHeroVisual />
       </section>
 
-      <div className="rb-reco-layout" role="main">
-        <div className="rb-reco-main">
+      <div className="rb-selection-layout">
+        <main className="rb-selection-main">
           <MultiMatchRecommendationSection
             matches={matches}
             activeCompetitionLabel={activeCompetitionLabel}
             recommendationMatchCount={recommendationMatchCount}
             recommendationSelectionProfile={recommendationSelectionProfile}
             multiMatchRecommendation={multiMatchRecommendation}
+            multiMatchStatus={multiMatchStatus}
             onChangeMatchCount={onChangeMatchCount}
             onChangeSelectionProfile={onChangeSelectionProfile}
             onGenerateRecommendation={onGenerateRecommendation}
-            multiMatchStatus={multiMatchStatus}
           />
-        </div>
+        </main>
 
         <RecommendationSidePanel
           multiMatchRecommendation={multiMatchRecommendation}
         />
       </div>
-
-      <p className="rb-reco-footer-note">
-        Outil d’aide à la décision. Les recommandations proposées ne constituent
-        pas un conseil d’investissement ou un pari.
-      </p>
     </div>
   );
 }
@@ -80,8 +73,8 @@ function RecommendationScreen({
 export default RecommendationScreen;
 
 // Schéma de communication du fichier :
-// RecommendationScreen.tsx
-// ├── reçoit les matchs, la compétition active, les paramètres et les résultats V19 depuis App.tsx
-// ├── utilise MultiMatchRecommendationSection.tsx pour le générateur et les résultats
-// ├── utilise RecommendationHeroVisual.tsx pour conserver le décor haut de page
-// └── utilise RecommendationSidePanel.tsx pour l’explication publique et le rappel responsable
+// App.tsx -> RecommendationScreen.tsx
+// RecommendationScreen.tsx -> MultiMatchRecommendationSection.tsx
+// RecommendationScreen.tsx -> RecommendationHeroVisual.tsx
+// RecommendationScreen.tsx -> RecommendationSidePanel.tsx
+// RecommendationScreen.tsx -> RecommendationScreen.css
