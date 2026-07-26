@@ -1,10 +1,18 @@
-// Ce fichier affiche l’écran Ressources unifié de RubyBets avec un hero premium, le glossaire et le cadre responsable.
+// Ce fichier compose l’écran Ressources modernisé avec son hero lumineux et le centre d’apprentissage RubyBets.
 
+import {
+  BarChart3,
+  BookOpen,
+  ShieldCheck,
+  Target,
+  TrendingUp,
+} from "lucide-react";
 import type {
   GlossaryResponse,
   ResponsibleInfoResponse,
 } from "../models/rubybets";
 import GlossarySection from "../components/GlossarySection";
+import "../styles/ResourcesScreen.css";
 
 type ResourcesScreenProps = {
   glossary: GlossaryResponse | null;
@@ -13,45 +21,100 @@ type ResourcesScreenProps = {
   responsibleInfoStatus: string;
 };
 
+// Ce composant dessine le livre lumineux et les quatre repères pédagogiques du hero.
+function ResourcesHeroVisual() {
+  return (
+    <div className="rb-learning-hero-visual" aria-hidden="true">
+      <span className="rb-learning-orbit rb-learning-orbit--one" />
+      <span className="rb-learning-orbit rb-learning-orbit--two" />
+      <span className="rb-learning-orbit rb-learning-orbit--three" />
+      <span className="rb-learning-hero-glow" />
+
+      <span className="rb-learning-book-stage">
+        <span className="rb-learning-book-halo" />
+        <span className="rb-learning-book">
+          <BookOpen size={86} strokeWidth={1.2} />
+        </span>
+        <span className="rb-learning-stage-ring rb-learning-stage-ring--one" />
+        <span className="rb-learning-stage-ring rb-learning-stage-ring--two" />
+      </span>
+
+      <span className="rb-learning-hero-node rb-learning-hero-node--understand">
+        <span className="rb-learning-hero-node__icon">
+          <BarChart3 size={23} strokeWidth={1.7} />
+        </span>
+        <span>
+          <strong>Comprendre</strong>
+          <small>les statistiques</small>
+        </span>
+      </span>
+
+      <span className="rb-learning-hero-node rb-learning-hero-node--analyse">
+        <span className="rb-learning-hero-node__icon">
+          <Target size={23} strokeWidth={1.7} />
+        </span>
+        <span>
+          <strong>Analyser</strong>
+          <small>les tendances</small>
+        </span>
+      </span>
+
+      <span className="rb-learning-hero-node rb-learning-hero-node--decide">
+        <span className="rb-learning-hero-node__icon">
+          <ShieldCheck size={23} strokeWidth={1.7} />
+        </span>
+        <span>
+          <strong>Décider</strong>
+          <small>en toute confiance</small>
+        </span>
+      </span>
+
+      <span className="rb-learning-hero-node rb-learning-hero-node--progress">
+        <span className="rb-learning-hero-node__icon">
+          <TrendingUp size={23} strokeWidth={1.7} />
+        </span>
+        <span>
+          <strong>Progresser</strong>
+          <small>à chaque match</small>
+        </span>
+      </span>
+    </div>
+  );
+}
+
 // Ce composant affiche les ressources pédagogiques et responsables sans modifier les appels API existants.
 function ResourcesScreen({
   glossary,
   glossaryStatus,
+  responsibleInfo,
+  responsibleInfoStatus,
 }: ResourcesScreenProps) {
   return (
-    <div className="rb-resources-v2-screen">
-      <header className="rb-resources-v2-hero">
-        <div className="rb-resources-v2-hero__copy">
-          <p className="rb-resources-v2-kicker">Ressources</p>
-          <h2>Centre de ressources RubyBets</h2>
+    <div className="rb-learning-screen">
+      <header className="rb-learning-hero">
+        <div className="rb-learning-hero__copy">
+          <p className="rb-learning-pill">Ressources</p>
+          <h1 className="rb-learning-hero-title">
+            <span className="rb-learning-hero-title__line">Centre de ressources</span>
+            <span className="rb-learning-hero-title__brand" aria-label="RubyBets">
+              <span>Ruby</span><strong>Bets</strong>
+            </span>
+          </h1>
           <p>
-            Comprenez les notions clés utilisées dans l’application ainsi que le cadre responsable
-            qui accompagne chaque lecture avant-match.
+            Des explications simples pour comprendre les notions clés et mieux interpréter
+            chaque analyse avant-match.
           </p>
         </div>
 
-        <div className="rb-resources-v2-hero__visual" aria-hidden="true">
-          <span className="rb-resources-v2-visual__tag rb-resources-v2-visual__tag--analysis">
-            Analyse
-          </span>
-          <span className="rb-resources-v2-visual__tag rb-resources-v2-visual__tag--data">
-            Données
-          </span>
-          <span className="rb-resources-v2-visual__tag rb-resources-v2-visual__tag--safe">
-            Responsable
-          </span>
-
-          <span className="rb-resources-v2-visual__document">
-            <span />
-            <span />
-            <span />
-            <span />
-            <span />
-          </span>
-        </div>
+        <ResourcesHeroVisual />
       </header>
 
-      <GlossarySection glossary={glossary} glossaryStatus={glossaryStatus} />
+      <GlossarySection
+        glossary={glossary}
+        glossaryStatus={glossaryStatus}
+        responsibleInfo={responsibleInfo}
+        responsibleInfoStatus={responsibleInfoStatus}
+      />
     </div>
   );
 }
@@ -59,8 +122,8 @@ function ResourcesScreen({
 export default ResourcesScreen;
 
 // Schéma de communication du fichier :
-// ResourcesScreen.tsx
-// ├── reçoit glossary et responsibleInfo depuis App.tsx
-// ├── transmet glossary à GlossarySection.tsx
-// ├── affiche le hero premium de l’écran Ressources
-// └── utilise App.css pour le rendu visuel sans modifier backend, API ou modèles ML
+// App.tsx
+//   └── ResourcesScreen.tsx
+//         ├── ResourcesHeroVisual (visuel local React/CSS)
+//         ├── GlossarySection.tsx (recherche, catégories et définitions)
+//         └── ResourcesScreen.css (design, animations et responsive)

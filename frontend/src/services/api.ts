@@ -4,6 +4,7 @@
 import type {
   ArchivedPredictionsQuery,
   ArchivedPredictionsResponse,
+  ArchivesReconciliationResponse,
   CompetitionsResponse,
   GlossaryResponse,
   HealthResponse,
@@ -474,9 +475,10 @@ export async function getMultiMatchRecommendation(
 }
 
 
-// Cette fonction récupère les prédictions archivées avec filtres et pagination.
+// Cette fonction récupère les analyses archivées avec filtres, pagination et annulation possible.
 export async function getArchivedPredictions(
-  filters: ArchivedPredictionsQuery = {}
+  filters: ArchivedPredictionsQuery = {},
+  signal?: AbortSignal
 ): Promise<ArchivedPredictionsResponse> {
   const params = new URLSearchParams();
 
@@ -513,7 +515,21 @@ export async function getArchivedPredictions(
 
   return fetchJson<ArchivedPredictionsResponse>(
     endpoint,
-    "Erreur lors du chargement des archives de prédictions."
+    "Erreur lors du chargement de l’historique.",
+    { signal }
+  );
+}
+
+// Cette fonction actualise un lot limité d’archives dont le résultat peut désormais être connu.
+export async function reconcileArchivedPredictions(
+  limit = 25
+): Promise<ArchivesReconciliationResponse> {
+  const safeLimit = Math.max(1, Math.min(limit, 100));
+
+  return fetchJson<ArchivesReconciliationResponse>(
+    `/api/archives/reconcile?limit=${safeLimit}`,
+    "Erreur lors de l’actualisation de l’historique.",
+    { method: "POST" }
   );
 }
 

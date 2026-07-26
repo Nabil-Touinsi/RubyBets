@@ -1032,6 +1032,17 @@ export type ArchivedPredictionsQuery = {
   offset?: number;
 };
 
+// Ce type décrit les indicateurs globaux calculés sur toutes les archives filtrées.
+export type ArchivedPredictionsSummary = {
+  total: number;
+  evaluated: number;
+  successful: number;
+  unsuccessful: number;
+  pending: number;
+  not_verifiable: number;
+  success_rate: number | null;
+};
+
 // Ce type décrit la réponse backend de la liste paginée des prédictions archivées.
 export type ArchivedPredictionsResponse = {
   status: "available" | "unavailable" | string;
@@ -1039,7 +1050,19 @@ export type ArchivedPredictionsResponse = {
   limit: number;
   offset: number;
   items: ArchivedPrediction[];
+  summary?: ArchivedPredictionsSummary;
   available_competitions?: string[];
+  message?: string;
+};
+
+// Ce type décrit le résultat public d’une actualisation des archives en attente.
+export type ArchivesReconciliationResponse = {
+  status: "updated" | "unavailable" | string;
+  checked_count: number;
+  updated_count: number;
+  resolved_count: number;
+  pending_count: number;
+  error_count: number;
   message?: string;
 };
 

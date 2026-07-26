@@ -53,6 +53,7 @@ import type {
 } from "../models/rubybets";
 import type { AppScreen } from "../types/navigation";
 import MatchNewsContextSection from "../components/MatchNewsContextSection";
+import GlossaryTooltip from "../components/GlossaryTooltip";
 import RubyNewsChat from "../components/RubyNewsChat";
 import {
   MatchPredictionSidebar,
@@ -1428,8 +1429,12 @@ function MetricComparisonCard({
           <MetricIcon size={18} strokeWidth={1.8} aria-hidden="true" />
         </span>
         <div>
-          <h4>{metric.label}</h4>
-          <span>{metric.note}</span>
+          <h4>
+            <GlossaryTooltip term={metric.label}>{metric.label}</GlossaryTooltip>
+          </h4>
+          <span>
+            <GlossaryTooltip term={metric.note}>{metric.note}</GlossaryTooltip>
+          </span>
         </div>
       </div>
 
@@ -1498,7 +1503,9 @@ function KeyIndicatorsSection({
           <p>Indicateurs clés</p>
           <h3>Comparaison avant-match</h3>
         </div>
-        <span>Données disponibles</span>
+        <span>
+          <GlossaryTooltip term="Données disponibles">Données disponibles</GlossaryTooltip>
+        </span>
       </div>
 
       <div className="rb-detail-v2-comparison-heading">
@@ -1506,7 +1513,9 @@ function KeyIndicatorsSection({
           <TeamLogo team={match.home_team} />
           <strong>{getTeamDisplayName(match.home_team)}</strong>
         </div>
-        <span>Comparaison des signaux</span>
+        <span>
+          <GlossaryTooltip term="Comparaison des signaux">Comparaison des signaux</GlossaryTooltip>
+        </span>
         <div>
           <strong>{getTeamDisplayName(match.away_team)}</strong>
           <TeamLogo team={match.away_team} />
@@ -2884,20 +2893,30 @@ function AdvancedSummaryCard({
       <span className="rb-detail-advanced-summary-card__icon">
         <Icon size={22} strokeWidth={1.8} aria-hidden="true" />
       </span>
-      <p>{definition.label}</p>
+      <p>
+        <GlossaryTooltip term={definition.label}>{definition.label}</GlossaryTooltip>
+      </p>
       <strong>
         {formatAdvancedMetricValue(homeMetric)}
         <small>vs</small>
         {formatAdvancedMetricValue(awayMetric)}
       </strong>
       <div className="rb-detail-advanced-summary-card__coverage">
-        <span title={getAdvancedMetricCoverageDescription(homeMetric)}>
+        <GlossaryTooltip
+          term="Couverture des données"
+          detail={getAdvancedMetricCoverageDescription(homeMetric)}
+        >
           {formatAdvancedMetricCoverageCompact(homeMetric)}
-        </span>
-        <small aria-hidden="true">Couverture</small>
-        <span title={getAdvancedMetricCoverageDescription(awayMetric)}>
+        </GlossaryTooltip>
+        <small>
+          <GlossaryTooltip term="Couverture des données">Couverture</GlossaryTooltip>
+        </small>
+        <GlossaryTooltip
+          term="Couverture des données"
+          detail={getAdvancedMetricCoverageDescription(awayMetric)}
+        >
           {formatAdvancedMetricCoverageCompact(awayMetric)}
-        </span>
+        </GlossaryTooltip>
       </div>
       <div className="rb-detail-advanced-summary-card__bars" aria-hidden="true">
         <i style={{ width: `${getAdvancedMetricBarWidth(homeMetric, awayMetric)}%` }} />
@@ -2922,14 +2941,21 @@ function AdvancedMetricRow({
     <div className="rb-detail-advanced-metric-row">
       <div className="rb-detail-advanced-metric-row__value rb-detail-advanced-metric-row__value--home">
         <strong>{formatAdvancedMetricValue(homeMetric)}</strong>
-        <span title={getAdvancedMetricCoverageDescription(homeMetric)}>
+        <GlossaryTooltip
+          term="Couverture des données"
+          detail={getAdvancedMetricCoverageDescription(homeMetric)}
+        >
           {formatAdvancedMetricCoverage(homeMetric)}
-        </span>
+        </GlossaryTooltip>
       </div>
 
       <div className="rb-detail-advanced-metric-row__center">
-        <p>{definition.label}</p>
-        <small>{definition.compactLabel}</small>
+        <p>
+          <GlossaryTooltip term={definition.label}>{definition.label}</GlossaryTooltip>
+        </p>
+        <small>
+          <GlossaryTooltip term={definition.compactLabel}>{definition.compactLabel}</GlossaryTooltip>
+        </small>
         <div aria-hidden="true">
           <i style={{ width: `${getAdvancedMetricBarWidth(homeMetric, awayMetric)}%` }} />
           <i style={{ width: `${getAdvancedMetricBarWidth(awayMetric, homeMetric)}%` }} />
@@ -2938,9 +2964,12 @@ function AdvancedMetricRow({
 
       <div className="rb-detail-advanced-metric-row__value rb-detail-advanced-metric-row__value--away">
         <strong>{formatAdvancedMetricValue(awayMetric)}</strong>
-        <span title={getAdvancedMetricCoverageDescription(awayMetric)}>
+        <GlossaryTooltip
+          term="Couverture des données"
+          detail={getAdvancedMetricCoverageDescription(awayMetric)}
+        >
           {formatAdvancedMetricCoverage(awayMetric)}
-        </span>
+        </GlossaryTooltip>
       </div>
     </div>
   );
@@ -2970,10 +2999,18 @@ function AdvancedMetricPanel({
     <section className="rb-detail-v2-card rb-detail-advanced-panel">
       <div className="rb-detail-v2-section-header">
         <div>
-          <p>{eyebrow}</p>
-          <h3>{title}</h3>
+          <p>
+            <GlossaryTooltip term={eyebrow}>{eyebrow}</GlossaryTooltip>
+          </p>
+          <h3>
+            <GlossaryTooltip term={title}>{title}</GlossaryTooltip>
+          </h3>
         </div>
-        <span>{visibleDefinitions.length} indicateur(s)</span>
+        <span>
+          <GlossaryTooltip term="Indicateur">
+            {visibleDefinitions.length} indicateur(s)
+          </GlossaryTooltip>
+        </span>
       </div>
 
       <div className="rb-detail-advanced-team-heading">
@@ -2981,7 +3018,11 @@ function AdvancedMetricPanel({
           <TeamLogo team={match.home_team} />
           <strong>{getTeamShortName(match.home_team)}</strong>
         </div>
-        <small>Comparaison sur données disponibles</small>
+        <small>
+          <GlossaryTooltip term="Comparaison sur données disponibles">
+            Comparaison sur données disponibles
+          </GlossaryTooltip>
+        </small>
         <div>
           <strong>{getTeamShortName(match.away_team)}</strong>
           <TeamLogo team={match.away_team} />
@@ -3021,8 +3062,14 @@ function AdvancedDataQualitySection({
     <section className="rb-detail-v2-card rb-detail-advanced-quality-card">
       <div className="rb-detail-v2-section-header">
         <div>
-          <p>Qualité des données</p>
-          <h3>Couverture de l'analyse avancée</h3>
+          <p>
+            <GlossaryTooltip term="Qualité des données">Qualité des données</GlossaryTooltip>
+          </p>
+          <h3>
+            <GlossaryTooltip term="Couverture de l'analyse">
+              Couverture de l'analyse avancée
+            </GlossaryTooltip>
+          </h3>
         </div>
         <span>{getAdvancedStatsStatusLabel(advancedStats)}</span>
       </div>
@@ -3154,10 +3201,20 @@ function AnalysisDetailTabContent({
       <section className="rb-detail-v2-card rb-detail-advanced-summary-section">
         <div className="rb-detail-v2-section-header">
           <div>
-            <p>Résumé analytique</p>
-            <h3>Signaux issus des derniers matchs terminés</h3>
+            <p>
+              <GlossaryTooltip term="Résumé analytique">Résumé analytique</GlossaryTooltip>
+            </p>
+            <h3>
+              <GlossaryTooltip term="Signaux récents">
+                Signaux issus des derniers matchs terminés
+              </GlossaryTooltip>
+            </h3>
           </div>
-          <span>{getAdvancedStatsStatusLabel(matchAdvancedStats)}</span>
+          <span>
+            <GlossaryTooltip term={getAdvancedStatsStatusLabel(matchAdvancedStats)}>
+              {getAdvancedStatsStatusLabel(matchAdvancedStats)}
+            </GlossaryTooltip>
+          </span>
         </div>
 
         {summaryDefinitions.length ? (

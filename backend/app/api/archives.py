@@ -6,7 +6,10 @@ from typing import Any
 
 from fastapi import APIRouter, Query
 
-from app.services.archives_service import get_archived_predictions
+from app.services.archives_service import (
+    get_archived_predictions,
+    reconcile_pending_archives,
+)
 
 
 router = APIRouter(
@@ -37,10 +40,19 @@ def read_archived_predictions(
     )
 
 
+# Cette route actualise un lot limité d'archives dont le match a déjà commencé.
+@router.post("/reconcile")
+async def reconcile_archived_predictions(
+    limit: int = Query(default=25, ge=1, le=100),
+) -> dict[str, Any]:
+    return await reconcile_pending_archives(limit=limit)
+
+
 # Schéma de communication :
 # frontend ArchivesScreen.tsx
 #     ↓
 # GET /api/archives/predictions?competition_name=...
+# POST /api/archives/reconcile
 #     ↓
 # archives_service.py
 #     ↓
