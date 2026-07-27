@@ -1,3 +1,11 @@
+# Ce fichier regroupe les tests backend du domaine api contracts.
+# Les sections sources restent identifiables pour préserver la traçabilité et faciliter la maintenance.
+
+
+# ============================================================================
+# Section issue de : backend/tests/test_api.py
+# ============================================================================
+
 # Ce fichier vérifie automatiquement les routes API principales du MVP RubyBets.
 # Il contrôle les réponses attendues sans appeler réellement les services externes (pour éviter les appels API pendant les tests, gagner du temps et ne pas polluer le cache local).
 
@@ -679,3 +687,165 @@ def test_flashscore_range_cache_flag_uses_successful_days_only(monkeypatch) -> N
 # ├── simule app.api.competitions pour tester /api/competitions sans cache réel
 # ├── simule app.api.matches pour tester routes, cache partagé, TTL et fraîcheur avant-match
 # └── simule app.api.recommendations pour tester la recommandation multi-matchs sans cache réel
+
+# ============================================================================
+# Section issue de : backend/tests/test_archives_public_contract.py
+# ============================================================================
+
+# Rôle du fichier :
+# Ces tests vérifient que le contrat public des archives masque les métriques et versions internes.
+
+from app.services.archives_service import (
+    build_archive_justification,
+    map_archive_row,
+)
+
+
+# Ce test vérifie qu’une nouvelle justification n’expose aucune probabilité interne.
+def test_build_archive_justification_hides_probability() -> None:
+    justification = build_archive_justification(
+        "BTTS",
+        {"max_probability": 0.521},
+    )
+
+    lowered = justification.lower()
+
+    assert "52.1" not in justification
+    assert "probabilité" not in lowered
+    assert "probability" not in lowered
+    assert "max_probability" not in lowered
+
+
+# Ce test vérifie que les anciennes archives sont assainies avant exposition publique.
+def test_map_archive_row_hides_legacy_probability_and_engine_version() -> None:
+    row = (
+        1,
+        "123",
+        "source-123",
+        "Competition",
+        "Home",
+        "Away",
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        "BTTS",
+        "NO",
+        "low",
+        "high",
+        "Prédiction BTTS générée avec une probabilité maximale de 52.1 %.",
+        "rubybets_ml_national_v18_3_4_dynamic_inference",
+        None,
+        None,
+        "SCHEDULED",
+        "pending",
+        None,
+    )
+
+    archive = map_archive_row(row)
+    public_json = str(archive).lower()
+
+    assert "engine_version" not in archive
+    assert "52.1" not in public_json
+    assert "probabilité" not in public_json
+    assert "rubybets_ml_national_v18_3_4_dynamic_inference" not in public_json
+
+
+# Schéma de communication :
+# test_archives_public_contract.py
+# └── archives_service.py
+#     ├── map_archive_row()
+#     └── build_archive_justification()
+
+# ============================================================================
+# Section issue de : backend/tests/test_archives_reconciliation.py
+# ============================================================================
+
+# Rôle du fichier :
+# Ces tests vérifient le résumé global et l'actualisation des résultats archivés.
+
+from datetime import datetime
+
+from app.services.archives_service import (
+    build_archive_reconciliation_update,
+    compute_archive_verdict,
+    normalize_archive_summary_row,
+)
+
+
+# Ce test vérifie que les indicateurs globaux utilisent toutes les archives agrégées.
+def test_normalize_archive_summary_row_computes_success_rate() -> None:
+    summary = normalize_archive_summary_row((20, 10, 7, 3, 8, 2))
+
+    assert summary == {
+        "total": 20,
+        "evaluated": 10,
+        "successful": 7,
+        "unsuccessful": 3,
+        "pending": 8,
+        "not_verifiable": 2,
+        "success_rate": 70.0,
+    }
+
+
+# Ce test vérifie qu'un résultat terminé actualise le score et le verdict 1X2.
+def test_build_archive_reconciliation_update_resolves_finished_match() -> None:
+    checked_at = datetime(2026, 7, 25, 12, 0, 0)
+    archive = {
+        "id": 42,
+        "market_type": "1X2",
+        "predicted_value": "TEAM_A_WIN",
+    }
+    source_match = {
+        "status": "FINISHED",
+        "score": {
+            "fullTime": {
+                "home": 2,
+                "away": 1,
+            }
+        },
+    }
+
+    update = build_archive_reconciliation_update(
+        archive=archive,
+        source_match=source_match,
+        checked_at=checked_at,
+    )
+
+    assert update == {
+        "id": 42,
+        "final_home_score": 2,
+        "final_away_score": 1,
+        "match_status": "FINISHED",
+        "verdict": "correct",
+        "checked_at": checked_at,
+    }
+
+
+# Ce test vérifie qu'un match annulé sans score ne reste pas indéfiniment en attente.
+def test_compute_archive_verdict_marks_cancelled_match_not_verifiable() -> None:
+    verdict = compute_archive_verdict(
+        market_type="BTTS",
+        predicted_value="YES",
+        final_home_score=None,
+        final_away_score=None,
+        match_status="CANCELLED",
+    )
+
+    assert verdict == "not_verifiable"
+
+
+# Schéma de communication :
+# test_archives_reconciliation.py
+# └── archives_service.py
+#     ├── normalize_archive_summary_row()
+#     ├── build_archive_reconciliation_update()
+#     └── compute_archive_verdict()
+
+# Schéma de communication du fichier :
+# backend/tests/test_api_contracts.py
+#   ├── importe les routes, services et contrats du domaine testé
+#   ├── utilise les fixtures partagées de backend/tests/conftest.py
+#   └── est collecté par pytest dans la suite backend complète

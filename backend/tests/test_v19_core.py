@@ -1,3 +1,11 @@
+# Ce fichier regroupe les tests backend du domaine v19 core.
+# Les sections sources restent identifiables pour préserver la traçabilité et faciliter la maintenance.
+
+
+# ============================================================================
+# Section issue de : backend/tests/test_v19.py
+# ============================================================================
+
 # Role du fichier :
 # Ces tests protègent les contrats et la chaîne interne H2H du domaine RubyBets V19.
 
@@ -2026,3 +2034,909 @@ def test_v19_h2h_api_maps_application_errors(
 #   -> verifie formules, profils, qualite, readiness et abstention locale H2H
 #   -> injecte des clients controles et ne contacte aucune API reelle
 #   -> ne teste aucune recommandation sportive
+
+# ============================================================================
+# Section issue de : backend/tests/test_v19_decision_orchestrator.py
+# ============================================================================
+
+# Rôle du fichier :
+# Ce fichier protège la politique de parité et les contrats de décision finale RubyBets V19.
+
+from dataclasses import FrozenInstanceError, is_dataclass
+
+import pytest
+
+from app.v19.application.decision_orchestrator import (
+    LEGACY_DECISION_ENGINE_VERSION,
+    orchestrate_legacy_decision,
+)
+from app.v19.domain.decision_contracts import (
+    DecisionResultV1,
+    RejectedExpertCandidateV1,
+)
+from app.v19.domain.decision_enums import (
+    CandidateRejectionReason,
+    DecisionAbstentionReason,
+    DecisionStatus,
+)
+from app.v19.domain.expert_contracts import ExpertCandidateV1
+from app.v19.domain.expert_enums import (
+    ExpertCandidateStatus,
+    ExpertMarketType,
+)
+
+
+# Construit un candidat minimal pour tester l'arbitrage sans dépendre des builders sportifs.
+def build_candidate(
+    market_type: ExpertMarketType,
+    status: ExpertCandidateStatus,
+    recommendation_value: str | None,
+    *,
+    missing_features: tuple[str, ...] = (),
+    caution_reasons: tuple[str, ...] = (),
+) -> ExpertCandidateV1:
+    return ExpertCandidateV1(
+        expert_id=f"expert-{market_type.value.lower()}",
+        expert_version=f"{market_type.value.lower()}.1",
+        market_type=market_type,
+        recommendation_value=recommendation_value,
+        status=status,
+        raw_score=0.80 if status is ExpertCandidateStatus.ELIGIBLE else None,
+        calibrated_probability=None,
+        confidence_level="high" if status is ExpertCandidateStatus.ELIGIBLE else None,
+        local_risk_level="low" if status is ExpertCandidateStatus.ELIGIBLE else None,
+        required_features=missing_features,
+        missing_features=missing_features,
+        positive_reasons=("TEST_ELIGIBLE",) if status is ExpertCandidateStatus.ELIGIBLE else (),
+        caution_reasons=caution_reasons,
+        quality_requirements=(),
+        metadata=(),
+    )
+
+
+# Retourne le motif de rejet associé au marché demandé.
+def rejection_reason_for(
+    result: DecisionResultV1,
+    market_type: ExpertMarketType,
+) -> CandidateRejectionReason:
+    return next(
+        rejected.reason
+        for rejected in result.rejected_candidates
+        if rejected.candidate.market_type is market_type
+    )
+
+
+# Vérifie les valeurs exactes du vocabulaire de décision V19.
+def test_decision_enums_keep_expected_values() -> None:
+    assert [status.value for status in DecisionStatus] == ["RECOMMEND", "ABSTAIN"]
+    assert [reason.value for reason in CandidateRejectionReason] == [
+        "HIGHER_PRIORITY_CANDIDATE_SELECTED",
+        "REPLACED_BY_BTTS_POLICY",
+        "CANDIDATE_INELIGIBLE",
+        "CANDIDATE_ERROR",
+    ]
+
+
+# Vérifie que les contrats de décision sont des dataclasses immuables.
+def test_decision_contracts_are_frozen_dataclasses() -> None:
+    assert is_dataclass(DecisionResultV1)
+    assert DecisionResultV1.__dataclass_params__.frozen is True
+    assert is_dataclass(RejectedExpertCandidateV1)
+    assert RejectedExpertCandidateV1.__dataclass_params__.frozen is True
+
+
+# Vérifie que le 1X2 strict conserve la priorité sur tous les autres marchés.
+def test_orchestrator_prioritizes_strict_1x2() -> None:
+    strict = build_candidate(ExpertMarketType.STRICT_1X2, ExpertCandidateStatus.ELIGIBLE, "HOME_WIN")
+    double = build_candidate(ExpertMarketType.DOUBLE_CHANCE, ExpertCandidateStatus.ELIGIBLE, "1X")
+    over = build_candidate(ExpertMarketType.OVER_1_5, ExpertCandidateStatus.ELIGIBLE, "OVER_1_5")
+    btts = build_candidate(ExpertMarketType.BTTS, ExpertCandidateStatus.ELIGIBLE, "BTTS_YES")
+
+    result = orchestrate_legacy_decision(match_id=123, candidates=(strict, double, over, btts))
+
+    assert result.status is DecisionStatus.RECOMMEND
+    assert result.selected_candidate is strict
+    assert all(
+        rejected.reason is CandidateRejectionReason.HIGHER_PRIORITY_CANDIDATE_SELECTED
+        for rejected in result.rejected_candidates
+    )
+
+
+# Vérifie que Double Chance est retenue lorsque le strict est inéligible.
+def test_orchestrator_selects_double_chance_after_strict_abstention() -> None:
+    strict = build_candidate(
+        ExpertMarketType.STRICT_1X2,
+        ExpertCandidateStatus.INELIGIBLE,
+        None,
+        caution_reasons=("STRICT_GATE_FAILED",),
+    )
+    double = build_candidate(ExpertMarketType.DOUBLE_CHANCE, ExpertCandidateStatus.ELIGIBLE, "X2")
+    over = build_candidate(ExpertMarketType.OVER_1_5, ExpertCandidateStatus.ELIGIBLE, "OVER_1_5")
+
+    result = orchestrate_legacy_decision(match_id="match-1", candidates=(strict, double, over))
+
+    assert result.selected_candidate is double
+    assert rejection_reason_for(result, ExpertMarketType.STRICT_1X2) is CandidateRejectionReason.CANDIDATE_INELIGIBLE
+    assert rejection_reason_for(result, ExpertMarketType.OVER_1_5) is CandidateRejectionReason.HIGHER_PRIORITY_CANDIDATE_SELECTED
+
+
+# Vérifie qu'Over 1.5 reste la base lorsque BTTS est inéligible.
+def test_orchestrator_keeps_over_15_when_btts_is_ineligible() -> None:
+    over = build_candidate(ExpertMarketType.OVER_1_5, ExpertCandidateStatus.ELIGIBLE, "OVER_1_5")
+    btts = build_candidate(
+        ExpertMarketType.BTTS,
+        ExpertCandidateStatus.INELIGIBLE,
+        None,
+        caution_reasons=("BTTS_SCORE_TOO_LOW",),
+    )
+
+    result = orchestrate_legacy_decision(match_id=456, candidates=(over, btts))
+
+    assert result.selected_candidate is over
+    assert rejection_reason_for(result, ExpertMarketType.BTTS) is CandidateRejectionReason.CANDIDATE_INELIGIBLE
+
+
+# Vérifie que BTTS remplace Over 1.5 lorsque les deux candidats sont éligibles.
+def test_orchestrator_replaces_over_15_with_btts() -> None:
+    over = build_candidate(ExpertMarketType.OVER_1_5, ExpertCandidateStatus.ELIGIBLE, "OVER_1_5")
+    btts = build_candidate(ExpertMarketType.BTTS, ExpertCandidateStatus.ELIGIBLE, "BTTS_YES")
+
+    result = orchestrate_legacy_decision(match_id=789, candidates=(over, btts))
+
+    assert result.selected_candidate is btts
+    assert rejection_reason_for(result, ExpertMarketType.OVER_1_5) is CandidateRejectionReason.REPLACED_BY_BTTS_POLICY
+
+
+# Vérifie que BTTS peut intervenir en fallback lorsqu'aucune base n'est éligible.
+def test_orchestrator_uses_btts_as_fallback() -> None:
+    over = build_candidate(
+        ExpertMarketType.OVER_1_5,
+        ExpertCandidateStatus.INELIGIBLE,
+        None,
+        caution_reasons=("OVER_15_RATE_BELOW_V15_THRESHOLD",),
+    )
+    btts = build_candidate(ExpertMarketType.BTTS, ExpertCandidateStatus.ELIGIBLE, "BTTS_YES")
+
+    result = orchestrate_legacy_decision(match_id=999, candidates=(over, btts))
+
+    assert result.selected_candidate is btts
+    assert rejection_reason_for(result, ExpertMarketType.OVER_1_5) is CandidateRejectionReason.CANDIDATE_INELIGIBLE
+
+
+# Vérifie qu'une absence totale de candidat éligible produit une abstention expliquée.
+def test_orchestrator_abstains_when_no_candidate_is_eligible() -> None:
+    strict = build_candidate(
+        ExpertMarketType.STRICT_1X2,
+        ExpertCandidateStatus.INELIGIBLE,
+        None,
+        caution_reasons=("FAVORITE_PROBABILITY_BELOW_THRESHOLD",),
+    )
+    btts = build_candidate(
+        ExpertMarketType.BTTS,
+        ExpertCandidateStatus.INELIGIBLE,
+        None,
+        caution_reasons=("BTTS_RATE_TOO_LOW",),
+    )
+
+    result = orchestrate_legacy_decision(match_id=1000, candidates=(strict, btts))
+
+    assert result.status is DecisionStatus.ABSTAIN
+    assert result.selected_candidate is None
+    assert result.abstention_reasons == (
+        DecisionAbstentionReason.NO_ELIGIBLE_CANDIDATE.value,
+        "FAVORITE_PROBABILITY_BELOW_THRESHOLD",
+        "BTTS_RATE_TOO_LOW",
+    )
+
+
+# Vérifie l'agrégation stable et sans doublon des features manquantes.
+def test_orchestrator_aggregates_missing_features() -> None:
+    strict = build_candidate(
+        ExpertMarketType.STRICT_1X2,
+        ExpertCandidateStatus.INELIGIBLE,
+        None,
+        missing_features=("market_favorite_prob", "market_entropy"),
+        caution_reasons=("MISSING_REQUIRED_FEATURES",),
+    )
+    double = build_candidate(
+        ExpertMarketType.DOUBLE_CHANCE,
+        ExpertCandidateStatus.INELIGIBLE,
+        None,
+        missing_features=("market_entropy", "market_top2_sum"),
+        caution_reasons=("MISSING_REQUIRED_FEATURES",),
+    )
+
+    result = orchestrate_legacy_decision(match_id=1001, candidates=(strict, double))
+
+    assert result.missing_features == (
+        "market_favorite_prob",
+        "market_entropy",
+        "market_top2_sum",
+    )
+
+
+# Vérifie qu'un candidat en erreur reste traçable sans bloquer une recommandation valide.
+def test_orchestrator_records_error_candidate_without_blocking_selection() -> None:
+    strict_error = build_candidate(
+        ExpertMarketType.STRICT_1X2,
+        ExpertCandidateStatus.ERROR,
+        None,
+        caution_reasons=("STRICT_EXPERT_ERROR",),
+    )
+    over = build_candidate(ExpertMarketType.OVER_1_5, ExpertCandidateStatus.ELIGIBLE, "OVER_1_5")
+
+    result = orchestrate_legacy_decision(match_id=1002, candidates=(strict_error, over))
+
+    assert result.selected_candidate is over
+    assert rejection_reason_for(result, ExpertMarketType.STRICT_1X2) is CandidateRejectionReason.CANDIDATE_ERROR
+
+
+# Vérifie la conservation des versions moteur, experts, features et métadonnées.
+def test_orchestrator_preserves_version_traceability() -> None:
+    over = build_candidate(ExpertMarketType.OVER_1_5, ExpertCandidateStatus.ELIGIBLE, "OVER_1_5")
+
+    result = orchestrate_legacy_decision(
+        match_id=1003,
+        candidates=(over,),
+        feature_versions=("v19.market.core.1", "v19.team.legacy.1"),
+        metadata=(("policy_mode", "LEGACY_PARITY"),),
+    )
+
+    assert result.engine_version == LEGACY_DECISION_ENGINE_VERSION
+    assert result.expert_versions == ((over.expert_id, over.expert_version),)
+    assert result.feature_versions == ("v19.market.core.1", "v19.team.legacy.1")
+    assert result.metadata == (("policy_mode", "LEGACY_PARITY"),)
+    assert result.match_id == "1003"
+
+
+# Vérifie que le résultat final refuse toute mutation après sa création.
+def test_decision_result_is_immutable() -> None:
+    over = build_candidate(ExpertMarketType.OVER_1_5, ExpertCandidateStatus.ELIGIBLE, "OVER_1_5")
+    result = orchestrate_legacy_decision(match_id=1004, candidates=(over,))
+
+    with pytest.raises(FrozenInstanceError):
+        setattr(result, "status", DecisionStatus.ABSTAIN)
+
+
+# Vérifie que le contrat refuse un résultat RECOMMEND sans candidat sélectionné.
+def test_decision_result_rejects_inconsistent_recommend_state() -> None:
+    with pytest.raises(ValueError, match="RECOMMEND requires"):
+        DecisionResultV1(
+            match_id="1005",
+            status=DecisionStatus.RECOMMEND,
+            selected_candidate=None,
+            evaluated_candidates=(),
+            rejected_candidates=(),
+            missing_features=(),
+            abstention_reasons=(),
+            engine_version=LEGACY_DECISION_ENGINE_VERSION,
+            expert_versions=(),
+            feature_versions=(),
+            metadata=(),
+        )
+
+
+# Schéma de communication :
+# test_v19_decision_orchestrator.py
+#   -> valide decision_enums.py, decision_contracts.py et decision_orchestrator.py
+#   -> protège la priorité V13.1 / V15 / V17 / V17.8 et les motifs de rejet
+#   -> ne dépend d'aucune API externe, base de données ou donnée sportive réelle
+
+# ============================================================================
+# Section issue de : backend/tests/test_v19_market_module.py
+# ============================================================================
+
+# Rôle du fichier :
+# Ce fichier vérifie la normalisation FlashScore, les features V13 et les experts Market RubyBets V19.
+
+from datetime import datetime, timezone
+from math import isclose
+
+from app.services.rapidapi_flashscore_client import (
+    encode_flashscore_match_id,
+    normalize_flashscore_team_for_rubybets,
+)
+from app.v19.acquisition.flashscore_odds_adapter import adapt_flashscore_odds_payload
+from app.v19.acquisition.flashscore_odds_provider import (
+    FLASHSCORE_ODDS_ENDPOINT,
+    get_flashscore_match_odds,
+    get_flashscore_match_odds_for_rubybets,
+)
+from app.v19.domain.expert_enums import ExpertCandidateStatus, ExpertMarketType
+from app.v19.domain.market_contracts import MarketModuleStatus, MarketQualityFlag
+from app.v19.experts.legacy_double_chance import build_legacy_double_chance_candidate
+from app.v19.experts.legacy_strict_1x2 import build_legacy_strict_1x2_candidate
+from app.v19.features.market_feature_builder import (
+    build_market_feature_snapshot,
+    market_features_to_dict,
+)
+
+
+FIXED_FETCHED_AT = datetime(2026, 7, 13, 8, 0, tzinfo=timezone.utc)
+FIXED_COMPUTED_AT = datetime(2026, 7, 13, 8, 5, tzinfo=timezone.utc)
+HOME_TEAM_ID = "home-1"
+AWAY_TEAM_ID = "away-2"
+
+
+# Construit les trois options 1X2 attendues par le mapping FlashScore validé.
+def build_options(
+    home_odd: float,
+    draw_odd: float,
+    away_odd: float,
+    *,
+    opening_home: float | None = None,
+    opening_draw: float | None = None,
+    opening_away: float | None = None,
+    active: bool = True,
+) -> list[dict[str, object]]:
+    return [
+        {
+            "eventParticipantId": HOME_TEAM_ID,
+            "value": home_odd,
+            "opening": opening_home,
+            "active": active,
+        },
+        {
+            "eventParticipantId": None,
+            "value": draw_odd,
+            "opening": opening_draw,
+            "active": active,
+        },
+        {
+            "eventParticipantId": AWAY_TEAM_ID,
+            "value": away_odd,
+            "opening": opening_away,
+            "active": active,
+        },
+    ]
+
+
+# Construit un bookmaker FlashScore contenant un marché HOME_DRAW_AWAY / FULL_TIME.
+def build_bookmaker(
+    bookmaker_id: str,
+    bookmaker_name: str,
+    options: list[dict[str, object]],
+) -> dict[str, object]:
+    return {
+        "bookmaker": {
+            "id": bookmaker_id,
+            "name": bookmaker_name,
+        },
+        "markets": [
+            {
+                "marketType": "HOME_DRAW_AWAY",
+                "period": "FULL_TIME",
+                "options": options,
+            }
+        ],
+    }
+
+
+# Construit le format réel bookmaker -> odds marchés -> odds sélections renvoyé par FlashScore.
+def build_real_flashscore_bookmaker(
+    bookmaker_name: str,
+    full_time_options: list[dict[str, object]],
+) -> dict[str, object]:
+    return {
+        "name": bookmaker_name,
+        "image": "https://example.invalid/bookmaker.png",
+        "odds": [
+            {
+                "bettingType": "HOME_DRAW_AWAY",
+                "bettingScope": "FIRST_HALF",
+                "hasLiveBettingOffers": False,
+                "odds": build_options(2.4, 2.8, 3.2),
+            },
+            {
+                "bettingType": "HOME_DRAW_AWAY",
+                "bettingScope": "FULL_TIME",
+                "hasLiveBettingOffers": False,
+                "odds": full_time_options,
+            },
+            {
+                "bettingType": "DOUBLE_CHANCE",
+                "bettingScope": "FULL_TIME",
+                "hasLiveBettingOffers": False,
+                "odds": [],
+            },
+        ],
+    }
+
+
+# Adapte un payload de test avec les identités de match communes aux scénarios.
+def adapt_payload(payload: object):
+    return adapt_flashscore_odds_payload(
+        payload=payload,
+        match_id="1813105023365578",
+        source_match_id="AbC123",
+        home_team_id=HOME_TEAM_ID,
+        away_team_id=AWAY_TEAM_ID,
+        fetched_at_utc=FIXED_FETCHED_AT,
+    )
+
+
+# Vérifie que le provider appelle exactement l'endpoint odds et transmet match_id.
+def test_flashscore_odds_provider_calls_expected_endpoint() -> None:
+    calls: list[tuple[str, dict[str, object] | None]] = []
+
+    def fake_client(endpoint: str, params: dict[str, object] | None):
+        calls.append((endpoint, params))
+        return {"data": []}
+
+    payload, metadata = get_flashscore_match_odds("AbC123", client=fake_client)
+
+    assert payload == {"data": []}
+    assert calls == [(FLASHSCORE_ODDS_ENDPOINT, {"match_id": "AbC123"})]
+    assert metadata["status"] == "success"
+
+
+# Vérifie que le provider convertit une erreur HTTP maîtrisée en métadonnées sans exception.
+def test_flashscore_odds_provider_preserves_controlled_error() -> None:
+    def fake_client(endpoint: str, params: dict[str, object] | None):
+        return {"status": "error", "status_code": 429, "message": "quota"}
+
+    payload, metadata = get_flashscore_match_odds("AbC123", client=fake_client)
+
+    assert payload is None
+    assert metadata["status"] == "error"
+    assert metadata["status_code"] == 429
+
+
+# Vérifie que le wrapper RubyBets décode l'identifiant avant d'appeler FlashScore.
+def test_flashscore_odds_provider_decodes_rubybets_match_id() -> None:
+    rubybets_match_id = encode_flashscore_match_id("AbC123")
+    observed_params: list[dict[str, object] | None] = []
+
+    def fake_client(endpoint: str, params: dict[str, object] | None):
+        observed_params.append(params)
+        return []
+
+    payload, metadata = get_flashscore_match_odds_for_rubybets(
+        rubybets_match_id,
+        client=fake_client,
+    )
+
+    assert payload == []
+    assert observed_params == [{"match_id": "AbC123"}]
+    assert metadata["rubybets_match_id"] == rubybets_match_id
+
+
+# Vérifie que la normalisation du match conserve l'identifiant participant utilisé par les odds.
+def test_flashscore_team_normalization_preserves_event_participant_id() -> None:
+    team = normalize_flashscore_team_for_rubybets(
+        {
+            "team_id": "home-team-id",
+            "event_participant_id": HOME_TEAM_ID,
+            "name": "Home FC",
+        }
+    )
+
+    assert team["sourceTeamId"] == "home-team-id"
+    assert team["sourceEventParticipantId"] == HOME_TEAM_ID
+
+
+# Vérifie le vrai format FlashScore sans utiliser l'ordre des sélections pour mapper les issues.
+def test_odds_adapter_supports_real_flashscore_nested_odds_shape() -> None:
+    options = [
+        {
+            "eventParticipantId": AWAY_TEAM_ID,
+            "value": 4.5,
+            "opening": 4.8,
+            "active": True,
+        },
+        {
+            "eventParticipantId": HOME_TEAM_ID,
+            "value": 1.8,
+            "opening": 2.0,
+            "active": True,
+        },
+        {
+            "eventParticipantId": None,
+            "value": 3.4,
+            "opening": 3.5,
+            "active": True,
+        },
+    ]
+
+    result = adapt_payload(
+        [build_real_flashscore_bookmaker("1xBet", options)]
+    )
+
+    assert result.status is MarketModuleStatus.DEGRADED
+    assert result.bookmaker_count_total == 1
+    assert result.bookmaker_count_eligible == 1
+    assert result.quality_flags == (MarketQualityFlag.SINGLE_BOOKMAKER_ONLY,)
+    triplet = result.triplets[0]
+    assert triplet.bookmaker_id == "1xBet"
+    assert triplet.bookmaker_name == "1xBet"
+    assert triplet.current_home_odd == 1.8
+    assert triplet.current_draw_odd == 3.4
+    assert triplet.current_away_odd == 4.5
+    assert triplet.opening_home_odd == 2.0
+
+
+# Vérifie le mapping domicile / nul / extérieur et la séparation current / opening.
+def test_odds_adapter_normalizes_complete_current_and_opening_triplet() -> None:
+    payload = [
+        build_bookmaker(
+            "bk-1",
+            "Bookmaker One",
+            build_options(
+                2.0,
+                4.0,
+                5.0,
+                opening_home=2.2,
+                opening_draw=3.8,
+                opening_away=4.8,
+            ),
+        ),
+        build_bookmaker(
+            "bk-2",
+            "Bookmaker Two",
+            build_options(
+                2.1,
+                3.9,
+                4.7,
+                opening_home=2.3,
+                opening_draw=3.7,
+                opening_away=4.6,
+            ),
+        ),
+    ]
+
+    result = adapt_payload(payload)
+
+    assert result.status is MarketModuleStatus.READY
+    assert result.bookmaker_count_total == 2
+    assert result.bookmaker_count_eligible == 2
+    assert result.quality_flags == ()
+    first_triplet = result.triplets[0]
+    assert first_triplet.bookmaker_id == "bk-1"
+    assert isclose(
+        first_triplet.current_home_probability
+        + first_triplet.current_draw_probability
+        + first_triplet.current_away_probability,
+        1.0,
+    )
+    assert first_triplet.opening_home_probability is not None
+    assert first_triplet.current_home_odd == 2.0
+    assert first_triplet.opening_home_odd == 2.2
+
+
+# Vérifie que le booléen opening sépare les enregistrements current et ouverture du fournisseur.
+def test_odds_adapter_supports_boolean_opening_indicator() -> None:
+    current_options = build_options(2.0, 4.0, 5.0)
+    for option in current_options:
+        option["opening"] = False
+
+    opening_options = build_options(2.2, 3.8, 4.8, active=False)
+    for option in opening_options:
+        option["opening"] = True
+
+    result = adapt_payload(
+        [build_bookmaker("bk-1", "Boolean Opening", current_options + opening_options)]
+    )
+
+    assert result.bookmaker_count_eligible == 1
+    triplet = result.triplets[0]
+    assert triplet.current_home_odd == 2.0
+    assert triplet.opening_home_odd == 2.2
+    assert triplet.opening_home_probability is not None
+
+
+# Vérifie qu'un bookmaker sans triplet complet est rejeté et tracé.
+def test_odds_adapter_rejects_incomplete_triplet() -> None:
+    incomplete_options = build_options(2.0, 4.0, 5.0)[:2]
+
+    result = adapt_payload([build_bookmaker("bk-1", "Incomplete", incomplete_options)])
+
+    assert result.status is MarketModuleStatus.UNAVAILABLE
+    assert result.bookmaker_count_eligible == 0
+    assert result.rejected_bookmakers == (("bk-1", "NO_VALID_MARKET_TRIPLET"),)
+    assert MarketQualityFlag.NO_VALID_MARKET_TRIPLET in result.quality_flags
+
+
+# Vérifie que les options explicitement inactives ne construisent pas de triplet exploitable.
+def test_odds_adapter_excludes_inactive_options() -> None:
+    result = adapt_payload(
+        [build_bookmaker("bk-1", "Inactive", build_options(2.0, 4.0, 5.0, active=False))]
+    )
+
+    assert result.status is MarketModuleStatus.UNAVAILABLE
+    assert result.bookmaker_count_eligible == 0
+
+
+# Vérifie qu'un identifiant d'équipe inconnu bloque le bookmaker avec un code stable.
+def test_odds_adapter_blocks_home_away_mapping_mismatch() -> None:
+    options = build_options(2.0, 4.0, 5.0)
+    options[2]["eventParticipantId"] = "unknown-team"
+
+    result = adapt_payload([build_bookmaker("bk-1", "Mismatch", options)])
+
+    assert result.status is MarketModuleStatus.INVALID
+    assert result.rejected_bookmakers == (("bk-1", "HOME_AWAY_MAPPING_MISMATCH"),)
+    assert MarketQualityFlag.HOME_AWAY_MAPPING_MISMATCH in result.quality_flags
+
+
+# Vérifie qu'une option sans eventParticipantId n'est jamais interprétée comme le nul.
+def test_odds_adapter_blocks_missing_participant_key() -> None:
+    options = build_options(2.0, 4.0, 5.0)
+    options[1].pop("eventParticipantId")
+
+    result = adapt_payload([build_bookmaker("bk-1", "Ambiguous", options)])
+
+    assert result.status is MarketModuleStatus.INVALID
+    assert MarketQualityFlag.AMBIGUOUS_PARTICIPANT_MAPPING in result.quality_flags
+
+
+# Vérifie qu'une cote inférieure ou égale à 1 est rejetée sans calcul de probabilité.
+def test_odds_adapter_rejects_invalid_odd_value() -> None:
+    result = adapt_payload(
+        [build_bookmaker("bk-1", "Invalid", build_options(1.0, 4.0, 5.0))]
+    )
+
+    assert result.status is MarketModuleStatus.INVALID
+    assert MarketQualityFlag.INVALID_ODD_VALUE in result.quality_flags
+
+
+# Vérifie que deux sélections contradictoires pour la même issue bloquent le bookmaker.
+def test_odds_adapter_rejects_duplicate_contradictory_selection() -> None:
+    options = build_options(2.0, 4.0, 5.0)
+    options.append(
+        {
+            "eventParticipantId": HOME_TEAM_ID,
+            "value": 2.2,
+            "opening": None,
+            "active": True,
+        }
+    )
+
+    result = adapt_payload([build_bookmaker("bk-1", "Duplicate", options)])
+
+    assert result.status is MarketModuleStatus.INVALID
+    assert MarketQualityFlag.DUPLICATE_CONTRADICTORY_SELECTION in result.quality_flags
+
+
+# Vérifie que l'absence d'opening dégrade le module sans substituer les valeurs current.
+def test_odds_adapter_marks_missing_opening_without_substitution() -> None:
+    result = adapt_payload(
+        [
+            build_bookmaker("bk-1", "One", build_options(2.0, 4.0, 5.0)),
+            build_bookmaker("bk-2", "Two", build_options(2.1, 3.9, 4.7)),
+        ]
+    )
+
+    assert result.status is MarketModuleStatus.DEGRADED
+    assert MarketQualityFlag.OPENING_ODDS_UNAVAILABLE in result.quality_flags
+    assert all(item.opening_home_probability is None for item in result.triplets)
+
+
+# Vérifie les neuf features V13 sur deux bookmakers et l'accord exact des favoris.
+def test_market_feature_builder_reproduces_v13_consensus_and_agreement() -> None:
+    result = adapt_payload(
+        [
+            build_bookmaker("bk-1", "Home Favorite", build_options(1.5, 4.0, 6.0)),
+            build_bookmaker("bk-2", "Away Favorite", build_options(4.0, 3.5, 1.8)),
+        ]
+    )
+    snapshot = build_market_feature_snapshot(result, computed_at_utc=FIXED_COMPUTED_AT)
+    features = market_features_to_dict(snapshot)
+
+    assert isclose(
+        features["market_home_prob_avg"]
+        + features["market_draw_prob_avg"]
+        + features["market_away_prob_avg"],
+        1.0,
+    )
+    assert features["market_available_triplets"] == 2
+    assert features["market_bookmaker_agreement_score"] == 0.5
+    assert features["v19_favorite_vote_share"] == 0.5
+    assert features["market_entropy"] > 0.0
+    assert features["v13_double_chance"] in {"1X", "X2", "12"}
+
+
+# Vérifie que les mouvements opening/current sont calculés sans mélanger les snapshots.
+def test_market_feature_builder_computes_opening_movements() -> None:
+    result = adapt_payload(
+        [
+            build_bookmaker(
+                "bk-1",
+                "One",
+                build_options(
+                    1.5,
+                    4.0,
+                    6.0,
+                    opening_home=3.5,
+                    opening_draw=4.0,
+                    opening_away=2.0,
+                ),
+            ),
+            build_bookmaker(
+                "bk-2",
+                "Two",
+                build_options(
+                    1.6,
+                    4.1,
+                    5.8,
+                    opening_home=3.6,
+                    opening_draw=4.1,
+                    opening_away=2.1,
+                ),
+            ),
+        ]
+    )
+    snapshot = build_market_feature_snapshot(result, computed_at_utc=FIXED_COMPUTED_AT)
+    features = market_features_to_dict(snapshot)
+
+    assert features["v19_market_opening_home_prob"] is not None
+    assert features["v19_home_prob_movement"] is not None
+    assert features["v19_favorite_changed_since_opening"] is True
+    assert MarketQualityFlag.FAVORITE_CHANGED in snapshot.quality_flags
+    assert features["v19_odds_age_seconds"] == 300.0
+
+
+# Vérifie qu'un module indisponible retourne les features legacy nulles sauf le compteur de triplets.
+def test_market_feature_builder_preserves_missingness_when_unavailable() -> None:
+    result = adapt_payload([])
+    snapshot = build_market_feature_snapshot(result, computed_at_utc=FIXED_COMPUTED_AT)
+    features = market_features_to_dict(snapshot)
+
+    assert snapshot.status is MarketModuleStatus.UNAVAILABLE
+    assert features["market_available_triplets"] == 0
+    assert features["market_home_prob_avg"] is None
+    assert features["market_favorite_prob"] is None
+
+
+# Vérifie que le seuil exact 0,80 / 0,10 produit un candidat 1X2 strict éligible.
+def test_strict_1x2_expert_is_eligible_at_exact_thresholds() -> None:
+    candidate = build_legacy_strict_1x2_candidate(
+        {
+            "market_favorite_prob": 0.80,
+            "market_margin_top1_top2": 0.10,
+            "v13_strict_prediction": "HOME_WIN",
+        }
+    )
+
+    assert candidate.status is ExpertCandidateStatus.ELIGIBLE
+    assert candidate.market_type is ExpertMarketType.STRICT_1X2
+    assert candidate.recommendation_value == "HOME_WIN"
+    assert candidate.raw_score == 0.80
+    assert candidate.calibrated_probability is None
+
+
+# Vérifie que le nul reste interdit par la politique stricte V13.1.
+def test_strict_1x2_expert_rejects_draw_even_with_strong_probability() -> None:
+    candidate = build_legacy_strict_1x2_candidate(
+        {
+            "market_favorite_prob": 0.85,
+            "market_margin_top1_top2": 0.20,
+            "v13_strict_prediction": "DRAW",
+        }
+    )
+
+    assert candidate.status is ExpertCandidateStatus.INELIGIBLE
+    assert "DRAW_NOT_ALLOWED_BY_V13_1_STRICT_POLICY" in candidate.caution_reasons
+
+
+# Vérifie que le strict déclare les features manquantes plutôt que d'inventer un score.
+def test_strict_1x2_expert_reports_missing_features() -> None:
+    candidate = build_legacy_strict_1x2_candidate({})
+
+    assert candidate.status is ExpertCandidateStatus.INELIGIBLE
+    assert candidate.raw_score is None
+    assert candidate.missing_features == (
+        "market_favorite_prob",
+        "market_margin_top1_top2",
+        "v13_strict_prediction",
+    )
+
+
+# Vérifie que les seuils exacts Double Chance produisent un candidat éligible hors priorité stricte.
+def test_double_chance_expert_is_eligible_at_exact_thresholds() -> None:
+    candidate = build_legacy_double_chance_candidate(
+        {
+            "market_top2_sum": 0.76,
+            "market_entropy": 1.07,
+            "market_available_triplets": 1,
+            "market_bookmaker_agreement_score": 0.00,
+            "v13_double_chance": "1X",
+            "market_favorite_prob": 0.70,
+            "market_margin_top1_top2": 0.05,
+            "v13_strict_prediction": "HOME_WIN",
+        }
+    )
+
+    assert candidate.status is ExpertCandidateStatus.ELIGIBLE
+    assert candidate.market_type is ExpertMarketType.DOUBLE_CHANCE
+    assert candidate.recommendation_value == "1X"
+    assert candidate.raw_score == 0.76
+
+
+# Vérifie que Double Chance s'efface lorsque le strict possède la priorité historique.
+def test_double_chance_expert_respects_strict_historical_priority() -> None:
+    candidate = build_legacy_double_chance_candidate(
+        {
+            "market_top2_sum": 0.85,
+            "market_entropy": 0.70,
+            "market_available_triplets": 3,
+            "market_bookmaker_agreement_score": 1.0,
+            "v13_double_chance": "1X",
+            "market_favorite_prob": 0.80,
+            "market_margin_top1_top2": 0.10,
+            "v13_strict_prediction": "HOME_WIN",
+        }
+    )
+
+    assert candidate.status is ExpertCandidateStatus.INELIGIBLE
+    assert "STRICT_1X2_HAS_HISTORICAL_PRIORITY" in candidate.caution_reasons
+
+
+# Vérifie que Double Chance refuse une entropie supérieure au maximum V13.1.
+def test_double_chance_expert_rejects_high_entropy() -> None:
+    candidate = build_legacy_double_chance_candidate(
+        {
+            "market_top2_sum": 0.80,
+            "market_entropy": 1.071,
+            "market_available_triplets": 2,
+            "market_bookmaker_agreement_score": 0.50,
+            "v13_double_chance": "X2",
+            "market_favorite_prob": 0.60,
+            "market_margin_top1_top2": 0.04,
+            "v13_strict_prediction": "AWAY_WIN",
+        }
+    )
+
+    assert candidate.status is ExpertCandidateStatus.INELIGIBLE
+    assert "ENTROPY_ABOVE_V13_1_MAXIMUM" in candidate.caution_reasons
+
+
+# Vérifie de bout en bout qu'un consensus très fort active le strict et bloque Double Chance.
+def test_market_pipeline_builds_strict_candidate_before_double_chance() -> None:
+    payload = [
+        build_bookmaker(
+            f"bk-{index}",
+            f"Bookmaker {index}",
+            build_options(1.05, 15.0, 20.0),
+        )
+        for index in range(3)
+    ]
+    normalization = adapt_payload(payload)
+    snapshot = build_market_feature_snapshot(normalization, computed_at_utc=FIXED_COMPUTED_AT)
+    features = market_features_to_dict(snapshot)
+
+    strict_candidate = build_legacy_strict_1x2_candidate(features)
+    double_candidate = build_legacy_double_chance_candidate(features)
+
+    assert strict_candidate.status is ExpertCandidateStatus.ELIGIBLE
+    assert strict_candidate.recommendation_value == "HOME_WIN"
+    assert double_candidate.status is ExpertCandidateStatus.INELIGIBLE
+    assert "STRICT_1X2_HAS_HISTORICAL_PRIORITY" in double_candidate.caution_reasons
+
+
+# Vérifie que le pipeline ne produit aucun candidat Market lorsque les odds sont absentes.
+def test_market_pipeline_abstains_locally_when_no_valid_triplet_exists() -> None:
+    normalization = adapt_payload([])
+    snapshot = build_market_feature_snapshot(normalization, computed_at_utc=FIXED_COMPUTED_AT)
+    features = market_features_to_dict(snapshot)
+
+    strict_candidate = build_legacy_strict_1x2_candidate(features)
+    double_candidate = build_legacy_double_chance_candidate(features)
+
+    assert strict_candidate.status is ExpertCandidateStatus.INELIGIBLE
+    assert double_candidate.status is ExpertCandidateStatus.INELIGIBLE
+    assert strict_candidate.recommendation_value is None
+    assert double_candidate.recommendation_value is None
+
+
+# Schéma de communication :
+# test_v19_market_module.py
+#   -> teste flashscore_odds_provider.py et flashscore_odds_adapter.py
+#   -> protège les formules V13 de market_feature_builder.py
+#   -> vérifie legacy_strict_1x2.py et legacy_double_chance.py
+#   -> garantit que les odds restent internes et qu'aucune décision globale n'est produite
+
+# Schéma de communication du fichier :
+# backend/tests/test_v19_core.py
+#   ├── importe les routes, services et contrats du domaine testé
+#   ├── utilise les fixtures partagées de backend/tests/conftest.py
+#   └── est collecté par pytest dans la suite backend complète
