@@ -1,6 +1,6 @@
 # Rôle du fichier :
 # Ce fichier centralise la configuration de l'API RubyBets :
-# sources football, chatbot Groq, services externes et connexion database.
+# sources football actives, chatbot Groq, services externes et connexion database.
 
 from pathlib import Path
 
@@ -16,10 +16,6 @@ class Settings(BaseSettings):
     # Football-Data.org - source principale du MVP
     football_data_key: str = ""
     football_data_base_url: str = "https://api.football-data.org/v4"
-
-    # API-Football / API-Sports - source secondaire pour enrichir l'historique des équipes
-    api_football_key: str = ""
-    api_football_base_url: str = "https://v3.football.api-sports.io"
 
     # RapidAPI / FlashScore - source tertiaire d'enrichissement
     rapidapi_key: str = ""
@@ -60,13 +56,6 @@ class Settings(BaseSettings):
         return {
             "X-Auth-Token": self.football_data_key,
             "Accept": "application/json",
-        }
-
-    # Retourne les headers nécessaires pour appeler API-Football / API-Sports.
-    def get_api_football_headers(self) -> dict[str, str]:
-        return {
-            "Accept": "application/json",
-            "x-apisports-key": self.api_football_key,
         }
 
     # Retourne les headers nécessaires pour appeler RapidAPI / FlashScore.
@@ -114,7 +103,7 @@ settings = Settings()
 # backend/.env
 #     ↓
 # backend/app/core/config.py
-#     ├── clients football et FlashScore
+#     ├── clients Football-Data et FlashScore
 #     ├── groq_chatbot_client.py
 #     ├── news_article_content_service.py
 #     └── services database / Hugging Face transitoire

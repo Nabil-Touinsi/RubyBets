@@ -7,9 +7,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.archives import router as archives_router
 from app.api.competitions import router as competitions_router
 from app.api.data_sources import router as data_sources_router
-from app.api.experimental_ml_clubs_v17_8 import router as experimental_ml_clubs_v17_8_router
-from app.api.experimental_ml_national_v18_3_3 import router as experimental_ml_national_v18_3_3_router
-from app.api.experimental_ml_v17_8 import router as experimental_ml_v17_8_router
 from app.api.experimental_ml_v19 import router as experimental_ml_v19_router
 from app.api.experimental_ml_v19_h2h import router as experimental_ml_v19_h2h_router
 from app.api.glossary import router as glossary_router
@@ -45,9 +42,6 @@ app.include_router(archives_router)
 app.include_router(glossary_router)
 app.include_router(responsible_info_router)
 app.include_router(ml_predictions_router)
-app.include_router(experimental_ml_v17_8_router)
-app.include_router(experimental_ml_national_v18_3_3_router)
-app.include_router(experimental_ml_clubs_v17_8_router)
 app.include_router(experimental_ml_v19_h2h_router)
 app.include_router(experimental_ml_v19_router)
 

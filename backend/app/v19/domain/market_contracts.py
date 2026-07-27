@@ -24,12 +24,6 @@ class MarketOutcome(str, Enum):
     AWAY_WIN = "AWAY_WIN"
 
 
-# Instant fonctionnel auquel une cote normalisée appartient.
-class MarketSnapshotKind(str, Enum):
-    CURRENT_SNAPSHOT = "CURRENT_SNAPSHOT"
-    OPENING_SNAPSHOT = "OPENING_SNAPSHOT"
-
-
 # Flags stables décrivant les anomalies et dégradations du Market Module.
 class MarketQualityFlag(str, Enum):
     AMBIGUOUS_PARTICIPANT_MAPPING = "AMBIGUOUS_PARTICIPANT_MAPPING"

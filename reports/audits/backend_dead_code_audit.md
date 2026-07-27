@@ -1,0 +1,1801 @@
+# Audit final du backend RubyBets
+
+> Audit statique réalisé après archivage sécurisé des briques V17/V18 et nettoyage du service Archives. Les signaux faibles restent soumis à validation humaine.
+
+## Synthèse exécutive
+
+- Modules Python actifs analysés : **81**
+- Endpoints FastAPI actifs détectés : **43**
+- Routers actifs détectés : **12**
+- Routers actifs enregistrés dans `backend/app/main.py` : **12**
+- Modules actifs sans import entrant apparent : **0**
+- Routers potentiellement non enregistrés : **0**
+- Définitions top-level à revoir : **0**
+- Routes sans appel littéral frontend détecté : **24**
+- Fichiers historiques archivés détectés : **37**
+- Modules de sources externes archivés après fermeture transitive : **1**
+- Références actives résiduelles vers les anciens routers : **0**
+- Groupes de doublons exacts : **375**
+- Caches Python générés encore présents : **0**
+- Erreurs de parsing Python : **0**
+
+## Décision globale
+
+- **À conserver** : les modules actifs, les experts `backend/app/v19/experts/legacy_*`, les deux dépendances historiques encore importées par V19, les modèles, datasets, caches métier et preuves RNCP.
+- **Déjà archivés** : les routers, services exclusifs, scripts et tests V17/V18 validés lors du lot précédent.
+- **À supprimer automatiquement** : aucun fichier supplémentaire dans ce rapport.
+- **À revoir avant un dernier micro-nettoyage** : uniquement les définitions listées dans la section 4.
+
+## 1. Modules actifs sans import entrant apparent
+
+- Aucun module actif orphelin détecté.
+
+## 2. Routers actifs et enregistrement FastAPI
+
+- `app.api.archives` — **enregistré**
+- `app.api.competitions` — **enregistré**
+- `app.api.data_sources` — **enregistré**
+- `app.api.experimental_ml_v19` — **enregistré**
+- `app.api.experimental_ml_v19_h2h` — **enregistré**
+- `app.api.glossary` — **enregistré**
+- `app.api.health` — **enregistré**
+- `app.api.matches` — **enregistré**
+- `app.api.ml_predictions` — **enregistré**
+- `app.api.news_chatbot` — **enregistré**
+- `app.api.recommendations` — **enregistré**
+- `app.api.responsible_info` — **enregistré**
+
+## 3. Endpoints FastAPI actifs
+
+- `GET /` — `backend/app/api/health.py::read_root`
+- `GET /api/archives/predictions` — `backend/app/api/archives.py::read_archived_predictions`
+- `POST /api/archives/reconcile` — `backend/app/api/archives.py::reconcile_archived_predictions`
+- `GET /api/competitions` — `backend/app/api/competitions.py::get_competitions`
+- `GET /api/experimental/ml-v19/h2h/rubybets-matches/{match_id}` — `backend/app/api/experimental_ml_v19_h2h.py::get_v19_h2h_rubybets_match`
+- `GET /api/experimental/ml-v19/rubybets-matches/{match_id}` — `backend/app/api/experimental_ml_v19.py::get_v19_rubybets_match_prediction`
+- `POST /api/experimental/ml-v19/selection` — `backend/app/api/experimental_ml_v19.py::create_v19_selection`
+- `GET /api/glossary` — `backend/app/api/glossary.py::get_glossary`
+- `GET /api/matches` — `backend/app/api/matches.py::get_matches`
+- `GET /api/matches/{match_id}` — `backend/app/api/matches.py::get_match_details`
+- `GET /api/matches/{match_id}/advanced-stats` — `backend/app/api/matches.py::get_match_advanced_stats`
+- `GET /api/matches/{match_id}/analysis` — `backend/app/api/matches.py::get_match_analysis`
+- `GET /api/matches/{match_id}/context` — `backend/app/api/matches.py::get_match_context`
+- `GET /api/matches/{match_id}/lineups` — `backend/app/api/matches.py::get_match_lineups`
+- `POST /api/matches/{match_id}/news-chat` — `backend/app/api/news_chatbot.py::chat_about_match_news`
+- `GET /api/matches/{match_id}/news-context` — `backend/app/api/matches.py::get_match_news_context`
+- `GET /api/matches/{match_id}/predictions` — `backend/app/api/matches.py::get_match_predictions`
+- `GET /api/matches/{match_id}/team-history` — `backend/app/api/matches.py::get_match_team_history`
+- `POST /api/ml/1x2/predict` — `backend/app/api/ml_predictions.py::predict_1x2_from_features`
+- `POST /api/ml/1x2/predict/batch/from-clean-matches` — `backend/app/api/ml_predictions.py::predict_1x2_batch_from_clean_matches`
+- `POST /api/ml/1x2/predict/from-clean-match/{clean_match_id}` — `backend/app/api/ml_predictions.py::predict_1x2_from_clean_match`
+- `POST /api/ml/1x2/predict/from-feature/{feature_id}` — `backend/app/api/ml_predictions.py::predict_1x2_from_database_feature`
+- `GET /api/ml/1x2/status` — `backend/app/api/ml_predictions.py::get_ml_1x2_status`
+- `POST /api/recommendations/multimatch` — `backend/app/api/recommendations.py::generate_multimatch_recommendation`
+- `GET /api/responsible-info` — `backend/app/api/responsible_info.py::get_responsible_info`
+- `GET /api/sources/football-data/competitions` — `backend/app/api/data_sources.py::get_football_data_competitions`
+- `GET /api/sources/football-data/competitions/{competition_code}` — `backend/app/api/data_sources.py::get_football_data_competition_details`
+- `GET /api/sources/football-data/competitions/{competition_code}/matches` — `backend/app/api/data_sources.py::get_football_data_competition_matches`
+- `GET /api/sources/football-data/competitions/{competition_code}/scorers` — `backend/app/api/data_sources.py::get_football_data_competition_scorers`
+- `GET /api/sources/football-data/competitions/{competition_code}/standings` — `backend/app/api/data_sources.py::get_football_data_competition_standings`
+- `GET /api/sources/football-data/competitions/{competition_code}/teams` — `backend/app/api/data_sources.py::get_football_data_competition_teams`
+- `GET /api/sources/football-data/matches` — `backend/app/api/data_sources.py::get_football_data_matches`
+- `GET /api/sources/football-data/matches/{match_id}` — `backend/app/api/data_sources.py::get_football_data_match_details`
+- `GET /api/sources/football-data/teams/{team_id}` — `backend/app/api/data_sources.py::get_football_data_team_details`
+- `GET /api/sources/football-data/teams/{team_id}/matches` — `backend/app/api/data_sources.py::get_football_data_team_matches`
+- `GET /api/sources/rapidapi-flashscore/h2h` — `backend/app/api/data_sources.py::get_flashscore_h2h`
+- `GET /api/sources/rapidapi-flashscore/lineups` — `backend/app/api/data_sources.py::get_flashscore_lineups`
+- `GET /api/sources/rapidapi-flashscore/match-details` — `backend/app/api/data_sources.py::get_flashscore_match_details`
+- `GET /api/sources/rapidapi-flashscore/match-statistics` — `backend/app/api/data_sources.py::get_flashscore_match_statistics`
+- `GET /api/sources/rapidapi-flashscore/match-summary` — `backend/app/api/data_sources.py::get_flashscore_match_summary`
+- `GET /api/sources/rapidapi-flashscore/standings` — `backend/app/api/data_sources.py::get_flashscore_standings`
+- `GET /health` — `backend/app/api/health.py::health_check`
+- `GET /health/database` — `backend/app/api/health.py::database_health_check`
+
+## 4. Définitions top-level à revoir
+
+> Ces définitions n'apparaissent qu'à leur déclaration dans le backend actif et les tests. Elles ne sont pas supprimées par ce lot.
+
+- Aucun candidat détecté.
+
+## 5. Routes sans appel littéral frontend détecté
+
+> Signal faible : certaines routes sont techniques, appelées indirectement, réservées à Swagger, aux scripts, aux tests ou à la soutenance.
+
+- `GET /api/experimental/ml-v19/h2h/rubybets-matches/{match_id}` — `backend/app/api/experimental_ml_v19_h2h.py::get_v19_h2h_rubybets_match`
+- `GET /api/matches/{match_id}/predictions` — `backend/app/api/matches.py::get_match_predictions`
+- `POST /api/ml/1x2/predict` — `backend/app/api/ml_predictions.py::predict_1x2_from_features`
+- `POST /api/ml/1x2/predict/batch/from-clean-matches` — `backend/app/api/ml_predictions.py::predict_1x2_batch_from_clean_matches`
+- `POST /api/ml/1x2/predict/from-clean-match/{clean_match_id}` — `backend/app/api/ml_predictions.py::predict_1x2_from_clean_match`
+- `POST /api/ml/1x2/predict/from-feature/{feature_id}` — `backend/app/api/ml_predictions.py::predict_1x2_from_database_feature`
+- `GET /api/ml/1x2/status` — `backend/app/api/ml_predictions.py::get_ml_1x2_status`
+- `POST /api/recommendations/multimatch` — `backend/app/api/recommendations.py::generate_multimatch_recommendation`
+- `GET /api/sources/football-data/competitions` — `backend/app/api/data_sources.py::get_football_data_competitions`
+- `GET /api/sources/football-data/competitions/{competition_code}` — `backend/app/api/data_sources.py::get_football_data_competition_details`
+- `GET /api/sources/football-data/competitions/{competition_code}/matches` — `backend/app/api/data_sources.py::get_football_data_competition_matches`
+- `GET /api/sources/football-data/competitions/{competition_code}/scorers` — `backend/app/api/data_sources.py::get_football_data_competition_scorers`
+- `GET /api/sources/football-data/competitions/{competition_code}/standings` — `backend/app/api/data_sources.py::get_football_data_competition_standings`
+- `GET /api/sources/football-data/competitions/{competition_code}/teams` — `backend/app/api/data_sources.py::get_football_data_competition_teams`
+- `GET /api/sources/football-data/matches` — `backend/app/api/data_sources.py::get_football_data_matches`
+- `GET /api/sources/football-data/matches/{match_id}` — `backend/app/api/data_sources.py::get_football_data_match_details`
+- `GET /api/sources/football-data/teams/{team_id}` — `backend/app/api/data_sources.py::get_football_data_team_details`
+- `GET /api/sources/football-data/teams/{team_id}/matches` — `backend/app/api/data_sources.py::get_football_data_team_matches`
+- `GET /api/sources/rapidapi-flashscore/h2h` — `backend/app/api/data_sources.py::get_flashscore_h2h`
+- `GET /api/sources/rapidapi-flashscore/lineups` — `backend/app/api/data_sources.py::get_flashscore_lineups`
+- `GET /api/sources/rapidapi-flashscore/match-details` — `backend/app/api/data_sources.py::get_flashscore_match_details`
+- `GET /api/sources/rapidapi-flashscore/match-statistics` — `backend/app/api/data_sources.py::get_flashscore_match_statistics`
+- `GET /api/sources/rapidapi-flashscore/match-summary` — `backend/app/api/data_sources.py::get_flashscore_match_summary`
+- `GET /api/sources/rapidapi-flashscore/standings` — `backend/app/api/data_sources.py::get_flashscore_standings`
+
+## 6. Fichiers versionnés ou legacy encore actifs
+
+- `backend/app/services/ml_clubs_v17_8_feature_builder.py` — **conservé : dépendance V19 validée**
+- `backend/app/services/ml_v17_8_service.py` — **conservé : dépendance V19 validée**
+- `backend/app/v19/experts/legacy_adapters.py` — **conservé : dépendance V19 validée**
+- `backend/app/v19/experts/legacy_btts.py` — **conservé : dépendance V19 validée**
+- `backend/app/v19/experts/legacy_double_chance.py` — **conservé : dépendance V19 validée**
+- `backend/app/v19/experts/legacy_over_15.py` — **conservé : dépendance V19 validée**
+- `backend/app/v19/experts/legacy_strict_1x2.py` — **conservé : dépendance V19 validée**
+- `backend/tests/test_v19_legacy_experts.py` — **conservé : dépendance V19 validée**
+
+## 7. Contrôle des références V17/V18 retirées
+
+- Aucune référence active aux trois anciens routers V17/V18.
+
+## 8. Archive backend V17/V18
+
+- Fichiers Python archivés détectés : **37**
+- Destination : `archive/backend_legacy/v17_v18/`
+- Les preuves, modèles et datasets métier restent hors de cette archive et sont conservés.
+
+## 8.1. Source externe retirée du backend actif
+
+- `backend/app/services/api_football_client.py` a été déplacé vers `archive/backend_legacy/retired_sources/backend/app/services/api_football_client.py`.
+- Motif : sa seule chaîne d'appel active dépendait de `get_api_football_finished_matches`, désormais supprimée.
+- Les paramètres `api_football_key`, `api_football_base_url` et la méthode `get_api_football_headers` ont également été retirés de la configuration active.
+- Aucun modèle, dataset, cache métier ou preuve RNCP n'a été supprimé.
+
+## 9. Doublons exacts
+
+- Groupe 1 :
+  - `backend/.venv/Include/site/python3.13/greenlet/greenlet.h`
+  - `backend/.venv/Lib/site-packages/greenlet/greenlet.h`
+- Groupe 2 :
+  - `backend/.venv/Lib/site-packages/alembic/templates/async/env.py`
+  - `backend/.venv/Lib/site-packages/alembic/templates/pyproject_async/env.py`
+- Groupe 3 :
+  - `backend/.venv/Lib/site-packages/alembic/templates/async/script.py.mako`
+  - `backend/.venv/Lib/site-packages/alembic/templates/generic/script.py.mako`
+  - `backend/.venv/Lib/site-packages/alembic/templates/pyproject/script.py.mako`
+  - `backend/.venv/Lib/site-packages/alembic/templates/pyproject_async/script.py.mako`
+- Groupe 4 :
+  - `backend/.venv/Lib/site-packages/alembic/templates/generic/env.py`
+  - `backend/.venv/Lib/site-packages/alembic/templates/pyproject/env.py`
+- Groupe 5 :
+  - `backend/.venv/Lib/site-packages/alembic/templates/pyproject/alembic.ini.mako`
+  - `backend/.venv/Lib/site-packages/alembic/templates/pyproject_async/alembic.ini.mako`
+- Groupe 6 :
+  - `backend/.venv/Lib/site-packages/alembic/templates/pyproject/pyproject.toml.mako`
+  - `backend/.venv/Lib/site-packages/alembic/templates/pyproject_async/pyproject.toml.mako`
+- Groupe 7 :
+  - `backend/.venv/Lib/site-packages/alembic-1.18.4.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/annotated_doc-0.0.4.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/annotated_types-0.7.0.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/anyio-4.13.0.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/babel-2.18.0.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/certifi-2026.4.22.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/charset_normalizer-3.4.9.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/click-8.3.3.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/colorama-0.4.6.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/courlan-1.4.0.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/dateparser-1.4.1.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/dnspython-2.8.0.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/email_validator-2.3.0.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/fastapi-0.136.1.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/fastapi_cli-0.0.24.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/fastapi_cloud_cli-0.17.0.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/fastar-0.11.0.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/googlenewsdecoder-0.1.7.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/greenlet-3.4.0.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/h11-0.16.0.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/htmldate-1.10.0.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/httpcore-1.0.9.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/httptools-0.7.1.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/httpx-0.28.1.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/idna-3.13.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/iniconfig-2.3.0.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/jinja2-3.1.6.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/joblib-1.5.3.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/justext-3.0.2.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/lxml-6.1.1.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/lxml_html_clean-0.4.5.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/mako-1.3.11.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/markdown_it_py-4.0.0.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/markupsafe-3.0.3.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/mdurl-0.1.2.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/numpy-2.4.6.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/packaging-26.2.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/pandas-3.0.3.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/pip-26.0.1.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/playwright-1.60.0.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/pluggy-1.6.0.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/psycopg-3.3.3.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/psycopg_binary-3.3.3.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/pydantic-2.13.3.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/pydantic_core-2.46.3.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/pydantic_extra_types-2.11.1.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/pydantic_settings-2.14.0.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/pyee-13.0.1.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/pygments-2.20.0.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/PySocks-1.7.1.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/pytest-9.0.3.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/python_dateutil-2.9.0.post0.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/python_dotenv-1.2.2.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/python_multipart-0.0.26.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/pytz-2026.2.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/pyyaml-6.0.3.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/regex-2026.7.10.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/requests-2.34.2.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/rich-15.0.0.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/rich_toolkit-0.19.7.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/rignore-0.7.6.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/scikit_learn-1.8.0.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/scipy-1.17.1.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/selectolax-0.4.11.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/sentry_sdk-2.58.0.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/shellingham-1.5.4.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/six-1.17.0.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/sqlalchemy-2.0.49.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/starlette-1.0.0.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/threadpoolctl-3.6.0.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/tld-0.13.2.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/trafilatura-2.1.0.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/typer-0.24.2.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/typing_extensions-4.15.0.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/typing_inspection-0.4.2.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/tzdata-2026.2.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/tzlocal-5.4.4.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/urllib3-2.6.3.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/uvicorn-0.46.0.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/watchfiles-1.1.1.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/websockets-16.0.dist-info/INSTALLER`
+  - `backend/.venv/Lib/site-packages/xgboost-3.2.0.dist-info/INSTALLER`
+- Groupe 8 :
+  - `backend/.venv/Lib/site-packages/alembic-1.18.4.dist-info/WHEEL`
+  - `backend/.venv/Lib/site-packages/psycopg-3.3.3.dist-info/WHEEL`
+  - `backend/.venv/Lib/site-packages/pyee-13.0.1.dist-info/WHEEL`
+  - `backend/.venv/Lib/site-packages/python_dotenv-1.2.2.dist-info/WHEEL`
+- Groupe 9 :
+  - `backend/.venv/Lib/site-packages/annotated_doc-0.0.4.dist-info/entry_points.txt`
+  - `backend/.venv/Lib/site-packages/fastapi_cli-0.0.24.dist-info/entry_points.txt`
+  - `backend/.venv/Lib/site-packages/fastapi_cloud_cli-0.17.0.dist-info/entry_points.txt`
+- Groupe 10 :
+  - `backend/.venv/Lib/site-packages/anyio-4.13.0.dist-info/WHEEL`
+  - `backend/.venv/Lib/site-packages/certifi-2026.4.22.dist-info/WHEEL`
+  - `backend/.venv/Lib/site-packages/courlan-1.4.0.dist-info/WHEEL`
+  - `backend/.venv/Lib/site-packages/dateparser-1.4.1.dist-info/WHEEL`
+  - `backend/.venv/Lib/site-packages/htmldate-1.10.0.dist-info/WHEEL`
+  - `backend/.venv/Lib/site-packages/lxml_html_clean-0.4.5.dist-info/WHEEL`
+  - `backend/.venv/Lib/site-packages/mako-1.3.11.dist-info/WHEEL`
+  - `backend/.venv/Lib/site-packages/pytest-9.0.3.dist-info/WHEEL`
+  - `backend/.venv/Lib/site-packages/requests-2.34.2.dist-info/WHEEL`
+  - `backend/.venv/Lib/site-packages/trafilatura-2.1.0.dist-info/WHEEL`
+  - `backend/.venv/Lib/site-packages/tzlocal-5.4.4.dist-info/WHEEL`
+- Groupe 11 :
+  - `backend/.venv/Lib/site-packages/babel/locale-data/az_Cyrl_AZ.dat`
+  - `backend/.venv/Lib/site-packages/babel/locale-data/az_Latn_AZ.dat`
+- Groupe 12 :
+  - `backend/.venv/Lib/site-packages/babel/locale-data/bal_Arab_PK.dat`
+  - `backend/.venv/Lib/site-packages/babel/locale-data/bal_Latn_PK.dat`
+- Groupe 13 :
+  - `backend/.venv/Lib/site-packages/babel/locale-data/bm_ML.dat`
+  - `backend/.venv/Lib/site-packages/babel/locale-data/bm_Nkoo_ML.dat`
+- Groupe 14 :
+  - `backend/.venv/Lib/site-packages/babel/locale-data/bs_Cyrl_BA.dat`
+  - `backend/.venv/Lib/site-packages/babel/locale-data/bs_Latn_BA.dat`
+- Groupe 15 :
+  - `backend/.venv/Lib/site-packages/babel/locale-data/en_Dsrt_US.dat`
+  - `backend/.venv/Lib/site-packages/babel/locale-data/en_US.dat`
+- Groupe 16 :
+  - `backend/.venv/Lib/site-packages/babel/locale-data/ha_Arab_NG.dat`
+  - `backend/.venv/Lib/site-packages/babel/locale-data/ha_NG.dat`
+- Groupe 17 :
+  - `backend/.venv/Lib/site-packages/babel/locale-data/hi_IN.dat`
+  - `backend/.venv/Lib/site-packages/babel/locale-data/hi_Latn_IN.dat`
+- Groupe 18 :
+  - `backend/.venv/Lib/site-packages/babel/locale-data/iu_CA.dat`
+  - `backend/.venv/Lib/site-packages/babel/locale-data/iu_Latn_CA.dat`
+- Groupe 19 :
+  - `backend/.venv/Lib/site-packages/babel/locale-data/kaa_Cyrl.dat`
+  - `backend/.venv/Lib/site-packages/babel/locale-data/kaa_Latn.dat`
+- Groupe 20 :
+  - `backend/.venv/Lib/site-packages/babel/locale-data/kaa_Cyrl_UZ.dat`
+  - `backend/.venv/Lib/site-packages/babel/locale-data/kaa_Latn_UZ.dat`
+- Groupe 21 :
+  - `backend/.venv/Lib/site-packages/babel/locale-data/kk_Cyrl_KZ.dat`
+  - `backend/.venv/Lib/site-packages/babel/locale-data/kk_KZ.dat`
+- Groupe 22 :
+  - `backend/.venv/Lib/site-packages/babel/locale-data/kok_Deva_IN.dat`
+  - `backend/.venv/Lib/site-packages/babel/locale-data/kok_Latn_IN.dat`
+- Groupe 23 :
+  - `backend/.venv/Lib/site-packages/babel/locale-data/ks_Arab_IN.dat`
+  - `backend/.venv/Lib/site-packages/babel/locale-data/ks_Deva_IN.dat`
+- Groupe 24 :
+  - `backend/.venv/Lib/site-packages/babel/locale-data/kxv_Deva_IN.dat`
+  - `backend/.venv/Lib/site-packages/babel/locale-data/kxv_Latn_IN.dat`
+  - `backend/.venv/Lib/site-packages/babel/locale-data/kxv_Orya_IN.dat`
+  - `backend/.venv/Lib/site-packages/babel/locale-data/kxv_Telu_IN.dat`
+- Groupe 25 :
+  - `backend/.venv/Lib/site-packages/babel/locale-data/mni_Beng_IN.dat`
+  - `backend/.venv/Lib/site-packages/babel/locale-data/mni_Mtei_IN.dat`
+- Groupe 26 :
+  - `backend/.venv/Lib/site-packages/babel/locale-data/ms_Arab_BN.dat`
+  - `backend/.venv/Lib/site-packages/babel/locale-data/ms_BN.dat`
+- Groupe 27 :
+  - `backend/.venv/Lib/site-packages/babel/locale-data/ms_Arab_MY.dat`
+  - `backend/.venv/Lib/site-packages/babel/locale-data/ms_MY.dat`
+- Groupe 28 :
+  - `backend/.venv/Lib/site-packages/babel/locale-data/sat_Deva_IN.dat`
+  - `backend/.venv/Lib/site-packages/babel/locale-data/sat_Olck_IN.dat`
+- Groupe 29 :
+  - `backend/.venv/Lib/site-packages/babel/locale-data/shi_Latn_MA.dat`
+  - `backend/.venv/Lib/site-packages/babel/locale-data/shi_Tfng_MA.dat`
+- Groupe 30 :
+  - `backend/.venv/Lib/site-packages/babel/locale-data/sr_Cyrl_RS.dat`
+  - `backend/.venv/Lib/site-packages/babel/locale-data/sr_Latn_RS.dat`
+- Groupe 31 :
+  - `backend/.venv/Lib/site-packages/babel/locale-data/uz_Cyrl_UZ.dat`
+  - `backend/.venv/Lib/site-packages/babel/locale-data/uz_Latn_UZ.dat`
+- Groupe 32 :
+  - `backend/.venv/Lib/site-packages/babel/locale-data/vai_Latn_LR.dat`
+  - `backend/.venv/Lib/site-packages/babel/locale-data/vai_Vaii_LR.dat`
+- Groupe 33 :
+  - `backend/.venv/Lib/site-packages/babel/locale-data/zh_Hans.dat`
+  - `backend/.venv/Lib/site-packages/babel/locale-data/zh_Latn.dat`
+- Groupe 34 :
+  - `backend/.venv/Lib/site-packages/babel/locale-data/zh_Hans_CN.dat`
+  - `backend/.venv/Lib/site-packages/babel/locale-data/zh_Latn_CN.dat`
+- Groupe 35 :
+  - `backend/.venv/Lib/site-packages/certifi-2026.4.22.dist-info/licenses/LICENSE`
+  - `backend/.venv/Lib/site-packages/pip/_vendor/certifi/LICENSE`
+  - `backend/.venv/Lib/site-packages/pip-26.0.1.dist-info/licenses/src/pip/_vendor/certifi/LICENSE`
+- Groupe 36 :
+  - `backend/.venv/Lib/site-packages/charset_normalizer-3.4.9.dist-info/WHEEL`
+  - `backend/.venv/Lib/site-packages/regex-2026.7.10.dist-info/WHEEL`
+  - `backend/.venv/Lib/site-packages/selectolax-0.4.11.dist-info/WHEEL`
+- Groupe 37 :
+  - `backend/.venv/Lib/site-packages/click-8.3.3.dist-info/WHEEL`
+  - `backend/.venv/Lib/site-packages/idna-3.13.dist-info/WHEEL`
+  - `backend/.venv/Lib/site-packages/markdown_it_py-4.0.0.dist-info/WHEEL`
+  - `backend/.venv/Lib/site-packages/packaging-26.2.dist-info/WHEEL`
+  - `backend/.venv/Lib/site-packages/pip-26.0.1.dist-info/WHEEL`
+  - `backend/.venv/Lib/site-packages/typing_extensions-4.15.0.dist-info/WHEEL`
+- Groupe 38 :
+  - `backend/.venv/Lib/site-packages/courlan-1.4.0.dist-info/licenses/LICENSE`
+  - `backend/.venv/Lib/site-packages/htmldate-1.10.0.dist-info/licenses/LICENSE`
+  - `backend/.venv/Lib/site-packages/trafilatura-2.1.0.dist-info/licenses/LICENSE`
+- Groupe 39 :
+  - `backend/.venv/Lib/site-packages/dnspython-2.8.0.dist-info/WHEEL`
+  - `backend/.venv/Lib/site-packages/httpcore-1.0.9.dist-info/WHEEL`
+  - `backend/.venv/Lib/site-packages/typing_inspection-0.4.2.dist-info/WHEEL`
+- Groupe 40 :
+  - `backend/.venv/Lib/site-packages/dotenv/py.typed`
+  - `backend/.venv/Lib/site-packages/markdown_it/py.typed`
+  - `backend/.venv/Lib/site-packages/mdurl/py.typed`
+  - `backend/.venv/Lib/site-packages/pip/_vendor/tomli/py.typed`
+  - `backend/.venv/Lib/site-packages/pip/_vendor/tomli_w/py.typed`
+- Groupe 41 :
+  - `backend/.venv/Lib/site-packages/email_validator-2.3.0.dist-info/WHEEL`
+  - `backend/.venv/Lib/site-packages/iniconfig-2.3.0.dist-info/WHEEL`
+  - `backend/.venv/Lib/site-packages/joblib-1.5.3.dist-info/WHEEL`
+  - `backend/.venv/Lib/site-packages/playwright-1.60.0.dist-info/WHEEL`
+- Groupe 42 :
+  - `backend/.venv/Lib/site-packages/fastapi-0.136.1.dist-info/WHEEL`
+  - `backend/.venv/Lib/site-packages/fastapi_cloud_cli-0.17.0.dist-info/WHEEL`
+  - `backend/.venv/Lib/site-packages/typer-0.24.2.dist-info/WHEEL`
+- Groupe 43 :
+  - `backend/.venv/Lib/site-packages/fastapi_cli/__main__.py`
+  - `backend/.venv/Lib/site-packages/fastapi_cloud_cli/__main__.py`
+  - `backend/.venv/Lib/site-packages/typer/__main__.py`
+- Groupe 44 :
+  - `backend/.venv/Lib/site-packages/fastapi_cli-0.0.24.dist-info/licenses/LICENSE`
+  - `backend/.venv/Lib/site-packages/fastapi_cloud_cli-0.17.0.dist-info/licenses/LICENSE`
+- Groupe 45 :
+  - `backend/.venv/Lib/site-packages/fastar-0.11.0.dist-info/WHEEL`
+  - `backend/.venv/Lib/site-packages/pydantic_core-2.46.3.dist-info/WHEEL`
+- Groupe 46 :
+  - `backend/.venv/Lib/site-packages/greenlet-3.4.0.dist-info/WHEEL`
+  - `backend/.venv/Lib/site-packages/lxml-6.1.1.dist-info/WHEEL`
+  - `backend/.venv/Lib/site-packages/sqlalchemy-2.0.49.dist-info/WHEEL`
+- Groupe 47 :
+  - `backend/.venv/Lib/site-packages/httptools-0.7.1.dist-info/WHEEL`
+  - `backend/.venv/Lib/site-packages/markupsafe-3.0.3.dist-info/WHEEL`
+  - `backend/.venv/Lib/site-packages/pyyaml-6.0.3.dist-info/WHEEL`
+  - `backend/.venv/Lib/site-packages/websockets-16.0.dist-info/WHEEL`
+- Groupe 48 :
+  - `backend/.venv/Lib/site-packages/idna/codec.py`
+  - `backend/.venv/Lib/site-packages/pip/_vendor/idna/codec.py`
+- Groupe 49 :
+  - `backend/.venv/Lib/site-packages/idna/compat.py`
+  - `backend/.venv/Lib/site-packages/pip/_vendor/idna/compat.py`
+- Groupe 50 :
+  - `backend/.venv/Lib/site-packages/idna/intranges.py`
+  - `backend/.venv/Lib/site-packages/pip/_vendor/idna/intranges.py`
+- Groupe 51 :
+  - `backend/.venv/Lib/site-packages/jinja2-3.1.6.dist-info/WHEEL`
+  - `backend/.venv/Lib/site-packages/threadpoolctl-3.6.0.dist-info/WHEEL`
+- Groupe 52 :
+  - `backend/.venv/Lib/site-packages/joblib/test/data/joblib_0.11.0_compressed_pickle_py36_np111.gz`
+  - `backend/.venv/Lib/site-packages/joblib/test/data/joblib_0.11.0_pickle_py36_np111.pkl.gzip`
+- Groupe 53 :
+  - `backend/.venv/Lib/site-packages/joblib/test/data/joblib_0.9.2_compressed_pickle_py27_np16.gz`
+  - `backend/.venv/Lib/site-packages/joblib/test/data/joblib_0.9.2_compressed_pickle_py27_np17.gz`
+- Groupe 54 :
+  - `backend/.venv/Lib/site-packages/joblib/test/data/joblib_0.9.2_compressed_pickle_py34_np19.gz`
+  - `backend/.venv/Lib/site-packages/joblib/test/data/joblib_0.9.2_compressed_pickle_py35_np19.gz`
+- Groupe 55 :
+  - `backend/.venv/Lib/site-packages/joblib/test/data/joblib_0.9.2_pickle_py27_np16.pkl_01.npy`
+  - `backend/.venv/Lib/site-packages/joblib/test/data/joblib_0.9.2_pickle_py27_np17.pkl_01.npy`
+  - `backend/.venv/Lib/site-packages/joblib/test/data/joblib_0.9.2_pickle_py33_np18.pkl_01.npy`
+  - `backend/.venv/Lib/site-packages/joblib/test/data/joblib_0.9.2_pickle_py34_np19.pkl_01.npy`
+  - `backend/.venv/Lib/site-packages/joblib/test/data/joblib_0.9.2_pickle_py35_np19.pkl_01.npy`
+- Groupe 56 :
+  - `backend/.venv/Lib/site-packages/joblib/test/data/joblib_0.9.2_pickle_py27_np16.pkl_02.npy`
+  - `backend/.venv/Lib/site-packages/joblib/test/data/joblib_0.9.2_pickle_py27_np17.pkl_02.npy`
+  - `backend/.venv/Lib/site-packages/joblib/test/data/joblib_0.9.2_pickle_py33_np18.pkl_02.npy`
+  - `backend/.venv/Lib/site-packages/joblib/test/data/joblib_0.9.2_pickle_py34_np19.pkl_02.npy`
+  - `backend/.venv/Lib/site-packages/joblib/test/data/joblib_0.9.2_pickle_py35_np19.pkl_02.npy`
+- Groupe 57 :
+  - `backend/.venv/Lib/site-packages/joblib/test/data/joblib_0.9.2_pickle_py27_np16.pkl_03.npy`
+  - `backend/.venv/Lib/site-packages/joblib/test/data/joblib_0.9.2_pickle_py27_np17.pkl_03.npy`
+- Groupe 58 :
+  - `backend/.venv/Lib/site-packages/joblib/test/data/joblib_0.9.2_pickle_py27_np16.pkl_04.npy`
+  - `backend/.venv/Lib/site-packages/joblib/test/data/joblib_0.9.2_pickle_py27_np17.pkl_04.npy`
+  - `backend/.venv/Lib/site-packages/joblib/test/data/joblib_0.9.2_pickle_py33_np18.pkl_04.npy`
+  - `backend/.venv/Lib/site-packages/joblib/test/data/joblib_0.9.2_pickle_py34_np19.pkl_04.npy`
+  - `backend/.venv/Lib/site-packages/joblib/test/data/joblib_0.9.2_pickle_py35_np19.pkl_04.npy`
+- Groupe 59 :
+  - `backend/.venv/Lib/site-packages/joblib/test/data/joblib_0.9.2_pickle_py33_np18.pkl_03.npy`
+  - `backend/.venv/Lib/site-packages/joblib/test/data/joblib_0.9.2_pickle_py34_np19.pkl_03.npy`
+  - `backend/.venv/Lib/site-packages/joblib/test/data/joblib_0.9.2_pickle_py35_np19.pkl_03.npy`
+- Groupe 60 :
+  - `backend/.venv/Lib/site-packages/lxml/etree.h`
+  - `backend/.venv/Lib/site-packages/lxml/lxml.etree.h`
+- Groupe 61 :
+  - `backend/.venv/Lib/site-packages/numpy/_core/include/numpy/random/LICENSE.txt`
+  - `backend/.venv/Lib/site-packages/numpy-2.4.6.dist-info/licenses/numpy/_core/include/numpy/libdivide/LICENSE.txt`
+- Groupe 62 :
+  - `backend/.venv/Lib/site-packages/numpy/ma/LICENSE`
+  - `backend/.venv/Lib/site-packages/numpy-2.4.6.dist-info/licenses/numpy/ma/LICENSE`
+- Groupe 63 :
+  - `backend/.venv/Lib/site-packages/numpy/random/LICENSE.md`
+  - `backend/.venv/Lib/site-packages/numpy-2.4.6.dist-info/licenses/numpy/random/LICENSE.md`
+- Groupe 64 :
+  - `backend/.venv/Lib/site-packages/numpy-2.4.6.dist-info/WHEEL`
+  - `backend/.venv/Lib/site-packages/pandas-3.0.3.dist-info/WHEEL`
+  - `backend/.venv/Lib/site-packages/scikit_learn-1.8.0.dist-info/WHEEL`
+  - `backend/.venv/Lib/site-packages/scipy-1.17.1.dist-info/WHEEL`
+- Groupe 65 :
+  - `backend/.venv/Lib/site-packages/numpy.libs/msvcp140-a4c2229bdc2a2a630acdc095b4d86008.dll`
+  - `backend/.venv/Lib/site-packages/pandas.libs/msvcp140-a4c2229bdc2a2a630acdc095b4d86008.dll`
+- Groupe 66 :
+  - `backend/.venv/Lib/site-packages/packaging/_elffile.py`
+  - `backend/.venv/Lib/site-packages/pip/_vendor/packaging/_elffile.py`
+- Groupe 67 :
+  - `backend/.venv/Lib/site-packages/packaging/_manylinux.py`
+  - `backend/.venv/Lib/site-packages/pip/_vendor/packaging/_manylinux.py`
+- Groupe 68 :
+  - `backend/.venv/Lib/site-packages/packaging/_musllinux.py`
+  - `backend/.venv/Lib/site-packages/pip/_vendor/packaging/_musllinux.py`
+- Groupe 69 :
+  - `backend/.venv/Lib/site-packages/packaging/licenses/_spdx.py`
+  - `backend/.venv/Lib/site-packages/pip/_vendor/packaging/licenses/_spdx.py`
+- Groupe 70 :
+  - `backend/.venv/Lib/site-packages/packaging-26.2.dist-info/licenses/LICENSE`
+  - `backend/.venv/Lib/site-packages/pip/_vendor/packaging/LICENSE`
+  - `backend/.venv/Lib/site-packages/pip-26.0.1.dist-info/licenses/src/pip/_vendor/packaging/LICENSE`
+- Groupe 71 :
+  - `backend/.venv/Lib/site-packages/packaging-26.2.dist-info/licenses/LICENSE.APACHE`
+  - `backend/.venv/Lib/site-packages/pip/_vendor/packaging/LICENSE.APACHE`
+  - `backend/.venv/Lib/site-packages/pip-26.0.1.dist-info/licenses/src/pip/_vendor/packaging/LICENSE.APACHE`
+- Groupe 72 :
+  - `backend/.venv/Lib/site-packages/packaging-26.2.dist-info/licenses/LICENSE.BSD`
+  - `backend/.venv/Lib/site-packages/pip/_vendor/packaging/LICENSE.BSD`
+  - `backend/.venv/Lib/site-packages/pip-26.0.1.dist-info/licenses/src/pip/_vendor/packaging/LICENSE.BSD`
+- Groupe 73 :
+  - `backend/.venv/Lib/site-packages/pip/_vendor/cachecontrol/LICENSE.txt`
+  - `backend/.venv/Lib/site-packages/pip-26.0.1.dist-info/licenses/src/pip/_vendor/cachecontrol/LICENSE.txt`
+- Groupe 74 :
+  - `backend/.venv/Lib/site-packages/pip/_vendor/dependency_groups/LICENSE.txt`
+  - `backend/.venv/Lib/site-packages/pip-26.0.1.dist-info/licenses/src/pip/_vendor/dependency_groups/LICENSE.txt`
+- Groupe 75 :
+  - `backend/.venv/Lib/site-packages/pip/_vendor/distlib/LICENSE.txt`
+  - `backend/.venv/Lib/site-packages/pip-26.0.1.dist-info/licenses/src/pip/_vendor/distlib/LICENSE.txt`
+- Groupe 76 :
+  - `backend/.venv/Lib/site-packages/pip/_vendor/distro/LICENSE`
+  - `backend/.venv/Lib/site-packages/pip-26.0.1.dist-info/licenses/src/pip/_vendor/distro/LICENSE`
+- Groupe 77 :
+  - `backend/.venv/Lib/site-packages/pip/_vendor/idna/LICENSE.md`
+  - `backend/.venv/Lib/site-packages/pip-26.0.1.dist-info/licenses/src/pip/_vendor/idna/LICENSE.md`
+- Groupe 78 :
+  - `backend/.venv/Lib/site-packages/pip/_vendor/msgpack/COPYING`
+  - `backend/.venv/Lib/site-packages/pip-26.0.1.dist-info/licenses/src/pip/_vendor/msgpack/COPYING`
+- Groupe 79 :
+  - `backend/.venv/Lib/site-packages/pip/_vendor/pkg_resources/LICENSE`
+  - `backend/.venv/Lib/site-packages/pip-26.0.1.dist-info/licenses/src/pip/_vendor/pkg_resources/LICENSE`
+- Groupe 80 :
+  - `backend/.venv/Lib/site-packages/pip/_vendor/platformdirs/LICENSE`
+  - `backend/.venv/Lib/site-packages/pip-26.0.1.dist-info/licenses/src/pip/_vendor/platformdirs/LICENSE`
+- Groupe 81 :
+  - `backend/.venv/Lib/site-packages/pip/_vendor/pygments/formatters/_mapping.py`
+  - `backend/.venv/Lib/site-packages/pygments/formatters/_mapping.py`
+- Groupe 82 :
+  - `backend/.venv/Lib/site-packages/pip/_vendor/pygments/LICENSE`
+  - `backend/.venv/Lib/site-packages/pip-26.0.1.dist-info/licenses/src/pip/_vendor/pygments/LICENSE`
+  - `backend/.venv/Lib/site-packages/pygments-2.20.0.dist-info/licenses/LICENSE`
+- Groupe 83 :
+  - `backend/.venv/Lib/site-packages/pip/_vendor/pygments/styles/_mapping.py`
+  - `backend/.venv/Lib/site-packages/pygments/styles/_mapping.py`
+- Groupe 84 :
+  - `backend/.venv/Lib/site-packages/pip/_vendor/pyproject_hooks/LICENSE`
+  - `backend/.venv/Lib/site-packages/pip-26.0.1.dist-info/licenses/src/pip/_vendor/pyproject_hooks/LICENSE`
+- Groupe 85 :
+  - `backend/.venv/Lib/site-packages/pip/_vendor/requests/LICENSE`
+  - `backend/.venv/Lib/site-packages/pip-26.0.1.dist-info/licenses/src/pip/_vendor/requests/LICENSE`
+  - `backend/.venv/Lib/site-packages/requests-2.34.2.dist-info/licenses/LICENSE`
+- Groupe 86 :
+  - `backend/.venv/Lib/site-packages/pip/_vendor/resolvelib/LICENSE`
+  - `backend/.venv/Lib/site-packages/pip-26.0.1.dist-info/licenses/src/pip/_vendor/resolvelib/LICENSE`
+  - `backend/.venv/Lib/site-packages/shellingham-1.5.4.dist-info/LICENSE`
+- Groupe 87 :
+  - `backend/.venv/Lib/site-packages/pip/_vendor/rich/_emoji_codes.py`
+  - `backend/.venv/Lib/site-packages/rich/_emoji_codes.py`
+- Groupe 88 :
+  - `backend/.venv/Lib/site-packages/pip/_vendor/rich/_export_format.py`
+  - `backend/.venv/Lib/site-packages/rich/_export_format.py`
+- Groupe 89 :
+  - `backend/.venv/Lib/site-packages/pip/_vendor/rich/_fileno.py`
+  - `backend/.venv/Lib/site-packages/rich/_fileno.py`
+- Groupe 90 :
+  - `backend/.venv/Lib/site-packages/pip/_vendor/rich/_loop.py`
+  - `backend/.venv/Lib/site-packages/rich/_loop.py`
+- Groupe 91 :
+  - `backend/.venv/Lib/site-packages/pip/_vendor/rich/_null_file.py`
+  - `backend/.venv/Lib/site-packages/rich/_null_file.py`
+- Groupe 92 :
+  - `backend/.venv/Lib/site-packages/pip/_vendor/rich/_palettes.py`
+  - `backend/.venv/Lib/site-packages/rich/_palettes.py`
+- Groupe 93 :
+  - `backend/.venv/Lib/site-packages/pip/_vendor/rich/_pick.py`
+  - `backend/.venv/Lib/site-packages/rich/_pick.py`
+- Groupe 94 :
+  - `backend/.venv/Lib/site-packages/pip/_vendor/rich/_ratio.py`
+  - `backend/.venv/Lib/site-packages/rich/_ratio.py`
+- Groupe 95 :
+  - `backend/.venv/Lib/site-packages/pip/_vendor/rich/_spinners.py`
+  - `backend/.venv/Lib/site-packages/rich/_spinners.py`
+- Groupe 96 :
+  - `backend/.venv/Lib/site-packages/pip/_vendor/rich/_stack.py`
+  - `backend/.venv/Lib/site-packages/rich/_stack.py`
+- Groupe 97 :
+  - `backend/.venv/Lib/site-packages/pip/_vendor/rich/_timer.py`
+  - `backend/.venv/Lib/site-packages/rich/_timer.py`
+- Groupe 98 :
+  - `backend/.venv/Lib/site-packages/pip/_vendor/rich/_wrap.py`
+  - `backend/.venv/Lib/site-packages/rich/_wrap.py`
+- Groupe 99 :
+  - `backend/.venv/Lib/site-packages/pip/_vendor/rich/bar.py`
+  - `backend/.venv/Lib/site-packages/rich/bar.py`
+- Groupe 100 :
+  - `backend/.venv/Lib/site-packages/pip/_vendor/rich/color.py`
+  - `backend/.venv/Lib/site-packages/rich/color.py`
+- Groupe 101 :
+  - `backend/.venv/Lib/site-packages/pip/_vendor/rich/color_triplet.py`
+  - `backend/.venv/Lib/site-packages/rich/color_triplet.py`
+- Groupe 102 :
+  - `backend/.venv/Lib/site-packages/pip/_vendor/rich/columns.py`
+  - `backend/.venv/Lib/site-packages/rich/columns.py`
+- Groupe 103 :
+  - `backend/.venv/Lib/site-packages/pip/_vendor/rich/constrain.py`
+  - `backend/.venv/Lib/site-packages/rich/constrain.py`
+- Groupe 104 :
+  - `backend/.venv/Lib/site-packages/pip/_vendor/rich/containers.py`
+  - `backend/.venv/Lib/site-packages/rich/containers.py`
+- Groupe 105 :
+  - `backend/.venv/Lib/site-packages/pip/_vendor/rich/errors.py`
+  - `backend/.venv/Lib/site-packages/rich/errors.py`
+- Groupe 106 :
+  - `backend/.venv/Lib/site-packages/pip/_vendor/rich/filesize.py`
+  - `backend/.venv/Lib/site-packages/rich/filesize.py`
+- Groupe 107 :
+  - `backend/.venv/Lib/site-packages/pip/_vendor/rich/LICENSE`
+  - `backend/.venv/Lib/site-packages/pip-26.0.1.dist-info/licenses/src/pip/_vendor/rich/LICENSE`
+  - `backend/.venv/Lib/site-packages/rich-15.0.0.dist-info/licenses/LICENSE`
+- Groupe 108 :
+  - `backend/.venv/Lib/site-packages/pip/_vendor/rich/measure.py`
+  - `backend/.venv/Lib/site-packages/rich/measure.py`
+- Groupe 109 :
+  - `backend/.venv/Lib/site-packages/pip/_vendor/rich/pager.py`
+  - `backend/.venv/Lib/site-packages/rich/pager.py`
+- Groupe 110 :
+  - `backend/.venv/Lib/site-packages/pip/_vendor/rich/panel.py`
+  - `backend/.venv/Lib/site-packages/rich/panel.py`
+- Groupe 111 :
+  - `backend/.venv/Lib/site-packages/pip/_vendor/rich/progress_bar.py`
+  - `backend/.venv/Lib/site-packages/rich/progress_bar.py`
+- Groupe 112 :
+  - `backend/.venv/Lib/site-packages/pip/_vendor/rich/region.py`
+  - `backend/.venv/Lib/site-packages/rich/region.py`
+- Groupe 113 :
+  - `backend/.venv/Lib/site-packages/pip/_vendor/rich/spinner.py`
+  - `backend/.venv/Lib/site-packages/rich/spinner.py`
+- Groupe 114 :
+  - `backend/.venv/Lib/site-packages/pip/_vendor/rich/status.py`
+  - `backend/.venv/Lib/site-packages/rich/status.py`
+- Groupe 115 :
+  - `backend/.venv/Lib/site-packages/pip/_vendor/rich/terminal_theme.py`
+  - `backend/.venv/Lib/site-packages/rich/terminal_theme.py`
+- Groupe 116 :
+  - `backend/.venv/Lib/site-packages/pip/_vendor/rich/themes.py`
+  - `backend/.venv/Lib/site-packages/rich/themes.py`
+- Groupe 117 :
+  - `backend/.venv/Lib/site-packages/pip/_vendor/tomli/LICENSE`
+  - `backend/.venv/Lib/site-packages/pip/_vendor/tomli_w/LICENSE`
+  - `backend/.venv/Lib/site-packages/pip-26.0.1.dist-info/licenses/src/pip/_vendor/tomli/LICENSE`
+  - `backend/.venv/Lib/site-packages/pip-26.0.1.dist-info/licenses/src/pip/_vendor/tomli_w/LICENSE`
+- Groupe 118 :
+  - `backend/.venv/Lib/site-packages/pip/_vendor/truststore/LICENSE`
+  - `backend/.venv/Lib/site-packages/pip-26.0.1.dist-info/licenses/src/pip/_vendor/truststore/LICENSE`
+- Groupe 119 :
+  - `backend/.venv/Lib/site-packages/pip/_vendor/urllib3/LICENSE.txt`
+  - `backend/.venv/Lib/site-packages/pip-26.0.1.dist-info/licenses/src/pip/_vendor/urllib3/LICENSE.txt`
+- Groupe 120 :
+  - `backend/.venv/Lib/site-packages/playwright/_impl/__pyinstaller/hook-playwright.async_api.py`
+  - `backend/.venv/Lib/site-packages/playwright/_impl/__pyinstaller/hook-playwright.sync_api.py`
+- Groupe 121 :
+  - `backend/.venv/Lib/site-packages/playwright/driver/package/lib/vite/dashboard/assets/codicon-DCmgc-ay.ttf`
+  - `backend/.venv/Lib/site-packages/playwright/driver/package/lib/vite/recorder/assets/codicon-DCmgc-ay.ttf`
+  - `backend/.venv/Lib/site-packages/playwright/driver/package/lib/vite/traceViewer/codicon.DCmgc-ay.ttf`
+- Groupe 122 :
+  - `backend/.venv/Lib/site-packages/playwright/driver/package/lib/vite/recorder/assets/codeMirrorModule-DYBRYzYX.css`
+  - `backend/.venv/Lib/site-packages/playwright/driver/package/lib/vite/traceViewer/codeMirrorModule.DYBRYzYX.css`
+- Groupe 123 :
+  - `backend/.venv/Lib/site-packages/playwright/driver/package/lib/vite/recorder/playwright-logo.svg`
+  - `backend/.venv/Lib/site-packages/playwright/driver/package/lib/vite/traceViewer/playwright-logo.svg`
+- Groupe 124 :
+  - `backend/.venv/Lib/site-packages/pydantic-2.13.3.dist-info/WHEEL`
+  - `backend/.venv/Lib/site-packages/pydantic_extra_types-2.11.1.dist-info/WHEEL`
+  - `backend/.venv/Lib/site-packages/pydantic_settings-2.14.0.dist-info/WHEEL`
+  - `backend/.venv/Lib/site-packages/pygments-2.20.0.dist-info/WHEEL`
+  - `backend/.venv/Lib/site-packages/python_multipart-0.0.26.dist-info/WHEEL`
+  - `backend/.venv/Lib/site-packages/rich_toolkit-0.19.7.dist-info/WHEEL`
+  - `backend/.venv/Lib/site-packages/starlette-1.0.0.dist-info/WHEEL`
+  - `backend/.venv/Lib/site-packages/uvicorn-0.46.0.dist-info/WHEEL`
+- Groupe 125 :
+  - `backend/.venv/Lib/site-packages/python_dateutil-2.9.0.post0.dist-info/WHEEL`
+  - `backend/.venv/Lib/site-packages/pytz-2026.2.dist-info/WHEEL`
+- Groupe 126 :
+  - `backend/.venv/Lib/site-packages/python_dateutil-2.9.0.post0.dist-info/zip-safe`
+  - `backend/.venv/Lib/site-packages/pytz-2026.2.dist-info/zip-safe`
+  - `backend/.venv/Lib/site-packages/shellingham-1.5.4.dist-info/zip-safe`
+  - `backend/.venv/Lib/site-packages/uvicorn/py.typed`
+- Groupe 127 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Africa/Abidjan`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Africa/Accra`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Africa/Bamako`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Africa/Banjul`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Africa/Conakry`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Africa/Dakar`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Africa/Freetown`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Africa/Lome`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Africa/Nouakchott`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Africa/Ouagadougou`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Africa/Timbuktu`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Atlantic/Reykjavik`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Atlantic/St_Helena`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Iceland`
+- Groupe 128 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Africa/Addis_Ababa`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Africa/Asmara`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Africa/Asmera`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Africa/Dar_es_Salaam`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Africa/Djibouti`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Africa/Kampala`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Africa/Mogadishu`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Africa/Nairobi`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Indian/Antananarivo`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Indian/Comoro`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Indian/Mayotte`
+- Groupe 129 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Africa/Bangui`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Africa/Brazzaville`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Africa/Douala`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Africa/Kinshasa`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Africa/Lagos`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Africa/Libreville`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Africa/Luanda`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Africa/Malabo`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Africa/Niamey`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Africa/Porto-Novo`
+- Groupe 130 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Africa/Blantyre`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Africa/Bujumbura`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Africa/Gaborone`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Africa/Harare`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Africa/Kigali`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Africa/Lubumbashi`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Africa/Lusaka`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Africa/Maputo`
+- Groupe 131 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Africa/Cairo`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Egypt`
+- Groupe 132 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Africa/Johannesburg`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Africa/Maseru`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Africa/Mbabane`
+- Groupe 133 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Africa/Tripoli`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Libya`
+- Groupe 134 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Adak`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Atka`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/US/Aleutian`
+- Groupe 135 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Anchorage`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/US/Alaska`
+- Groupe 136 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Anguilla`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Antigua`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Aruba`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Blanc-Sablon`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Curacao`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Dominica`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Grenada`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Guadeloupe`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Kralendijk`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Lower_Princes`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Marigot`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Montserrat`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Port_of_Spain`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Puerto_Rico`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/St_Barthelemy`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/St_Kitts`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/St_Lucia`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/St_Thomas`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/St_Vincent`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Tortola`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Virgin`
+- Groupe 137 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Argentina/Buenos_Aires`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Buenos_Aires`
+- Groupe 138 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Argentina/Catamarca`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Argentina/ComodRivadavia`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Catamarca`
+- Groupe 139 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Argentina/Cordoba`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Cordoba`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Rosario`
+- Groupe 140 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Argentina/Jujuy`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Jujuy`
+- Groupe 141 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Argentina/Mendoza`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Mendoza`
+- Groupe 142 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Atikokan`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Cayman`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Coral_Harbour`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Panama`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/EST`
+- Groupe 143 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Chicago`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/CST6CDT`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/US/Central`
+- Groupe 144 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Creston`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Phoenix`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/MST`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/US/Arizona`
+- Groupe 145 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Denver`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Shiprock`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/MST7MDT`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Navajo`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/US/Mountain`
+- Groupe 146 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Detroit`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/US/Michigan`
+- Groupe 147 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Edmonton`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Yellowknife`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Canada/Mountain`
+- Groupe 148 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Ensenada`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Santa_Isabel`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Tijuana`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Mexico/BajaNorte`
+- Groupe 149 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Fort_Wayne`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Indiana/Indianapolis`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Indianapolis`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/US/East-Indiana`
+- Groupe 150 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Godthab`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Nuuk`
+- Groupe 151 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Halifax`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Canada/Atlantic`
+- Groupe 152 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Havana`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Cuba`
+- Groupe 153 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Indiana/Knox`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Knox_IN`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/US/Indiana-Starke`
+- Groupe 154 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Iqaluit`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Pangnirtung`
+- Groupe 155 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Jamaica`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Jamaica`
+- Groupe 156 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Kentucky/Louisville`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Louisville`
+- Groupe 157 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Los_Angeles`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/PST8PDT`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/US/Pacific`
+- Groupe 158 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Manaus`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Brazil/West`
+- Groupe 159 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Mazatlan`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Mexico/BajaSur`
+- Groupe 160 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Mexico_City`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Mexico/General`
+- Groupe 161 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Montreal`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Nassau`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Nipigon`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Thunder_Bay`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Toronto`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Canada/Eastern`
+- Groupe 162 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/New_York`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/EST5EDT`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/US/Eastern`
+- Groupe 163 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Noronha`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Brazil/DeNoronha`
+- Groupe 164 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Porto_Acre`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Rio_Branco`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Brazil/Acre`
+- Groupe 165 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Rainy_River`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Winnipeg`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Canada/Central`
+- Groupe 166 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Regina`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Canada/Saskatchewan`
+- Groupe 167 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Santiago`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Chile/Continental`
+- Groupe 168 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Sao_Paulo`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Brazil/East`
+- Groupe 169 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/St_Johns`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Canada/Newfoundland`
+- Groupe 170 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Vancouver`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Canada/Pacific`
+- Groupe 171 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/America/Whitehorse`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Canada/Yukon`
+- Groupe 172 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Antarctica/DumontDUrville`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Pacific/Chuuk`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Pacific/Port_Moresby`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Pacific/Truk`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Pacific/Yap`
+- Groupe 173 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Antarctica/McMurdo`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Antarctica/South_Pole`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/NZ`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Pacific/Auckland`
+- Groupe 174 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Antarctica/Syowa`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Asia/Aden`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Asia/Kuwait`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Asia/Riyadh`
+- Groupe 175 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Arctic/Longyearbyen`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Atlantic/Jan_Mayen`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Europe/Berlin`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Europe/Copenhagen`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Europe/Oslo`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Europe/Stockholm`
+- Groupe 176 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Asia/Ashgabat`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Asia/Ashkhabad`
+- Groupe 177 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Asia/Bahrain`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Asia/Qatar`
+- Groupe 178 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Asia/Bangkok`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Asia/Phnom_Penh`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Asia/Vientiane`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Indian/Christmas`
+- Groupe 179 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Asia/Brunei`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Asia/Kuching`
+- Groupe 180 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Asia/Calcutta`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Asia/Kolkata`
+- Groupe 181 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Asia/Choibalsan`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Asia/Ulaanbaatar`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Asia/Ulan_Bator`
+- Groupe 182 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Asia/Chongqing`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Asia/Chungking`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Asia/Harbin`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Asia/Shanghai`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/PRC`
+- Groupe 183 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Asia/Dacca`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Asia/Dhaka`
+- Groupe 184 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Asia/Dubai`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Asia/Muscat`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Indian/Mahe`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Indian/Reunion`
+- Groupe 185 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Asia/Ho_Chi_Minh`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Asia/Saigon`
+- Groupe 186 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Asia/Hong_Kong`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Hongkong`
+- Groupe 187 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Asia/Istanbul`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Europe/Istanbul`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Turkey`
+- Groupe 188 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Asia/Jerusalem`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Asia/Tel_Aviv`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Israel`
+- Groupe 189 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Asia/Kashgar`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Asia/Urumqi`
+- Groupe 190 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Asia/Kathmandu`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Asia/Katmandu`
+- Groupe 191 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Asia/Kuala_Lumpur`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Asia/Singapore`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Singapore`
+- Groupe 192 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Asia/Macao`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Asia/Macau`
+- Groupe 193 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Asia/Makassar`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Asia/Ujung_Pandang`
+- Groupe 194 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Asia/Nicosia`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Europe/Nicosia`
+- Groupe 195 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Asia/Rangoon`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Asia/Yangon`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Indian/Cocos`
+- Groupe 196 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Asia/Seoul`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/ROK`
+- Groupe 197 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Asia/Taipei`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/ROC`
+- Groupe 198 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Asia/Tehran`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Iran`
+- Groupe 199 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Asia/Thimbu`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Asia/Thimphu`
+- Groupe 200 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Asia/Tokyo`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Japan`
+- Groupe 201 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Atlantic/Faeroe`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Atlantic/Faroe`
+- Groupe 202 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Australia/ACT`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Australia/Canberra`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Australia/NSW`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Australia/Sydney`
+- Groupe 203 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Australia/Adelaide`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Australia/South`
+- Groupe 204 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Australia/Brisbane`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Australia/Queensland`
+- Groupe 205 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Australia/Broken_Hill`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Australia/Yancowinna`
+- Groupe 206 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Australia/Currie`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Australia/Hobart`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Australia/Tasmania`
+- Groupe 207 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Australia/Darwin`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Australia/North`
+- Groupe 208 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Australia/LHI`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Australia/Lord_Howe`
+- Groupe 209 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Australia/Melbourne`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Australia/Victoria`
+- Groupe 210 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Australia/Perth`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Australia/West`
+- Groupe 211 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/CET`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Europe/Amsterdam`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Europe/Brussels`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Europe/Luxembourg`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/MET`
+- Groupe 212 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Chile/EasterIsland`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Pacific/Easter`
+- Groupe 213 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/EET`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Europe/Athens`
+- Groupe 214 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Eire`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Europe/Dublin`
+- Groupe 215 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Etc/GMT`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Etc/GMT+0`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Etc/GMT-0`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Etc/GMT0`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Etc/Greenwich`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/GMT`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/GMT+0`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/GMT-0`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/GMT0`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Greenwich`
+- Groupe 216 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Etc/UCT`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Etc/Universal`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Etc/UTC`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Etc/Zulu`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/UCT`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Universal`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/UTC`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Zulu`
+- Groupe 217 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Europe/Belfast`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Europe/Guernsey`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Europe/Isle_of_Man`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Europe/Jersey`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Europe/London`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/GB`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/GB-Eire`
+- Groupe 218 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Europe/Belgrade`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Europe/Ljubljana`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Europe/Podgorica`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Europe/Sarajevo`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Europe/Skopje`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Europe/Zagreb`
+- Groupe 219 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Europe/Bratislava`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Europe/Prague`
+- Groupe 220 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Europe/Busingen`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Europe/Vaduz`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Europe/Zurich`
+- Groupe 221 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Europe/Chisinau`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Europe/Tiraspol`
+- Groupe 222 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Europe/Helsinki`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Europe/Mariehamn`
+- Groupe 223 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Europe/Kiev`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Europe/Kyiv`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Europe/Uzhgorod`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Europe/Zaporozhye`
+- Groupe 224 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Europe/Lisbon`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Portugal`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/WET`
+- Groupe 225 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Europe/Monaco`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Europe/Paris`
+- Groupe 226 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Europe/Moscow`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/W-SU`
+- Groupe 227 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Europe/Rome`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Europe/San_Marino`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Europe/Vatican`
+- Groupe 228 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Europe/Warsaw`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Poland`
+- Groupe 229 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/HST`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Pacific/Honolulu`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Pacific/Johnston`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/US/Hawaii`
+- Groupe 230 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Indian/Kerguelen`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Indian/Maldives`
+- Groupe 231 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/iso3166.tab`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/iso3166.tab`
+- Groupe 232 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Kwajalein`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Pacific/Kwajalein`
+- Groupe 233 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/leapseconds`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/leapseconds`
+- Groupe 234 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/NZ-CHAT`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Pacific/Chatham`
+- Groupe 235 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Pacific/Enderbury`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Pacific/Kanton`
+- Groupe 236 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Pacific/Funafuti`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Pacific/Majuro`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Pacific/Tarawa`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Pacific/Wake`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Pacific/Wallis`
+- Groupe 237 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Pacific/Guadalcanal`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Pacific/Pohnpei`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Pacific/Ponape`
+- Groupe 238 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Pacific/Guam`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Pacific/Saipan`
+- Groupe 239 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Pacific/Midway`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Pacific/Pago_Pago`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/Pacific/Samoa`
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/US/Samoa`
+- Groupe 240 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/zone.tab`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/zone.tab`
+- Groupe 241 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/zone1970.tab`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/zone1970.tab`
+- Groupe 242 :
+  - `backend/.venv/Lib/site-packages/pytz/zoneinfo/zonenow.tab`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/zonenow.tab`
+- Groupe 243 :
+  - `backend/.venv/Lib/site-packages/rignore-0.7.6.dist-info/WHEEL`
+  - `backend/.venv/Lib/site-packages/watchfiles-1.1.1.dist-info/WHEEL`
+- Groupe 244 :
+  - `backend/.venv/Lib/site-packages/scipy/_lib/array_api_compat/common/_fft.py`
+  - `backend/.venv/Lib/site-packages/sklearn/externals/array_api_compat/common/_fft.py`
+- Groupe 245 :
+  - `backend/.venv/Lib/site-packages/scipy/_lib/array_api_compat/cupy/_info.py`
+  - `backend/.venv/Lib/site-packages/sklearn/externals/array_api_compat/cupy/_info.py`
+- Groupe 246 :
+  - `backend/.venv/Lib/site-packages/scipy/_lib/array_api_compat/torch/_info.py`
+  - `backend/.venv/Lib/site-packages/sklearn/externals/array_api_compat/torch/_info.py`
+- Groupe 247 :
+  - `backend/.venv/Lib/site-packages/scipy/_lib/array_api_compat/torch/_typing.py`
+  - `backend/.venv/Lib/site-packages/sklearn/externals/array_api_compat/torch/_typing.py`
+- Groupe 248 :
+  - `backend/.venv/Lib/site-packages/scipy/_lib/array_api_extra/_lib/_at.py`
+  - `backend/.venv/Lib/site-packages/sklearn/externals/array_api_extra/_lib/_at.py`
+- Groupe 249 :
+  - `backend/.venv/Lib/site-packages/scipy/_lib/array_api_extra/_lib/_backends.py`
+  - `backend/.venv/Lib/site-packages/sklearn/externals/array_api_extra/_lib/_backends.py`
+- Groupe 250 :
+  - `backend/.venv/Lib/site-packages/scipy/_lib/array_api_extra/_lib/_lazy.py`
+  - `backend/.venv/Lib/site-packages/sklearn/externals/array_api_extra/_lib/_lazy.py`
+- Groupe 251 :
+  - `backend/.venv/Lib/site-packages/scipy/_lib/array_api_extra/_lib/_testing.py`
+  - `backend/.venv/Lib/site-packages/sklearn/externals/array_api_extra/_lib/_testing.py`
+- Groupe 252 :
+  - `backend/.venv/Lib/site-packages/scipy/_lib/array_api_extra/_lib/_utils/_compat.py`
+  - `backend/.venv/Lib/site-packages/sklearn/externals/array_api_extra/_lib/_utils/_compat.py`
+- Groupe 253 :
+  - `backend/.venv/Lib/site-packages/scipy/_lib/array_api_extra/_lib/_utils/_compat.pyi`
+  - `backend/.venv/Lib/site-packages/sklearn/externals/array_api_extra/_lib/_utils/_compat.pyi`
+- Groupe 254 :
+  - `backend/.venv/Lib/site-packages/scipy/_lib/array_api_extra/_lib/_utils/_typing.py`
+  - `backend/.venv/Lib/site-packages/sklearn/externals/array_api_extra/_lib/_utils/_typing.py`
+- Groupe 255 :
+  - `backend/.venv/Lib/site-packages/scipy/_lib/array_api_extra/_lib/_utils/_typing.pyi`
+  - `backend/.venv/Lib/site-packages/sklearn/externals/array_api_extra/_lib/_utils/_typing.pyi`
+- Groupe 256 :
+  - `backend/.venv/Lib/site-packages/scipy/_lib/array_api_extra/testing.py`
+  - `backend/.venv/Lib/site-packages/sklearn/externals/array_api_extra/testing.py`
+- Groupe 257 :
+  - `backend/.venv/Lib/site-packages/sentry_sdk-2.58.0.dist-info/WHEEL`
+  - `backend/.venv/Lib/site-packages/tzdata-2026.2.dist-info/WHEEL`
+- Groupe 258 :
+  - `backend/.venv/Lib/site-packages/sklearn/cluster/_hdbscan/_tree.cp313-win_amd64.lib`
+  - `backend/.venv/Lib/site-packages/sklearn/tree/_tree.cp313-win_amd64.lib`
+- Groupe 259 :
+  - `backend/.venv/Lib/site-packages/sklearn/datasets/tests/data/openml/id_292/api-v1-jdf-292.json.gz`
+  - `backend/.venv/Lib/site-packages/sklearn/datasets/tests/data/openml/id_292/api-v1-jdf-40981.json.gz`
+- Groupe 260 :
+  - `backend/.venv/Lib/site-packages/sklearn/ensemble/_gradient_boosting.cp313-win_amd64.lib`
+  - `backend/.venv/Lib/site-packages/sklearn/ensemble/_hist_gradient_boosting/_gradient_boosting.cp313-win_amd64.lib`
+- Groupe 261 :
+  - `backend/.venv/Lib/site-packages/sklearn/manifold/_utils.cp313-win_amd64.lib`
+  - `backend/.venv/Lib/site-packages/sklearn/tree/_utils.cp313-win_amd64.lib`
+- Groupe 262 :
+  - `backend/.venv/Lib/site-packages/tld/res/effective_tld_names.dat.txt`
+  - `backend/.venv/Lib/site-packages/tld/res/effective_tld_names_public_only.dat.txt`
+- Groupe 263 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Africa/Abidjan`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Africa/Accra`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Africa/Bamako`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Africa/Banjul`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Africa/Conakry`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Africa/Dakar`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Africa/Freetown`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Africa/Lome`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Africa/Nouakchott`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Africa/Ouagadougou`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Africa/Timbuktu`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Atlantic/Reykjavik`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Atlantic/St_Helena`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Iceland`
+- Groupe 264 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Africa/Addis_Ababa`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Africa/Asmara`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Africa/Asmera`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Africa/Dar_es_Salaam`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Africa/Djibouti`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Africa/Kampala`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Africa/Mogadishu`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Africa/Nairobi`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Indian/Antananarivo`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Indian/Comoro`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Indian/Mayotte`
+- Groupe 265 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Africa/Bangui`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Africa/Brazzaville`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Africa/Douala`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Africa/Kinshasa`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Africa/Lagos`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Africa/Libreville`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Africa/Luanda`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Africa/Malabo`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Africa/Niamey`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Africa/Porto-Novo`
+- Groupe 266 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Africa/Blantyre`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Africa/Bujumbura`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Africa/Gaborone`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Africa/Harare`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Africa/Kigali`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Africa/Lubumbashi`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Africa/Lusaka`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Africa/Maputo`
+- Groupe 267 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Africa/Cairo`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Egypt`
+- Groupe 268 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Africa/Johannesburg`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Africa/Maseru`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Africa/Mbabane`
+- Groupe 269 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Africa/Tripoli`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Libya`
+- Groupe 270 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Adak`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Atka`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/US/Aleutian`
+- Groupe 271 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Anchorage`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/US/Alaska`
+- Groupe 272 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Anguilla`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Antigua`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Aruba`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Blanc-Sablon`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Curacao`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Dominica`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Grenada`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Guadeloupe`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Kralendijk`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Lower_Princes`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Marigot`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Montserrat`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Port_of_Spain`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Puerto_Rico`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/St_Barthelemy`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/St_Kitts`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/St_Lucia`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/St_Thomas`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/St_Vincent`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Tortola`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Virgin`
+- Groupe 273 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Argentina/Buenos_Aires`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Buenos_Aires`
+- Groupe 274 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Argentina/Catamarca`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Argentina/ComodRivadavia`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Catamarca`
+- Groupe 275 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Argentina/Cordoba`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Cordoba`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Rosario`
+- Groupe 276 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Argentina/Jujuy`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Jujuy`
+- Groupe 277 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Argentina/Mendoza`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Mendoza`
+- Groupe 278 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Atikokan`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Cayman`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Coral_Harbour`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Panama`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/EST`
+- Groupe 279 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Chicago`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/CST6CDT`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/US/Central`
+- Groupe 280 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Creston`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Phoenix`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/MST`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/US/Arizona`
+- Groupe 281 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Denver`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Shiprock`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/MST7MDT`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Navajo`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/US/Mountain`
+- Groupe 282 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Detroit`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/US/Michigan`
+- Groupe 283 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Edmonton`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Yellowknife`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Canada/Mountain`
+- Groupe 284 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Ensenada`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Santa_Isabel`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Tijuana`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Mexico/BajaNorte`
+- Groupe 285 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Fort_Wayne`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Indiana/Indianapolis`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Indianapolis`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/US/East-Indiana`
+- Groupe 286 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Godthab`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Nuuk`
+- Groupe 287 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Halifax`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Canada/Atlantic`
+- Groupe 288 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Havana`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Cuba`
+- Groupe 289 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Indiana/Knox`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Knox_IN`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/US/Indiana-Starke`
+- Groupe 290 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Iqaluit`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Pangnirtung`
+- Groupe 291 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Jamaica`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Jamaica`
+- Groupe 292 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Kentucky/Louisville`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Louisville`
+- Groupe 293 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Los_Angeles`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/PST8PDT`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/US/Pacific`
+- Groupe 294 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Manaus`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Brazil/West`
+- Groupe 295 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Mazatlan`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Mexico/BajaSur`
+- Groupe 296 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Mexico_City`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Mexico/General`
+- Groupe 297 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Montreal`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Nassau`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Nipigon`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Thunder_Bay`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Toronto`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Canada/Eastern`
+- Groupe 298 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/New_York`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/EST5EDT`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/US/Eastern`
+- Groupe 299 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Noronha`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Brazil/DeNoronha`
+- Groupe 300 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Porto_Acre`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Rio_Branco`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Brazil/Acre`
+- Groupe 301 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Rainy_River`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Winnipeg`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Canada/Central`
+- Groupe 302 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Regina`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Canada/Saskatchewan`
+- Groupe 303 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Santiago`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Chile/Continental`
+- Groupe 304 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Sao_Paulo`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Brazil/East`
+- Groupe 305 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/St_Johns`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Canada/Newfoundland`
+- Groupe 306 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Vancouver`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Canada/Pacific`
+- Groupe 307 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/America/Whitehorse`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Canada/Yukon`
+- Groupe 308 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Antarctica/DumontDUrville`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Pacific/Chuuk`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Pacific/Port_Moresby`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Pacific/Truk`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Pacific/Yap`
+- Groupe 309 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Antarctica/McMurdo`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Antarctica/South_Pole`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/NZ`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Pacific/Auckland`
+- Groupe 310 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Antarctica/Syowa`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Asia/Aden`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Asia/Kuwait`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Asia/Riyadh`
+- Groupe 311 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Arctic/Longyearbyen`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Atlantic/Jan_Mayen`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Europe/Berlin`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Europe/Copenhagen`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Europe/Oslo`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Europe/Stockholm`
+- Groupe 312 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Asia/Ashgabat`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Asia/Ashkhabad`
+- Groupe 313 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Asia/Bahrain`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Asia/Qatar`
+- Groupe 314 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Asia/Bangkok`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Asia/Phnom_Penh`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Asia/Vientiane`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Indian/Christmas`
+- Groupe 315 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Asia/Brunei`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Asia/Kuching`
+- Groupe 316 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Asia/Calcutta`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Asia/Kolkata`
+- Groupe 317 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Asia/Choibalsan`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Asia/Ulaanbaatar`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Asia/Ulan_Bator`
+- Groupe 318 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Asia/Chongqing`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Asia/Chungking`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Asia/Harbin`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Asia/Shanghai`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/PRC`
+- Groupe 319 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Asia/Dacca`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Asia/Dhaka`
+- Groupe 320 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Asia/Dubai`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Asia/Muscat`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Indian/Mahe`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Indian/Reunion`
+- Groupe 321 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Asia/Ho_Chi_Minh`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Asia/Saigon`
+- Groupe 322 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Asia/Hong_Kong`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Hongkong`
+- Groupe 323 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Asia/Istanbul`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Europe/Istanbul`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Turkey`
+- Groupe 324 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Asia/Jerusalem`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Asia/Tel_Aviv`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Israel`
+- Groupe 325 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Asia/Kashgar`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Asia/Urumqi`
+- Groupe 326 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Asia/Kathmandu`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Asia/Katmandu`
+- Groupe 327 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Asia/Kuala_Lumpur`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Asia/Singapore`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Singapore`
+- Groupe 328 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Asia/Macao`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Asia/Macau`
+- Groupe 329 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Asia/Makassar`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Asia/Ujung_Pandang`
+- Groupe 330 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Asia/Nicosia`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Europe/Nicosia`
+- Groupe 331 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Asia/Rangoon`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Asia/Yangon`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Indian/Cocos`
+- Groupe 332 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Asia/Seoul`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/ROK`
+- Groupe 333 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Asia/Taipei`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/ROC`
+- Groupe 334 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Asia/Tehran`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Iran`
+- Groupe 335 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Asia/Thimbu`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Asia/Thimphu`
+- Groupe 336 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Asia/Tokyo`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Japan`
+- Groupe 337 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Atlantic/Faeroe`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Atlantic/Faroe`
+- Groupe 338 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Australia/ACT`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Australia/Canberra`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Australia/NSW`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Australia/Sydney`
+- Groupe 339 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Australia/Adelaide`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Australia/South`
+- Groupe 340 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Australia/Brisbane`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Australia/Queensland`
+- Groupe 341 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Australia/Broken_Hill`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Australia/Yancowinna`
+- Groupe 342 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Australia/Currie`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Australia/Hobart`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Australia/Tasmania`
+- Groupe 343 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Australia/Darwin`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Australia/North`
+- Groupe 344 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Australia/LHI`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Australia/Lord_Howe`
+- Groupe 345 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Australia/Melbourne`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Australia/Victoria`
+- Groupe 346 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Australia/Perth`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Australia/West`
+- Groupe 347 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/CET`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Europe/Amsterdam`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Europe/Brussels`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Europe/Luxembourg`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/MET`
+- Groupe 348 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Chile/EasterIsland`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Pacific/Easter`
+- Groupe 349 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/EET`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Europe/Athens`
+- Groupe 350 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Eire`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Europe/Dublin`
+- Groupe 351 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Etc/GMT`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Etc/GMT+0`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Etc/GMT-0`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Etc/GMT0`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Etc/Greenwich`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/GMT`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/GMT+0`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/GMT-0`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/GMT0`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Greenwich`
+- Groupe 352 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Etc/UCT`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Etc/Universal`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Etc/UTC`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Etc/Zulu`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/UCT`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Universal`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/UTC`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Zulu`
+- Groupe 353 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Europe/Belfast`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Europe/Guernsey`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Europe/Isle_of_Man`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Europe/Jersey`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Europe/London`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/GB`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/GB-Eire`
+- Groupe 354 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Europe/Belgrade`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Europe/Ljubljana`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Europe/Podgorica`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Europe/Sarajevo`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Europe/Skopje`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Europe/Zagreb`
+- Groupe 355 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Europe/Bratislava`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Europe/Prague`
+- Groupe 356 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Europe/Busingen`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Europe/Vaduz`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Europe/Zurich`
+- Groupe 357 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Europe/Chisinau`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Europe/Tiraspol`
+- Groupe 358 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Europe/Helsinki`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Europe/Mariehamn`
+- Groupe 359 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Europe/Kiev`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Europe/Kyiv`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Europe/Uzhgorod`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Europe/Zaporozhye`
+- Groupe 360 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Europe/Lisbon`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Portugal`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/WET`
+- Groupe 361 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Europe/Monaco`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Europe/Paris`
+- Groupe 362 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Europe/Moscow`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/W-SU`
+- Groupe 363 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Europe/Rome`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Europe/San_Marino`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Europe/Vatican`
+- Groupe 364 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Europe/Warsaw`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Poland`
+- Groupe 365 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/HST`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Pacific/Honolulu`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Pacific/Johnston`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/US/Hawaii`
+- Groupe 366 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Indian/Kerguelen`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Indian/Maldives`
+- Groupe 367 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Kwajalein`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Pacific/Kwajalein`
+- Groupe 368 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/NZ-CHAT`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Pacific/Chatham`
+- Groupe 369 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Pacific/Enderbury`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Pacific/Kanton`
+- Groupe 370 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Pacific/Funafuti`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Pacific/Majuro`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Pacific/Tarawa`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Pacific/Wake`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Pacific/Wallis`
+- Groupe 371 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Pacific/Guadalcanal`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Pacific/Pohnpei`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Pacific/Ponape`
+- Groupe 372 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Pacific/Guam`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Pacific/Saipan`
+- Groupe 373 :
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Pacific/Midway`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Pacific/Pago_Pago`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/Pacific/Samoa`
+  - `backend/.venv/Lib/site-packages/tzdata/zoneinfo/US/Samoa`
+- Groupe 374 :
+  - `backend/.venv/Scripts/pip.exe`
+  - `backend/.venv/Scripts/pip3.13.exe`
+  - `backend/.venv/Scripts/pip3.exe`
+- Groupe 375 :
+  - `backend/.venv/Scripts/py.test.exe`
+  - `backend/.venv/Scripts/pytest.exe`
+
+## 10. Fichiers backend volumineux
+
+- `backend/.venv/Lib/site-packages/xgboost/lib/xgboost.dll` — **136.94 Mo**
+- `backend/.venv/Lib/site-packages/playwright/driver/node.exe` — **87.45 Mo**
+- `backend/.venv/Lib/site-packages/numpy.libs/libscipy_openblas64_-63c857e738469261263c764a36be9436.dll` — **19.47 Mo**
+- `backend/.venv/Lib/site-packages/scipy.libs/libscipy_openblas-64eda39e79589aedb16f58e5547eb599.dll` — **19.32 Mo**
+- `backend/.venv/Lib/site-packages/scipy/optimize/_highspy/_core.cp313-win_amd64.pyd` — **6.15 Mo**
+- `backend/.venv/Lib/site-packages/psycopg_binary.libs/libcrypto-3-x64-62ef03561cdc339644c11de55c99266c.dll` — **5.08 Mo**
+- `backend/.venv/Lib/site-packages/pydantic_core/_pydantic_core.cp313-win_amd64.pyd` — **5.01 Mo**
+- `backend/.venv/Lib/site-packages/psycopg_binary/_psycopg.c` — **4.65 Mo**
+- `backend/.venv/Lib/site-packages/scipy/sparse/_sparsetools.cp313-win_amd64.pyd` — **3.92 Mo**
+- `backend/.venv/Lib/site-packages/lxml/etree.cp313-win_amd64.pyd` — **3.84 Mo**
+- `backend/.venv/Lib/site-packages/numpy/_core/_multiarray_umath.cp313-win_amd64.pyd` — **3.54 Mo**
+- `backend/.venv/Lib/site-packages/selectolax/lexbor.cp313-win_amd64.pyd` — **3.12 Mo**
+- `backend/.venv/Lib/site-packages/playwright/driver/package/lib/coreBundle.js` — **3.06 Mo**
+- `backend/.venv/Lib/site-packages/playwright/driver/package/lib/utilsBundle.js` — **2.95 Mo**
+- `backend/.venv/Lib/site-packages/scipy/io/_fast_matrix_market/_fmm_core.cp313-win_amd64.pyd` — **2.71 Mo**
+- `backend/.venv/Lib/site-packages/playwright/driver/package/api.json` — **2.69 Mo**
+- `backend/.venv/Lib/site-packages/selectolax/lexbor.c` — **2.62 Mo**
+- `backend/.venv/Lib/site-packages/scipy/special/_ufuncs_cxx.cp313-win_amd64.pyd` — **2.29 Mo**
+- `backend/.venv/Lib/site-packages/scipy/special/_special_ufuncs.cp313-win_amd64.pyd` — **2.19 Mo**
+- `backend/.venv/Lib/site-packages/scipy/linalg/_flapack.cp313-win_amd64.pyd` — **2.17 Mo**
+- `backend/.venv/Lib/site-packages/scipy/special/cython_special.cp313-win_amd64.pyd` — **2.10 Mo**
+- `backend/.venv/Lib/site-packages/selectolax/parser.c` — **2.06 Mo**
+- `backend/.venv/Lib/site-packages/selectolax/parser.cp313-win_amd64.pyd` — **1.98 Mo**
+- `backend/app/data/cache/flashscore_matches_2026-07-25_europe_berlin.json` — **1.98 Mo**
+- `backend/app/data/cache/flashscore_matches_2026-08-01_europe_berlin.json` — **1.88 Mo**
+- `backend/.venv/Lib/site-packages/psycopg_binary/pq.c` — **1.87 Mo**
+- `backend/app/data/cache/flashscore_matches_2026-07-18_europe_berlin.json` — **1.74 Mo**
+- `backend/.venv/Lib/site-packages/rignore/rignore.cp313-win_amd64.pyd` — **1.73 Mo**
+- `backend/.venv/Lib/site-packages/lxml/objectify.cp313-win_amd64.pyd` — **1.66 Mo**
+- `backend/.venv/Lib/site-packages/pandas/_libs/groupby.cp313-win_amd64.pyd` — **1.64 Mo**
+- `backend/.venv/Lib/site-packages/pandas/_libs/hashtable.cp313-win_amd64.pyd` — **1.49 Mo**
+- `backend/.venv/Lib/site-packages/scipy/spatial/_ckdtree.cp313-win_amd64.pyd` — **1.45 Mo**
+- `backend/.venv/Lib/site-packages/scipy/special/_gufuncs.cp313-win_amd64.pyd` — **1.44 Mo**
+- `backend/.venv/Lib/site-packages/pandas/_libs/algos.cp313-win_amd64.pyd` — **1.36 Mo**
+- `backend/.venv/Lib/site-packages/scipy/special/_ufuncs.cp313-win_amd64.pyd` — **1.33 Mo**
+- `backend/.venv/Lib/site-packages/scipy/spatial/_distance_pybind.cp313-win_amd64.pyd` — **1.32 Mo**
+- `backend/.venv/Lib/site-packages/sklearn/_loss/_loss.cp313-win_amd64.pyd` — **1.25 Mo**
+- `backend/.venv/Lib/site-packages/scipy/optimize/_highspy/_highs_options.cp313-win_amd64.pyd` — **1.22 Mo**
+- `backend/.venv/Lib/site-packages/scipy/special/tests/data/boost.npz` — **1.21 Mo**
+- `backend/.venv/Lib/site-packages/scipy/stats/_unuran/unuran_wrapper.cp313-win_amd64.pyd` — **1.21 Mo**
+- `backend/.venv/Lib/site-packages/scipy/interpolate/_rbfinterp_pythran.cp313-win_amd64.pyd` — **1.11 Mo**
+- `backend/.venv/Lib/site-packages/fastar/fastar.cp313-win_amd64.pyd` — **1.08 Mo**
+- `backend/app/data/cache/flashscore_matches_2026-08-02_europe_berlin.json` — **1.06 Mo**
+- `backend/.venv/Lib/site-packages/scipy/stats/_stats_pythran.cp313-win_amd64.pyd` — **1.06 Mo**
+- `backend/app/data/cache/flashscore_matches_2026-07-26_europe_berlin.json` — **1.05 Mo**
+- `backend/.venv/Lib/site-packages/scipy/fft/_pocketfft/pypocketfft.cp313-win_amd64.pyd` — **1.05 Mo**
+- `backend/.venv/Lib/site-packages/scipy/linalg/_linalg_pythran.cp313-win_amd64.pyd` — **1.01 Mo**
+- `backend/.venv/Lib/site-packages/scipy/linalg/_batched_linalg.cp313-win_amd64.pyd` — **1.01 Mo**
+
+## 11. Caches Python générés
+
+- Aucun `__pycache__` ni fichier `.pyc` détecté.
+
+## 12. Erreurs de parsing
+
+- Aucun fichier Python actif en erreur de parsing.
+
+## 13. Plan de staging préparé — non exécuté
+
+Le staging doit rester explicite et ne doit pas utiliser `git add .` ni `git add -A`.
+
+Fichiers de documentation modifiés par ce lot :
+
+- `backend/app/services/archives_service.py` (commentaire de schéma uniquement) ;
+- `docs/api_documentation.md` ;
+- `reports/audits/backend_dead_code_audit.md`.
+
+Le plan exécutable est généré dans `reports/audits/backend_cleanup_staging_plan.ps1`. Il n’est pas exécuté par l’audit.
+
+## 14. Anomalies bloquantes
+
+- Aucun blocage structurel détecté.
+
+---
+
+### Schéma de communication
+
+`backend/app + backend/tests + frontend/src` → `analyse AST/imports/routes` → `rapport final` → `validation pytest` → `staging explicite ultérieur`

@@ -3,22 +3,9 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-
-
 LEGACY_MARKET_FEATURE_SET_VERSION = "v19.market.legacy-parity.1"
 ENHANCED_MARKET_FEATURE_SET_VERSION = "v19.market.enhanced.1"
 MARKET_FEATURE_SET_VERSION = f"{LEGACY_MARKET_FEATURE_SET_VERSION}+{ENHANCED_MARKET_FEATURE_SET_VERSION}"
-
-
-# Décrit une feature Market, sa famille, son type et sa formule de référence.
-@dataclass(frozen=True)
-class MarketFeatureDefinition:
-    name: str
-    family: str
-    data_type: str
-    formula: str
-    required_for_legacy_parity: bool
 
 
 LEGACY_MARKET_FEATURE_NAMES = (
@@ -72,27 +59,9 @@ ENHANCED_MARKET_FEATURE_NAMES = (
 )
 
 
-MARKET_FEATURE_CATALOG = (
-    MarketFeatureDefinition("market_home_prob_avg", "LEGACY_CONSENSUS", "float", "mean(p_home) then renormalize", True),
-    MarketFeatureDefinition("market_draw_prob_avg", "LEGACY_CONSENSUS", "float", "mean(p_draw) then renormalize", True),
-    MarketFeatureDefinition("market_away_prob_avg", "LEGACY_CONSENSUS", "float", "mean(p_away) then renormalize", True),
-    MarketFeatureDefinition("market_favorite_prob", "LEGACY_CONSENSUS", "float", "max(consensus probabilities)", True),
-    MarketFeatureDefinition("market_margin_top1_top2", "LEGACY_CONSENSUS", "float", "top1 - top2", True),
-    MarketFeatureDefinition("market_top2_sum", "LEGACY_CONSENSUS", "float", "top1 + top2", True),
-    MarketFeatureDefinition("market_entropy", "LEGACY_CONSENSUS", "float", "-sum(p_i * ln(p_i))", True),
-    MarketFeatureDefinition("market_available_triplets", "LEGACY_COVERAGE", "int", "count(valid current triplets)", True),
-    MarketFeatureDefinition("market_bookmaker_agreement_score", "LEGACY_AGREEMENT", "float", "bookmakers matching consensus favorite / valid triplets", True),
-)
-
-
 # Retourne les noms officiels dans un ordre stable pour sérialiser les snapshots.
 def get_market_feature_names() -> tuple[str, ...]:
     return LEGACY_MARKET_FEATURE_NAMES + LEGACY_MARKET_DERIVED_NAMES + ENHANCED_MARKET_FEATURE_NAMES
-
-
-# Recherche la définition d'une feature legacy par son nom officiel.
-def get_market_feature_definition(name: str) -> MarketFeatureDefinition | None:
-    return next((definition for definition in MARKET_FEATURE_CATALOG if definition.name == name), None)
 
 
 # Schéma de communication :

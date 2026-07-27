@@ -1,11 +1,10 @@
 # Ce fichier construit l'historique recent des equipes pour alimenter la fiche detail match RubyBets.
-# Il utilise FlashScore comme source principale et garde Football-Data en fallback sans inventer de donnees.
+# Il utilise FlashScore comme source principale et Football-Data comme fallback sans inventer de données.
 
 from typing import Any
 import unicodedata
 
 from app.core.constants import FOOTBALL_DATA_PROVIDER
-from app.services.api_football_client import get_normalized_api_football_team_history
 from app.services.rapidapi_flashscore_client import (
     get_flashscore_head_to_head,
     get_flashscore_histories_for_match,
@@ -27,7 +26,6 @@ TEAM_HISTORY_CACHE_TTL_MINUTES = 720
 TEAM_HISTORY_LIMIT = 20
 OVERVIEW_RECENT_MATCHES_LIMIT = 5
 CLUB_ANALYSIS_RECENT_MATCHES_MIN = 8
-API_FOOTBALL_HISTORY_LIMIT = 20
 FLASHSCORE_HISTORY_LIMIT = 20
 TEAM_HISTORY_RESPONSE_CACHE_TTL_MINUTES = 720
 
@@ -348,11 +346,6 @@ def rebuild_history_with_matches(
     }
 
 
-# Cette fonction indique si un historique possede assez de matchs pour l'aperçu MVP.
-def has_enough_recent_overview_matches(history: dict[str, Any]) -> bool:
-    return len(history.get("recent_matches_overview", [])) >= OVERVIEW_RECENT_MATCHES_LIMIT
-
-
 # Cette fonction indique si un historique possède assez de matchs pour alimenter un moteur clubs.
 def has_enough_analysis_matches(history: dict[str, Any]) -> bool:
     return len(history.get("recent_matches", [])) >= CLUB_ANALYSIS_RECENT_MATCHES_MIN
@@ -403,29 +396,6 @@ async def get_team_finished_matches(
         match["data_source"] = "football_data"
 
     return matches, freshness
-
-
-# Cette fonction recupere les matchs termines d'une equipe via API-Football si Football-Data est insuffisant.
-async def get_api_football_finished_matches(
-    team_name: str,
-    target_utc_date: str | None,
-) -> tuple[list[dict[str, Any]], dict[str, Any]]:
-    matches, metadata = await get_normalized_api_football_team_history(
-        team_name=team_name,
-        target_date=target_utc_date,
-        limit=API_FOOTBALL_HISTORY_LIMIT,
-    )
-
-    return matches, {
-        "provider": "api_football",
-        "from_cache": False,
-        "status": metadata.get("status"),
-        "api_team_id": metadata.get("api_team_id"),
-        "api_team_name": metadata.get("api_team_name"),
-        "results": metadata.get("results", 0),
-        "raw_results": metadata.get("raw_results"),
-        "message": metadata.get("message"),
-    }
 
 
 # Cette fonction formate une liste de matchs bruts pour une equipe donnee.
@@ -615,7 +585,6 @@ def merge_history_with_fallback(
     )
 
     return rebuild_history_with_matches(primary_history, merged_matches)
-
 
 
 # Cette fonction complete les historiques a partir des identifiants FlashScore deja presents dans le detail match.
