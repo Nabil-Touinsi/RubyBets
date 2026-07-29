@@ -50,3 +50,14 @@ jobs:
           path: reports/evidence/model_delivery/model_artifacts_validation.json
           if-no-files-found: error
           retention-days: 30
+
+      - name: Monitor ML model metrics
+        run: python scripts/ci/monitor_model_metrics.py
+
+      - name: Upload ML monitoring report
+        uses: actions/upload-artifact@v4
+        with:
+          name: rubybets-ml-model-monitoring
+          path: reports/evidence/model_monitoring/model_metrics_monitoring.json
+          if-no-files-found: error
+          retention-days: 30
