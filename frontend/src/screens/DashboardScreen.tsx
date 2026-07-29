@@ -128,6 +128,7 @@ function DashboardScreen({
   const firstMatch = matchesToFollow[0] || null;
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCarouselStart(0);
   }, [selectedCompetition, matchesToFollow.length]);
 

@@ -4,8 +4,6 @@ export type AppScreen =
   | "dashboard"
   | "matches"
   | "match-details"
-  | "analysis"
-  | "predictions"
   | "recommendation"
   | "archives"
   | "resources";
@@ -30,6 +28,6 @@ export const NAVIGATION_ITEMS: NavigationItem[] = [
 // navigation.ts
 // ├── fournit la liste des écrans disponibles dans RubyBets
 // ├── alimente TopNavigation.tsx pour afficher le menu principal simplifié
-// ├── conserve analysis et predictions comme routes internes non affichées dans le menu principal
+// ├── limite le routage aux écrans actifs du MVP
 // ├── ajoute archives comme nouvel écran de suivi des prédictions
 // └── regroupe glossaire et informations responsables dans resources

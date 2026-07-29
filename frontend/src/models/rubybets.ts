@@ -348,123 +348,6 @@ export type TeamHistoryResponse = {
   data_freshness: TeamHistoryFreshness;
 };
 
-
-// Ce type décrit le domaine d'équipe attendu par le module H2H expérimental V19.
-export type V19H2HEntityType = "CLUB" | "NATIONAL_TEAM";
-
-// Ce type décrit le statut global renvoyé par le module H2H V19.
-export type V19H2HModuleStatus =
-  | "READY"
-  | "DEGRADED"
-  | "UNAVAILABLE"
-  | "INVALID"
-  | string;
-
-// Ce type décrit une feature typée calculée par le catalogue v19.h2h.core.1.
-export type V19H2HFeature = {
-  name: string;
-  value: number | string | boolean | null;
-  data_type: string;
-  unit: string;
-  feature_version: string;
-  meeting_count_used: number;
-  source_meeting_ids: string[];
-  missing_state: string | null;
-  quality_flags: string[];
-};
-
-// Ce type décrit une anomalie ou un motif structuré du module H2H V19.
-export type V19H2HIssue = {
-  code: string;
-  severity: string;
-  scope: string;
-  message: string;
-  affected_meeting_ids: string[];
-};
-
-// Ce type décrit la disponibilité du résultat H2H pour un consommateur spécialisé.
-export type V19H2HConsumerReadiness = {
-  consumer_id: string;
-  status: string;
-  available_features: string[];
-  missing_features: string[];
-  blocking_issues: V19H2HIssue[];
-  warnings: V19H2HIssue[];
-};
-
-// Ce type décrit le résumé de sélection des confrontations candidates et exploitables.
-export type V19H2HMeetingSelectionSummary = {
-  domain_profile: string;
-  candidate_count: number;
-  temporally_eligible_count: number;
-  identity_eligible_count: number;
-  deduplicated_count: number;
-  usable_count: number;
-  excluded_count: number;
-  exclusion_counts_by_reason: Array<{
-    reason: string;
-    count: number;
-  }>;
-  newest_meeting_utc: string | null;
-  oldest_meeting_utc: string | null;
-  selected_meeting_ids: string[];
-};
-
-// Ce type décrit le diagnostic qualité global produit par le module H2H V19.
-export type V19H2HQualityReport = {
-  overall_status: string;
-  overall_score: number | null;
-  temporal_integrity: string;
-  identity_quality: string;
-  source_reliability: string;
-  score_reliability: string;
-  competition_context_coverage: string;
-  venue_context_coverage: string;
-  tie_context_coverage: string;
-  data_completeness: string;
-  issues: V19H2HIssue[];
-};
-
-// Ce type décrit la réponse expérimentale H2H V19 exposée au frontend.
-export type V19H2HResponse = {
-  source: string;
-  scope: string;
-  match_id: number;
-  entity_type: V19H2HEntityType;
-  request_id: string;
-  module_status: V19H2HModuleStatus;
-  module_outcome: string;
-  feature_set_version: string;
-  result: {
-    contract_version: string;
-    request_id: string;
-    target_match_id: string;
-    computed_at_utc: string;
-    cutoff_utc: string;
-    module_status: V19H2HModuleStatus;
-    module_outcome: string;
-    feature_set_version: string;
-    features: V19H2HFeature[];
-    meeting_selection_summary: V19H2HMeetingSelectionSummary;
-    quality_report: V19H2HQualityReport;
-    readiness_by_consumer: V19H2HConsumerReadiness[];
-    missing_features: string[];
-    warnings: V19H2HIssue[];
-    abstention_reasons: V19H2HIssue[];
-    provenance: {
-      input_contract_hash: string;
-      source_providers: string[];
-      provider_snapshot_ids: string[];
-      normalization_version: string;
-      identity_resolver_version: string;
-      processing_policy_version: string;
-      deduplication_policy_version: string;
-      feature_builder_version: string;
-    };
-  };
-  responsible_note: string;
-};
-
 // Ce type décrit le résumé public de la recommandation produit V19.
 export type V19ProductRecommendation = {
   market_type: string;
@@ -627,7 +510,6 @@ export type MatchAnalysisResponse = {
   data_freshness: MatchCompositeDataFreshness;
 };
 
-
 // Ce type décrit un joueur de composition ou d'absence fourni par la route /lineups.
 export type MatchLineupPlayer = {
   name: string | null;
@@ -732,50 +614,6 @@ export type MatchLineupsResponse = {
   fallback?: MatchLineupFallback | null;
 };
 
-// Ce type décrit une prédiction individuelle affichée dans RubyBets.
-export type PredictionItem = {
-  market: string;
-  prediction: string;
-  label: string;
-  confidence: string;
-  risk: string;
-  justification: string;
-};
-
-// Ce type décrit la réponse backend des prédictions avant-match.
-export type MatchPredictionsResponse = {
-  source: string;
-  match_id: number;
-  predictions: {
-    status: string;
-    message?: string;
-    method?: string;
-    inputs?: {
-      home_team_position: number | null;
-      away_team_position: number | null;
-      position_gap: number | null;
-      points_gap: number | null;
-      goal_difference_gap: number | null;
-      average_goal_context: number | null;
-      home_goals_for_avg: number | null;
-      away_goals_for_avg: number | null;
-    };
-    predictions: {
-      one_x_two: PredictionItem;
-      goals: PredictionItem;
-      btts: PredictionItem;
-    } | null;
-    limits?: string[];
-  };
-  data_used: {
-    match_details: boolean;
-    competition_standings: boolean;
-    home_team_standing_available: boolean;
-    away_team_standing_available: boolean;
-  };
-  data_freshness: MatchCompositeDataFreshness;
-};
-
 // Ce type décrit une correction de cohérence appliquée entre deux marchés prédictifs.
 export type MarketConsistencyAdjustment = {
   code: string;
@@ -798,60 +636,6 @@ export type MarketConsistencyChecks = {
   rules_version: string;
   adjustments_count: number;
   adjustments: MarketConsistencyAdjustment[];
-};
-
-// Ce type décrit une sélection issue du selector_result du modèle national expérimental.
-export type MultiMatchRecommendationItem = {
-  match: Match;
-  selected_market: string | null;
-  selected_prediction: string | null;
-  selected_confidence: number | null;
-  risk_level: "low" | "medium" | "high" | string;
-  selector_rule: string | null;
-  reference_reliability: number | null;
-  reference_coverage: number | null;
-  reference_selected_rows: number | null;
-  selector_version: string | null;
-  selector_profile: string | null;
-  selector_variant: string | null;
-  model_family: string;
-  model_variant: string;
-  odds_used: boolean;
-  source_match_prediction: string | null;
-  consistency_checks?: MarketConsistencyChecks | null;
-  responsible_note?: string | null;
-};
-
-// Ce type décrit la réponse backend de la sélection multi-matchs basée sur le modèle national.
-export type MultiMatchRecommendationResponse = {
-  source: string;
-  scope?: string;
-  status: "computed" | "empty" | string;
-  method: string;
-  request: {
-    competition_code: string;
-    match_count: number;
-    risk_level: "low" | "medium" | "high";
-    date_from: string | null;
-    date_to: string | null;
-  };
-  available_matches_count: number;
-  computed_matches_count?: number;
-  skipped_matches_count?: number;
-  selected_count: number;
-  recommendations: MultiMatchRecommendationItem[];
-  selection_logic: {
-    description: string;
-    risk_filter?: string;
-    sorting?: string;
-    risk_levels?: {
-      low: string;
-      medium: string;
-      high: string;
-    };
-  };
-  limits: string[];
-  data_freshness?: RecommendationDataFreshness;
 };
 
 // Ce type décrit un élément du glossaire pédagogique.
@@ -894,98 +678,6 @@ export type ResponsibleInfoResponse = {
     guarantees_result: boolean;
   };
 };
-
-// Ce type décrit les métadonnées d’un match analysé par le modèle national expérimental.
-export type NationalMlMatchMetadata = {
-  clean_match_id: string;
-  rubybets_match_id?: number | null;
-  feature_id: string;
-  feature_version: string;
-  match_date_utc: string | null;
-  season: string | null;
-  competition_code: string | null;
-  competition_name: string | null;
-  stage: string | null;
-  group_name: string | null;
-  team_a_name: string | null;
-  team_b_name: string | null;
-  inference_mode?: string;
-};
-
-// Ce type limite les clés de marchés principales utilisées par l’écran Prédictions.
-export type NationalMlMarketKey = "1x2" | "over_1_5" | "over_2_5" | "btts";
-
-// Ce type décrit le résultat du sélecteur expérimental du modèle national.
-export type NationalMlSelectorResult = {
-  source: string;
-  scope: string;
-  status: "RECOMMEND" | "ABSTAIN" | string;
-  selector_version: string;
-  selector_profile: string;
-  selector_variant: string;
-  selected_market: string;
-  selected_prediction: string | null;
-  selected_confidence: number | null;
-  risk_level: string;
-  selector_rule: string;
-  reference_reliability: number | null;
-  reference_coverage: number | null;
-  reference_selected_rows: number | null;
-  reference_double_chance_share: number | null;
-  responsible_note: string;
-  excluded_outcome?: string;
-};
-
-// Ce type décrit une prédiction brute ou corrigée par marché produite par le modèle national.
-export type NationalMlMarketPrediction = {
-  model_name: string;
-  prediction: string;
-  probabilities: Record<string, number>;
-  max_probability: number;
-  consistency_status?: "adjusted" | "ok" | string;
-  raw_prediction?: string;
-  raw_max_probability?: number;
-  adjusted_by_rule?: string;
-  adjustment_reason?: string;
-};
-
-// Ce type décrit les features construites dynamiquement pour le match sélectionné.
-export type NationalMlDynamicFeatures = Record<string, number | null>;
-
-// Ce type décrit la réponse API du modèle national expérimental pour un match sélectionné.
-export type NationalMlPredictionResponse = {
-  source: string;
-  scope: string;
-  status: "computed" | "unavailable" | string;
-  data_source_file: string;
-  match: NationalMlMatchMetadata;
-  dynamic_features?: NationalMlDynamicFeatures;
-  market_predictions?: Partial<Record<NationalMlMarketKey, NationalMlMarketPrediction>> &
-    Record<string, NationalMlMarketPrediction | undefined>;
-  raw_market_predictions?: Partial<Record<NationalMlMarketKey, NationalMlMarketPrediction>> &
-    Record<string, NationalMlMarketPrediction | undefined>;
-  consistency_checks?: MarketConsistencyChecks | null;
-  selector_result: NationalMlSelectorResult | null;
-  unavailable_reason?: string;
-  responsible_note: string;
-  rubybets_match_id?: number | null;
-  source_used_for_match?: string;
-  model_family?: "national" | string;
-  model_variant?: string;
-  odds_used?: boolean;
-  data_freshness?: {
-    match_cache?: CacheFreshness | null;
-    match_last_updated?: string | null;
-  };
-};
-
-// Ces alias conservent la compatibilité avec l’ancien nommage V18.3.3 déjà utilisé dans certains composants.
-export type V1833MatchMetadata = NationalMlMatchMetadata;
-export type V1833SelectorResult = NationalMlSelectorResult;
-export type V1833MarketPrediction = NationalMlMarketPrediction;
-export type V1833DynamicFeatures = NationalMlDynamicFeatures;
-export type V1833MatchPredictionResponse = NationalMlPredictionResponse;
-
 
 // Ce type décrit les verdicts possibles d’une prédiction archivée.
 export type ArchivedPredictionVerdict =
@@ -1065,7 +757,6 @@ export type ArchivesReconciliationResponse = {
   error_count: number;
   message?: string;
 };
-
 
 // Ce type décrit une métrique avancée agrégée uniquement sur les matchs où la donnée existe réellement.
 export type MatchAdvancedStatsMetric = {

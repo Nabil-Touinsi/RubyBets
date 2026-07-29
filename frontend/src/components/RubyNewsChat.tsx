@@ -306,6 +306,7 @@ function RubyNewsChat({
   useEffect(() => {
     if (!isVisible) {
       requestAbortRef.current?.abort();
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsConversationOpen(false);
     }
   }, [isVisible]);

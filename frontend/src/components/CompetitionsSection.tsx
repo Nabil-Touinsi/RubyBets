@@ -78,6 +78,7 @@ function CompetitionsSection({
       selectedCompetitionIndex / COMPETITIONS_PER_PAGE,
     );
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCompetitionPage((currentPage) => {
       if (targetPage === currentPage) {
         return currentPage;
@@ -90,6 +91,7 @@ function CompetitionsSection({
 
   // Cette synchronisation garde la page valide lorsque la liste des compétitions change.
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCompetitionPage((currentPage) =>
       Math.min(currentPage, Math.max(totalPages - 1, 0)),
     );

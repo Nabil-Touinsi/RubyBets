@@ -43,7 +43,6 @@ import { NAVIGATION_ITEMS } from "./types/navigation";
 import DashboardScreen from "./screens/DashboardScreen";
 import MatchesScreen from "./screens/MatchesScreen";
 import MatchDetailsScreen from "./screens/MatchDetailsScreen";
-import AnalysisScreen from "./screens/AnalysisScreen";
 import RecommendationScreen from "./screens/RecommendationScreen";
 import ArchivesScreen from "./screens/ArchivesScreen";
 import StatusPanel from "./components/StatusPanel";
@@ -359,6 +358,7 @@ function App() {
         setResponsibleInfo(null);
         setResponsibleInfoStatus("Impossible de charger les informations responsables");
       });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Actualise uniquement les matchs de la compétition active sans recharger toute l’application.
@@ -880,21 +880,6 @@ function App() {
       );
     }
 
-    if (currentScreen === "analysis") {
-      if (!hasSelectedMatch) {
-        return renderMatchRequiredState("Analyse pré-match");
-      }
-
-      return (
-        <AnalysisScreen
-          matchAnalysis={selectedMatchAnalysis}
-          matchDetails={selectedMatchDetails}
-          matchContext={selectedMatchContext}
-          matchAnalysisStatus={matchAnalysisStatus}
-          onNavigate={setCurrentScreen}
-        />
-      );
-    }
 
 
 

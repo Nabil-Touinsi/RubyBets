@@ -2,14 +2,12 @@
 // Il garde une barre horizontale premium sans modifier la logique métier ni les contrats API.
 
 import {
-  Activity,
   Archive,
   BookOpen,
   CalendarDays,
   CheckCircle2,
   FileText,
   Home,
-  TrendingUp,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import type { AppScreen, NavigationItem } from "../types/navigation";
@@ -25,8 +23,6 @@ const NAVIGATION_ICONS: Record<AppScreen, LucideIcon> = {
   dashboard: Home,
   matches: CalendarDays,
   "match-details": FileText,
-  analysis: Activity,
-  predictions: TrendingUp,
   recommendation: CheckCircle2,
   archives: Archive,
   resources: BookOpen,

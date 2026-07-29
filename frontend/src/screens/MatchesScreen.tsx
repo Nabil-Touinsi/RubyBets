@@ -307,11 +307,13 @@ function MatchesScreen({
 
   // Cette synchronisation ramène la pagination au début dès qu’un filtre ou le tri change.
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCurrentPage(1);
   }, [selectedCompetition, dateFilter, statusFilter, teamSearch, sortMode]);
 
   // Cette synchronisation garde la page courante valide si le nombre de résultats change après un chargement API.
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCurrentPage((page) => Math.min(page, totalPages));
   }, [totalPages]);
 

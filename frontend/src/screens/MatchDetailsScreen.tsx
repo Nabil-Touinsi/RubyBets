@@ -1349,47 +1349,45 @@ function buildMetricCards(
 }
 
 // Cette fonction associe chaque famille de signal à une icône homogène.
-function getInsightIcon(card: InsightCard): LucideIcon {
+function renderInsightIcon(card: InsightCard) {
   if (card.icon === "attack" || card.badge === "Buts marqués") {
-    return Target;
+    return <Target size={18} strokeWidth={1.8} aria-hidden="true" />;
   }
 
   if (card.icon === "defense" || card.badge === "Buts encaissés") {
-    return ShieldCheck;
+    return <ShieldCheck size={18} strokeWidth={1.8} aria-hidden="true" />;
   }
 
   if (card.icon === "context" || card.badge === "Contexte") {
-    return Compass;
+    return <Compass size={18} strokeWidth={1.8} aria-hidden="true" />;
   }
 
-  return TrendingUp;
+  return <TrendingUp size={18} strokeWidth={1.8} aria-hidden="true" />;
 }
 
 // Cette fonction associe chaque indicateur comparatif à une icône métier.
-function getMetricIcon(metric: MetricCard): LucideIcon {
+function renderMetricIcon(metric: MetricCard) {
   if (metric.label.includes("Buts marqués")) {
-    return Target;
+    return <Target size={18} strokeWidth={1.8} aria-hidden="true" />;
   }
 
   if (metric.label.includes("Buts encaissés")) {
-    return ShieldCheck;
+    return <ShieldCheck size={18} strokeWidth={1.8} aria-hidden="true" />;
   }
 
   if (metric.label.includes("Différence")) {
-    return Scale;
+    return <Scale size={18} strokeWidth={1.8} aria-hidden="true" />;
   }
 
-  return Gauge;
+  return <Gauge size={18} strokeWidth={1.8} aria-hidden="true" />;
 }
 
 // Ce composant affiche une carte d’analyse synthétique avec une iconographie premium.
 function AnalysisInsightCard({ card }: { card: InsightCard }) {
-  const InsightIcon = getInsightIcon(card);
-
   return (
     <article className={`rb-detail-v2-insight-card rb-detail-v2-insight-card--${card.tone}`}>
       <span className="rb-detail-v2-insight-card__icon">
-        <InsightIcon size={18} strokeWidth={1.8} aria-hidden="true" />
+        {renderInsightIcon(card)}
       </span>
       <div>
         <p>{card.badge}</p>
@@ -1414,8 +1412,6 @@ function MetricComparisonCard({
     "--home-width": `${metric.homeBar}%`,
     "--away-width": `${metric.awayBar}%`,
   } as CSSProperties;
-  const MetricIcon = getMetricIcon(metric);
-
   return (
     <article className={`rb-detail-v2-metric-card rb-detail-v2-metric-card--${metric.accent}`} style={style}>
       <div className="rb-detail-v2-metric-side rb-detail-v2-metric-side--home">
@@ -1426,7 +1422,7 @@ function MetricComparisonCard({
 
       <div className="rb-detail-v2-metric-card__header">
         <span className="rb-detail-v2-metric-card__icon">
-          <MetricIcon size={18} strokeWidth={1.8} aria-hidden="true" />
+          {renderMetricIcon(metric)}
         </span>
         <div>
           <h4>

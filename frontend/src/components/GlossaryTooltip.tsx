@@ -138,6 +138,7 @@ function GlossaryTooltip({
     let isCurrent = true;
 
     if (glossaryItemsCache) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setDefinition(findGlossaryItem(glossaryItemsCache, term));
       setLoadState("ready");
       return () => {
@@ -168,6 +169,7 @@ function GlossaryTooltip({
 
   useEffect(() => {
     if (!isOpen) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setPosition((current) => ({ ...current, ready: false }));
       return;
     }

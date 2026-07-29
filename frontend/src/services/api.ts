@@ -16,15 +16,9 @@ import type {
   MatchNewsContextResponse,
   NewsChatbotRequest,
   NewsChatbotResponse,
-  MatchPredictionsResponse,
   MatchesResponse,
-  NationalMlPredictionResponse,
-  MultiMatchRecommendationResponse,
   ResponsibleInfoResponse,
   TeamHistoryResponse,
-  V1833MatchPredictionResponse,
-  V19H2HEntityType,
-  V19H2HResponse,
   V19ProductPredictionResponse,
   V19SelectionProfile,
   V19SelectionRequest,
@@ -215,25 +209,6 @@ export async function getMatchTeamHistory(
   );
 }
 
-
-// Cette fonction détermine le profil H2H V19 selon la compétition actuellement sélectionnée.
-function getV19H2HEntityType(competitionCode: string): V19H2HEntityType {
-  return competitionCode === "WC" ? "NATIONAL_TEAM" : "CLUB";
-}
-
-// Cette fonction récupère l'analyse expérimentale H2H V19 d'un match RubyBets réel.
-export async function getV19H2HAnalysis(
-  matchId: number,
-  competitionCode: string
-): Promise<V19H2HResponse> {
-  const entityType = getV19H2HEntityType(competitionCode);
-
-  return fetchJson<V19H2HResponse>(
-    `/api/experimental/ml-v19/h2h/rubybets-matches/${matchId}?entity_type=${entityType}`,
-    "Erreur lors du chargement de l'analyse H2H V19."
-  );
-}
-
 // Cette classe conserve le statut HTTP d'une erreur de décision RubyBets afin de distinguer une indisponibilité d'une erreur temporaire.
 export class V19ProductApiError extends Error {
   status: number;
@@ -377,7 +352,6 @@ export async function getMatchAdvancedStats(
   );
 }
 
-
 // Cette fonction récupère l’analyse explicable avant-match d’un match précis.
 export async function getMatchAnalysis(
   matchId: number
@@ -388,7 +362,6 @@ export async function getMatchAnalysis(
   );
 }
 
-
 // Cette fonction récupère les compositions probables, officielles et absences disponibles pour un match précis.
 export async function getMatchLineups(
   matchId: number
@@ -398,82 +371,6 @@ export async function getMatchLineups(
     "Erreur lors du chargement des compositions du match."
   );
 }
-
-// Cette fonction récupère les prédictions avant-match d’un match précis.
-export async function getMatchPredictions(
-  matchId: number
-): Promise<MatchPredictionsResponse> {
-  return fetchJson<MatchPredictionsResponse>(
-    `/api/matches/${matchId}/predictions`,
-    "Erreur lors du chargement des prédictions du match."
-  );
-}
-
-// Cette fonction récupère une prédiction expérimentale V18.3.3 à partir d’un clean_match_id réel du CSV 348.
-export async function getV1833PredictionByMatchId(
-  cleanMatchId: string
-): Promise<V1833MatchPredictionResponse> {
-  return fetchJson<V1833MatchPredictionResponse>(
-    `/api/experimental/ml-national/v18-3-3/matches/${cleanMatchId}`,
-    "Erreur lors du chargement du résultat expérimental V18.3.3."
-  );
-}
-
-// Cette fonction demande au backend de calculer le modèle national expérimental pour le match RubyBets sélectionné.
-export async function getNationalDynamicPredictionByRubyBetsMatchId(
-  matchId: number
-): Promise<NationalMlPredictionResponse> {
-  return fetchJson<NationalMlPredictionResponse>(
-    `/api/experimental/ml-national/v18-3-3/rubybets-matches/${matchId}`,
-    "Erreur lors du calcul dynamique du modèle national expérimental."
-  );
-}
-
-// Cette fonction conserve l’ancien nom d’appel V18.3.3 pour éviter de casser les imports existants pendant la migration.
-export async function getV1833DynamicPredictionByRubyBetsMatchId(
-  matchId: number
-): Promise<V1833MatchPredictionResponse> {
-  return getNationalDynamicPredictionByRubyBetsMatchId(matchId);
-}
-
-// Cette fonction demande au backend de générer une sélection ML nationale à partir des mêmes prédictions que l’écran Prédictions.
-export async function getNationalMlMultiMatchSelection(
-  competitionCode: string,
-  matchCount: number,
-  riskLevel: "low" | "medium" | "high"
-): Promise<MultiMatchRecommendationResponse> {
-  return fetchJson<MultiMatchRecommendationResponse>(
-    "/api/experimental/ml-national/v18-3-3/selection",
-    "Erreur lors de la génération de la sélection ML nationale.",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        competition_code: competitionCode,
-        match_count: matchCount,
-        risk_level: riskLevel,
-        date_from: null,
-        date_to: null,
-      }),
-    }
-  );
-}
-
-// Cette fonction conserve l’ancien nom utilisé par App.tsx pendant la migration de l’écran Sélection.
-export async function getMultiMatchRecommendation(
-  competitionCode: string,
-  matchCount: number,
-  riskLevel: "low" | "medium" | "high"
-): Promise<MultiMatchRecommendationResponse> {
-  return getNationalMlMultiMatchSelection(
-    competitionCode,
-    matchCount,
-    riskLevel
-  );
-}
-
 
 // Cette fonction récupère les analyses archivées avec filtres, pagination et annulation possible.
 export async function getArchivedPredictions(

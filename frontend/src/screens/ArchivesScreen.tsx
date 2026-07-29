@@ -696,6 +696,7 @@ function ArchivesScreen() {
     }
 
     lastAutomaticRefreshAt = now;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void refreshKnownResults(false);
   }, []);
 
@@ -755,6 +756,7 @@ function ArchivesScreen() {
 
   useEffect(() => {
     if (archives.length === 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelectedArchiveId(null);
       return;
     }
