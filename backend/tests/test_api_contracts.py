@@ -15,6 +15,7 @@ from typing import Any
 from fastapi.testclient import TestClient
 
 from app.api import competitions as competitions_api
+from app.api import health as health_api
 from app.api import matches as matches_api
 from app.api import recommendations as recommendations_api
 from app.main import app
@@ -154,6 +155,34 @@ def test_health_route_returns_ok_status():
 
     assert response.status_code == 200
     assert response.json() == {"status": "ok"}
+
+
+# Ce test vérifie que le monitoring signale une base PostgreSQL disponible.
+def test_database_health_route_reports_available(monkeypatch):
+    monkeypatch.setattr(health_api, "check_database_connection", lambda: True)
+
+    response = client.get("/health/database")
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "service": "database",
+        "status": "ok",
+        "database": "rubybets_db",
+    }
+
+
+# Ce test vérifie que le monitoring signale une base PostgreSQL indisponible sans masquer l'incident.
+def test_database_health_route_reports_unavailable(monkeypatch):
+    monkeypatch.setattr(health_api, "check_database_connection", lambda: False)
+
+    response = client.get("/health/database")
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "service": "database",
+        "status": "unavailable",
+        "database": "rubybets_db",
+    }
 
 
 # Ce test vérifie que la route compétitions retourne uniquement les ligues du MVP.
