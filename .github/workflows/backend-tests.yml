@@ -39,3 +39,14 @@ jobs:
 
       - name: Run backend tests
         run: pytest
+
+      - name: Validate ML model artifacts
+        run: python scripts/ci/validate_model_artifacts.py
+
+      - name: Upload ML validation report
+        uses: actions/upload-artifact@v4
+        with:
+          name: rubybets-ml-model-validation
+          path: reports/evidence/model_delivery/model_artifacts_validation.json
+          if-no-files-found: error
+          retention-days: 30
