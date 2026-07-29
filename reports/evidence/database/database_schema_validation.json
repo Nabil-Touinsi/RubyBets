@@ -1,0 +1,207 @@
+{
+  "status": "PASSED",
+  "generated_at_utc": "2026-07-29T19:41:44.259978+00:00",
+  "database": {
+    "name": "rubybets_db",
+    "server_version": "18.3",
+    "connection_configured": true,
+    "connection_secret_exposed_in_report": false
+  },
+  "schemas": {
+    "detected": [
+      "ml",
+      "ml_national",
+      "public"
+    ],
+    "core_schema_present": true,
+    "analytical_schemas_detected": [
+      "ml",
+      "ml_national"
+    ]
+  },
+  "tables": {
+    "total_detected": 17,
+    "required_public_tables": [
+      "archived_predictions",
+      "competitions",
+      "matches",
+      "predictions",
+      "recommendation_items",
+      "recommendations",
+      "teams"
+    ],
+    "missing_public_tables": [],
+    "detected": [
+      {
+        "table_schema": "ml",
+        "table_name": "clean_matches"
+      },
+      {
+        "table_schema": "ml",
+        "table_name": "features"
+      },
+      {
+        "table_schema": "ml",
+        "table_name": "import_batches"
+      },
+      {
+        "table_schema": "ml",
+        "table_name": "model_runs"
+      },
+      {
+        "table_schema": "ml",
+        "table_name": "raw_matches"
+      },
+      {
+        "table_schema": "ml_national",
+        "table_name": "clean_matches"
+      },
+      {
+        "table_schema": "ml_national",
+        "table_name": "competition_metadata"
+      },
+      {
+        "table_schema": "ml_national",
+        "table_name": "features"
+      },
+      {
+        "table_schema": "ml_national",
+        "table_name": "raw_matches"
+      },
+      {
+        "table_schema": "ml_national",
+        "table_name": "team_rankings"
+      },
+      {
+        "table_schema": "public",
+        "table_name": "archived_predictions"
+      },
+      {
+        "table_schema": "public",
+        "table_name": "competitions"
+      },
+      {
+        "table_schema": "public",
+        "table_name": "matches"
+      },
+      {
+        "table_schema": "public",
+        "table_name": "predictions"
+      },
+      {
+        "table_schema": "public",
+        "table_name": "recommendation_items"
+      },
+      {
+        "table_schema": "public",
+        "table_name": "recommendations"
+      },
+      {
+        "table_schema": "public",
+        "table_name": "teams"
+      }
+    ]
+  },
+  "constraints": {
+    "primary_keys": 17,
+    "foreign_keys": 13,
+    "unique_constraints": 10,
+    "check_constraints": 115,
+    "required_relations": 7,
+    "detected_foreign_key_relations": 12,
+    "missing_relations": [],
+    "relations": [
+      {
+        "source_schema": "ml",
+        "source_table": "clean_matches",
+        "target_schema": "ml",
+        "target_table": "raw_matches"
+      },
+      {
+        "source_schema": "ml",
+        "source_table": "features",
+        "target_schema": "ml",
+        "target_table": "clean_matches"
+      },
+      {
+        "source_schema": "ml",
+        "source_table": "raw_matches",
+        "target_schema": "ml",
+        "target_table": "import_batches"
+      },
+      {
+        "source_schema": "ml_national",
+        "source_table": "clean_matches",
+        "target_schema": "ml_national",
+        "target_table": "raw_matches"
+      },
+      {
+        "source_schema": "ml_national",
+        "source_table": "features",
+        "target_schema": "ml_national",
+        "target_table": "clean_matches"
+      },
+      {
+        "source_schema": "public",
+        "source_table": "archived_predictions",
+        "target_schema": "public",
+        "target_table": "matches"
+      },
+      {
+        "source_schema": "public",
+        "source_table": "archived_predictions",
+        "target_schema": "public",
+        "target_table": "predictions"
+      },
+      {
+        "source_schema": "public",
+        "source_table": "matches",
+        "target_schema": "public",
+        "target_table": "competitions"
+      },
+      {
+        "source_schema": "public",
+        "source_table": "matches",
+        "target_schema": "public",
+        "target_table": "teams"
+      },
+      {
+        "source_schema": "public",
+        "source_table": "predictions",
+        "target_schema": "public",
+        "target_table": "matches"
+      },
+      {
+        "source_schema": "public",
+        "source_table": "recommendation_items",
+        "target_schema": "public",
+        "target_table": "predictions"
+      },
+      {
+        "source_schema": "public",
+        "source_table": "recommendation_items",
+        "target_schema": "public",
+        "target_table": "recommendations"
+      }
+    ],
+    "indexes": 47
+  },
+  "rgpd_scope": {
+    "mvp_user_accounts": false,
+    "mvp_payment_data": false,
+    "mvp_personal_data_collection": false,
+    "personal_data_candidates": {
+      "tables": [],
+      "columns": []
+    },
+    "database_url_stored_outside_git": true,
+    "data_categories": [
+      "données football issues de sources documentées",
+      "données préparées et features analytiques",
+      "prédictions et recommandations calculées",
+      "logs techniques sans secret"
+    ]
+  },
+  "errors": [],
+  "warnings": []
+}
